@@ -72,9 +72,9 @@ export default async function LandingPage() {
       {/* Hero Section */}
       <section className="relative h-[85vh] flex items-center justify-center overflow-hidden bg-zinc-900">
         {/* Background Image */}
-        <div className="absolute inset-0 bg-[url('https://image.fonwall.ru/o/qq/front-view-tuning-wallpaper-abt-audi-a6-white-luxury-cars.jpeg?auto=compress&fit=crop&w=2560&h=1440&domain=img1.fonwall.ru')] bg-cover bg-center opacity-40"></div>
+        <div className="absolute inset-0 bg-[url('https://images4.alphacoders.com/988/988087.jpg')] bg-cover bg-center opacity-70"></div>
         {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-white/30 via-transparent to-transparent"></div>
         
         <div className="relative container mx-auto px-6 flex flex-col items-center text-center z-10 pt-20">
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-6 drop-shadow-lg">
@@ -88,7 +88,7 @@ export default async function LandingPage() {
       </section>
 
       {/* Booking Engine */}
-      <BookingEngine />
+      <BookingEngine className="-mt-32" />
 
       {/* About Section */}
       <section id="about" className="pt-32 pb-24 bg-white">
