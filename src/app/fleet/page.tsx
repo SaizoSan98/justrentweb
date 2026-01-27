@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { FleetCard } from "@/components/fleet/FleetCard";
+import { Header } from "@/components/layout/Header";
+import { BookingEngine } from "@/components/booking/BookingEngine";
 
 export const dynamic = 'force-dynamic';
 

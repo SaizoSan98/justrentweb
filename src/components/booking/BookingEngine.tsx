@@ -152,28 +152,13 @@ export function BookingEngine() {
                     </PopoverContent>
                   </Popover>
                 </div>
-                <div className="w-24">
-                   <label className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-2 block">
-                    Time
-                  </label>
-                  <div className="relative">
-                    <select 
-                      value={endTime}
-                      onChange={(e) => setEndTime(e.target.value)}
-                      className="w-full h-14 pl-3 pr-8 bg-white border border-zinc-200 rounded-xl text-lg font-bold text-zinc-900 focus:outline-none focus:ring-2 focus:ring-red-600 appearance-none hover:bg-zinc-50 hover:border-red-600 transition-all cursor-pointer"
-                    >
-                      {Array.from({ length: 24 * 2 }).map((_, i) => {
-                        const h = Math.floor(i / 2)
-                        const m = i % 2 === 0 ? "00" : "30"
-                        const time = `${h.toString().padStart(2, '0')}:${m}`
-                        return <option key={time} value={time}>{time}</option>
-                      })}
-                    </select>
-                    <Clock className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 pointer-events-none" />
-                  </div>
-                </div>
+                
+                <TimePicker 
+                  label="Time"
+                  value={endTime}
+                  onChange={setEndTime}
+                />
               </div>
-
             </div>
 
             {/* Search Button */}
