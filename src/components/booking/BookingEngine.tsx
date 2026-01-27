@@ -33,7 +33,7 @@ export function BookingEngine({
   const router = useRouter()
   const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
     from: initialStartDate || new Date(),
-    to: initialEndDate || addDays(new Date(), 3),
+    to: initialEndDate || addDays(initialStartDate || new Date(), 3),
   })
   
   const [startTime, setStartTime] = React.useState("10:00")
