@@ -1,11 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { Calendar as CalendarIcon, MapPin, Car, ChevronRight, Clock } from "lucide-react"
+import { Calendar as CalendarIcon, MapPin, Car, Clock } from "lucide-react"
 import { addDays, format } from "date-fns"
 import { useRouter } from "next/navigation"
 import { DateRange } from "react-day-picker"
-import { hu } from "date-fns/locale"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -26,7 +25,7 @@ export function BookingEngine() {
   
   const [startTime, setStartTime] = React.useState("10:00")
   const [endTime, setEndTime] = React.useState("10:00")
-  const [location, setLocation] = React.useState("Budapest Repülőtér Terminal 2B")
+  const [location] = React.useState("Budapest Airport (BUD)")
   
   const handleSearch = () => {
     const params = new URLSearchParams()
@@ -40,7 +39,7 @@ export function BookingEngine() {
       {/* Tab selection */}
       <div className="flex gap-2 mb-4">
         <Button variant="secondary" className="bg-zinc-900 text-white hover:bg-zinc-800 rounded-full px-6 gap-2">
-          <Car className="w-4 h-4" /> Autóbérlés
+          <Car className="w-4 h-4" /> Car Rental
         </Button>
       </div>
 
@@ -50,15 +49,15 @@ export function BookingEngine() {
           {/* Location Input */}
           <div>
             <label className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-2 block">
-              Felvétel és leadás
+              Pick-up & Return
             </label>
             <div className="relative group">
               <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 group-hover:text-zinc-900 transition-colors" />
               <input 
                 type="text" 
                 value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 bg-zinc-50 border border-zinc-200 rounded-xl text-lg font-bold text-zinc-900 focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all"
+                readOnly
+                className="w-full pl-12 pr-4 py-4 bg-zinc-50 border border-zinc-200 rounded-xl text-lg font-bold text-zinc-900 focus:outline-none focus:ring-2 focus:ring-red-600 transition-all cursor-not-allowed opacity-80"
               />
             </div>
           </div>
@@ -71,19 +70,19 @@ export function BookingEngine() {
               <div className="flex gap-2">
                 <div className="flex-grow relative">
                   <label className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-2 block">
-                    Felvételi dátum
+                    Pick-up Date
                   </label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant={"outline"}
                         className={cn(
-                          "w-full justify-start text-left font-bold text-lg h-14 bg-white border-zinc-200 hover:bg-zinc-50 hover:border-orange-500 rounded-xl",
+                          "w-full justify-start text-left font-bold text-lg h-14 bg-white border-zinc-200 hover:bg-zinc-50 hover:border-red-600 rounded-xl",
                           !dateRange?.from && "text-muted-foreground"
                         )}
                       >
                         <CalendarIcon className="mr-2 h-5 w-5 text-zinc-400" />
-                        {dateRange?.from ? format(dateRange.from, "MMM d.", { locale: hu }) : <span>Dátum</span>}
+                        {dateRange?.from ? format(dateRange.from, "MMM d.") : <span>Pick Date</span>}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
@@ -101,13 +100,13 @@ export function BookingEngine() {
                 </div>
                 <div className="w-24">
                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-2 block">
-                    Idő
+                    Time
                   </label>
                   <div className="relative">
                     <select 
                       value={startTime}
                       onChange={(e) => setStartTime(e.target.value)}
-                      className="w-full h-14 pl-3 pr-8 bg-white border border-zinc-200 rounded-xl text-lg font-bold text-zinc-900 focus:outline-none focus:ring-2 focus:ring-orange-500 appearance-none hover:bg-zinc-50 hover:border-orange-500 transition-all cursor-pointer"
+                      className="w-full h-14 pl-3 pr-8 bg-white border border-zinc-200 rounded-xl text-lg font-bold text-zinc-900 focus:outline-none focus:ring-2 focus:ring-red-600 appearance-none hover:bg-zinc-50 hover:border-red-600 transition-all cursor-pointer"
                     >
                       {Array.from({ length: 24 * 2 }).map((_, i) => {
                         const h = Math.floor(i / 2)
@@ -125,19 +124,19 @@ export function BookingEngine() {
               <div className="flex gap-2">
                 <div className="flex-grow relative">
                   <label className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-2 block">
-                    Leadás dátuma
+                    Return Date
                   </label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant={"outline"}
                         className={cn(
-                          "w-full justify-start text-left font-bold text-lg h-14 bg-white border-zinc-200 hover:bg-zinc-50 hover:border-orange-500 rounded-xl",
+                          "w-full justify-start text-left font-bold text-lg h-14 bg-white border-zinc-200 hover:bg-zinc-50 hover:border-red-600 rounded-xl",
                           !dateRange?.to && "text-muted-foreground"
                         )}
                       >
                         <CalendarIcon className="mr-2 h-5 w-5 text-zinc-400" />
-                        {dateRange?.to ? format(dateRange.to, "MMM d.", { locale: hu }) : <span>Dátum</span>}
+                        {dateRange?.to ? format(dateRange.to, "MMM d.") : <span>Pick Date</span>}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="end">
@@ -155,13 +154,13 @@ export function BookingEngine() {
                 </div>
                 <div className="w-24">
                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-2 block">
-                    Idő
+                    Time
                   </label>
                   <div className="relative">
                     <select 
                       value={endTime}
                       onChange={(e) => setEndTime(e.target.value)}
-                      className="w-full h-14 pl-3 pr-8 bg-white border border-zinc-200 rounded-xl text-lg font-bold text-zinc-900 focus:outline-none focus:ring-2 focus:ring-orange-500 appearance-none hover:bg-zinc-50 hover:border-orange-500 transition-all cursor-pointer"
+                      className="w-full h-14 pl-3 pr-8 bg-white border border-zinc-200 rounded-xl text-lg font-bold text-zinc-900 focus:outline-none focus:ring-2 focus:ring-red-600 appearance-none hover:bg-zinc-50 hover:border-red-600 transition-all cursor-pointer"
                     >
                       {Array.from({ length: 24 * 2 }).map((_, i) => {
                         const h = Math.floor(i / 2)
@@ -181,9 +180,9 @@ export function BookingEngine() {
             <div className="w-full lg:w-48 pb-0.5">
               <Button 
                 onClick={handleSearch}
-                className="w-full h-14 bg-orange-600 hover:bg-orange-700 text-white font-bold text-lg rounded-xl shadow-lg shadow-orange-600/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full h-14 bg-red-600 hover:bg-red-700 text-white font-bold text-lg rounded-xl shadow-lg shadow-red-600/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
-                Autók mutatása
+                Show Cars
               </Button>
             </div>
           </div>

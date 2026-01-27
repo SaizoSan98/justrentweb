@@ -48,19 +48,19 @@ export default async function LandingPage() {
       <header className="fixed top-0 w-full z-50 border-b border-zinc-200 bg-white/80 backdrop-blur-md">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
           <Link href="/" className="text-2xl font-bold tracking-tighter text-zinc-900">
-            Just<span className="text-orange-600">Rent</span>
+            Just<span className="text-red-600">Rent</span>
           </Link>
           <nav className="hidden md:flex gap-8 text-sm font-medium">
-            <Link href="/fleet" className="text-zinc-600 hover:text-orange-600 transition-colors">Fleet</Link>
-            <Link href="#about" className="text-zinc-600 hover:text-orange-600 transition-colors">About</Link>
-            <Link href="#services" className="text-zinc-600 hover:text-orange-600 transition-colors">Services</Link>
+            <Link href="/" className="text-zinc-600 hover:text-red-600 transition-colors">Home</Link>
+            <Link href="/fleet" className="text-zinc-600 hover:text-red-600 transition-colors">Our Fleet</Link>
+            <Link href="#contact" className="text-zinc-600 hover:text-red-600 transition-colors">Contact</Link>
           </nav>
           <div className="flex items-center gap-4">
             <Button variant="ghost" className="text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 font-medium">
-              Sign In
+              Call Now!
             </Button>
-            <Button className="bg-orange-600 hover:bg-orange-700 text-white rounded-full px-6 shadow-lg shadow-orange-600/20">
-              Book Now
+            <Button className="bg-red-600 hover:bg-red-700 text-white rounded-full px-6 shadow-lg shadow-red-600/20">
+              Book Now!
             </Button>
           </div>
         </div>
@@ -75,11 +75,8 @@ export default async function LandingPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-zinc-50 via-transparent to-transparent"></div>
         
         <div className="relative container mx-auto px-6 flex flex-col items-center text-center z-10 pt-20">
-          <span className="inline-block py-1 px-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-sm font-medium mb-6">
-            Premium Car Rental Service
-          </span>
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-6 drop-shadow-sm">
-            Drive the <span className="text-orange-500">Extraordinary.</span>
+            JUST <span className="text-red-500">RENT</span>
           </h1>
           <p className="text-xl md:text-2xl text-zinc-100 max-w-2xl mb-12 font-light leading-relaxed drop-shadow-sm">
             Experience the thrill of driving the world&#39;s finest automobiles.
@@ -104,7 +101,7 @@ export default async function LandingPage() {
             </p>
             <ul className="space-y-6">
                <li className="flex items-start gap-4">
-                 <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 shrink-0">
+                 <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0">
                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                  </div>
                  <div>
@@ -113,7 +110,7 @@ export default async function LandingPage() {
                  </div>
                </li>
                <li className="flex items-start gap-4">
-                 <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 shrink-0">
+                 <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0">
                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                  </div>
                  <div>
@@ -122,7 +119,7 @@ export default async function LandingPage() {
                  </div>
                </li>
                <li className="flex items-start gap-4">
-                 <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 shrink-0">
+                 <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                  </div>
                  <div>
@@ -225,7 +222,7 @@ export default async function LandingPage() {
                <p className="text-sm text-zinc-400 leading-relaxed">
                  hello@justrent.com<br/>
                  +36 1 234 5678<br/>
-                 1051 Budapest, Bajcsy-Zsilinszky út 12.
+                 Budapest Airport, Terminal 2B
                </p>
              </div>
            </div>
@@ -233,9 +230,9 @@ export default async function LandingPage() {
              <p>&copy; {new Date().getFullYear()} JustRent. All rights reserved.</p>
              <div className="flex gap-4 mt-4 md:mt-0">
                {/* Social Icons placeholders */}
-               <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center hover:bg-orange-600 transition-colors cursor-pointer text-white">FB</div>
-               <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center hover:bg-orange-600 transition-colors cursor-pointer text-white">IG</div>
-               <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center hover:bg-orange-600 transition-colors cursor-pointer text-white">TW</div>
+               <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center hover:bg-red-600 transition-colors cursor-pointer text-white">FB</div>
+               <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center hover:bg-red-600 transition-colors cursor-pointer text-white">IG</div>
+               <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center hover:bg-red-600 transition-colors cursor-pointer text-white">TW</div>
              </div>
            </div>
         </div>

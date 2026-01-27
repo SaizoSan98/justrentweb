@@ -115,10 +115,10 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
       <DialogContent className="max-w-5xl p-0 bg-white gap-0 overflow-hidden border-0">
         <div className="grid md:grid-cols-2 h-full min-h-[600px]">
           {/* Left: Car Visuals */}
-          <div className="bg-zinc-900 p-8 flex flex-col relative text-white">
+          <div className="bg-zinc-50 p-8 flex flex-col relative text-zinc-900 border-r border-zinc-100">
              <div className="mb-8">
                <h2 className="text-4xl font-black uppercase mb-2">{car.make} {car.model}</h2>
-               <p className="text-zinc-400 font-medium">vagy hasonló | {car.category}</p>
+               <p className="text-zinc-500 font-medium">or similar | {car.category}</p>
              </div>
              
              <div className="flex-grow flex items-center justify-center relative my-8">
@@ -132,29 +132,29 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
              <div className="grid grid-cols-4 gap-4 text-center mt-auto">
                 <div className="flex flex-col items-center gap-2">
                    <Users className="w-6 h-6 text-zinc-400" />
-                   <span className="text-sm font-bold">5 ülés</span>
+                   <span className="text-sm font-bold">5 seats</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                    <Briefcase className="w-6 h-6 text-zinc-400" />
-                   <span className="text-sm font-bold">2 táska</span>
+                   <span className="text-sm font-bold">2 bags</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                    <Gauge className="w-6 h-6 text-zinc-400" />
-                   <span className="text-sm font-bold">Kézi</span>
+                   <span className="text-sm font-bold">Manual</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                    <div className="w-6 h-6 flex items-center justify-center border-2 border-zinc-400 rounded text-xs font-bold text-zinc-400">5</div>
-                   <span className="text-sm font-bold">5 ajtó</span>
+                   <span className="text-sm font-bold">5 doors</span>
                 </div>
              </div>
              
-             <div className="mt-8 pt-6 border-t border-zinc-800 flex items-center gap-2 text-zinc-400 text-sm">
-                <Info className="w-4 h-4" /> A sofőr minimális életkora: 21 év
+             <div className="mt-8 pt-6 border-t border-zinc-200 flex items-center gap-2 text-zinc-500 text-sm">
+                <Info className="w-4 h-4" /> Minimum driver age: 21
              </div>
           </div>
 
           {/* Right: Booking Options */}
-          <div className="p-8 flex flex-col bg-zinc-50 h-full overflow-y-auto">
+          <div className="p-8 flex flex-col bg-white h-full overflow-y-auto">
              <div className="flex justify-between items-center mb-6">
                <h3 className="text-lg font-bold text-zinc-900">Foglalási lehetőségek</h3>
                {/* Close button is handled by DialogPrimitive.Close in DialogContent but we can add visual header if needed */}
@@ -164,7 +164,7 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
              <div className="space-y-4 mb-8">
                 <div 
                   className={cn(
-                    "border-2 rounded-xl p-4 cursor-pointer transition-all bg-white hover:border-orange-200",
+                    "border-2 rounded-xl p-4 cursor-pointer transition-all bg-white hover:border-red-200",
                     selectedRate === "best" ? "border-black ring-1 ring-black/5" : "border-zinc-200"
                   )}
                   onClick={() => setSelectedRate("best")}
@@ -191,7 +191,7 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
 
                 <div 
                   className={cn(
-                    "border-2 rounded-xl p-4 cursor-pointer transition-all bg-white hover:border-orange-200",
+                    "border-2 rounded-xl p-4 cursor-pointer transition-all bg-white hover:border-red-200",
                     selectedRate === "flexible" ? "border-black ring-1 ring-black/5" : "border-zinc-200"
                   )}
                   onClick={() => setSelectedRate("flexible")}
@@ -210,7 +210,7 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
                          <div className="flex justify-between items-center mb-1">
                             <h4 className="font-bold text-zinc-900">Maradjon rugalmas</h4>
                             <div className="flex items-center gap-2">
-                              <span className="text-xs font-bold bg-orange-600 text-white px-2 py-1 rounded">Népszerű</span>
+                              <span className="text-xs font-bold bg-red-600 text-white px-2 py-1 rounded">Népszerű</span>
                               <span className="text-xs font-bold text-zinc-900">+{flexibleSurcharge.toLocaleString()} Ft / nap</span>
                             </div>
                          </div>
@@ -226,7 +226,7 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
              <div className="space-y-4 mb-8">
                 <div 
                   className={cn(
-                    "border-2 rounded-xl p-4 cursor-pointer transition-all bg-white hover:border-orange-200",
+                    "border-2 rounded-xl p-4 cursor-pointer transition-all bg-white hover:border-red-200",
                     selectedMileage === "limited" ? "border-black ring-1 ring-black/5" : "border-zinc-200"
                   )}
                   onClick={() => setSelectedMileage("limited")}
@@ -253,7 +253,7 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
 
                 <div 
                   className={cn(
-                    "border-2 rounded-xl p-4 cursor-pointer transition-all bg-white hover:border-orange-200",
+                    "border-2 rounded-xl p-4 cursor-pointer transition-all bg-white hover:border-red-200",
                     selectedMileage === "unlimited" ? "border-black ring-1 ring-black/5" : "border-zinc-200"
                   )}
                   onClick={() => setSelectedMileage("unlimited")}
@@ -290,7 +290,7 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
                    {/* Price Breakdown Trigger - Could be another Dialog */}
                    <Dialog>
                      <DialogTrigger asChild>
-                       <button className="text-sm font-bold underline text-zinc-900 hover:text-orange-600">Ár részletezése</button>
+                       <button className="text-sm font-bold underline text-zinc-900 hover:text-red-600">Ár részletezése</button>
                      </DialogTrigger>
                      <DialogContent className="max-w-md bg-white p-6">
                         <DialogHeader>
@@ -332,7 +332,7 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
                    </Dialog>
                 </div>
                 
-                <Button className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-6 rounded-xl shadow-lg shadow-orange-600/20 text-lg uppercase tracking-wide">
+                <Button className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-6 rounded-xl shadow-lg shadow-red-600/20 text-lg uppercase tracking-wide">
                    Következő
                 </Button>
              </div>
