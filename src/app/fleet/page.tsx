@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Car } from "@prisma/client";
+import { Users, Briefcase, Fuel, Snowflake, Gauge, Info } from "lucide-react";
 
 export const dynamic = 'force-dynamic';
 
@@ -12,6 +13,16 @@ export default async function FleetPage({
 }) {
   const params = await searchParams;
   const category = typeof params.category === 'string' ? params.category : undefined;
+  
+  // Date parsing and calculation
+  const startDateStr = typeof params.startDate === 'string' ? params.startDate : undefined;
+  const endDateStr = typeof params.endDate === 'string' ? params.endDate : undefined;
+  
+  const startDate = startDateStr ? new Date(startDateStr) : new Date();
+  const endDate = endDateStr ? new Date(endDateStr) : new Date(Date.now() + 3 * 24 * 60 * 60 * 1000); // Default 3 days
+  
+  const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1; // Minimum 1 day
 
   const whereClause: any = {
     status: 'AVAILABLE',
@@ -29,44 +40,44 @@ export default async function FleetPage({
   });
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900">
+    <div className="min-h-screen bg-zinc-50 text-zinc-900 font-sans">
       {/* Header */}
-      <header className="bg-white border-b border-zinc-200 sticky top-0 z-50">
-        <div className="container mx-auto px-4 h-20 flex items-center justify-between">
+      <header className="bg-white border-b border-zinc-200 sticky top-0 z-50 shadow-sm">
+        <div className="container mx-auto px-6 h-20 flex items-center justify-between">
           <Link href="/" className="text-2xl font-bold tracking-tighter">
-            Just<span className="text-orange-600">Rent</span>
+            Just<span className="text-teal-500">Rent</span>
           </Link>
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-            <Link href="/" className="text-zinc-600 hover:text-orange-600 transition-colors">Home</Link>
-            <Link href="/fleet" className="text-orange-600">Fleet</Link>
-            <Link href="/about" className="text-zinc-600 hover:text-orange-600 transition-colors">About</Link>
-            <Link href="/contact" className="text-zinc-600 hover:text-orange-600 transition-colors">Contact</Link>
+            <Link href="/" className="text-zinc-600 hover:text-teal-500 transition-colors">Home</Link>
+            <Link href="/fleet" className="text-teal-500">Fleet</Link>
+            <Link href="/about" className="text-zinc-600 hover:text-teal-500 transition-colors">About</Link>
+            <Link href="/contact" className="text-zinc-600 hover:text-teal-500 transition-colors">Contact</Link>
           </nav>
-          <Button className="bg-orange-600 hover:bg-orange-700 text-white rounded-full px-6">
+          <Button className="bg-teal-500 hover:bg-teal-600 text-white rounded-full px-6 font-semibold shadow-md shadow-teal-500/20">
             Sign In
           </Button>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-12">
-        <div className="mb-12">
-          <h1 className="text-4xl font-bold mb-4 text-zinc-900">Our Premium Fleet</h1>
-          <p className="text-zinc-600 text-lg max-w-2xl">
-            Choose from our exclusive collection of high-end vehicles. Whether you need a luxury SUV for a family trip or a sportscar for a weekend getaway, we have the perfect car for you.
+      <main className="container mx-auto px-6 py-12">
+        <div className="mb-12 text-center">
+          <h1 className="text-4xl font-extrabold mb-4 text-zinc-900 tracking-tight">Our Premium Fleet</h1>
+          <p className="text-zinc-500 text-lg max-w-2xl mx-auto">
+            Showing prices for <span className="font-bold text-teal-600">{diffDays} days</span> rental period.
           </p>
         </div>
 
-        {/* Filters (Simple placeholder for now) */}
-        <div className="flex gap-4 mb-8 overflow-x-auto pb-4">
+        {/* Filters */}
+        <div className="flex justify-center gap-3 mb-12 overflow-x-auto pb-4">
           {['All Categories', 'SUV', 'Sedan', 'Sports', 'Luxury'].map((cat) => (
             <Link 
               key={cat} 
-              href={cat === 'All Categories' ? '/fleet' : `/fleet?category=${cat}`}
-              className={`px-4 py-2 rounded-full border text-sm font-medium whitespace-nowrap transition-all ${
+              href={cat === 'All Categories' ? `/fleet?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}` : `/fleet?category=${cat}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`}
+              className={`px-6 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all shadow-sm ${
                 (category === cat || (!category && cat === 'All Categories'))
-                  ? 'bg-zinc-900 text-white border-zinc-900' 
-                  : 'bg-white text-zinc-600 border-zinc-200 hover:border-orange-500 hover:text-orange-500'
+                  ? 'bg-teal-500 text-white shadow-teal-500/30 transform scale-105' 
+                  : 'bg-white text-zinc-500 border border-zinc-200 hover:border-teal-500 hover:text-teal-500'
               }`}
             >
               {cat}
@@ -76,61 +87,92 @@ export default async function FleetPage({
 
         {/* Car Grid */}
         {cars.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl border border-zinc-100 shadow-sm">
-            <h3 className="text-xl font-semibold text-zinc-900 mb-2">No cars available</h3>
+          <div className="text-center py-20 bg-white rounded-3xl border border-zinc-100 shadow-sm max-w-lg mx-auto">
+            <h3 className="text-xl font-bold text-zinc-900 mb-2">No cars available</h3>
             <p className="text-zinc-500">Try adjusting your filters or check back later.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {cars.map((car: Car) => (
-              <div key={car.id} className="group bg-white border border-zinc-200 rounded-2xl overflow-hidden hover:shadow-xl hover:border-orange-200 transition-all duration-300">
-                <div className="h-56 bg-zinc-100 relative overflow-hidden">
-                  {car.imageUrl ? (
-                    <img 
-                      src={car.imageUrl} 
-                      alt={`${car.make} ${car.model}`} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-zinc-400">
-                      No Image Available
-                    </div>
-                  )}
-                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-zinc-900 shadow-sm border border-zinc-100">
-                    {car.category}
-                  </div>
-                </div>
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-xl font-bold text-zinc-900">{car.make} {car.model}</h3>
-                      <p className="text-sm text-zinc-500">{car.year} • {car.licensePlate}</p>
-                    </div>
-                  </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {cars.map((car: Car) => {
+              const totalPrice = Number(car.pricePerDay) * diffDays;
+              
+              return (
+                <div key={car.id} className="group bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 relative border border-zinc-100 flex flex-col">
                   
-                  <div className="flex items-center gap-4 mb-6 text-sm text-zinc-500">
-                    <div className="flex items-center gap-1">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                      Automatic
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                      5 Seats
+                  {/* Info Badge */}
+                  <div className="absolute top-0 left-0 z-20">
+                    <div className="bg-teal-500 text-white w-12 h-12 flex items-center justify-center rounded-br-3xl shadow-md">
+                      <Info className="w-6 h-6" />
                     </div>
                   </div>
 
-                  <div className="flex justify-between items-center pt-4 border-t border-zinc-100">
-                    <div>
-                      <p className="text-zinc-400 text-xs uppercase tracking-wide font-semibold">Price per day</p>
-                      <p className="text-orange-600 font-bold text-2xl">${Number(car.pricePerDay)}</p>
+                  {/* Car Category Badge (Top Right - Optional/Stylistic) */}
+                  <div className="absolute top-4 right-4 z-10">
+                    <span className="text-xs font-bold text-teal-500 uppercase tracking-widest">{car.category}</span>
+                  </div>
+
+                  {/* Image Area */}
+                  <div className="h-48 bg-gradient-to-b from-zinc-50 to-white relative flex items-center justify-center p-6 mt-6">
+                    {car.imageUrl ? (
+                      <img 
+                        src={car.imageUrl} 
+                        alt={`${car.make} ${car.model}`} 
+                        className="w-full h-full object-contain drop-shadow-xl group-hover:scale-110 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="text-zinc-300 font-bold text-2xl">NO IMAGE</div>
+                    )}
+                  </div>
+
+                  {/* Content Area */}
+                  <div className="p-6 pt-2 flex flex-col flex-grow text-center">
+                    <h3 className="text-xl font-black text-zinc-900 uppercase tracking-tight mb-1">
+                      {car.make} {car.model}
+                    </h3>
+                    <p className="text-zinc-400 text-sm font-medium mb-6">or similar</p>
+
+                    {/* Features Grid */}
+                    <div className="grid grid-cols-3 gap-y-6 gap-x-2 mb-8 px-2">
+                      <div className="flex flex-col items-center gap-1">
+                        <Users className="w-5 h-5 text-teal-500" />
+                        <span className="text-xs text-zinc-500 font-medium">5</span>
+                      </div>
+                      <div className="flex flex-col items-center gap-1">
+                        <Briefcase className="w-5 h-5 text-teal-500" />
+                        <span className="text-xs text-zinc-500 font-medium">3</span>
+                      </div>
+                      <div className="flex flex-col items-center gap-1">
+                        <div className="w-5 h-5 flex items-center justify-center border-2 border-teal-500 rounded text-[10px] font-bold text-teal-500">5</div>
+                        <span className="text-xs text-zinc-500 font-medium">Doors</span>
+                      </div>
+                      <div className="flex flex-col items-center gap-1">
+                        <Snowflake className="w-5 h-5 text-teal-500" />
+                        <span className="text-xs text-zinc-500 font-medium">AC</span>
+                      </div>
+                      <div className="flex flex-col items-center gap-1">
+                        <Gauge className="w-5 h-5 text-teal-500" />
+                        <span className="text-xs text-zinc-500 font-medium">Auto</span>
+                      </div>
+                      <div className="flex flex-col items-center gap-1">
+                        <Fuel className="w-5 h-5 text-teal-500" />
+                        <span className="text-xs text-zinc-500 font-medium">Petrol</span>
+                      </div>
                     </div>
-                    <Button className="bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg px-6">
-                      Rent Now
-                    </Button>
+
+                    {/* Price & Action */}
+                    <div className="mt-auto">
+                      <div className="mb-4">
+                        <span className="text-2xl font-black text-teal-600">{totalPrice.toLocaleString()} HUF</span>
+                        <span className="text-xs text-zinc-400 font-medium block uppercase tracking-wide">for {diffDays} days</span>
+                      </div>
+                      <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-6 rounded-2xl shadow-lg shadow-teal-500/30 hover:shadow-teal-500/40 transition-all transform active:scale-95 uppercase tracking-wider text-base">
+                        FOGLALÁS
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </main>
