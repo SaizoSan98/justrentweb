@@ -22,15 +22,18 @@ interface BookingEngineProps {
   initialEndDate?: Date
   className?: string
   showLabel?: boolean
+  compact?: boolean
 }
 
 export function BookingEngine({ 
   initialStartDate, 
   initialEndDate,
   className,
-  showLabel = true
+  showLabel = true,
+  compact = false
 }: BookingEngineProps) {
   const router = useRouter()
+  const [isExpanded, setIsExpanded] = React.useState(!compact)
   const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
     from: initialStartDate || new Date(),
     to: initialEndDate,
