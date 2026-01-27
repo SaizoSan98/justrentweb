@@ -10,7 +10,20 @@ export default async function LandingPage() {
     take: 3,
     where: { status: 'AVAILABLE' },
     orderBy: { pricePerDay: 'asc' }
-  });
+  }).then((items: any[]) => items.map((car: any) => {
+    // FORCE OVERRIDE IMAGES as requested by user
+    // Ignoring DB imageUrl to ensure these specific images are used
+    if (car.make === 'Tesla' && car.model === 'Model 3') {
+      return { ...car, imageUrl: "https://imgd.aeplcdn.com/1056x594/n/cw/ec/175993/kushaq-exterior-right-front-three-quarter-2.png?isig=0&q=80&wm=1" };
+    }
+    if (car.make === 'BMW' && car.model === 'X5') {
+      return { ...car, imageUrl: "https://imgd.aeplcdn.com/370x208/n/cw/ec/102663/baleno-exterior-right-front-three-quarter-69.png?isig=0&q=80" };
+    }
+    if (car.make === 'Mercedes-Benz' && car.model === 'C-Class') {
+      return { ...car, imageUrl: "https://imgd.aeplcdn.com/370x208/n/cw/ec/51909/a4-exterior-right-front-three-quarter-80.png?isig=0&q=80" };
+    }
+    return car;
+  }));
 
   type CarItem = {
     id: string;
@@ -168,7 +181,7 @@ export default async function LandingPage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {cars.map((car: any) => (
+            {cars.map((car: CarItem) => (
               <div key={car.id} className="group bg-white border border-zinc-200 rounded-2xl overflow-hidden hover:shadow-xl hover:border-red-200 transition-all duration-300">
                 <div className="h-56 bg-zinc-50 relative overflow-hidden flex items-center justify-center p-4">
                    <img 

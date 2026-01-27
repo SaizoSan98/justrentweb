@@ -101,15 +101,29 @@ export default async function FleetPage({
     orderBy: {
       pricePerDay: 'asc',
     },
-  }).then((items: any[]) => items.map((car: any) => ({
-    ...car,
-    pricePerDay: Number(car.pricePerDay),
-    pricingTiers: car.pricingTiers.map((tier: any) => ({
-      ...tier,
-      pricePerDay: Number(tier.pricePerDay),
-      deposit: Number(tier.deposit)
-    }))
-  })));
+  }).then((items: any[]) => items.map((car: any) => {
+    // FORCE OVERRIDE IMAGES as requested by user
+    let forcedImage = car.imageUrl;
+    
+    if (car.make === 'Tesla' && car.model === 'Model 3') {
+      forcedImage = "https://imgd.aeplcdn.com/1056x594/n/cw/ec/175993/kushaq-exterior-right-front-three-quarter-2.png?isig=0&q=80&wm=1";
+    } else if (car.make === 'BMW' && car.model === 'X5') {
+      forcedImage = "https://imgd.aeplcdn.com/370x208/n/cw/ec/102663/baleno-exterior-right-front-three-quarter-69.png?isig=0&q=80";
+    } else if (car.make === 'Mercedes-Benz' && car.model === 'C-Class') {
+      forcedImage = "https://imgd.aeplcdn.com/370x208/n/cw/ec/51909/a4-exterior-right-front-three-quarter-80.png?isig=0&q=80";
+    }
+
+    return {
+      ...car,
+      imageUrl: forcedImage,
+      pricePerDay: Number(car.pricePerDay),
+      pricingTiers: car.pricingTiers.map((tier: any) => ({
+        ...tier,
+        pricePerDay: Number(tier.pricePerDay),
+        deposit: Number(tier.deposit)
+      }))
+    };
+  }));
 
   return (
     <div className="min-h-screen bg-white text-zinc-900 font-sans">
