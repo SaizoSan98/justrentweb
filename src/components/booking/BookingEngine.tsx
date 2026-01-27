@@ -34,10 +34,20 @@ export function BookingEngine({
 }: BookingEngineProps) {
   const router = useRouter()
   const [isExpanded, setIsExpanded] = React.useState(!compact)
-  const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
+  const [dateRange, setDateRange] = React.useState<DateRange | undefined>(() => ({
     from: initialStartDate || new Date(),
     to: initialEndDate,
-  })
+  }))
+  
+  // Update state when props change (crucial for navigation from home to fleet)
+  React.useEffect(() => {
+    if (initialStartDate || initialEndDate) {
+      setDateRange({
+        from: initialStartDate || new Date(),
+        to: initialEndDate
+      })
+    }
+  }, [initialStartDate, initialEndDate])
   
   const [startTime, setStartTime] = React.useState("10:00")
   const [endTime, setEndTime] = React.useState("10:00")

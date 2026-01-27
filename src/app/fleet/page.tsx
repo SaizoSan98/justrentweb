@@ -55,14 +55,21 @@ export default async function FleetPage({
   const startDateStr = typeof params.startDate === 'string' ? params.startDate : undefined;
   const endDateStr = typeof params.endDate === 'string' ? params.endDate : undefined;
   
+  // If no params provided, default to today ONLY (no 3 days default)
   const startDate = startDateStr ? new Date(startDateStr) : new Date();
-  const endDate = endDateStr ? new Date(endDateStr) : new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000);
+  const endDate = endDateStr ? new Date(endDateStr) : undefined;
   
   // Fix: Ensure we compare start of days to avoid time nuances if we want pure calendar days
   const s = new Date(startDate); s.setHours(0,0,0,0);
-  const e = new Date(endDate); e.setHours(0,0,0,0);
+  // If endDate is undefined, we assume 1 day for display/calculation purposes until user picks a range
+  const e = endDate ? new Date(endDate) : new Date(startDate); 
+  if (endDate) e.setHours(0,0,0,0);
+  
   const diffTime = e.getTime() - s.getTime();
   const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+  
+  // For DB query, if no endDate is set, we just check availability for startDate (1 day)
+  const queryEndDate = endDate || new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
 
   const whereClause: { status: 'AVAILABLE'; category?: string } = {
     status: 'AVAILABLE',
@@ -81,7 +88,7 @@ export default async function FleetPage({
             some: {
               status: 'AVAILABLE',
               startDate: { lte: startDate },
-              endDate: { gte: endDate },
+              endDate: { gte: queryEndDate },
             },
           },
         },
@@ -91,7 +98,7 @@ export default async function FleetPage({
               some: {
                 status: { in: ['MAINTENANCE', 'RENTED', 'OUT_OF_SERVICE'] },
                 AND: [
-                  { startDate: { lt: endDate } },
+                  { startDate: { lt: queryEndDate } },
                   { endDate: { gt: startDate } },
                 ],
               },
@@ -136,19 +143,20 @@ export default async function FleetPage({
       <Header />
 
       {/* Booking Engine */}
-      <div className="pt-24 pb-8 bg-zinc-50/50">
+      <div className="pt-32 pb-8 bg-zinc-50/50">
         <BookingEngine 
+          key={`${startDate.toISOString()}-${endDate?.toISOString() ?? 'undefined'}`}
           initialStartDate={startDate}
           initialEndDate={endDate}
-          className="w-full max-w-6xl mx-auto px-4"
+          className="w-full max-w-6xl mx-auto px-4 mt-0 shadow-none border border-zinc-200"
           showLabel={false}
+          compact={true}
         />
       </div>
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-12">
         <div className="mb-12 text-center">
-          <h1 className="text-4xl font-extrabold mb-4 text-zinc-900 tracking-tight">Our Premium Fleet</h1>
           <div className="inline-flex items-center gap-2 bg-zinc-100 px-4 py-2 rounded-full">
             <span className="text-zinc-500 font-medium">Selected Duration:</span>
             <span className="font-bold text-red-600">{diffDays} {diffDays === 1 ? 'Day' : 'Days'}</span>
@@ -160,7 +168,7 @@ export default async function FleetPage({
           {['All Categories', 'SUV', 'Sedan', 'Sports', 'Luxury'].map((cat) => (
             <Link 
               key={cat} 
-              href={cat === 'All Categories' ? `/fleet?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}` : `/fleet?category=${cat}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`}
+              href={cat === 'All Categories' ? `/fleet?startDate=${startDate.toISOString()}&endDate=${queryEndDate.toISOString()}` : `/fleet?category=${cat}&startDate=${startDate.toISOString()}&endDate=${queryEndDate.toISOString()}`}
               className={`px-6 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all shadow-sm ${
                 (category === cat || (!category && cat === 'All Categories'))
                   ? 'bg-red-600 text-white shadow-red-600/30 transform scale-105' 
