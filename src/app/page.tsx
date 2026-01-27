@@ -23,24 +23,24 @@ export default async function LandingPage() {
     status: string;
   };
   function getStockImageUrl(make: string, model: string): string {
-    const key = `${make} ${model}`.toLowerCase();
-    const map: Record<string, string> = {
-      "bmw x5": "https://www.pngmart.com/files/22/BMW-X5-PNG-Clipart.png",
-      "mercedes-benz c-class": "https://www.pngmart.com/files/22/Mercedes-Benz-C-Class-PNG-Isolated-Pic.png",
-      "audi a5": "https://www.pngmart.com/files/22/Audi-A5-PNG-File.png",
-      "tesla model 3": "https://www.pngmart.com/files/22/Tesla-Model-3-PNG-Picture.png",
-      "porsche 911 carrera": "https://www.pngmart.com/files/22/Porsche-911-PNG-Clipart.png",
-    };
-    if (map[key]) return map[key];
-    const brandFallback: Record<string, string> = {
-      "bmw": "https://www.pngmart.com/files/22/BMW-X5-PNG-Clipart.png",
-      "mercedes-benz": "https://www.pngmart.com/files/22/Mercedes-Benz-C-Class-PNG-Isolated-Pic.png",
-      "audi": "https://www.pngmart.com/files/22/Audi-A5-PNG-File.png",
-      "tesla": "https://www.pngmart.com/files/22/Tesla-Model-3-PNG-Picture.png",
-      "porsche": "https://www.pngmart.com/files/22/Porsche-911-PNG-Clipart.png",
-    };
-    const brand = make.toLowerCase();
-    return brandFallback[brand] ?? "https://www.pngmart.com/files/22/Tesla-Model-3-PNG-Picture.png";
+    const pool = [
+      "https://www.pngmart.com/files/22/BMW-X5-PNG-Clipart.png",
+      "https://www.pngmart.com/files/22/Mercedes-Benz-C-Class-PNG-Isolated-Pic.png",
+      "https://www.pngmart.com/files/22/Audi-A5-PNG-File.png",
+      "https://www.pngmart.com/files/22/Tesla-Model-3-PNG-Picture.png",
+      "https://www.pngmart.com/files/22/Porsche-911-PNG-Clipart.png",
+      "https://www.pngmart.com/files/22/Chevrolet-Camaro-PNG-Image.png",
+      "https://www.pngmart.com/files/22/Range-Rover-PNG-Clipart.png"
+    ];
+    // Use a deterministic hash based on make+model to pick an image from the pool
+    // This ensures the same car always gets the same random image
+    const str = `${make}${model}`;
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash) % pool.length;
+    return pool[index];
   }
   return (
     <div className="flex flex-col min-h-screen bg-white text-zinc-900 font-sans">
@@ -69,7 +69,7 @@ export default async function LandingPage() {
       {/* Hero Section */}
       <section className="relative h-[85vh] flex items-center justify-center overflow-hidden bg-zinc-900">
         {/* Background Image */}
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center opacity-40"></div>
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center opacity-40"></div>
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
         

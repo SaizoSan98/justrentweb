@@ -154,7 +154,7 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
           {/* Right: Booking Options */}
           <div className="p-8 flex flex-col bg-white h-full overflow-y-auto">
              <div className="flex justify-between items-center mb-6">
-               <h3 className="text-lg font-bold text-zinc-900">Foglalási lehetőségek</h3>
+               <h3 className="text-lg font-bold text-zinc-900">Booking Options</h3>
                {/* Close button is handled by DialogPrimitive.Close in DialogContent but we can add visual header if needed */}
              </div>
 
@@ -179,10 +179,10 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
                       </div>
                       <div className="flex-grow">
                          <div className="flex justify-between items-center mb-1">
-                            <h4 className="font-bold text-zinc-900">Legjobb ár</h4>
-                            <span className="text-xs font-bold bg-zinc-100 px-2 py-1 rounded">Tartalmaz</span>
+                            <h4 className="font-bold text-zinc-900">Best Price</h4>
+                            <span className="text-xs font-bold bg-zinc-100 px-2 py-1 rounded">Included</span>
                          </div>
-                         <p className="text-xs text-zinc-500">Fizess most, lemondható és módosítható díj ellenében</p>
+                         <p className="text-xs text-zinc-500">Pay now, cancellable and modifiable for a fee</p>
                       </div>
                    </div>
                 </div>
@@ -206,19 +206,19 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
                       </div>
                       <div className="flex-grow">
                          <div className="flex justify-between items-center mb-1">
-                            <h4 className="font-bold text-zinc-900">Maradjon rugalmas</h4>
+                            <h4 className="font-bold text-zinc-900">Stay Flexible</h4>
                             <div className="flex items-center gap-2">
-                              <span className="text-xs font-bold bg-red-600 text-white px-2 py-1 rounded">Népszerű</span>
-                              <span className="text-xs font-bold text-zinc-900">+{flexibleSurcharge.toLocaleString()} Ft / nap</span>
+                              <span className="text-xs font-bold bg-red-600 text-white px-2 py-1 rounded">Popular</span>
+                              <span className="text-xs font-bold text-zinc-900">+{flexibleSurcharge.toLocaleString()} Ft / day</span>
                             </div>
                          </div>
-                         <p className="text-xs text-zinc-500">Fizessen átvételkor, ingyenes lemondás és újrafoglalás bármikor az átvétel időpontja előtt</p>
+                         <p className="text-xs text-zinc-500">Pay at pick-up, free cancellation and rebooking anytime before pick-up</p>
                       </div>
                    </div>
                 </div>
              </div>
 
-             <h3 className="text-lg font-bold text-zinc-900 mb-4">Futásteljesítményt</h3>
+             <h3 className="text-lg font-bold text-zinc-900 mb-4">Mileage</h3>
 
              {/* Mileage Selection */}
              <div className="space-y-4 mb-8">
@@ -242,9 +242,9 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
                       <div className="flex-grow">
                          <div className="flex justify-between items-center mb-1">
                             <h4 className="font-bold text-zinc-900">1200 km</h4>
-                            <span className="text-xs font-bold bg-zinc-100 px-2 py-1 rounded">Tartalmaz</span>
+                            <span className="text-xs font-bold bg-zinc-100 px-2 py-1 rounded">Included</span>
                          </div>
-                         <p className="text-xs text-zinc-500">+194,74 Ft / minden megtett plusz km</p>
+                         <p className="text-xs text-zinc-500">+194.74 Ft / extra km</p>
                       </div>
                    </div>
                 </div>
@@ -268,10 +268,10 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
                       </div>
                       <div className="flex-grow">
                          <div className="flex justify-between items-center mb-1">
-                            <h4 className="font-bold text-zinc-900">Korlátlan km</h4>
-                            <span className="text-xs font-bold text-zinc-900">+{Math.round(unlimitedMileageSurcharge).toLocaleString()} Ft naponta</span>
+                            <h4 className="font-bold text-zinc-900">Unlimited km</h4>
+                            <span className="text-xs font-bold text-zinc-900">+{Math.round(unlimitedMileageSurcharge).toLocaleString()} Ft per day</span>
                          </div>
-                         <p className="text-xs text-zinc-500">Az összes kilométer benne van az árban</p>
+                         <p className="text-xs text-zinc-500">All kilometers included in the price</p>
                       </div>
                    </div>
                 </div>
@@ -281,48 +281,48 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
              <div className="mt-auto pt-6 border-t border-zinc-200">
                 <div className="flex justify-between items-end mb-4">
                    <div>
-                      <div className="text-3xl font-black text-zinc-900">{Math.round(finalPricePerDay).toLocaleString()} Ft <span className="text-lg font-medium text-zinc-500">/nap</span></div>
-                      <div className="text-sm text-zinc-500">{finalTotalPrice.toLocaleString()} Ft Összesen</div>
+                      <div className="text-3xl font-black text-zinc-900">{Math.round(finalPricePerDay).toLocaleString()} Ft <span className="text-lg font-medium text-zinc-500">/day</span></div>
+                      <div className="text-sm text-zinc-500">{finalTotalPrice.toLocaleString()} Ft Total</div>
                    </div>
                    
                    {/* Price Breakdown Trigger - Could be another Dialog */}
                    <Dialog>
                      <DialogTrigger asChild>
-                       <button className="text-sm font-bold underline text-zinc-900 hover:text-red-600">Ár részletezése</button>
+                       <button className="text-sm font-bold underline text-zinc-900 hover:text-red-600">Price Breakdown</button>
                      </DialogTrigger>
                      <DialogContent className="max-w-md bg-white p-6">
                         <DialogHeader>
-                          <DialogTitle className="text-2xl font-black uppercase mb-6">Ár Részletezése</DialogTitle>
+                          <DialogTitle className="text-2xl font-black uppercase mb-6">Price Breakdown</DialogTitle>
                         </DialogHeader>
                         <div className="space-y-6">
                            <div>
-                              <h4 className="font-bold mb-2">Bérleti díjak</h4>
+                              <h4 className="font-bold mb-2">Rental Fees</h4>
                               <div className="flex justify-between text-sm">
-                                 <span>{diffDays} Alapdíj x {Math.round(finalPricePerDay).toLocaleString()} Ft</span>
+                                 <span>{diffDays} Base rate x {Math.round(finalPricePerDay).toLocaleString()} Ft</span>
                                  <span className="font-bold">{finalTotalPrice.toLocaleString()} Ft</span>
                               </div>
                            </div>
                            
                            <div>
-                              <h4 className="font-bold mb-2">Adók és díjak</h4>
+                              <h4 className="font-bold mb-2">Taxes & Fees</h4>
                               <div className="space-y-2 text-sm text-zinc-600">
                                  <div className="flex justify-between">
-                                    <span>Regisztrációs díj</span>
-                                    <span>34 916 Ft</span>
+                                    <span>Registration Fee</span>
+                                    <span>34,916 Ft</span>
                                  </div>
                                  <div className="flex justify-between">
-                                    <span>Szerződéskötési díj</span>
-                                    <span>1 115 Ft</span>
+                                    <span>Contract Fee</span>
+                                    <span>1,115 Ft</span>
                                  </div>
                                  <div className="flex justify-between">
-                                    <span>Winterization fee</span>
-                                    <span>48 494 Ft</span>
+                                    <span>Winterization Fee</span>
+                                    <span>48,494 Ft</span>
                                  </div>
                               </div>
                            </div>
 
                            <div className="pt-4 border-t border-zinc-200 flex justify-between items-center">
-                              <span className="font-bold text-lg">Összesen (adóval együtt)</span>
+                              <span className="font-bold text-lg">Total (incl. tax)</span>
                               <span className="font-black text-2xl">{(finalTotalPrice + 34916 + 1115 + 48494).toLocaleString()} Ft</span>
                            </div>
                         </div>
@@ -331,7 +331,7 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
                 </div>
                 
                 <Button className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-6 rounded-xl shadow-lg shadow-red-600/20 text-lg uppercase tracking-wide">
-                   Következő
+                   Next
                 </Button>
              </div>
           </div>
