@@ -24,13 +24,10 @@ export default async function LandingPage() {
   };
   function getStockImageUrl(make: string, model: string): string {
     const pool = [
-      "https://www.pngmart.com/files/22/BMW-X5-PNG-Clipart.png",
-      "https://www.pngmart.com/files/22/Mercedes-Benz-C-Class-PNG-Isolated-Pic.png",
-      "https://www.pngmart.com/files/22/Audi-A5-PNG-File.png",
-      "https://www.pngmart.com/files/22/Tesla-Model-3-PNG-Picture.png",
-      "https://www.pngmart.com/files/22/Porsche-911-PNG-Clipart.png",
-      "https://www.pngmart.com/files/22/Chevrolet-Camaro-PNG-Image.png",
-      "https://www.pngmart.com/files/22/Range-Rover-PNG-Clipart.png"
+      "https://imgd.aeplcdn.com/1056x594/n/cw/ec/175993/kushaq-exterior-right-front-three-quarter-2.png?isig=0&q=80&wm=1",
+      "https://imgd.aeplcdn.com/370x208/n/cw/ec/102663/baleno-exterior-right-front-three-quarter-69.png?isig=0&q=80",
+      "https://imgd.aeplcdn.com/370x208/n/cw/ec/51909/a4-exterior-right-front-three-quarter-80.png?isig=0&q=80",
+      "https://imgd.aeplcdn.com/370x208/n/cw/ec/39472/a6-exterior-right-front-three-quarter-3.png?isig=0&q=80"
     ];
     // Use a deterministic hash based on make+model to pick an image from the pool
     // This ensures the same car always gets the same random image
