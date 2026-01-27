@@ -25,10 +25,10 @@ A projekt technikai alapjainak lerakása és a vizuális keretrendszer kialakít
 - [x] **Landing Page:** Hero szekció, "About", "Fleet" teaser, Footer.
 - [x] **UI Komponensek:** Booking Engine (Kereső) és Admin Calendar (Naptár) vizuális vázlata.
 
-### 🚧 2. Fázis: Adatbázis és Adminisztráció (KÖVETKEZŐ LÉPÉS)
+### 🚧 2. Fázis: Adatbázis és Adminisztráció (FOLYAMATBAN)
 Az alkalmazás "agyának" beüzemelése. Valós adatok kezelése a statikus mockupok helyett.
-- [ ] **Adatbázis Kapcsolat:** Neon.tech PostgreSQL összekötése, Prisma migrációk lefuttatása.
-- [ ] **Seed Adatok:** Kezdeti autók és teszt felhasználók feltöltése az adatbázisba.
+- [x] **Adatbázis Kapcsolat:** Neon.tech PostgreSQL összekötése, Prisma migrációk lefuttatása.
+- [x] **Seed Adatok:** Kezdeti autók és teszt felhasználók feltöltése az adatbázisba.
 - [ ] **Admin Dashboard Layout:** Védett útvonalak (`/admin`) kialakítása.
 - [ ] **Flotta Kezelés (CRUD):**
     - Autók listázása táblázatban.
