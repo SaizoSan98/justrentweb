@@ -35,6 +35,7 @@ interface CalendarProps {
   onSelect?: (date: any) => void
   numberOfMonths?: number // Ignored in this simple custom implementation for now, defaults to 1 view
   defaultMonth?: Date
+  disabled?: (date: Date) => boolean
 }
 
 function Calendar({
@@ -43,6 +44,7 @@ function Calendar({
   selected,
   onSelect,
   defaultMonth,
+  disabled,
 }: CalendarProps) {
   const [currentMonth, setCurrentMonth] = React.useState(defaultMonth || new Date())
 
@@ -148,11 +150,15 @@ function Calendar({
           const inRange = isInRange(day)
           const isRangeStart = mode === "range" && (selected as DateRange)?.from && isSameDay(day, (selected as DateRange).from!)
           const isRangeEnd = mode === "range" && (selected as DateRange)?.to && isSameDay(day, (selected as DateRange).to!)
+          const isDisabled = disabled ? disabled(day) : false
           
           let bgClass = "bg-transparent"
           let textClass = isCurrentMonth ? "text-zinc-900" : "text-zinc-300"
           
-          if (selectedDay) {
+          if (isDisabled) {
+            textClass = "text-zinc-200 cursor-not-allowed"
+            bgClass = "hover:bg-transparent"
+          } else if (selectedDay) {
             bgClass = "!bg-red-600 shadow-md shadow-red-600/20"
             textClass = "!text-white font-bold"
           } else if (inRange) {
@@ -165,7 +171,7 @@ function Calendar({
 
           // Rounding for range
           let roundedClass = "rounded-md"
-          if (inRange) {
+          if (inRange && !isDisabled) {
             roundedClass = "rounded-none"
             if (isRangeStart) roundedClass = "rounded-l-md"
             if (isRangeEnd) roundedClass = "rounded-r-md"
@@ -174,13 +180,15 @@ function Calendar({
           return (
             <button
               key={day.toISOString()}
-              onClick={() => handleDayClick(day)}
+              onClick={() => !isDisabled && handleDayClick(day)}
+              disabled={isDisabled}
               className={cn(
                 "w-10 h-10 flex items-center justify-center text-sm transition-all hover:bg-zinc-100",
                 bgClass,
                 textClass,
                 roundedClass,
-                selectedDay && "hover:bg-red-700"
+                selectedDay && "hover:bg-red-700",
+                isDisabled && "hover:bg-transparent opacity-50"
               )}
               type="button"
             >

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Calendar as CalendarIcon, MapPin, Car, Clock } from "lucide-react"
-import { addDays, format } from "date-fns"
+import { addDays, format, differenceInDays, isBefore, startOfDay, addHours } from "date-fns"
 import { useRouter } from "next/navigation"
 import { DateRange } from "react-day-picker"
 
@@ -33,14 +33,52 @@ export function BookingEngine({
   const router = useRouter()
   const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
     from: initialStartDate || new Date(),
-    to: initialEndDate || addDays(initialStartDate || new Date(), 3),
+    to: initialEndDate,
   })
   
   const [startTime, setStartTime] = React.useState("10:00")
   const [endTime, setEndTime] = React.useState("10:00")
   const [location] = React.useState("Budapest Airport (BUD)")
+  const [error, setError] = React.useState<string | null>(null)
   
+  const daysSelected = dateRange?.from && dateRange?.to 
+    ? Math.max(1, differenceInDays(dateRange.to, dateRange.from)) 
+    : 0
+
   const handleSearch = () => {
+    setError(null)
+
+    if (!dateRange?.from || !dateRange?.to) {
+      setError("Please select a valid date range.")
+      return
+    }
+
+    // 1. Check for past dates (Pick-up date cannot be in the past)
+    const today = startOfDay(new Date())
+    if (isBefore(dateRange.from, today)) {
+      setError("Pick-up date cannot be in the past.")
+      return
+    }
+
+    // 2. Check max 30 days
+    const daysDiff = differenceInDays(dateRange.to, dateRange.from)
+    if (daysDiff > 30) {
+      setError("For rentals longer than 30 days, please contact us directly at info@justrent.com or +36 1 234 5678.")
+      return
+    }
+
+    // 3. Check minimum 4-hour lead time
+    // Construct full pickup date object
+    const now = new Date()
+    const [hours, minutes] = startTime.split(':').map(Number)
+    const pickupDateTime = new Date(dateRange.from)
+    pickupDateTime.setHours(hours, minutes, 0, 0)
+
+    if (isBefore(pickupDateTime, addHours(now, 4))) {
+      setError("Pick-up time must be at least 4 hours from now.")
+      return
+    }
+
     const params = new URLSearchParams()
     if (dateRange?.from) params.set("startDate", dateRange.from.toISOString())
     if (dateRange?.to) params.set("endDate", dateRange.to.toISOString())
@@ -48,13 +86,15 @@ export function BookingEngine({
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto -mt-24 relative z-20 px-4">
+    <div className={cn("w-full max-w-6xl mx-auto -mt-24 relative z-20 px-4", className)}>
       {/* Tab selection */}
-      <div className="flex gap-2 mb-4">
-        <Button variant="secondary" className="bg-zinc-900 text-white hover:bg-zinc-800 rounded-full px-6 gap-2">
-          <Car className="w-4 h-4" /> Car Rental
-        </Button>
-      </div>
+      {showLabel && (
+        <div className="flex gap-2 mb-4">
+          <Button variant="secondary" className="bg-zinc-900 text-white hover:bg-zinc-800 rounded-full px-6 gap-2">
+            <Car className="w-4 h-4" /> Car Rental
+          </Button>
+        </div>
+      )}
 
       <Card className="border-0 shadow-2xl bg-white rounded-3xl p-6">
         <CardContent className="p-0 space-y-6">
@@ -106,6 +146,7 @@ export function BookingEngine({
                           selected={dateRange}
                           onSelect={setDateRange}
                           numberOfMonths={2}
+                          disabled={(date) => date < startOfDay(new Date())}
                         />
                       </div>
                     </PopoverContent>

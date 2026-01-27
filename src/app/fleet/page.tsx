@@ -132,13 +132,24 @@ export default async function FleetPage({
       {/* Header */}
       <Header />
 
+      {/* Booking Engine */}
+      <div className="pt-24 pb-8 bg-zinc-50/50">
+        <BookingEngine 
+          initialStartDate={startDate}
+          initialEndDate={endDate}
+          className="w-full max-w-6xl mx-auto px-4"
+          showLabel={false}
+        />
+      </div>
+
       {/* Main Content */}
       <main className="container mx-auto px-6 py-12">
         <div className="mb-12 text-center">
           <h1 className="text-4xl font-extrabold mb-4 text-zinc-900 tracking-tight">Our Premium Fleet</h1>
-          <p className="text-zinc-500 text-lg max-w-2xl mx-auto">
-            Showing prices for <span className="font-bold text-red-600">{diffDays} days</span> rental period.
-          </p>
+          <div className="inline-flex items-center gap-2 bg-zinc-100 px-4 py-2 rounded-full">
+            <span className="text-zinc-500 font-medium">Selected Duration:</span>
+            <span className="font-bold text-red-600">{diffDays} {diffDays === 1 ? 'Day' : 'Days'}</span>
+          </div>
         </div>
 
         {/* Filters */}
