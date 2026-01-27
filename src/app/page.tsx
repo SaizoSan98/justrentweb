@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { BookingEngine } from "@/components/booking/BookingEngine";
 
 export default function LandingPage() {
   return (
@@ -96,71 +97,38 @@ export default function LandingPage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Car Card 1 */}
-            <div className="group bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden hover:border-orange-500/50 transition-all duration-300">
-              <div className="h-48 bg-zinc-800 relative">
-                 <div className="absolute inset-0 flex items-center justify-center text-zinc-600">
-                   [BMW X5 Image]
-                 </div>
-              </div>
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-xl font-bold">BMW X5</h3>
-                    <p className="text-sm text-zinc-500">SUV • Automatic</p>
+            {cars.map((car) => (
+              <div key={car.id} className="group bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden hover:border-orange-500/50 transition-all duration-300">
+                <div className="h-48 bg-zinc-800 relative overflow-hidden">
+                   {car.imageUrl ? (
+                     <img 
+                       src={car.imageUrl} 
+                       alt={`${car.make} ${car.model}`} 
+                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                     />
+                   ) : (
+                     <div className="absolute inset-0 flex items-center justify-center text-zinc-600">
+                       No Image
+                     </div>
+                   )}
+                </div>
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-xl font-bold">{car.make} {car.model}</h3>
+                      <p className="text-sm text-zinc-500">{car.category} • {car.year}</p>
+                    </div>
+                    <span className="bg-zinc-900 text-xs font-bold px-2 py-1 rounded border border-zinc-800 uppercase text-zinc-400">
+                      {car.category}
+                    </span>
                   </div>
-                  <span className="bg-zinc-900 text-xs font-bold px-2 py-1 rounded border border-zinc-800">Premium</span>
-                </div>
-                <div className="flex justify-between items-center mt-6">
-                  <p className="text-orange-500 font-bold text-lg">$120 <span className="text-sm text-zinc-500 font-normal">/ day</span></p>
-                  <Button size="sm" variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white">Details</Button>
-                </div>
-              </div>
-            </div>
-
-            {/* Car Card 2 */}
-            <div className="group bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden hover:border-orange-500/50 transition-all duration-300">
-              <div className="h-48 bg-zinc-800 relative">
-                 <div className="absolute inset-0 flex items-center justify-center text-zinc-600">
-                   [Mercedes C-Class Image]
-                 </div>
-              </div>
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-xl font-bold">Mercedes C-Class</h3>
-                    <p className="text-sm text-zinc-500">Sedan • Automatic</p>
+                  <div className="flex justify-between items-center mt-6">
+                    <p className="text-orange-500 font-bold text-lg">${car.pricePerDay} <span className="text-sm text-zinc-500 font-normal">/ day</span></p>
+                    <Button size="sm" variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white">Details</Button>
                   </div>
-                  <span className="bg-zinc-900 text-xs font-bold px-2 py-1 rounded border border-zinc-800">Luxury</span>
-                </div>
-                <div className="flex justify-between items-center mt-6">
-                  <p className="text-orange-500 font-bold text-lg">$145 <span className="text-sm text-zinc-500 font-normal">/ day</span></p>
-                  <Button size="sm" variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white">Details</Button>
                 </div>
               </div>
-            </div>
-
-             {/* Car Card 3 */}
-             <div className="group bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden hover:border-orange-500/50 transition-all duration-300">
-              <div className="h-48 bg-zinc-800 relative">
-                 <div className="absolute inset-0 flex items-center justify-center text-zinc-600">
-                   [Audi A5 Image]
-                 </div>
-              </div>
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-xl font-bold">Audi A5</h3>
-                    <p className="text-sm text-zinc-500">Coupe • Automatic</p>
-                  </div>
-                  <span className="bg-zinc-900 text-xs font-bold px-2 py-1 rounded border border-zinc-800">Sport</span>
-                </div>
-                <div className="flex justify-between items-center mt-6">
-                  <p className="text-orange-500 font-bold text-lg">$130 <span className="text-sm text-zinc-500 font-normal">/ day</span></p>
-                  <Button size="sm" variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white">Details</Button>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
           
            <div className="mt-8 text-center md:hidden">
