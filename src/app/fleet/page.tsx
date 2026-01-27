@@ -58,8 +58,11 @@ export default async function FleetPage({
   const startDate = startDateStr ? new Date(startDateStr) : new Date();
   const endDate = endDateStr ? new Date(endDateStr) : new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000);
   
-  const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1; // Minimum 1 day
+  // Fix: Ensure we compare start of days to avoid time nuances if we want pure calendar days
+  const s = new Date(startDate); s.setHours(0,0,0,0);
+  const e = new Date(endDate); e.setHours(0,0,0,0);
+  const diffTime = e.getTime() - s.getTime();
+  const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
 
   const whereClause: { status: 'AVAILABLE'; category?: string } = {
     status: 'AVAILABLE',
