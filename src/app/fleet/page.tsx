@@ -10,9 +10,9 @@ export const dynamic = 'force-dynamic';
 export default async function FleetPage({
   searchParams,
 }: {
-  searchParams?: { [key: string]: string | string[] | undefined }
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-  const params = searchParams ?? {};
+  const params = await searchParams ?? {};
   const category = typeof params.category === 'string' ? params.category : undefined;
   
   type PricingTier = {
