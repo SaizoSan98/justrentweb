@@ -56,14 +56,14 @@ export default async function LandingPage() {
             Experience the thrill of driving the world's finest automobiles.
             Seamless booking, exceptional service.
           </p>
-          
-          {/* Booking Engine */}
-          <BookingEngine />
         </div>
       </section>
 
+      {/* Booking Engine */}
+      <BookingEngine />
+
       {/* About Section */}
-      <section id="about" className="py-24 bg-white">
+      <section id="about" className="pt-32 pb-24 bg-white">
         <div className="container mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
           <div>
             <h2 className="text-3xl md:text-4xl font-bold mb-6 text-zinc-900">Why Choose JustRent?</h2>

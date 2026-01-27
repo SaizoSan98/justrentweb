@@ -45,15 +45,15 @@ export default async function FleetPage({
       <header className="bg-white border-b border-zinc-200 sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
           <Link href="/" className="text-2xl font-bold tracking-tighter">
-            Just<span className="text-teal-500">Rent</span>
+            Just<span className="text-orange-600">Rent</span>
           </Link>
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-            <Link href="/" className="text-zinc-600 hover:text-teal-500 transition-colors">Home</Link>
-            <Link href="/fleet" className="text-teal-500">Fleet</Link>
-            <Link href="/about" className="text-zinc-600 hover:text-teal-500 transition-colors">About</Link>
-            <Link href="/contact" className="text-zinc-600 hover:text-teal-500 transition-colors">Contact</Link>
+            <Link href="/" className="text-zinc-600 hover:text-orange-600 transition-colors">Home</Link>
+            <Link href="/fleet" className="text-orange-600">Fleet</Link>
+            <Link href="/about" className="text-zinc-600 hover:text-orange-600 transition-colors">About</Link>
+            <Link href="/contact" className="text-zinc-600 hover:text-orange-600 transition-colors">Contact</Link>
           </nav>
-          <Button className="bg-teal-500 hover:bg-teal-600 text-white rounded-full px-6 font-semibold shadow-md shadow-teal-500/20">
+          <Button className="bg-orange-600 hover:bg-orange-700 text-white rounded-full px-6 font-semibold shadow-md shadow-orange-600/20">
             Sign In
           </Button>
         </div>
@@ -64,7 +64,7 @@ export default async function FleetPage({
         <div className="mb-12 text-center">
           <h1 className="text-4xl font-extrabold mb-4 text-zinc-900 tracking-tight">Our Premium Fleet</h1>
           <p className="text-zinc-500 text-lg max-w-2xl mx-auto">
-            Showing prices for <span className="font-bold text-teal-600">{diffDays} days</span> rental period.
+            Showing prices for <span className="font-bold text-orange-600">{diffDays} days</span> rental period.
           </p>
         </div>
 
@@ -76,8 +76,8 @@ export default async function FleetPage({
               href={cat === 'All Categories' ? `/fleet?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}` : `/fleet?category=${cat}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`}
               className={`px-6 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all shadow-sm ${
                 (category === cat || (!category && cat === 'All Categories'))
-                  ? 'bg-teal-500 text-white shadow-teal-500/30 transform scale-105' 
-                  : 'bg-white text-zinc-500 border border-zinc-200 hover:border-teal-500 hover:text-teal-500'
+                  ? 'bg-orange-600 text-white shadow-orange-600/30 transform scale-105' 
+                  : 'bg-white text-zinc-500 border border-zinc-200 hover:border-orange-600 hover:text-orange-600'
               }`}
             >
               {cat}
@@ -92,7 +92,7 @@ export default async function FleetPage({
             <p className="text-zinc-500">Try adjusting your filters or check back later.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {cars.map((car: Car) => {
               const totalPrice = Number(car.pricePerDay) * diffDays;
               
@@ -101,14 +101,14 @@ export default async function FleetPage({
                   
                   {/* Info Badge */}
                   <div className="absolute top-0 left-0 z-20">
-                    <div className="bg-teal-500 text-white w-12 h-12 flex items-center justify-center rounded-br-3xl shadow-md">
+                    <div className="bg-orange-600 text-white w-12 h-12 flex items-center justify-center rounded-br-3xl shadow-md">
                       <Info className="w-6 h-6" />
                     </div>
                   </div>
 
                   {/* Car Category Badge (Top Right - Optional/Stylistic) */}
                   <div className="absolute top-4 right-4 z-10">
-                    <span className="text-xs font-bold text-teal-500 uppercase tracking-widest">{car.category}</span>
+                    <span className="text-xs font-bold text-orange-600 uppercase tracking-widest">{car.category}</span>
                   </div>
 
                   {/* Image Area */}
@@ -134,27 +134,27 @@ export default async function FleetPage({
                     {/* Features Grid */}
                     <div className="grid grid-cols-3 gap-y-6 gap-x-2 mb-8 px-2">
                       <div className="flex flex-col items-center gap-1">
-                        <Users className="w-5 h-5 text-teal-500" />
+                        <Users className="w-5 h-5 text-orange-600" />
                         <span className="text-xs text-zinc-500 font-medium">5</span>
                       </div>
                       <div className="flex flex-col items-center gap-1">
-                        <Briefcase className="w-5 h-5 text-teal-500" />
+                        <Briefcase className="w-5 h-5 text-orange-600" />
                         <span className="text-xs text-zinc-500 font-medium">3</span>
                       </div>
                       <div className="flex flex-col items-center gap-1">
-                        <div className="w-5 h-5 flex items-center justify-center border-2 border-teal-500 rounded text-[10px] font-bold text-teal-500">5</div>
+                        <div className="w-5 h-5 flex items-center justify-center border-2 border-orange-600 rounded text-[10px] font-bold text-orange-600">5</div>
                         <span className="text-xs text-zinc-500 font-medium">Doors</span>
                       </div>
                       <div className="flex flex-col items-center gap-1">
-                        <Snowflake className="w-5 h-5 text-teal-500" />
+                        <Snowflake className="w-5 h-5 text-orange-600" />
                         <span className="text-xs text-zinc-500 font-medium">AC</span>
                       </div>
                       <div className="flex flex-col items-center gap-1">
-                        <Gauge className="w-5 h-5 text-teal-500" />
+                        <Gauge className="w-5 h-5 text-orange-600" />
                         <span className="text-xs text-zinc-500 font-medium">Auto</span>
                       </div>
                       <div className="flex flex-col items-center gap-1">
-                        <Fuel className="w-5 h-5 text-teal-500" />
+                        <Fuel className="w-5 h-5 text-orange-600" />
                         <span className="text-xs text-zinc-500 font-medium">Petrol</span>
                       </div>
                     </div>
@@ -162,10 +162,10 @@ export default async function FleetPage({
                     {/* Price & Action */}
                     <div className="mt-auto">
                       <div className="mb-4">
-                        <span className="text-2xl font-black text-teal-600">{totalPrice.toLocaleString()} HUF</span>
+                        <span className="text-2xl font-black text-orange-600">{totalPrice.toLocaleString()} HUF</span>
                         <span className="text-xs text-zinc-400 font-medium block uppercase tracking-wide">for {diffDays} days</span>
                       </div>
-                      <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-6 rounded-2xl shadow-lg shadow-teal-500/30 hover:shadow-teal-500/40 transition-all transform active:scale-95 uppercase tracking-wider text-base">
+                      <Button className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-6 rounded-2xl shadow-lg shadow-orange-600/30 hover:shadow-orange-600/40 transition-all transform active:scale-95 uppercase tracking-wider text-base">
                         FOGLALÁS
                       </Button>
                     </div>
