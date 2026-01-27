@@ -1,8 +1,16 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { BookingEngine } from "@/components/booking/BookingEngine";
+import { prisma } from "@/lib/prisma";
 
-export default function LandingPage() {
+export const dynamic = 'force-dynamic'
+
+export default async function LandingPage() {
+  const cars = await prisma.car.findMany({
+    take: 3,
+    where: { status: 'AVAILABLE' },
+    orderBy: { pricePerDay: 'asc' }
+  });
   return (
     <div className="flex flex-col min-h-screen bg-zinc-950 text-zinc-50 font-sans">
       {/* Navbar */}
@@ -123,7 +131,7 @@ export default function LandingPage() {
                     </span>
                   </div>
                   <div className="flex justify-between items-center mt-6">
-                    <p className="text-orange-500 font-bold text-lg">${car.pricePerDay} <span className="text-sm text-zinc-500 font-normal">/ day</span></p>
+                    <p className="text-orange-500 font-bold text-lg">${Number(car.pricePerDay)} <span className="text-sm text-zinc-500 font-normal">/ day</span></p>
                     <Button size="sm" variant="outline" className="border-zinc-700 text-zinc-300 hover:bg-zinc-800 hover:text-white">Details</Button>
                   </div>
                 </div>
