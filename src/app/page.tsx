@@ -56,6 +56,14 @@ export default async function LandingPage() {
             <Link href="#contact" className="text-zinc-600 hover:text-red-600 transition-colors">Contact</Link>
           </nav>
           <div className="flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-4 mr-4">
+              <Button variant="ghost" className="text-zinc-600 hover:text-red-600 font-bold">
+                Login
+              </Button>
+              <Button variant="ghost" className="text-zinc-600 hover:text-red-600 font-bold">
+                Register
+              </Button>
+            </div>
             <Button variant="ghost" className="text-zinc-900 hover:text-red-600 hover:bg-zinc-100 font-bold uppercase tracking-wide">
               Call Now!
             </Button>
@@ -69,7 +77,7 @@ export default async function LandingPage() {
       {/* Hero Section */}
       <section className="relative h-[85vh] flex items-center justify-center overflow-hidden bg-zinc-900">
         {/* Background Image */}
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1503376763036-066120622c74?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center opacity-40"></div>
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1617788138017-80ad40651399?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center opacity-40"></div>
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
         

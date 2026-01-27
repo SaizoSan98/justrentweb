@@ -116,9 +116,19 @@ export default async function FleetPage({
             <Link href="/fleet" className="text-red-600 font-bold">Our Fleet</Link>
             <Link href="/#contact" className="text-zinc-600 hover:text-red-600 transition-colors">Contact</Link>
           </nav>
-          <Button className="bg-red-600 hover:bg-red-700 text-white rounded-full px-6 font-semibold shadow-md shadow-red-600/20 uppercase tracking-wide">
-            Book Now!
-          </Button>
+          <div className="flex items-center gap-4">
+             <div className="hidden md:flex items-center gap-4">
+               <Button variant="ghost" className="text-zinc-600 hover:text-red-600 font-bold">
+                 Login
+               </Button>
+               <Button variant="ghost" className="text-zinc-600 hover:text-red-600 font-bold">
+                 Register
+               </Button>
+             </div>
+             <Button className="bg-red-600 hover:bg-red-700 text-white rounded-full px-6 font-semibold shadow-md shadow-red-600/20 uppercase tracking-wide">
+               Book Now!
+             </Button>
+          </div>
         </div>
       </header>
 
