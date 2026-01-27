@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Users, Briefcase, Fuel, Snowflake, Gauge, Info } from "lucide-react";
+import { FleetCard } from "@/components/fleet/FleetCard";
 
 export const dynamic = 'force-dynamic';
 
@@ -18,17 +18,6 @@ export default async function FleetPage({
     maxDays: number | null;
     pricePerDay: number;
     deposit: number;
-  };
-  type CarItem = {
-    id: string;
-    make: string;
-    model: string;
-    year: number;
-    category: string;
-    imageUrl: string | null;
-    pricePerDay: number;
-    status: string;
-    pricingTiers: PricingTier[];
   };
   
   function getStockImageUrl(make: string, model: string): string {
@@ -70,7 +59,7 @@ export default async function FleetPage({
     whereClause.category = category;
   }
 
-  const cars: CarItem[] = await prisma.car.findMany({
+  const cars = await prisma.car.findMany({
     where: {
       ...whereClause,
       AND: [
@@ -104,7 +93,15 @@ export default async function FleetPage({
     orderBy: {
       pricePerDay: 'asc',
     },
-  });
+  }).then((items: any[]) => items.map((car: any) => ({
+    ...car,
+    pricePerDay: Number(car.pricePerDay),
+    pricingTiers: car.pricingTiers.map((tier: any) => ({
+      ...tier,
+      pricePerDay: Number(tier.pricePerDay),
+      deposit: Number(tier.deposit)
+    }))
+  })));
 
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-900 font-sans">

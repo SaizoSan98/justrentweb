@@ -156,7 +156,7 @@ export default async function LandingPage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {cars.map((car: CarItem) => (
+            {cars.map((car) => (
               <div key={car.id} className="group bg-white border border-zinc-200 rounded-2xl overflow-hidden hover:shadow-xl hover:border-orange-200 transition-all duration-300">
                 <div className="h-56 bg-zinc-100 relative overflow-hidden">
                    <img 

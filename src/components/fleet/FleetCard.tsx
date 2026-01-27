@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { Car } from "@prisma/client"
 import { Users, Briefcase, Gauge, Info, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -20,8 +19,20 @@ type PricingTier = {
   deposit: number
 }
 
+type CarType = {
+  id: string
+  make: string
+  model: string
+  year: number
+  category: string
+  imageUrl: string | null
+  pricePerDay: number
+  status: string
+  pricingTiers: PricingTier[]
+}
+
 type FleetCardProps = {
-  car: Car & { pricingTiers: PricingTier[] }
+  car: CarType
   diffDays: number
   imageUrl: string
 }
