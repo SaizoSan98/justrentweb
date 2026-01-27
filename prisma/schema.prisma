@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum CarStatus {
+  AVAILABLE
+  RENTED
+  MAINTENANCE
+  OUT_OF_SERVICE
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String?
+  password  String?   // Hashed
+  role      Role      @default(USER)
+  bookings  Booking[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Car {
+  id              String         @id @default(cuid())
+  make            String
+  model           String
+  year            Int
+  licensePlate    String         @unique
+  mileage         Int
+  category        String         // e.g. SUV, Sedan, Luxury
+  pricePerDay     Decimal
+  status          CarStatus      @default(AVAILABLE)
+  imageUrl        String?        // Main image
+  images          String[]       // Additional images (Vercel Blob URLs)
+  features        String[]
+  bookings        Booking[]
+  damageReports   DamageReport[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+model Booking {
+  id          String        @id @default(cuid())
+  startDate   DateTime
+  endDate     DateTime
+  totalPrice  Decimal
+  status      BookingStatus @default(PENDING)
+  userId      String
+  user        User          @relation(fields: [userId], references: [id])
+  carId       String
+  car         Car           @relation(fields: [carId], references: [id])
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model DamageReport {
+  id          String   @id @default(cuid())
+  description String
+  images      String[] // Vercel Blob URLs
+  carId       String
+  car         Car      @relation(fields: [carId], references: [id])
+  createdAt   DateTime @default(now())
+}
