@@ -1,68 +1,94 @@
 # 🚗 JustRent - Projekt Ütemterv (Roadmap)
 
-Ez a dokumentum a **JustRent** autókölcsönző platform fejlesztési ütemtervét, technológiai hátterét és a következő lépéseket tartalmazza.
+Ez a dokumentum a **JustRent** autókölcsönző platform fejlesztési ütemtervét, technológiai hátterét és a részletes adminisztrációs terveket tartalmazza.
 
 ## 🎯 Projekt Vízió
-Egy modern, prémium megjelenésű, Next.js alapú autókölcsönző rendszer létrehozása, amely gyors foglalást, átlátható adminisztrációt és megbízható működést kínál. A design a "sixt.hu" prémium stílusát követi.
+Egy modern, prémium megjelenésű (Sixt-stílusú), Next.js alapú autókölcsönző rendszer. Fókuszban a gyors foglalás, a vizuális élmény és a rendkívül részletes, mindenre kiterjedő adminisztrációs felület.
 
 ## 🛠 Technológiai Stack
 - **Frontend:** Next.js 16 (App Router), React 19, Tailwind CSS v4
-- **UI Könyvtár:** Shadcn UI, Lucide Icons
+- **UI Könyvtár:** Shadcn UI, Lucide Icons, **Custom Calendar & TimePicker**
 - **Backend:** Next.js Server Actions
 - **Adatbázis:** PostgreSQL (Neon.tech), Prisma ORM
-- **Tárhely (Images):** Vercel Blob
+- **Tárhely (Images):** Vercel Blob / Külső URL-ek
 - **Hosting:** Vercel
 
 ---
 
 ## 📅 Fejlesztési Fázisok
 
-### ✅ 1. Fázis: Alapok és Prototípus (KÉSZ)
-A projekt technikai alapjainak lerakása és a vizuális keretrendszer kialakítása.
-- [x] **Projekt inicializálása:** Next.js, Tailwind, TypeScript beállítása.
-- [x] **Design Rendszer:** Színek (Zinc/Orange), betűtípusok, Shadcn UI komponensek (Button, Card, Input).
-- [x] **Adatbázis Tervezés:** Prisma séma elkészítése (`User`, `Car`, `Booking`, `DamageReport`).
-- [x] **Landing Page:** Hero szekció, "About", "Fleet" teaser, Footer.
-- [x] **UI Komponensek:** Booking Engine (Kereső) és Admin Calendar (Naptár) vizuális vázlata.
+### ✅ 1. Fázis: Alapok és UI Keretrendszer (KÉSZ)
+A vizuális alapok és a legfontosabb felhasználói felületek elkészültek.
+- [x] **Projekt inicializálása:** Next.js, Tailwind, TypeScript.
+- [x] **Design Rendszer:** Prémium fekete/fehér/piros színvilág.
+- [x] **Landing Page:** Hero szekció (Unsplash képpel), Kereső sáv, About szekció.
+- [x] **Booking Engine:**
+    - Egyedi, robusztus **Naptár** komponens (Grid alapú, nem esik szét).
+    - Prémium **Időválasztó** (TimePicker) görgethető listával.
+    - Keresési paraméterek szinkronizálása URL-ben.
+- [x] **Fleet Page (Flotta):**
+    - Autók listázása kártyákon.
+    - Kereső integrálása a flotta oldalra is.
+    - Árak dinamikus számítása a kiválasztott időszak alapján.
+- [x] **Header & Auth:**
+    - Letisztult fejléc (CTA gombok nélkül).
+    - **AuthModal:** Bejelentkezés/Regisztráció váltófüllel, prémium popup.
+    - Nyelvválasztó (vizuális).
 
-### 🚧 2. Fázis: Adatbázis és Adminisztráció (FOLYAMATBAN)
-Az alkalmazás "agyának" beüzemelése. Valós adatok kezelése a statikus mockupok helyett.
-- [x] **Adatbázis Kapcsolat:** Neon.tech PostgreSQL összekötése, Prisma migrációk lefuttatása.
-- [x] **Seed Adatok:** Kezdeti autók és teszt felhasználók feltöltése az adatbázisba.
-- [ ] **Admin Dashboard Layout:** Védett útvonalak (`/admin`) kialakítása.
-- [ ] **Flotta Kezelés (CRUD):**
-    - Autók listázása táblázatban.
-    - Új autó felvétele űrlap (Képfeltöltés Vercel Blob-ba).
-    - Autó szerkesztése és törlése.
-- [ ] **Interaktív Naptár:** A `AdminCalendar` komponens bekötése a valós foglalási adatokhoz.
+### 🚧 2. Fázis: Adatbázis és Adminisztráció (KÖVETKEZŐ LÉPÉS)
+A rendszer "lelke". Az admin felületnek teljes kontrollt kell biztosítania a flotta és az árazás felett.
 
-### 🔜 3. Fázis: Foglalási Folyamat (User Flow)
-A látogatók számára elérhető funkciók implementálása.
-- [ ] **Kereső Logika:** A főoldali kereső összekötése az adatbázissal (szűrés dátum és helyszín szerint).
-- [ ] **Autó Részletező Oldal:** Egyedi oldal minden autónak (`/cars/[id]`), specifikációkkal és galériával.
-- [ ] **Checkout Folyamat:**
-    - Foglalási összesítő.
-    - Felhasználói adatok bekérése.
-    - Stripe fizetési integráció (először Test módban).
-- [ ] **Visszaigazolás:** Sikeres foglalás oldal és e-mail értesítés (opcionális: Resend).
+#### 2.1 Admin Dashboard Tervezése (`/admin`)
+- **Dashboard Home:** Gyors áttekintés (Aktív bérlések, Mai átvételek/visszavételek, Bevételek).
+- **Védett útvonalak:** Csak admin jogosultsággal elérhető felület.
 
-### 🔮 4. Fázis: Haladó Funkciók és Finomhangolás
-A rendszer üzleti értékének növelése extra funkciókkal.
-- [ ] **Autentikáció:** NextAuth.js (v5) bevezetése (Google login + Email/Jelszó).
-- [ ] **Jogosultságkezelés:** Admin vs. User szerepkörök érvényesítése (Middleware védelem).
-- [ ] **Kárbejelentő Modul:** Admin felületen sérülések rögzítése fotókkal (Vercel Blob).
-- [ ] **Mobil Optimalizálás:** Teljes körű reszponzivitás ellenőrzése.
-- [ ] **SEO és Performance:** Meta tag-ek beállítása, képek optimalizálása (`next/image`).
+#### 2.2 Részletes Flotta Kezelés (Car Management)
+Minden autóhoz részletes adatlap tartozik, amit az admin szerkeszthet:
+- **Alapadatok:** Márka, Modell, Évjárat, Kategória (SUV, Sedan, stb.), Rendszám, Alvázszám (VIN).
+- **Specifikációk:** Ülések, Ajtók, Váltó (Man/Auto), Üzemanyag, Motor méret/erő.
+- **Média:** Főkép és Galéria feltöltése (Drag & drop).
+- **Státusz:** Elérhető, Karbantartás alatt, Szervizben, Kiadva.
+
+#### 2.3 Intelligens Árazási Rendszer (Pricing Engine)
+Az admin itt tudja finomhangolni a bevételeket:
+- **Alapár (Base Price):** Napi bérleti díj.
+- **Időtartam Kedvezmények (Duration Tiers):**
+    - 1-3 nap: 100% ár
+    - 4-7 nap: -10%
+    - 8-30 nap: -20%
+    - 30+ nap: Egyedi ár
+- **Szezonális Árazás:** Kiemelt időszakok (Karácsony, Nyár) szorzói.
+- **Fizetési Mód Árazás:** "Pay at Pickup" felár (pl. +10%) vs. "Prepay" (Online fizetés) kedvezmény.
+
+#### 2.4 Extrák és Opciók Kezelése (Add-ons)
+Az admin hozhat létre és árazhat be extrákat:
+- **Tételek:** Gyerekülés, GPS, Hólánc, Tetőbox.
+- **Szolgáltatások:** Határátlépési engedély, Sofőrszolgálat.
+- **Biztosítások:** Alap, Medium, Premium csomagok (önrész csökkentés).
+- **Kaució (Deposit):** Kategóriánként vagy autónként állítható összeg.
+
+#### 2.5 Kilométer Limit (Mileage Policy)
+- **Csomagok:**
+    - Limitált: Napi X km (pl. 200km) benne van az árban.
+    - Túlfutás díja: X Ft / km.
+    - Korlátlan: Fix felár/nap ellenében.
+
+### � 3. Fázis: Foglalási Folyamat és Checkout
+- [ ] **Részletes Autó Oldal:** Dinamikus adatlap a fenti adatok alapján.
+- [ ] **Kosár és Checkout:**
+    - Extrák kiválasztása.
+    - Végösszeg számítása (Napok * Ár + Extrák + ÁFA).
+    - Fizetési kapu integráció (Stripe).
+- [ ] **Foglalás Kezelés:** Admin jóváhagyás, Visszaigazoló e-mail.
+
+### 🔮 4. Fázis: Kiegészítő Funkciók
+- [ ] **Kárbejelentő:** Admin felületen sérülések rögzítése (Kép + Leírás).
+- [ ] **Többnyelvűség:** Teljes fordítás (EN, HU, HE) - i18n.
+- [ ] **Valutaváltó:** HUF / EUR / USD árak kijelzése.
 
 ---
 
-## 🚀 Telepítési Útmutató (Deployment)
-
-1. **Adatbázis:** Neon.tech projekt létrehozása -> Connection string másolása `.env`-be.
-2. **Migráció:** `npx prisma migrate dev --name init`
-3. **GitHub:** Kód feltöltése a tárolóba.
-4. **Vercel:** Projekt importálása, környezeti változók beállítása (`DATABASE_URL`, `BLOB_READ_WRITE_TOKEN`).
-
-## 📝 Megjegyzések
-- A designnál a "Dark Mode" az alapértelmezett a prémium érzet miatt.
-- A képek tárolása kritikus pont, a Vercel Blob a leggyorsabb megoldás Next.js-hez.
+## � Fejlesztői Jegyzetek
+- **Naptár:** A saját fejlesztésű `src/components/ui/calendar.tsx` a standard, ezt kell használni mindhol.
+- **Képek:** Jelenleg külső URL-eket használunk, de a feltöltés funkcióhoz Vercel Blob vagy AWS S3 integráció szükséges majd.
+- **Auth:** A jelenlegi `AuthModal` csak UI, be kell kötni a NextAuth-ot a valódi működéshez.
