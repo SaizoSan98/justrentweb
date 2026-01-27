@@ -173,3 +173,16 @@ export async function createExtra(formData: FormData) {
     console.error("Failed to create extra:", error)
   }
 }
+
+export async function toggleUserRole(userId: string, currentRole: string) {
+  const newRole = currentRole === 'ADMIN' ? 'USER' : 'ADMIN'
+  try {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { role: newRole }
+    })
+    revalidatePath('/admin/users')
+  } catch (error) {
+    console.error("Failed to update user role:", error)
+  }
+}

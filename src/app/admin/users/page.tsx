@@ -1,5 +1,8 @@
 import { prisma } from "@/lib/prisma"
 import { format } from "date-fns"
+import { Button } from "@/components/ui/button"
+import { ShieldAlert, ShieldCheck } from "lucide-react"
+import { toggleUserRole } from "../actions"
 
 export default async function UsersPage() {
   const users = await prisma.user.findMany({
@@ -21,6 +24,7 @@ export default async function UsersPage() {
                 <th className="px-6 py-4">Email</th>
                 <th className="px-6 py-4">Role</th>
                 <th className="px-6 py-4">Joined</th>
+                <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100">
@@ -43,11 +47,32 @@ export default async function UsersPage() {
                   <td className="px-6 py-4 text-zinc-500">
                     {format(new Date(user.createdAt), 'MMM d, yyyy')}
                   </td>
+                  <td className="px-6 py-4 text-right">
+                    <form action={toggleUserRole.bind(null, user.id, user.role)}>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className={user.role === 'ADMIN' ? 'text-red-600 hover:text-red-700 hover:bg-red-50' : 'text-green-600 hover:text-green-700 hover:bg-green-50'}
+                      >
+                        {user.role === 'ADMIN' ? (
+                          <>
+                            <ShieldAlert className="w-4 h-4 mr-2" />
+                            Demote to User
+                          </>
+                        ) : (
+                          <>
+                            <ShieldCheck className="w-4 h-4 mr-2" />
+                            Promote to Admin
+                          </>
+                        )}
+                      </Button>
+                    </form>
+                  </td>
                 </tr>
               ))}
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-6 py-12 text-center text-zinc-500">
+                  <td colSpan={5} className="px-6 py-12 text-center text-zinc-500">
                     No users found.
                   </td>
                 </tr>
