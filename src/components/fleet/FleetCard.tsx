@@ -61,50 +61,48 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div className="group bg-zinc-900 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 relative border border-zinc-800 flex flex-col cursor-pointer h-full">
-          {/* Main Card Content - SIXT Style */}
+        <div className="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-xl hover:border-red-200 transition-all duration-300 relative border border-zinc-200 flex flex-col cursor-pointer h-full">
+          {/* Main Card Content */}
           <div className="p-6 relative z-10">
-            <h3 className="text-2xl font-black text-white uppercase tracking-tight mb-1">
+            <h3 className="text-2xl font-black text-zinc-900 uppercase tracking-tight mb-1">
               {car.make} {car.model}
             </h3>
-            <p className="text-zinc-400 text-sm font-medium mb-4">vagy hasonló | {car.category}</p>
+            <p className="text-zinc-500 text-sm font-medium mb-4">or similar | {car.category}</p>
             
             <div className="flex gap-4 mb-4">
-              <div className="flex items-center gap-1.5 bg-zinc-800/50 px-2 py-1 rounded text-zinc-300 text-xs font-bold">
+              <div className="flex items-center gap-1.5 bg-zinc-100 px-2 py-1 rounded text-zinc-600 text-xs font-bold border border-zinc-200">
                 <Users className="w-3.5 h-3.5" /> 5
               </div>
-              <div className="flex items-center gap-1.5 bg-zinc-800/50 px-2 py-1 rounded text-zinc-300 text-xs font-bold">
+              <div className="flex items-center gap-1.5 bg-zinc-100 px-2 py-1 rounded text-zinc-600 text-xs font-bold border border-zinc-200">
                 <Briefcase className="w-3.5 h-3.5" /> 2
               </div>
-              <div className="flex items-center gap-1.5 bg-zinc-800/50 px-2 py-1 rounded text-zinc-300 text-xs font-bold">
-                <Gauge className="w-3.5 h-3.5" /> Kézi
+              <div className="flex items-center gap-1.5 bg-zinc-100 px-2 py-1 rounded text-zinc-600 text-xs font-bold border border-zinc-200">
+                <Gauge className="w-3.5 h-3.5" /> Manual
               </div>
             </div>
           </div>
 
-          {/* Car Image - Overlapping */}
-          <div className="relative h-48 -mt-8 mb-4 flex items-center justify-center">
+          {/* Car Image - Clean on white */}
+          <div className="relative h-48 -mt-8 mb-4 flex items-center justify-center p-4">
             <img 
               src={imageUrl} 
               alt={`${car.make} ${car.model}`} 
-              className="w-full h-full object-contain drop-shadow-2xl group-hover:scale-105 transition-transform duration-500 relative z-0"
+              className="w-full h-full object-contain drop-shadow-xl group-hover:scale-105 transition-transform duration-500 relative z-0"
             />
-            {/* Fade at bottom */}
-            <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-zinc-900 to-transparent z-10"></div>
           </div>
 
           {/* Footer Price */}
           <div className="mt-auto p-6 pt-0 relative z-20">
-             <div className="flex items-center gap-2 mb-2 text-green-500 text-xs font-bold">
-                <Check className="w-3 h-3" /> Korlátlan kilométer
+             <div className="flex items-center gap-2 mb-2 text-zinc-900 text-xs font-bold">
+                <Check className="w-3 h-3 text-red-600" /> Unlimited Mileage
              </div>
              <div className="flex items-end justify-between">
                <div>
-                 <span className="text-2xl font-black text-white">{pricePerDay.toLocaleString()} Ft</span>
-                 <span className="text-zinc-400 text-sm font-medium"> /nap</span>
+                 <span className="text-2xl font-black text-red-600">{pricePerDay.toLocaleString()} Ft</span>
+                 <span className="text-zinc-500 text-sm font-medium"> /day</span>
                </div>
-               <div className="text-zinc-500 text-xs text-right">
-                 {totalPrice.toLocaleString()} Ft Összesen
+               <div className="text-zinc-400 text-xs text-right font-medium">
+                 {totalPrice.toLocaleString()} Ft Total
                </div>
              </div>
           </div>
@@ -115,7 +113,7 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
       <DialogContent className="max-w-5xl p-0 bg-white gap-0 overflow-hidden border-0">
         <div className="grid md:grid-cols-2 h-full min-h-[600px]">
           {/* Left: Car Visuals */}
-          <div className="bg-zinc-50 p-8 flex flex-col relative text-zinc-900 border-r border-zinc-100">
+          <div className="bg-white p-8 flex flex-col relative text-zinc-900 border-r border-zinc-100">
              <div className="mb-8">
                <h2 className="text-4xl font-black uppercase mb-2">{car.make} {car.model}</h2>
                <p className="text-zinc-500 font-medium">or similar | {car.category}</p>
@@ -165,14 +163,14 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
                 <div 
                   className={cn(
                     "border-2 rounded-xl p-4 cursor-pointer transition-all bg-white hover:border-red-200",
-                    selectedRate === "best" ? "border-black ring-1 ring-black/5" : "border-zinc-200"
+                    selectedRate === "best" ? "border-red-600 ring-1 ring-red-600/5" : "border-zinc-200"
                   )}
                   onClick={() => setSelectedRate("best")}
                 >
                    <div className="flex items-start gap-4">
                       <div className="mt-1">
                         {selectedRate === "best" ? (
-                          <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center">
+                          <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
                             <div className="w-2.5 h-2.5 bg-white rounded-full" />
                           </div>
                         ) : (
@@ -192,14 +190,14 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
                 <div 
                   className={cn(
                     "border-2 rounded-xl p-4 cursor-pointer transition-all bg-white hover:border-red-200",
-                    selectedRate === "flexible" ? "border-black ring-1 ring-black/5" : "border-zinc-200"
+                    selectedRate === "flexible" ? "border-red-600 ring-1 ring-red-600/5" : "border-zinc-200"
                   )}
                   onClick={() => setSelectedRate("flexible")}
                 >
                    <div className="flex items-start gap-4">
                       <div className="mt-1">
                         {selectedRate === "flexible" ? (
-                          <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center">
+                          <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
                             <div className="w-2.5 h-2.5 bg-white rounded-full" />
                           </div>
                         ) : (
@@ -227,14 +225,14 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
                 <div 
                   className={cn(
                     "border-2 rounded-xl p-4 cursor-pointer transition-all bg-white hover:border-red-200",
-                    selectedMileage === "limited" ? "border-black ring-1 ring-black/5" : "border-zinc-200"
+                    selectedMileage === "limited" ? "border-red-600 ring-1 ring-red-600/5" : "border-zinc-200"
                   )}
                   onClick={() => setSelectedMileage("limited")}
                 >
                    <div className="flex items-start gap-4">
                       <div className="mt-1">
                         {selectedMileage === "limited" ? (
-                          <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center">
+                          <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
                             <div className="w-2.5 h-2.5 bg-white rounded-full" />
                           </div>
                         ) : (
@@ -254,14 +252,14 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
                 <div 
                   className={cn(
                     "border-2 rounded-xl p-4 cursor-pointer transition-all bg-white hover:border-red-200",
-                    selectedMileage === "unlimited" ? "border-black ring-1 ring-black/5" : "border-zinc-200"
+                    selectedMileage === "unlimited" ? "border-red-600 ring-1 ring-red-600/5" : "border-zinc-200"
                   )}
                   onClick={() => setSelectedMileage("unlimited")}
                 >
                    <div className="flex items-start gap-4">
                       <div className="mt-1">
                         {selectedMileage === "unlimited" ? (
-                          <div className="w-6 h-6 bg-black rounded-full flex items-center justify-center">
+                          <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
                             <div className="w-2.5 h-2.5 bg-white rounded-full" />
                           </div>
                         ) : (

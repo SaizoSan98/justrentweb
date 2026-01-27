@@ -25,27 +25,27 @@ export default async function LandingPage() {
   function getStockImageUrl(make: string, model: string): string {
     const key = `${make} ${model}`.toLowerCase();
     const map: Record<string, string> = {
-      "bmw x5": "https://images.unsplash.com/photo-1555215696-99ac45e43d34?auto=format&fit=crop&q=80",
-      "mercedes-benz c-class": "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&q=80",
-      "audi a5": "https://images.unsplash.com/photo-1606152421802-db97b9c7a11b?auto=format&fit=crop&q=80",
-      "tesla model 3": "https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&q=80",
-      "porsche 911 carrera": "https://images.unsplash.com/photo-1503376763036-066120622c74?auto=format&fit=crop&q=80",
+      "bmw x5": "https://www.pngmart.com/files/22/BMW-X5-PNG-Clipart.png",
+      "mercedes-benz c-class": "https://www.pngmart.com/files/22/Mercedes-Benz-C-Class-PNG-Isolated-Pic.png",
+      "audi a5": "https://www.pngmart.com/files/22/Audi-A5-PNG-File.png",
+      "tesla model 3": "https://www.pngmart.com/files/22/Tesla-Model-3-PNG-Picture.png",
+      "porsche 911 carrera": "https://www.pngmart.com/files/22/Porsche-911-PNG-Clipart.png",
     };
     if (map[key]) return map[key];
     const brandFallback: Record<string, string> = {
-      "bmw": "https://images.unsplash.com/photo-1619767886558-ef9bb5e31403?auto=format&fit=crop&q=80",
-      "mercedes-benz": "https://images.unsplash.com/photo-1616789919274-52a8d55e6b69?auto=format&fit=crop&q=80",
-      "audi": "https://images.unsplash.com/photo-1614241202229-4a27a8d15b10?auto=format&fit=crop&q=80",
-      "tesla": "https://images.unsplash.com/photo-1606676463510-b1c153c0a5fd?auto=format&fit=crop&q=80",
-      "porsche": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&q=80",
+      "bmw": "https://www.pngmart.com/files/22/BMW-X5-PNG-Clipart.png",
+      "mercedes-benz": "https://www.pngmart.com/files/22/Mercedes-Benz-C-Class-PNG-Isolated-Pic.png",
+      "audi": "https://www.pngmart.com/files/22/Audi-A5-PNG-File.png",
+      "tesla": "https://www.pngmart.com/files/22/Tesla-Model-3-PNG-Picture.png",
+      "porsche": "https://www.pngmart.com/files/22/Porsche-911-PNG-Clipart.png",
     };
     const brand = make.toLowerCase();
-    return brandFallback[brand] ?? "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&q=80";
+    return brandFallback[brand] ?? "https://www.pngmart.com/files/22/Tesla-Model-3-PNG-Picture.png";
   }
   return (
-    <div className="flex flex-col min-h-screen bg-zinc-50 text-zinc-900 font-sans">
+    <div className="flex flex-col min-h-screen bg-white text-zinc-900 font-sans">
       {/* Navbar */}
-      <header className="fixed top-0 w-full z-50 border-b border-zinc-200 bg-white/80 backdrop-blur-md">
+      <header className="fixed top-0 w-full z-50 border-b border-zinc-200 bg-white/95 backdrop-blur-md">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
           <Link href="/" className="text-2xl font-bold tracking-tighter text-zinc-900">
             Just<span className="text-red-600">Rent</span>
@@ -56,10 +56,10 @@ export default async function LandingPage() {
             <Link href="#contact" className="text-zinc-600 hover:text-red-600 transition-colors">Contact</Link>
           </nav>
           <div className="flex items-center gap-4">
-            <Button variant="ghost" className="text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 font-medium">
+            <Button variant="ghost" className="text-zinc-900 hover:text-red-600 hover:bg-zinc-100 font-bold uppercase tracking-wide">
               Call Now!
             </Button>
-            <Button className="bg-red-600 hover:bg-red-700 text-white rounded-full px-6 shadow-lg shadow-red-600/20">
+            <Button className="bg-red-600 hover:bg-red-700 text-white rounded-full px-6 shadow-lg shadow-red-600/20 uppercase tracking-wide font-bold">
               Book Now!
             </Button>
           </div>
@@ -67,18 +67,17 @@ export default async function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative h-[85vh] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[85vh] flex items-center justify-center overflow-hidden bg-zinc-900">
         {/* Background Image */}
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center"></div>
-        {/* Overlay - Lighter for this theme but still needed for white text */}
-        <div className="absolute inset-0 bg-black/40"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-zinc-50 via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center opacity-40"></div>
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
         
         <div className="relative container mx-auto px-6 flex flex-col items-center text-center z-10 pt-20">
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-6 drop-shadow-sm">
-            JUST <span className="text-red-500">RENT</span>
+          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-6 drop-shadow-lg">
+            JUST <span className="text-red-600">RENT</span>
           </h1>
-          <p className="text-xl md:text-2xl text-zinc-100 max-w-2xl mb-12 font-light leading-relaxed drop-shadow-sm">
+          <p className="text-xl md:text-2xl text-zinc-200 max-w-2xl mb-12 font-light leading-relaxed drop-shadow-md">
             Experience the thrill of driving the world&#39;s finest automobiles.
             Seamless booking, exceptional service.
           </p>
@@ -144,24 +143,24 @@ export default async function LandingPage() {
         <div className="container mx-auto px-6">
           <div className="flex justify-between items-end mb-12">
             <div>
-              <span className="text-orange-600 font-bold uppercase tracking-wider text-sm mb-2 block">Our Collection</span>
+              <span className="text-red-600 font-bold uppercase tracking-wider text-sm mb-2 block">Our Collection</span>
               <h2 className="text-3xl md:text-4xl font-bold text-zinc-900">Featured Vehicles</h2>
             </div>
-            <Link href="/fleet" className="text-zinc-900 hover:text-orange-600 font-medium hidden md:flex items-center gap-2 transition-colors">
+            <Link href="/fleet" className="text-zinc-900 hover:text-red-600 font-medium hidden md:flex items-center gap-2 transition-colors">
               View All Cars <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
             </Link>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {cars.map((car) => (
-              <div key={car.id} className="group bg-white border border-zinc-200 rounded-2xl overflow-hidden hover:shadow-xl hover:border-orange-200 transition-all duration-300">
-                <div className="h-56 bg-zinc-100 relative overflow-hidden">
+            {cars.map((car: any) => (
+              <div key={car.id} className="group bg-white border border-zinc-200 rounded-2xl overflow-hidden hover:shadow-xl hover:border-red-200 transition-all duration-300">
+                <div className="h-56 bg-zinc-50 relative overflow-hidden flex items-center justify-center p-4">
                    <img 
                      src={car.imageUrl ?? getStockImageUrl(car.make, car.model)} 
                      alt={`${car.make} ${car.model}`} 
-                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                     className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
                    />
-                   <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-zinc-900 shadow-sm">
+                   <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-zinc-900 shadow-sm border border-zinc-100">
                      {car.category}
                    </div>
                 </div>
@@ -173,8 +172,8 @@ export default async function LandingPage() {
                     </div>
                   </div>
                   <div className="flex justify-between items-center pt-4 border-t border-zinc-100">
-                    <p className="text-orange-600 font-bold text-lg">${Number(car.pricePerDay)} <span className="text-sm text-zinc-400 font-normal">/ day</span></p>
-                    <Button size="sm" variant="outline" className="border-zinc-200 text-zinc-600 hover:bg-zinc-900 hover:text-white hover:border-zinc-900 rounded-lg">Details</Button>
+                    <p className="text-red-600 font-bold text-lg">${Number(car.pricePerDay)} <span className="text-sm text-zinc-400 font-normal">/ day</span></p>
+                    <Button size="sm" variant="outline" className="border-zinc-200 text-zinc-600 hover:bg-red-600 hover:text-white hover:border-red-600 rounded-lg">Details</Button>
                   </div>
                 </div>
               </div>
@@ -182,7 +181,7 @@ export default async function LandingPage() {
           </div>
           
            <div className="mt-8 text-center md:hidden">
-            <Link href="/fleet" className="text-orange-600 font-bold">
+            <Link href="/fleet" className="text-red-600 font-bold">
               View All Cars &rarr;
             </Link>
           </div>

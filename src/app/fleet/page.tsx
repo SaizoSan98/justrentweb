@@ -23,22 +23,22 @@ export default async function FleetPage({
   function getStockImageUrl(make: string, model: string): string {
     const key = `${make} ${model}`.toLowerCase();
     const map: Record<string, string> = {
-      "bmw x5": "https://images.unsplash.com/photo-1555215696-99ac45e43d34?auto=format&fit=crop&q=80",
-      "mercedes-benz c-class": "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&q=80",
-      "audi a5": "https://images.unsplash.com/photo-1606152421802-db97b9c7a11b?auto=format&fit=crop&q=80",
-      "tesla model 3": "https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&q=80",
-      "porsche 911 carrera": "https://images.unsplash.com/photo-1503376763036-066120622c74?auto=format&fit=crop&q=80",
+      "bmw x5": "https://www.pngmart.com/files/22/BMW-X5-PNG-Clipart.png",
+      "mercedes-benz c-class": "https://www.pngmart.com/files/22/Mercedes-Benz-C-Class-PNG-Isolated-Pic.png",
+      "audi a5": "https://www.pngmart.com/files/22/Audi-A5-PNG-File.png",
+      "tesla model 3": "https://www.pngmart.com/files/22/Tesla-Model-3-PNG-Picture.png",
+      "porsche 911 carrera": "https://www.pngmart.com/files/22/Porsche-911-PNG-Clipart.png",
     };
     if (map[key]) return map[key];
     const brandFallback: Record<string, string> = {
-      "bmw": "https://images.unsplash.com/photo-1619767886558-ef9bb5e31403?auto=format&fit=crop&q=80",
-      "mercedes-benz": "https://images.unsplash.com/photo-1616789919274-52a8d55e6b69?auto=format&fit=crop&q=80",
-      "audi": "https://images.unsplash.com/photo-1614241202229-4a27a8d15b10?auto=format&fit=crop&q=80",
-      "tesla": "https://images.unsplash.com/photo-1606676463510-b1c153c0a5fd?auto=format&fit=crop&q=80",
-      "porsche": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&q=80",
+      "bmw": "https://www.pngmart.com/files/22/BMW-X5-PNG-Clipart.png",
+      "mercedes-benz": "https://www.pngmart.com/files/22/Mercedes-Benz-C-Class-PNG-Isolated-Pic.png",
+      "audi": "https://www.pngmart.com/files/22/Audi-A5-PNG-File.png",
+      "tesla": "https://www.pngmart.com/files/22/Tesla-Model-3-PNG-Picture.png",
+      "porsche": "https://www.pngmart.com/files/22/Porsche-911-PNG-Clipart.png",
     };
     const brand = make.toLowerCase();
-    return brandFallback[brand] ?? "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&q=80";
+    return brandFallback[brand] ?? "https://www.pngmart.com/files/22/Tesla-Model-3-PNG-Picture.png";
   }
   
   // Date parsing and calculation
@@ -104,21 +104,20 @@ export default async function FleetPage({
   })));
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900 font-sans">
+    <div className="min-h-screen bg-white text-zinc-900 font-sans">
       {/* Header */}
       <header className="bg-white border-b border-zinc-200 sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
           <Link href="/" className="text-2xl font-bold tracking-tighter">
-            Just<span className="text-orange-600">Rent</span>
+            Just<span className="text-red-600">Rent</span>
           </Link>
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-            <Link href="/" className="text-zinc-600 hover:text-orange-600 transition-colors">Home</Link>
-            <Link href="/fleet" className="text-orange-600">Fleet</Link>
-            <Link href="/about" className="text-zinc-600 hover:text-orange-600 transition-colors">About</Link>
-            <Link href="/contact" className="text-zinc-600 hover:text-orange-600 transition-colors">Contact</Link>
+            <Link href="/" className="text-zinc-600 hover:text-red-600 transition-colors">Home</Link>
+            <Link href="/fleet" className="text-red-600 font-bold">Our Fleet</Link>
+            <Link href="/#contact" className="text-zinc-600 hover:text-red-600 transition-colors">Contact</Link>
           </nav>
-          <Button className="bg-orange-600 hover:bg-orange-700 text-white rounded-full px-6 font-semibold shadow-md shadow-orange-600/20">
-            Sign In
+          <Button className="bg-red-600 hover:bg-red-700 text-white rounded-full px-6 font-semibold shadow-md shadow-red-600/20 uppercase tracking-wide">
+            Book Now!
           </Button>
         </div>
       </header>
@@ -128,7 +127,7 @@ export default async function FleetPage({
         <div className="mb-12 text-center">
           <h1 className="text-4xl font-extrabold mb-4 text-zinc-900 tracking-tight">Our Premium Fleet</h1>
           <p className="text-zinc-500 text-lg max-w-2xl mx-auto">
-            Showing prices for <span className="font-bold text-orange-600">{diffDays} days</span> rental period.
+            Showing prices for <span className="font-bold text-red-600">{diffDays} days</span> rental period.
           </p>
         </div>
 
@@ -140,8 +139,8 @@ export default async function FleetPage({
               href={cat === 'All Categories' ? `/fleet?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}` : `/fleet?category=${cat}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`}
               className={`px-6 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all shadow-sm ${
                 (category === cat || (!category && cat === 'All Categories'))
-                  ? 'bg-orange-600 text-white shadow-orange-600/30 transform scale-105' 
-                  : 'bg-white text-zinc-500 border border-zinc-200 hover:border-orange-600 hover:text-orange-600'
+                  ? 'bg-red-600 text-white shadow-red-600/30 transform scale-105' 
+                  : 'bg-white text-zinc-500 border border-zinc-200 hover:border-red-600 hover:text-red-600'
               }`}
             >
               {cat}
@@ -157,7 +156,7 @@ export default async function FleetPage({
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {cars.map((car) => {
+            {cars.map((car: any) => {
               const imageUrl = car.imageUrl ?? getStockImageUrl(car.make, car.model);
               return (
                 <FleetCard 
