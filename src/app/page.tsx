@@ -69,7 +69,7 @@ export default async function LandingPage() {
       {/* Hero Section */}
       <section className="relative h-[85vh] flex items-center justify-center overflow-hidden bg-zinc-900">
         {/* Background Image */}
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center opacity-40"></div>
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1503376763036-066120622c74?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center opacity-40"></div>
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
         
