@@ -39,16 +39,6 @@ export function BookingEngine({
     to: initialEndDate,
   }))
   
-  // Update state when props change (crucial for navigation from home to fleet)
-  React.useEffect(() => {
-    if (initialStartDate || initialEndDate) {
-      setDateRange({
-        from: initialStartDate || new Date(),
-        to: initialEndDate
-      })
-    }
-  }, [initialStartDate, initialEndDate])
-  
   const [startTime, setStartTime] = React.useState("10:00")
   const [endTime, setEndTime] = React.useState("10:00")
   const [location] = React.useState("Budapest Airport (BUD)")
