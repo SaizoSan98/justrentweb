@@ -4,6 +4,12 @@ import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { put } from "@vercel/blob"
+import { logout } from "@/lib/auth"
+
+export async function logoutAction() {
+  await logout()
+  redirect('/login')
+}
 
 export async function deleteCar(id: string) {
   try {
