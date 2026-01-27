@@ -128,31 +128,7 @@ export default async function FleetPage({
   return (
     <div className="min-h-screen bg-white text-zinc-900 font-sans">
       {/* Header */}
-      <header className="bg-white border-b border-zinc-200 sticky top-0 z-50 shadow-sm">
-        <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold tracking-tighter">
-            Just<span className="text-red-600">Rent</span>
-          </Link>
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-            <Link href="/" className="text-zinc-600 hover:text-red-600 transition-colors">Home</Link>
-            <Link href="/fleet" className="text-red-600 font-bold">Our Fleet</Link>
-            <Link href="/#contact" className="text-zinc-600 hover:text-red-600 transition-colors">Contact</Link>
-          </nav>
-          <div className="flex items-center gap-4">
-             <div className="hidden md:flex items-center gap-4">
-               <Button variant="ghost" className="text-zinc-600 hover:text-red-600 font-bold">
-                 Login
-               </Button>
-               <Button variant="ghost" className="text-zinc-600 hover:text-red-600 font-bold">
-                 Register
-               </Button>
-             </div>
-             <Button className="bg-red-600 hover:bg-red-700 text-white rounded-full px-6 font-semibold shadow-md shadow-red-600/20 uppercase tracking-wide">
-               Book Now!
-             </Button>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-12">

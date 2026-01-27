@@ -66,34 +66,7 @@ export default async function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen bg-white text-zinc-900 font-sans">
       {/* Navbar */}
-      <header className="fixed top-0 w-full z-50 border-b border-zinc-200 bg-white/95 backdrop-blur-md">
-        <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold tracking-tighter text-zinc-900">
-            Just<span className="text-red-600">Rent</span>
-          </Link>
-          <nav className="hidden md:flex gap-8 text-sm font-medium">
-            <Link href="/" className="text-zinc-600 hover:text-red-600 transition-colors">Home</Link>
-            <Link href="/fleet" className="text-zinc-600 hover:text-red-600 transition-colors">Our Fleet</Link>
-            <Link href="#contact" className="text-zinc-600 hover:text-red-600 transition-colors">Contact</Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-4 mr-4">
-              <Button variant="ghost" className="text-zinc-600 hover:text-red-600 font-bold">
-                Login
-              </Button>
-              <Button variant="ghost" className="text-zinc-600 hover:text-red-600 font-bold">
-                Register
-              </Button>
-            </div>
-            <Button variant="ghost" className="text-zinc-900 hover:text-red-600 hover:bg-zinc-100 font-bold uppercase tracking-wide">
-              Call Now!
-            </Button>
-            <Button className="bg-red-600 hover:bg-red-700 text-white rounded-full px-6 shadow-lg shadow-red-600/20 uppercase tracking-wide font-bold">
-              Book Now!
-            </Button>
-          </div>
-        </div>
-      </header>
+      <Header transparent={true} />
 
       {/* Hero Section */}
       <section className="relative h-[85vh] flex items-center justify-center overflow-hidden bg-zinc-900">
