@@ -74,9 +74,9 @@ export default async function LandingPage() {
         {/* Background Image */}
         <div className="absolute inset-0 bg-[url('https://images4.alphacoders.com/988/988087.jpg')] bg-cover bg-center opacity-70"></div>
         {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-white/30 via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
         
-        <div className="relative container mx-auto px-6 flex flex-col items-center text-center z-10 pt-20">
+        <div className="relative container mx-auto px-6 flex flex-col items-center text-center z-10 pt-20 pb-32">
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-6 drop-shadow-lg">
             JUST <span className="text-red-600">RENT</span>
           </h1>
@@ -88,7 +88,7 @@ export default async function LandingPage() {
       </section>
 
       {/* Booking Engine */}
-      <BookingEngine className="-mt-32" />
+      <BookingEngine className="-mt-48" />
 
       {/* About Section */}
       <section id="about" className="pt-32 pb-24 bg-white">
