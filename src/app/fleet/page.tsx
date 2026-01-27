@@ -21,6 +21,17 @@ export default async function FleetPage({
   };
   
   function getStockImageUrl(make: string, model: string): string {
+    // Explicit mappings for the 3 test cars as requested by user
+    if (make === 'Tesla' && model === 'Model 3') {
+      return "https://imgd.aeplcdn.com/1056x594/n/cw/ec/175993/kushaq-exterior-right-front-three-quarter-2.png?isig=0&q=80&wm=1";
+    }
+    if (make === 'BMW' && model === 'X5') {
+      return "https://imgd.aeplcdn.com/370x208/n/cw/ec/102663/baleno-exterior-right-front-three-quarter-69.png?isig=0&q=80";
+    }
+    if (make === 'Mercedes-Benz' && model === 'C-Class') {
+      return "https://imgd.aeplcdn.com/370x208/n/cw/ec/51909/a4-exterior-right-front-three-quarter-80.png?isig=0&q=80";
+    }
+
     const pool = [
       "https://imgd.aeplcdn.com/1056x594/n/cw/ec/175993/kushaq-exterior-right-front-three-quarter-2.png?isig=0&q=80&wm=1",
       "https://imgd.aeplcdn.com/370x208/n/cw/ec/102663/baleno-exterior-right-front-three-quarter-69.png?isig=0&q=80",
