@@ -54,8 +54,18 @@ model Car {
   damageReports   DamageReport[]
   pricingTiers    PricingTier[]
   availabilities  Availability[]
+  deposit         Decimal        @default(0)
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
+}
+
+model Extra {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  price       Decimal
+  priceType   String    @default("PER_DAY") // PER_DAY, PER_RENTAL
+  bookings    Booking[]
 }
 
 model Booking {
@@ -68,6 +78,7 @@ model Booking {
   user        User          @relation(fields: [userId], references: [id])
   carId       String
   car         Car           @relation(fields: [carId], references: [id])
+  extras      Extra[]
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 }

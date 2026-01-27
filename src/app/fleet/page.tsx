@@ -114,22 +114,26 @@ export default async function FleetPage({
       pricePerDay: 'asc',
     },
   }).then((items: any[]) => items.map((car: any) => {
-    // FORCE OVERRIDE IMAGES as requested by user
-    let forcedImage = car.imageUrl;
+    // Only use stock images if no image is uploaded
+    let displayImage = car.imageUrl;
     
-    if (car.make === 'Tesla' && car.model === 'Model 3') {
-      forcedImage = "https://imgd.aeplcdn.com/1056x594/n/cw/ec/175993/kushaq-exterior-right-front-three-quarter-2.png?isig=0&q=80&wm=1";
-    } else if (car.make === 'BMW' && car.model === 'X5') {
-      forcedImage = "https://imgd.aeplcdn.com/370x208/n/cw/ec/102663/baleno-exterior-right-front-three-quarter-69.png?isig=0&q=80";
-    } else if (car.make === 'Mercedes-Benz' && car.model === 'C-Class') {
-      forcedImage = "https://imgd.aeplcdn.com/370x208/n/cw/ec/51909/a4-exterior-right-front-three-quarter-80.png?isig=0&q=80";
+    if (!displayImage) {
+      if (car.make === 'Tesla' && car.model === 'Model 3') {
+        displayImage = "https://imgd.aeplcdn.com/1056x594/n/cw/ec/175993/kushaq-exterior-right-front-three-quarter-2.png?isig=0&q=80&wm=1";
+      } else if (car.make === 'BMW' && car.model === 'X5') {
+        displayImage = "https://imgd.aeplcdn.com/370x208/n/cw/ec/102663/baleno-exterior-right-front-three-quarter-69.png?isig=0&q=80";
+      } else if (car.make === 'Mercedes-Benz' && car.model === 'C-Class') {
+        displayImage = "https://imgd.aeplcdn.com/370x208/n/cw/ec/51909/a4-exterior-right-front-three-quarter-80.png?isig=0&q=80";
+      } else {
+        displayImage = getStockImageUrl(car.make, car.model);
+      }
     }
 
     return {
       ...car,
-      imageUrl: forcedImage,
+      imageUrl: displayImage,
       pricePerDay: Number(car.pricePerDay),
-      pricingTiers: car.pricingTiers.map((tier: any) => ({
+      pricingTiers: car.pricingTiers.sort((a: any, b: any) => a.minDays - b.minDays).map((tier: any) => ({
         ...tier,
         pricePerDay: Number(tier.pricePerDay),
         deposit: Number(tier.deposit)
