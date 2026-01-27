@@ -52,6 +52,8 @@ model Car {
   features        String[]
   bookings        Booking[]
   damageReports   DamageReport[]
+  pricingTiers    PricingTier[]
+  availabilities  Availability[]
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 }
@@ -77,4 +79,25 @@ model DamageReport {
   carId       String
   car         Car      @relation(fields: [carId], references: [id])
   createdAt   DateTime @default(now())
+}
+
+model PricingTier {
+  id          String   @id @default(cuid())
+  carId       String
+  car         Car      @relation(fields: [carId], references: [id])
+  minDays     Int
+  maxDays     Int?
+  pricePerDay Decimal
+  deposit     Decimal
+  createdAt   DateTime @default(now())
+}
+
+model Availability {
+  id        String    @id @default(cuid())
+  carId     String
+  car       Car       @relation(fields: [carId], references: [id])
+  startDate DateTime
+  endDate   DateTime
+  status    CarStatus
+  createdAt DateTime  @default(now())
 }

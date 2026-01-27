@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Car } from "@prisma/client";
 import { Users, Briefcase, Fuel, Snowflake, Gauge, Info } from "lucide-react";
 
 export const dynamic = 'force-dynamic';
@@ -9,22 +8,61 @@ export const dynamic = 'force-dynamic';
 export default async function FleetPage({
   searchParams,
 }: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  searchParams?: { [key: string]: string | string[] | undefined }
 }) {
-  const params = await searchParams;
+  const params = searchParams ?? {};
   const category = typeof params.category === 'string' ? params.category : undefined;
+  
+  type PricingTier = {
+    minDays: number;
+    maxDays: number | null;
+    pricePerDay: number;
+    deposit: number;
+  };
+  type CarItem = {
+    id: string;
+    make: string;
+    model: string;
+    year: number;
+    category: string;
+    imageUrl: string | null;
+    pricePerDay: number;
+    status: string;
+    pricingTiers: PricingTier[];
+  };
+  
+  function getStockImageUrl(make: string, model: string): string {
+    const key = `${make} ${model}`.toLowerCase();
+    const map: Record<string, string> = {
+      "bmw x5": "https://images.unsplash.com/photo-1555215696-99ac45e43d34?auto=format&fit=crop&q=80",
+      "mercedes-benz c-class": "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&q=80",
+      "audi a5": "https://images.unsplash.com/photo-1606152421802-db97b9c7a11b?auto=format&fit=crop&q=80",
+      "tesla model 3": "https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&q=80",
+      "porsche 911 carrera": "https://images.unsplash.com/photo-1503376763036-066120622c74?auto=format&fit=crop&q=80",
+    };
+    if (map[key]) return map[key];
+    const brandFallback: Record<string, string> = {
+      "bmw": "https://images.unsplash.com/photo-1619767886558-ef9bb5e31403?auto=format&fit=crop&q=80",
+      "mercedes-benz": "https://images.unsplash.com/photo-1616789919274-52a8d55e6b69?auto=format&fit=crop&q=80",
+      "audi": "https://images.unsplash.com/photo-1614241202229-4a27a8d15b10?auto=format&fit=crop&q=80",
+      "tesla": "https://images.unsplash.com/photo-1606676463510-b1c153c0a5fd?auto=format&fit=crop&q=80",
+      "porsche": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&q=80",
+    };
+    const brand = make.toLowerCase();
+    return brandFallback[brand] ?? "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&q=80";
+  }
   
   // Date parsing and calculation
   const startDateStr = typeof params.startDate === 'string' ? params.startDate : undefined;
   const endDateStr = typeof params.endDate === 'string' ? params.endDate : undefined;
   
   const startDate = startDateStr ? new Date(startDateStr) : new Date();
-  const endDate = endDateStr ? new Date(endDateStr) : new Date(Date.now() + 3 * 24 * 60 * 60 * 1000); // Default 3 days
+  const endDate = endDateStr ? new Date(endDateStr) : new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000);
   
   const diffTime = Math.abs(endDate.getTime() - startDate.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1; // Minimum 1 day
 
-  const whereClause: any = {
+  const whereClause: { status: 'AVAILABLE'; category?: string } = {
     status: 'AVAILABLE',
   };
 
@@ -32,8 +70,37 @@ export default async function FleetPage({
     whereClause.category = category;
   }
 
-  const cars = await prisma.car.findMany({
-    where: whereClause,
+  const cars: CarItem[] = await prisma.car.findMany({
+    where: {
+      ...whereClause,
+      AND: [
+        {
+          availabilities: {
+            some: {
+              status: 'AVAILABLE',
+              startDate: { lte: startDate },
+              endDate: { gte: endDate },
+            },
+          },
+        },
+        {
+          NOT: {
+            availabilities: {
+              some: {
+                status: { in: ['MAINTENANCE', 'RENTED', 'OUT_OF_SERVICE'] },
+                AND: [
+                  { startDate: { lt: endDate } },
+                  { endDate: { gt: startDate } },
+                ],
+              },
+            },
+          },
+        },
+      ],
+    },
+    include: {
+      pricingTiers: true,
+    },
     orderBy: {
       pricePerDay: 'asc',
     },
@@ -93,84 +160,15 @@ export default async function FleetPage({
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {cars.map((car: Car) => {
-              const totalPrice = Number(car.pricePerDay) * diffDays;
-              
+            {cars.map((car) => {
+              const imageUrl = car.imageUrl ?? getStockImageUrl(car.make, car.model);
               return (
-                <div key={car.id} className="group bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 relative border border-zinc-100 flex flex-col">
-                  
-                  {/* Info Badge */}
-                  <div className="absolute top-0 left-0 z-20">
-                    <div className="bg-orange-600 text-white w-12 h-12 flex items-center justify-center rounded-br-3xl shadow-md">
-                      <Info className="w-6 h-6" />
-                    </div>
-                  </div>
-
-                  {/* Car Category Badge (Top Right - Optional/Stylistic) */}
-                  <div className="absolute top-4 right-4 z-10">
-                    <span className="text-xs font-bold text-orange-600 uppercase tracking-widest">{car.category}</span>
-                  </div>
-
-                  {/* Image Area */}
-                  <div className="h-48 bg-gradient-to-b from-zinc-50 to-white relative flex items-center justify-center p-6 mt-6">
-                    {car.imageUrl ? (
-                      <img 
-                        src={car.imageUrl} 
-                        alt={`${car.make} ${car.model}`} 
-                        className="w-full h-full object-contain drop-shadow-xl group-hover:scale-110 transition-transform duration-500"
-                      />
-                    ) : (
-                      <div className="text-zinc-300 font-bold text-2xl">NO IMAGE</div>
-                    )}
-                  </div>
-
-                  {/* Content Area */}
-                  <div className="p-6 pt-2 flex flex-col flex-grow text-center">
-                    <h3 className="text-xl font-black text-zinc-900 uppercase tracking-tight mb-1">
-                      {car.make} {car.model}
-                    </h3>
-                    <p className="text-zinc-400 text-sm font-medium mb-6">or similar</p>
-
-                    {/* Features Grid */}
-                    <div className="grid grid-cols-3 gap-y-6 gap-x-2 mb-8 px-2">
-                      <div className="flex flex-col items-center gap-1">
-                        <Users className="w-5 h-5 text-orange-600" />
-                        <span className="text-xs text-zinc-500 font-medium">5</span>
-                      </div>
-                      <div className="flex flex-col items-center gap-1">
-                        <Briefcase className="w-5 h-5 text-orange-600" />
-                        <span className="text-xs text-zinc-500 font-medium">3</span>
-                      </div>
-                      <div className="flex flex-col items-center gap-1">
-                        <div className="w-5 h-5 flex items-center justify-center border-2 border-orange-600 rounded text-[10px] font-bold text-orange-600">5</div>
-                        <span className="text-xs text-zinc-500 font-medium">Doors</span>
-                      </div>
-                      <div className="flex flex-col items-center gap-1">
-                        <Snowflake className="w-5 h-5 text-orange-600" />
-                        <span className="text-xs text-zinc-500 font-medium">AC</span>
-                      </div>
-                      <div className="flex flex-col items-center gap-1">
-                        <Gauge className="w-5 h-5 text-orange-600" />
-                        <span className="text-xs text-zinc-500 font-medium">Auto</span>
-                      </div>
-                      <div className="flex flex-col items-center gap-1">
-                        <Fuel className="w-5 h-5 text-orange-600" />
-                        <span className="text-xs text-zinc-500 font-medium">Petrol</span>
-                      </div>
-                    </div>
-
-                    {/* Price & Action */}
-                    <div className="mt-auto">
-                      <div className="mb-4">
-                        <span className="text-2xl font-black text-orange-600">{totalPrice.toLocaleString()} HUF</span>
-                        <span className="text-xs text-zinc-400 font-medium block uppercase tracking-wide">for {diffDays} days</span>
-                      </div>
-                      <Button className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-6 rounded-2xl shadow-lg shadow-orange-600/30 hover:shadow-orange-600/40 transition-all transform active:scale-95 uppercase tracking-wider text-base">
-                        FOGLALÁS
-                      </Button>
-                    </div>
-                  </div>
-                </div>
+                <FleetCard 
+                  key={car.id} 
+                  car={car} 
+                  diffDays={diffDays} 
+                  imageUrl={imageUrl} 
+                />
               );
             })}
           </div>

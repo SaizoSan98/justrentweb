@@ -80,6 +80,78 @@ async function main() {
       data: car,
     })
     console.log(`Created car with id: ${createdCar.id}`)
+
+    // Pricing tiers per car
+    await prisma.pricingTier.createMany({
+      data: [
+        {
+          carId: createdCar.id,
+          minDays: 1,
+          maxDays: 2,
+          pricePerDay: car.pricePerDay,
+          deposit: 200,
+        },
+        {
+          carId: createdCar.id,
+          minDays: 3,
+          maxDays: 6,
+          pricePerDay: Number(car.pricePerDay) * 0.95,
+          deposit: 180,
+        },
+        {
+          carId: createdCar.id,
+          minDays: 7,
+          maxDays: 14,
+          pricePerDay: Number(car.pricePerDay) * 0.9,
+          deposit: 160,
+        },
+        {
+          carId: createdCar.id,
+          minDays: 15,
+          maxDays: 30,
+          pricePerDay: Number(car.pricePerDay) * 0.85,
+          deposit: 140,
+        },
+        {
+          carId: createdCar.id,
+          minDays: 31,
+          maxDays: null,
+          pricePerDay: Number(car.pricePerDay) * 0.8,
+          deposit: 120,
+        },
+      ],
+    })
+
+    // Availability blocks per car: mostly available next 30 days, with maintenance gaps
+    const today = new Date()
+    const addDays = (d: Date, n: number) => new Date(d.getTime() + n * 24 * 60 * 60 * 1000)
+
+    await prisma.availability.create({
+      data: {
+        carId: createdCar.id,
+        startDate: today,
+        endDate: addDays(today, 30),
+        status: CarStatus.AVAILABLE,
+      },
+    })
+
+    await prisma.availability.create({
+      data: {
+        carId: createdCar.id,
+        startDate: addDays(today, 10),
+        endDate: addDays(today, 12),
+        status: CarStatus.MAINTENANCE,
+      },
+    })
+
+    await prisma.availability.create({
+      data: {
+        carId: createdCar.id,
+        startDate: addDays(today, 20),
+        endDate: addDays(today, 21),
+        status: CarStatus.RENTED,
+      },
+    })
   }
 
   console.log('Seeding finished.')

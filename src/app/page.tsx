@@ -2,7 +2,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { BookingEngine } from "@/components/booking/BookingEngine";
 import { prisma } from "@/lib/prisma";
-import { Car } from "@prisma/client";
 
 export const dynamic = 'force-dynamic'
 
@@ -13,6 +12,36 @@ export default async function LandingPage() {
     orderBy: { pricePerDay: 'asc' }
   });
 
+  type CarItem = {
+    id: string;
+    make: string;
+    model: string;
+    year: number;
+    category: string;
+    imageUrl: string | null;
+    pricePerDay: number;
+    status: string;
+  };
+  function getStockImageUrl(make: string, model: string): string {
+    const key = `${make} ${model}`.toLowerCase();
+    const map: Record<string, string> = {
+      "bmw x5": "https://images.unsplash.com/photo-1555215696-99ac45e43d34?auto=format&fit=crop&q=80",
+      "mercedes-benz c-class": "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&q=80",
+      "audi a5": "https://images.unsplash.com/photo-1606152421802-db97b9c7a11b?auto=format&fit=crop&q=80",
+      "tesla model 3": "https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&q=80",
+      "porsche 911 carrera": "https://images.unsplash.com/photo-1503376763036-066120622c74?auto=format&fit=crop&q=80",
+    };
+    if (map[key]) return map[key];
+    const brandFallback: Record<string, string> = {
+      "bmw": "https://images.unsplash.com/photo-1619767886558-ef9bb5e31403?auto=format&fit=crop&q=80",
+      "mercedes-benz": "https://images.unsplash.com/photo-1616789919274-52a8d55e6b69?auto=format&fit=crop&q=80",
+      "audi": "https://images.unsplash.com/photo-1614241202229-4a27a8d15b10?auto=format&fit=crop&q=80",
+      "tesla": "https://images.unsplash.com/photo-1606676463510-b1c153c0a5fd?auto=format&fit=crop&q=80",
+      "porsche": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&q=80",
+    };
+    const brand = make.toLowerCase();
+    return brandFallback[brand] ?? "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&q=80";
+  }
   return (
     <div className="flex flex-col min-h-screen bg-zinc-50 text-zinc-900 font-sans">
       {/* Navbar */}
@@ -53,7 +82,7 @@ export default async function LandingPage() {
             Drive the <span className="text-orange-500">Extraordinary.</span>
           </h1>
           <p className="text-xl md:text-2xl text-zinc-100 max-w-2xl mb-12 font-light leading-relaxed drop-shadow-sm">
-            Experience the thrill of driving the world's finest automobiles.
+            Experience the thrill of driving the world&#39;s finest automobiles.
             Seamless booking, exceptional service.
           </p>
         </div>
@@ -69,7 +98,7 @@ export default async function LandingPage() {
             <h2 className="text-3xl md:text-4xl font-bold mb-6 text-zinc-900">Why Choose JustRent?</h2>
             <p className="text-zinc-600 text-lg leading-relaxed mb-8">
               Founded with a passion for excellence, JustRent offers a curated selection of 
-              premium vehicles for those who demand more from their journey. Whether it's 
+              premium vehicles for those who demand more from their journey. Whether it&#39;s 
               a business trip or a weekend getaway, our fleet is meticulously maintained 
               to ensure safety, comfort, and style.
             </p>
@@ -127,20 +156,14 @@ export default async function LandingPage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {cars.map((car) => (
+            {cars.map((car: CarItem) => (
               <div key={car.id} className="group bg-white border border-zinc-200 rounded-2xl overflow-hidden hover:shadow-xl hover:border-orange-200 transition-all duration-300">
                 <div className="h-56 bg-zinc-100 relative overflow-hidden">
-                   {car.imageUrl ? (
-                     <img 
-                       src={car.imageUrl} 
-                       alt={`${car.make} ${car.model}`} 
-                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                     />
-                   ) : (
-                     <div className="absolute inset-0 flex items-center justify-center text-zinc-400">
-                       No Image
-                     </div>
-                   )}
+                   <img 
+                     src={car.imageUrl ?? getStockImageUrl(car.make, car.model)} 
+                     alt={`${car.make} ${car.model}`} 
+                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                   />
                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-zinc-900 shadow-sm">
                      {car.category}
                    </div>
