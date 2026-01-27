@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { BookingEngine } from "@/components/booking/BookingEngine";
+import { Header } from "@/components/layout/Header";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic'
