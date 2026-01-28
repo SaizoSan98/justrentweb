@@ -8,7 +8,8 @@ import {
   Calendar, 
   PlusCircle,
   LogOut,
-  Star
+  Star,
+  Tag
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -24,15 +25,15 @@ export default function AdminLayout({
       {/* Sidebar */}
       <aside className="w-64 bg-zinc-900 text-white flex flex-col fixed h-full z-50">
         <div className="p-6 border-b border-zinc-800">
-          <Link href="/" className="text-2xl font-black tracking-tight">
+          <Link href="/" className="text-2xl font-black tracking-tight block">
             JUST <span className="text-red-600">RENT</span>
             <span className="text-xs font-normal text-zinc-400 block tracking-widest mt-1">ADMIN PANEL</span>
-            <div className="mt-4 pt-4 border-t border-zinc-800 text-xs">
-              <span className="text-zinc-500 block">Welcome,</span>
-              <span className="text-white font-bold block">Farkas Bence</span>
-              <span className="text-red-600 font-bold text-[10px] uppercase tracking-wider">SUPERADMIN</span>
-            </div>
           </Link>
+          <div className="mt-4 pt-4 border-t border-zinc-800 text-xs">
+            <span className="text-zinc-500 block">Welcome,</span>
+            <span className="text-white font-bold block">Farkas Bence</span>
+            <span className="text-red-600 font-bold text-[10px] uppercase tracking-wider">SUPERADMIN</span>
+          </div>
         </div>
         
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
@@ -54,6 +55,13 @@ export default function AdminLayout({
             </Button>
           </Link>
           
+          <Link href="/admin/categories">
+            <Button variant="ghost" className="w-full justify-start text-zinc-300 hover:text-white hover:bg-zinc-800">
+              <Tag className="mr-3 h-5 w-5" />
+              Categories
+            </Button>
+          </Link>
+
           <Link href="/admin/cars/new">
             <Button variant="ghost" className="w-full justify-start text-zinc-300 hover:text-white hover:bg-zinc-800">
               <PlusCircle className="mr-3 h-5 w-5" />

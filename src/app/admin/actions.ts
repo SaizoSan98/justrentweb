@@ -318,3 +318,35 @@ export async function toggleFeaturedCar(carId: string, isFeatured: boolean) {
     console.error("Failed to toggle featured status:", error)
   }
 }
+
+export async function createCategory(formData: FormData) {
+  const name = formData.get('name') as string
+  const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '')
+  const description = formData.get('description') as string
+  const imageUrl = formData.get('imageUrl') as string
+
+  try {
+    await prisma.category.create({
+      data: {
+        name,
+        slug,
+        description,
+        imageUrl
+      }
+    })
+    revalidatePath('/admin/categories')
+  } catch (error) {
+    console.error("Failed to create category:", error)
+  }
+}
+
+export async function deleteCategory(id: string) {
+  try {
+    await prisma.category.delete({
+      where: { id }
+    })
+    revalidatePath('/admin/categories')
+  } catch (error) {
+    console.error("Failed to delete category:", error)
+  }
+}
