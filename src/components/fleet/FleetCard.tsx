@@ -266,6 +266,19 @@ export function FleetCard({
                   </div>
                 </div>
              </div>
+
+             {/* Dynamic Price Display */}
+             <div className="mt-auto pt-4 border-t border-zinc-200">
+                <div className="flex justify-between items-end">
+                   <div>
+                      <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Total</span>
+                      <div className="text-[10px] text-zinc-400">Incl. VAT & Deposit</div>
+                   </div>
+                   <div className="text-xl font-black text-red-600">
+                      €{totalRequired.toFixed(2)}
+                   </div>
+                </div>
+             </div>
           </div>
 
           {/* RIGHT COLUMN: Configuration & Steps */}
