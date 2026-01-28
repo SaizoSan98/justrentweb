@@ -104,6 +104,13 @@ export default async function AdminLayout({
               Users
             </Button>
           </Link>
+
+          <Link href="/admin/settings">
+            <Button variant="ghost" className="w-full justify-start text-zinc-300 hover:text-white hover:bg-zinc-800">
+              <Settings className="mr-3 h-5 w-5" />
+              Settings
+            </Button>
+          </Link>
         </nav>
 
         <div className="p-4 border-t border-zinc-800">
