@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { format } from "date-fns"
 import { BookingFilters } from "@/components/admin/BookingFilters"
+import { BookingActions } from "@/components/admin/BookingActions"
 
 export default async function BookingsPage({
   searchParams,
@@ -69,6 +70,7 @@ export default async function BookingsPage({
                 <th className="px-6 py-4">Dates</th>
                 <th className="px-6 py-4">Total</th>
                 <th className="px-6 py-4">Status</th>
+                <th className="px-6 py-4">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-100">
@@ -101,6 +103,9 @@ export default async function BookingsPage({
                     }`}>
                       {booking.status}
                     </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <BookingActions bookingId={booking.id} status={booking.status} />
                   </td>
                 </tr>
               ))}

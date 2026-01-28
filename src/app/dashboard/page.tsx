@@ -5,10 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Calendar, Car, Clock } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { redirect } from "next/navigation"
 
 export default async function DashboardPage() {
   const session = await getSession()
   if (!session?.user?.id) return null
+
+  // Redirect Admins to Admin Dashboard
+  if (session.user.role === 'ADMIN' || session.user.role === 'SUPERADMIN') {
+    redirect('/admin')
+  }
 
   const bookings = await prisma.booking.findMany({
     where: { userId: session.user.id },

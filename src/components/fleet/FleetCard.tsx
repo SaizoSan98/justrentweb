@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useActionState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Users, Briefcase, Gauge, Info, Check, Shield, Zap, CreditCard, MapPin, Calendar, ArrowRight, ChevronLeft, AlertCircle } from "lucide-react"
+import { Users, Briefcase, Gauge, Info, Check, Shield, Zap, CreditCard, MapPin, Calendar, ArrowRight, ChevronLeft, AlertCircle, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -15,6 +15,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
+
+import { createBooking } from "@/app/fleet/actions"
 
 type PricingTier = {
   minDays: number
@@ -90,6 +92,8 @@ export function FleetCard({
 
   const imageUrl = car.imageUrl || (car.images && car.images.length > 0 ? car.images[0] : "/placeholder-car.jpg")
 
+  const [state, formAction, isPending] = useActionState(createBooking, null)
+
   // Pricing Logic
   const tier = car.pricingTiers.find(
     (t: any) => diffDays >= t.minDays && (t.maxDays === null || diffDays <= t.maxDays)
@@ -160,7 +164,7 @@ export function FleetCard({
             <Briefcase className="w-3.5 h-3.5" /> {car.suitcases}
           </div>
           <div className="flex items-center gap-1.5 bg-zinc-100 px-2 py-1 rounded text-zinc-600 text-xs font-bold border border-zinc-200">
-            <Gauge className="w-3.5 h-3.5" /> {car.transmission === 'AUTOMATIC' ? 'Auto' : 'Manual'}
+            <Settings className="w-3.5 h-3.5" /> {car.transmission === 'AUTOMATIC' ? 'Automatic' : 'Manual'}
           </div>
         </div>
       </div>
@@ -238,8 +242,8 @@ export function FleetCard({
                    <span className="font-bold text-zinc-700">{car.suitcases} bags</span>
                 </div>
                 <div className="flex items-center gap-2 p-2 bg-white rounded-lg border border-zinc-100">
-                   <Gauge className="w-4 h-4 text-zinc-400" />
-                   <span className="font-bold text-zinc-700">{car.transmission === 'AUTOMATIC' ? 'Auto' : 'Manual'}</span>
+                   <Settings className="w-4 h-4 text-zinc-400" />
+                   <span className="font-bold text-zinc-700">{car.transmission === 'AUTOMATIC' ? 'Automatic' : 'Manual'}</span>
                 </div>
                 <div className="flex items-center gap-2 p-2 bg-white rounded-lg border border-zinc-100">
                    <div className="w-4 h-4 flex items-center justify-center border border-zinc-400 rounded text-[9px] font-bold text-zinc-400">{car.doors}</div>
@@ -380,9 +384,6 @@ export function FleetCard({
                   </div>
                 </div>
 
-                {/* Extras Selection (Moved to Step 2) */}
-                {/* REMOVED FROM STEP 1 */}
-
                 {/* Price Breakdown */}
                 <div className="bg-zinc-50 rounded-xl p-4 border border-zinc-100 space-y-2 mt-auto mb-16 md:mb-0">
                   <h4 className="font-bold text-zinc-900 text-xs mb-2">Price Breakdown</h4>
@@ -522,37 +523,50 @@ export function FleetCard({
             )}
 
             {step === 3 && (
-              <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300 pb-20 md:pb-0">
+              <form action={formAction} className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300 pb-20 md:pb-0">
+                 <input type="hidden" name="carId" value={car.id} />
+                 <input type="hidden" name="startDate" value={startDate.toISOString()} />
+                 <input type="hidden" name="endDate" value={endDate ? endDate.toISOString() : new Date(startDate.getTime() + 24 * 60 * 60 * 1000).toISOString()} />
+                 <input type="hidden" name="totalPrice" value={totalRequired} />
+                 <input type="hidden" name="extras" value={JSON.stringify(selectedExtras)} />
+
                  <div>
-                    <Button variant="ghost" size="sm" onClick={() => setStep(2)} className="-ml-2 mb-1 h-8 text-zinc-500 hover:text-zinc-900">
+                    <Button type="button" variant="ghost" size="sm" onClick={() => setStep(2)} className="-ml-2 mb-1 h-8 text-zinc-500 hover:text-zinc-900">
                        <ChevronLeft className="w-4 h-4 mr-1" /> Back to Extras
                     </Button>
                     <h3 className="text-lg font-bold text-zinc-900 mb-0.5">Your Details</h3>
                     <p className="text-zinc-500 text-xs">Please fill in your information.</p>
                  </div>
 
+                 {state?.error && (
+                    <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-100 flex items-center gap-2">
+                       <AlertCircle className="w-4 h-4" />
+                       {state.error}
+                    </div>
+                 )}
+
                  <div className="space-y-3">
                     <div className="grid md:grid-cols-2 gap-3">
                        <div className="space-y-1">
                           <Label className="text-xs">First Name</Label>
-                          <Input className="h-9" placeholder="John" />
+                          <Input name="firstName" className="h-9" placeholder="John" required />
                        </div>
                        <div className="space-y-1">
                           <Label className="text-xs">Last Name</Label>
-                          <Input className="h-9" placeholder="Doe" />
+                          <Input name="lastName" className="h-9" placeholder="Doe" required />
                        </div>
                     </div>
                     <div className="space-y-1">
                        <Label className="text-xs">Email Address</Label>
-                       <Input className="h-9" type="email" placeholder="john@example.com" />
+                       <Input name="email" className="h-9" type="email" placeholder="john@example.com" required />
                     </div>
                     <div className="space-y-1">
                        <Label className="text-xs">Phone Number</Label>
-                       <Input className="h-9" type="tel" placeholder="+36 30 123 4567" />
+                       <Input name="phone" className="h-9" type="tel" placeholder="+36 30 123 4567" required />
                     </div>
                     <div className="space-y-1">
                        <Label className="text-xs">Additional Requests</Label>
-                       <Input className="h-9" placeholder="Flight number, child seat request, etc." />
+                       <Input name="comments" className="h-9" placeholder="Flight number, child seat request, etc." />
                     </div>
                  </div>
 
@@ -565,20 +579,24 @@ export function FleetCard({
 
                  <div className="md:hidden mt-8 mb-24">
                     <Button 
-                       className="w-full h-12 text-base font-bold bg-zinc-900 hover:bg-zinc-800 shadow-xl"
+                       type="submit"
+                       disabled={isPending}
+                       className="w-full h-12 text-base font-bold bg-zinc-900 hover:bg-zinc-800 shadow-xl disabled:opacity-50"
                     >
-                       Book Now
+                       {isPending ? "Processing..." : "Book Now"}
                     </Button>
                  </div>
 
                  <div className="hidden md:block fixed bottom-0 left-0 w-full p-4 bg-white border-t border-zinc-200 md:static md:p-0 md:bg-transparent md:border-0 z-50">
                     <Button 
-                       className="w-full h-12 md:h-10 text-base md:text-sm font-bold bg-zinc-900 hover:bg-zinc-800 shadow-xl"
+                       type="submit"
+                       disabled={isPending}
+                       className="w-full h-12 md:h-10 text-base md:text-sm font-bold bg-zinc-900 hover:bg-zinc-800 shadow-xl disabled:opacity-50"
                     >
-                       Book Now
+                       {isPending ? "Processing..." : "Book Now"}
                     </Button>
                  </div>
-              </div>
+              </form>
             )}
             
           </div>
