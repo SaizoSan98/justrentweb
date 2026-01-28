@@ -48,7 +48,7 @@ export default async function BookingsPage() {
                     {format(new Date(booking.endDate), 'MMM d, yyyy')}
                   </td>
                   <td className="px-6 py-4 font-bold text-zinc-900">
-                    {Number(booking.totalPrice).toLocaleString()} Ft
+                    €{Number(booking.totalPrice).toLocaleString()}
                   </td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${

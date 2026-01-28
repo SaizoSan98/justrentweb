@@ -57,7 +57,7 @@ export default async function CarsPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 font-mono text-zinc-600">{car.licensePlate}</td>
-                  <td className="px-6 py-4 font-bold text-zinc-900">{Number(car.pricePerDay).toLocaleString()} Ft</td>
+                  <td className="px-6 py-4 font-bold text-zinc-900">€{Number(car.pricePerDay).toLocaleString()}</td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
                       car.status === 'AVAILABLE' ? 'bg-green-100 text-green-800 border border-green-200' :

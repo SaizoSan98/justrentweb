@@ -59,7 +59,7 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
   
   // Calculations
   const flexibleSurcharge = Math.round(pricePerDay * 0.15) // 15% extra
-  const unlimitedMileageSurcharge = 46968 / diffDays // Fixed total extra spread per day for demo
+  const unlimitedMileageSurcharge = 115 / diffDays // Fixed total extra spread per day for demo
   
   const finalPricePerDay = pricePerDay + 
     (selectedRate === "flexible" ? flexibleSurcharge : 0) +
@@ -109,11 +109,11 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
              </div>
              <div className="flex items-end justify-between">
                <div>
-                 <span className="text-2xl font-black text-red-600">{pricePerDay.toLocaleString()} Ft</span>
+                 <span className="text-2xl font-black text-red-600">€{pricePerDay.toLocaleString()}</span>
                  <span className="text-zinc-500 text-sm font-medium"> /day</span>
                </div>
                <div className="text-zinc-400 text-xs text-right font-medium">
-                 {totalPrice.toLocaleString()} Ft Total
+                 €{totalPrice.toLocaleString()} Total
                </div>
              </div>
           </div>
@@ -222,7 +222,7 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
                             <h4 className="font-bold text-zinc-900">Stay Flexible</h4>
                             <div className="flex items-center gap-2">
                               <span className="text-xs font-bold bg-red-600 text-white px-2 py-1 rounded">Popular</span>
-                              <span className="text-xs font-bold text-zinc-900">+{flexibleSurcharge.toLocaleString()} Ft / day</span>
+                              <span className="text-xs font-bold text-zinc-900">+€{flexibleSurcharge.toLocaleString()} / day</span>
                             </div>
                          </div>
                          <p className="text-xs text-zinc-500">Pay at pick-up, free cancellation and rebooking anytime before pick-up</p>
@@ -257,7 +257,7 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
                             <h4 className="font-bold text-zinc-900">1200 km</h4>
                             <span className="text-xs font-bold bg-zinc-100 px-2 py-1 rounded">Included</span>
                          </div>
-                         <p className="text-xs text-zinc-500">+194.74 Ft / extra km</p>
+                         <p className="text-xs text-zinc-500">+€0.50 / extra km</p>
                       </div>
                    </div>
                 </div>
@@ -282,7 +282,7 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
                       <div className="flex-grow">
                          <div className="flex justify-between items-center mb-1">
                             <h4 className="font-bold text-zinc-900">Unlimited km</h4>
-                            <span className="text-xs font-bold text-zinc-900">+{Math.round(unlimitedMileageSurcharge).toLocaleString()} Ft per day</span>
+                            <span className="text-xs font-bold text-zinc-900">+€{Math.round(unlimitedMileageSurcharge).toLocaleString()} per day</span>
                          </div>
                          <p className="text-xs text-zinc-500">All kilometers included in the price</p>
                       </div>
@@ -294,8 +294,8 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
              <div className="mt-auto pt-6 border-t border-zinc-200">
                 <div className="flex justify-between items-end mb-4">
                    <div>
-                      <div className="text-3xl font-black text-zinc-900">{Math.round(finalPricePerDay).toLocaleString()} Ft <span className="text-lg font-medium text-zinc-500">/day</span></div>
-                      <div className="text-sm text-zinc-500">{finalTotalPrice.toLocaleString()} Ft Total</div>
+                      <div className="text-3xl font-black text-zinc-900">€{Math.round(finalPricePerDay).toLocaleString()} <span className="text-lg font-medium text-zinc-500">/day</span></div>
+                      <div className="text-sm text-zinc-500">€{finalTotalPrice.toLocaleString()} Total</div>
                    </div>
                    
                    {/* Price Breakdown Trigger - Could be another Dialog */}
@@ -311,8 +311,8 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
                            <div>
                               <h4 className="font-bold mb-2">Rental Fees</h4>
                               <div className="flex justify-between text-sm">
-                                 <span>{diffDays} Base rate x {Math.round(finalPricePerDay).toLocaleString()} Ft</span>
-                                 <span className="font-bold">{finalTotalPrice.toLocaleString()} Ft</span>
+                                 <span>{diffDays} Base rate x €{Math.round(finalPricePerDay).toLocaleString()}</span>
+                                 <span className="font-bold">€{finalTotalPrice.toLocaleString()}</span>
                               </div>
                            </div>
                            
@@ -321,22 +321,22 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
                               <div className="space-y-2 text-sm text-zinc-600">
                                  <div className="flex justify-between">
                                     <span>Registration Fee</span>
-                                    <span>34,916 Ft</span>
+                                    <span>€85</span>
                                  </div>
                                  <div className="flex justify-between">
                                     <span>Contract Fee</span>
-                                    <span>1,115 Ft</span>
+                                    <span>€3</span>
                                  </div>
                                  <div className="flex justify-between">
                                     <span>Winterization Fee</span>
-                                    <span>48,494 Ft</span>
+                                    <span>€120</span>
                                  </div>
                               </div>
                            </div>
 
                            <div className="pt-4 border-t border-zinc-200 flex justify-between items-center">
                               <span className="font-bold text-lg">Total (incl. tax)</span>
-                              <span className="font-black text-2xl">{(finalTotalPrice + 34916 + 1115 + 48494).toLocaleString()} Ft</span>
+                              <span className="font-black text-2xl">€{(finalTotalPrice + 85 + 3 + 120).toLocaleString()}</span>
                            </div>
                         </div>
                      </DialogContent>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useTransition } from "react"
+import Image from "next/image"
 import { differenceInDays, format, addDays } from "date-fns"
 import { Calendar, MapPin, Check, ShieldCheck, CreditCard, Wallet, PlaneLanding, PlaneTakeoff, Baby, User, Map as MapIcon, Snowflake, Star, Clock, Edit2 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"

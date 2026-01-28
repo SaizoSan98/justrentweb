@@ -34,7 +34,7 @@ export function Header({ transparent = false }: HeaderProps) {
           {/* Language Selector (Visual Only) */}
           <div className="hidden md:flex items-center gap-2 text-zinc-600 hover:text-zinc-900 cursor-pointer transition-colors group">
             <Globe className="w-5 h-5 group-hover:text-red-600 transition-colors" />
-            <span className="text-sm font-bold">EN | USD</span>
+            <span className="text-sm font-bold">ENG | EUR</span>
           </div>
 
           <div className="w-px h-6 bg-zinc-200 hidden md:block" />
