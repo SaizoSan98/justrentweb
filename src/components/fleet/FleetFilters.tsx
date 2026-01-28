@@ -16,7 +16,8 @@ const SEATS = [2, 4, 5, 7, 8, 9]
 
 export function FleetFilters({ 
   currentFilters, 
-  counts 
+  counts,
+  options
 }: { 
   currentFilters?: {
     category?: string[]
@@ -28,9 +29,21 @@ export function FleetFilters({
   counts?: {
     total: number
   }
+  options?: {
+    categories: string[]
+    transmissions: string[]
+    fuelTypes: string[]
+    seats: number[]
+  }
 }) {
   const router = useRouter()
   const searchParams = useSearchParams()
+
+  // Use props or fallbacks (though props should be provided)
+  const categoriesList = options?.categories || CATEGORIES
+  const transmissionsList = options?.transmissions || TRANSMISSIONS
+  const fuelTypesList = options?.fuelTypes || FUEL_TYPES
+  const seatsList = options?.seats || SEATS
   
   // State from URL
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
@@ -146,7 +159,7 @@ export function FleetFilters({
                   <div className="space-y-4">
                     <h3 className="font-bold text-sm uppercase text-zinc-500 tracking-wider">Vehicle Type</h3>
                     <div className="grid grid-cols-2 gap-3">
-                      {CATEGORIES.map(cat => (
+                      {categoriesList.map(cat => (
                         <div 
                           key={cat}
                           className={cn(
@@ -178,7 +191,7 @@ export function FleetFilters({
                       >
                         <Check className="w-4 h-4" /> Guaranteed Model
                       </div>
-                      {TRANSMISSIONS.map(t => (
+                      {transmissionsList.map(t => (
                         <div 
                           key={t}
                           className={cn(
@@ -192,7 +205,7 @@ export function FleetFilters({
                           <Gauge className="w-4 h-4" /> {t === 'AUTOMATIC' ? 'Automatic' : 'Manual'}
                         </div>
                       ))}
-                       {FUEL_TYPES.map(f => (
+                       {fuelTypesList.map(f => (
                         <div 
                           key={f}
                           className={cn(
@@ -213,18 +226,18 @@ export function FleetFilters({
                   <div className="space-y-4">
                     <h3 className="font-bold text-sm uppercase text-zinc-500 tracking-wider">Seats</h3>
                     <div className="flex flex-wrap gap-3">
-                      {SEATS.map(num => (
+                      {seatsList.map(num => (
                         <div 
                           key={num}
                           className={cn(
-                            "w-12 h-12 border-2 rounded-xl flex items-center justify-center cursor-pointer transition-all text-sm font-bold",
-                            selectedSeats.includes(num.toString())
+                            "border-2 rounded-full px-4 py-2 cursor-pointer transition-all text-sm font-bold flex items-center gap-2",
+                            selectedSeats.includes(num.toString()) 
                               ? "border-zinc-900 bg-zinc-900 text-white" 
                               : "border-zinc-100 hover:border-zinc-300 text-zinc-700"
                           )}
                           onClick={() => toggleSelection(selectedSeats, num.toString(), setSelectedSeats)}
                         >
-                          {num}
+                          <Users className="w-4 h-4" /> {num} Seats
                         </div>
                       ))}
                     </div>

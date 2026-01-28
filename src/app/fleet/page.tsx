@@ -137,6 +137,36 @@ export default async function FleetPage({
     }
   });
 
+  const [categoriesData, transmissionsData, fuelTypesData, seatsData] = await Promise.all([
+    prisma.category.findMany({ 
+      select: { name: true }, 
+      orderBy: { name: 'asc' } 
+    }),
+    prisma.car.findMany({ 
+      select: { transmission: true }, 
+      distinct: ['transmission'],
+      where: { status: 'AVAILABLE' }
+    }),
+    prisma.car.findMany({ 
+      select: { fuelType: true }, 
+      distinct: ['fuelType'],
+      where: { status: 'AVAILABLE' }
+    }),
+    prisma.car.findMany({ 
+      select: { seats: true }, 
+      distinct: ['seats'], 
+      orderBy: { seats: 'asc' },
+      where: { status: 'AVAILABLE' }
+    }),
+  ]);
+
+  const filterOptions = {
+    categories: categoriesData.map(c => c.name),
+    transmissions: transmissionsData.map(t => t.transmission),
+    fuelTypes: fuelTypesData.map(f => f.fuelType),
+    seats: seatsData.map(s => s.seats)
+  };
+
   const serializedCars = cars.map((car: any) => ({
     ...car,
     pricePerDay: Number(car.pricePerDay),
@@ -188,6 +218,7 @@ export default async function FleetPage({
                counts={{
                  total: serializedCars.length
                }}
+               options={filterOptions}
              />
           </aside>
 

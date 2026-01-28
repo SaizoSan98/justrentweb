@@ -107,16 +107,20 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
       if (!formData.has('orSimilar')) formData.append('orSimilar', 'false')
       if (!formData.has('airConditioning')) formData.append('airConditioning', 'false')
       
+      let result
       if (isEditing && car?.id) {
         formData.append('id', car.id)
-        await updateCar(formData)
-        toast.success("Car updated successfully")
+        result = await updateCar(formData)
       } else {
-        await createCar(formData)
-        toast.success("Car created successfully")
+        result = await createCar(formData)
       }
-      
-      // router.push('/admin/cars') // Handled by server action redirect usually, but safety here
+
+      if (result.success) {
+        toast.success(isEditing ? "Car updated successfully" : "Car created successfully")
+        router.push('/admin/cars')
+      } else {
+        throw new Error(result.error || "Unknown error")
+      }
     } catch (error) {
       console.error("Error submitting form:", error)
       toast.error("Failed to save car. Please try again.")

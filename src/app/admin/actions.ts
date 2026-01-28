@@ -110,12 +110,11 @@ export async function createCar(formData: FormData) {
       }
     })
     revalidatePath('/admin/cars')
+    return { success: true }
   } catch (error) {
     console.error("Failed to create car:", error)
-    throw error
+    return { success: false, error: "Failed to create car" }
   }
-  
-  redirect('/admin/cars')
 }
 
 export async function updateCar(formData: FormData) {
@@ -205,12 +204,12 @@ export async function updateCar(formData: FormData) {
         }
       }
     })
-    revalidatePath('/admin/cars')
+ revalidatePath('/admin/cars')
+    return { success: true }
   } catch (error) {
     console.error("Failed to update car:", error)
+    return { success: false, error: "Failed to update car" }
   }
-  
-  redirect('/admin/cars')
 }
 
 export async function deleteExtra(id: string) {
