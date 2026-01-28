@@ -5,6 +5,53 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { put } from "@vercel/blob"
 import { logout, login } from "@/lib/auth"
+import fs from "fs"
+import path from "path"
+import { writeFile, mkdir } from "fs/promises"
+
+// Helper to upload image (Vercel Blob OR Local Fallback)
+async function uploadImage(file: File): Promise<string | null> {
+  if (!file || file.size === 0) return null
+
+  // 1. Try Vercel Blob if configured
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    try {
+      const blob = await put(file.name, file, { 
+        access: 'public',
+        token: process.env.BLOB_READ_WRITE_TOKEN
+      })
+      return blob.url
+    } catch (error) {
+      console.error("Vercel Blob upload failed, falling back to local storage:", error)
+      // Fallback to local storage if blob fails
+    }
+  }
+
+  // 2. Local Storage Fallback
+  try {
+    const bytes = await file.arrayBuffer()
+    const buffer = Buffer.from(bytes)
+    
+    // Create unique filename
+    const timestamp = Date.now()
+    const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
+    const filename = `${timestamp}-${safeName}`
+    
+    // Ensure upload dir exists
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads')
+    await mkdir(uploadDir, { recursive: true })
+    
+    // Write file
+    const filePath = path.join(uploadDir, filename)
+    await writeFile(filePath, buffer)
+    
+    // Return public URL
+    return `/uploads/${filename}`
+  } catch (error) {
+    console.error("Local file upload failed:", error)
+    throw new Error("Failed to save image locally")
+  }
+}
 
 export async function logoutAction() {
   await logout()
@@ -57,11 +104,10 @@ export async function createCar(formData: FormData) {
 
   if (imageFile && imageFile.size > 0) {
     try {
-      const blob = await put(imageFile.name, imageFile, { 
-        access: 'public',
-        token: process.env.BLOB_READ_WRITE_TOKEN
-      })
-      imageUrl = blob.url
+      const uploadedUrl = await uploadImage(imageFile)
+      if (uploadedUrl) {
+        imageUrl = uploadedUrl
+      }
     } catch (error: any) {
       console.error("Failed to upload image:", error)
       return { success: false, error: `Image upload failed: ${error.message}` }
@@ -161,11 +207,10 @@ export async function updateCar(formData: FormData) {
   
   if (imageFile && imageFile.size > 0) {
     try {
-      const blob = await put(imageFile.name, imageFile, { 
-        access: 'public',
-        token: process.env.BLOB_READ_WRITE_TOKEN
-      })
-      imageUrl = blob.url
+      const uploadedUrl = await uploadImage(imageFile)
+      if (uploadedUrl) {
+        imageUrl = uploadedUrl
+      }
     } catch (error: any) {
       console.error("Failed to upload image:", error)
       return { success: false, error: `Image upload failed: ${error.message}` }
@@ -218,7 +263,7 @@ export async function updateCar(formData: FormData) {
         }
       }
     })
- revalidatePath('/admin/cars')
+    revalidatePath('/admin/cars')
     return { success: true }
   } catch (error: any) {
     console.error("Failed to update car:", error)
