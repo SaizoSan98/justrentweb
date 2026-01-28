@@ -236,7 +236,10 @@ export default async function FleetPage({
                  total: serializedCars.length
                }}
                options={filterOptions}
-               availableCars={allAvailableCars}
+               availableCars={allAvailableCars.map(car => ({
+                 ...car,
+                 guaranteedModel: !car.orSimilar
+               }))}
              />
            </div>
         </div>
