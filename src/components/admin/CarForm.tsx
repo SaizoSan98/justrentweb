@@ -139,14 +139,14 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
       console.log("Server Result:", result)
 
       if (result.success) {
-        toast.success(isEditing ? "Car updated successfully" : "Car created successfully")
+        toast.success(isEditing ? "Vehicle successfully updated!" : "Vehicle successfully created!")
         router.push('/admin/cars')
       } else {
         throw new Error(result.error || "Unknown error")
       }
     } catch (error: any) {
       console.error("Error submitting form:", error)
-      toast.error(`Failed to save car: ${error.message}`)
+      toast.error(`Failed to save vehicle: ${error.message}`)
     } finally {
       setIsSubmitting(false)
     }

@@ -111,9 +111,13 @@ export async function createCar(formData: FormData) {
     })
     revalidatePath('/admin/cars')
     return { success: true }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Failed to create car:", error)
-    return { success: false, error: "Failed to create car" }
+    // Check for Prisma unique constraint error (P2002)
+    if (error.code === 'P2002' && error.meta?.target?.includes('licensePlate')) {
+      return { success: false, error: "A car with this license plate already exists." }
+    }
+    return { success: false, error: error.message || "Failed to create car" }
   }
 }
 
@@ -206,9 +210,12 @@ export async function updateCar(formData: FormData) {
     })
  revalidatePath('/admin/cars')
     return { success: true }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Failed to update car:", error)
-    return { success: false, error: "Failed to update car" }
+    if (error.code === 'P2002' && error.meta?.target?.includes('licensePlate')) {
+      return { success: false, error: "A car with this license plate already exists." }
+    }
+    return { success: false, error: error.message || "Failed to update car" }
   }
 }
 
