@@ -4,10 +4,13 @@ import { BookingEngine } from "@/components/booking/BookingEngine";
 import { Header } from "@/components/layout/Header";
 import { prisma } from "@/lib/prisma";
 import { FleetCard } from "@/components/fleet/FleetCard"
+import { getSession } from "@/lib/auth"
+import { Hero } from "@/components/home/Hero"
 
 export const dynamic = 'force-dynamic'
 
 export default async function LandingPage() {
+  const session = await getSession()
   const featuredCars = await prisma.car.findMany({
     where: { 
       status: 'AVAILABLE',
@@ -33,25 +36,10 @@ export default async function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen bg-white text-zinc-900 font-sans">
       {/* Navbar */}
-      <Header transparent={true} />
+      <Header transparent={true} user={session?.user} />
 
       {/* Hero Section */}
-      <section className="relative h-[85vh] flex items-center justify-center overflow-hidden bg-zinc-900">
-        {/* Background Image */}
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1736310305983-5efe64f5bb23?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')] bg-cover bg-center opacity-70"></div>
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
-        
-        <div className="relative container mx-auto px-6 flex flex-col items-center text-center z-10 pt-20 pb-32">
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-6 drop-shadow-lg">
-            JUST <span className="text-red-600">RENT</span>
-          </h1>
-          <p className="text-xl md:text-2xl text-zinc-200 max-w-2xl mb-12 font-light leading-relaxed drop-shadow-md">
-            Experience the thrill of driving the world&#39;s finest automobiles.
-            Seamless booking, exceptional service.
-          </p>
-        </div>
-      </section>
+      <Hero />
 
       {/* Booking Engine */}
       <BookingEngine className="-mt-48" />
@@ -98,94 +86,68 @@ export default async function LandingPage() {
             </ul>
           </div>
           <div className="relative h-[500px] bg-zinc-100 rounded-2xl overflow-hidden shadow-2xl">
-             <img 
-               src="https://images.unsplash.com/photo-1550355291-6438b9008f31?q=80&w=2574&auto=format&fit=crop" 
-               alt="Luxury Car Interior" 
-               className="absolute inset-0 w-full h-full object-cover"
-             />
+             <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1560958089-b8a1929cea89?q=80&w=2071&auto=format&fit=crop')] bg-cover bg-center"></div>
           </div>
         </div>
       </section>
 
-      {/* Fleet Teaser */}
-      <section id="fleet" className="py-24 bg-zinc-50 border-t border-zinc-200">
+      {/* Featured Fleet Section */}
+      <section id="fleet" className="py-24 bg-zinc-50">
         <div className="container mx-auto px-6">
           <div className="flex justify-between items-end mb-12">
             <div>
-              <span className="text-red-600 font-bold uppercase tracking-wider text-sm mb-2 block">Our Collection</span>
-              <h2 className="text-3xl md:text-4xl font-bold text-zinc-900">Featured Vehicles</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-zinc-900">Our Premium Fleet</h2>
+              <p className="text-zinc-600">Choose from our exclusive collection of high-end vehicles.</p>
             </div>
-            <Link href="/fleet" className="text-zinc-900 hover:text-red-600 font-medium hidden md:flex items-center gap-2 transition-colors">
-              View All Cars <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+            <Link href="/fleet">
+              <Button variant="outline" className="hidden md:flex">View All Cars</Button>
             </Link>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {serializedFeaturedCars.map((car: any) => (
-              <div key={car.id} className="h-full">
-                <FleetCard 
-                  car={car}
-                  diffDays={1} // Default to 1 day for display
-                  imageUrl={car.imageUrl}
-                />
-              </div>
+              <FleetCard key={car.id} car={car} />
             ))}
           </div>
           
-           <div className="mt-8 text-center md:hidden">
-            <Link href="/fleet" className="text-red-600 font-bold">
-              View All Cars &rarr;
+          <div className="mt-12 text-center md:hidden">
+            <Link href="/fleet">
+              <Button variant="outline" className="w-full">View All Cars</Button>
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="py-24 bg-zinc-900 text-white">
+        <div className="container mx-auto px-6 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Experience Excellence?</h2>
+          <p className="text-zinc-400 text-lg mb-8 max-w-2xl mx-auto">
+            Contact our concierge team to arrange your booking or discuss your specific requirements.
+          </p>
+          <div className="flex flex-col md:flex-row justify-center gap-6">
+            <Button size="lg" className="bg-red-600 hover:bg-red-700 text-white">
+              Call Us Now
+            </Button>
+            <Button size="lg" variant="outline" className="text-white border-zinc-700 hover:bg-zinc-800 hover:text-white">
+              Send an Email
+            </Button>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-zinc-900 text-zinc-300 py-16">
-        <div className="container mx-auto px-6 text-center md:text-left">
-           <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-             <div>
-               <h3 className="text-2xl font-bold text-white mb-6">JustRent</h3>
-               <p className="text-zinc-400 text-sm leading-relaxed">
-                 Premium car rental service for the modern traveler. 
-                 Experience the difference with our top-tier fleet and exceptional service.
-               </p>
-             </div>
-             <div>
-               <h4 className="font-bold text-white mb-6">Quick Links</h4>
-               <ul className="space-y-3 text-sm text-zinc-400">
-                 <li><Link href="/" className="hover:text-white transition-colors">Home</Link></li>
-                 <li><Link href="/fleet" className="hover:text-white transition-colors">Our Fleet</Link></li>
-                 <li><Link href="#about" className="hover:text-white transition-colors">About Us</Link></li>
-                 <li><Link href="#services" className="hover:text-white transition-colors">Services</Link></li>
-               </ul>
-             </div>
-             <div>
-               <h4 className="font-bold text-white mb-6">Legal</h4>
-               <ul className="space-y-3 text-sm text-zinc-400">
-                 <li><Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-                 <li><Link href="#" className="hover:text-white transition-colors">Terms of Service</Link></li>
-                 <li><Link href="#" className="hover:text-white transition-colors">Cookie Policy</Link></li>
-               </ul>
-             </div>
-             <div>
-               <h4 className="font-bold text-white mb-6">Contact Us</h4>
-               <p className="text-sm text-zinc-400 leading-relaxed">
-                 hello@justrent.com<br/>
-                 +36 1 234 5678<br/>
-                 Budapest Airport, Terminal 2B
-               </p>
-             </div>
-           </div>
-           <div className="mt-16 pt-8 border-t border-zinc-800 text-center text-zinc-500 text-sm flex flex-col md:flex-row justify-between items-center">
-             <p>&copy; {new Date().getFullYear()} JustRent. All rights reserved.</p>
-             <div className="flex gap-4 mt-4 md:mt-0">
-               {/* Social Icons placeholders */}
-               <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center hover:bg-red-600 transition-colors cursor-pointer text-white">FB</div>
-               <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center hover:bg-red-600 transition-colors cursor-pointer text-white">IG</div>
-               <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center hover:bg-red-600 transition-colors cursor-pointer text-white">TW</div>
-             </div>
-           </div>
+      <footer className="bg-zinc-950 py-12 border-t border-zinc-900 text-sm text-zinc-500">
+        <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-2">
+             <span className="text-zinc-100 font-bold uppercase tracking-wider">Just<span className="text-red-600">Rent</span></span>
+             <span>© 2024</span>
+          </div>
+          <div className="flex gap-8">
+            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+            <a href="#" className="hover:text-white transition-colors">Cookie Policy</a>
+          </div>
         </div>
       </footer>
     </div>

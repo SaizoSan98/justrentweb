@@ -111,6 +111,7 @@ model Settings {
   id          String   @id @default("settings") // Singleton
   openingTime String   @default("08:00")
   closingTime String   @default("18:00")
+  weeklyHours Json?    // Structured weekly opening hours
   updatedAt   DateTime @updatedAt
 }
 

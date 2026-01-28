@@ -21,16 +21,20 @@ export async function getSettings() {
   return settings
 }
 
-export async function updateSettings(formData: FormData) {
-  const openingTime = formData.get("openingTime") as string
-  const closingTime = formData.get("closingTime") as string
-
+export async function updateSettings(weeklyHours: any) {
+  // If we receive FormData (from old form), handle it, but we prefer object now
+  // Actually let's just support the object call from client component
+  
   await prisma.settings.upsert({
     where: { id: "settings" },
-    update: { openingTime, closingTime },
-    create: { id: "settings", openingTime, closingTime }
+    update: { weeklyHours },
+    create: { 
+      id: "settings", 
+      weeklyHours,
+      openingTime: "08:00", // Fallback
+      closingTime: "18:00"
+    }
   })
 
   revalidatePath("/admin/settings")
-  // return { success: true }
 }

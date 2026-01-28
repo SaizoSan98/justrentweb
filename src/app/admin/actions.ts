@@ -8,7 +8,7 @@ import { logout, login } from "@/lib/auth"
 
 export async function logoutAction() {
   await logout()
-  redirect('/login')
+  redirect('/')
 }
 
 export async function deleteCar(id: string) {
@@ -112,6 +112,7 @@ export async function createCar(formData: FormData) {
     revalidatePath('/admin/cars')
   } catch (error) {
     console.error("Failed to create car:", error)
+    throw error
   }
   
   redirect('/admin/cars')

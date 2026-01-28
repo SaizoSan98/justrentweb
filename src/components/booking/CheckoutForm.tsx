@@ -93,16 +93,49 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
     return h * 60 + m
   }
 
-  const isAfterHours = (time: string) => {
+  const isAfterHours = (date: Date, time: string) => {
     if (!settings) return false
+    
+    // Parse weekly settings
+    let weeklyHours = settings.weeklyHours
+    if (typeof weeklyHours === 'string') {
+      try {
+        weeklyHours = JSON.parse(weeklyHours)
+      } catch (e) {
+        weeklyHours = {}
+      }
+    }
+    
+    if (!weeklyHours) {
+        // Fallback to global legacy settings
+        const t = parseTime(time)
+        const open = parseTime(settings.openingTime || "08:00")
+        const close = parseTime(settings.closingTime || "18:00")
+        return t < open || t > close
+    }
+
+    const dayName = format(date, 'EEEE') // "Monday", "Tuesday"...
+    const daySettings = weeklyHours[dayName]
+
+    if (!daySettings) {
+        // If no settings for this day, assume default open
+        const t = parseTime(time)
+        const open = parseTime(settings.openingTime || "08:00")
+        const close = parseTime(settings.closingTime || "18:00")
+        return t < open || t > close
+    }
+
+    if (daySettings.isClosed) return true
+
     const t = parseTime(time)
-    const open = parseTime(settings.openingTime)
-    const close = parseTime(settings.closingTime)
+    const open = parseTime(daySettings.open)
+    const close = parseTime(daySettings.close)
+
     return t < open || t > close
   }
 
-  const pickupFee = (settings && isAfterHours(startTime)) ? Number(car.pickupAfterHoursPrice || 0) : 0
-  const returnFee = (settings && isAfterHours(endTime)) ? Number(car.returnAfterHoursPrice || 0) : 0
+  const pickupFee = (settings && isAfterHours(startDate, startTime)) ? Number(car.pickupAfterHoursPrice || 0) : 0
+  const returnFee = (settings && isAfterHours(endDate, endTime)) ? Number(car.returnAfterHoursPrice || 0) : 0
 
   const totalPrice = basePrice + insurancePrice + extrasPrice + pickupFee + returnFee
 

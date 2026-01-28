@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FleetCard } from "@/components/fleet/FleetCard";
 import { Header } from "@/components/layout/Header";
 import { BookingEngine } from "@/components/booking/BookingEngine";
+import { getSession } from "@/lib/auth";
 
 import { FleetFilters } from "@/components/fleet/FleetFilters";
 
@@ -14,6 +15,7 @@ export default async function FleetPage({
 }: {
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
+  const session = await getSession();
   const params = await searchParams ?? {};
   const category = typeof params.category === 'string' ? params.category : undefined;
   const categories = typeof params.category === 'object' ? params.category : (category ? [category] : undefined);
@@ -102,163 +104,119 @@ export default async function FleetPage({
   }
 
   if (seatCounts && seatCounts.length > 0) {
-    whereClause.seats = { in: seatCounts.map(Number) };
+    // Handling "8+" case if needed, otherwise exact match
+    const seatsNumbers = seatCounts.map(s => parseInt(s));
+    whereClause.seats = { in: seatsNumbers };
   }
 
   if (guaranteedModel) {
-    whereClause.orSimilar = false; // "Guaranteed Model" implies orSimilar is FALSE (you get exactly this car)
-    // Or if the logic is reversed in user mind, but usually "Guaranteed" means NO "or similar"
+    whereClause.guaranteedModel = true;
   }
 
-  const cars = await prisma.car.findMany({
-    where: {
-      ...whereClause,
-      AND: [
+  // Filter out cars that are booked in the requested period
+  // We need to check for overlapping bookings
+  whereClause.bookings = {
+    none: {
+      OR: [
         {
-          availabilities: {
-            some: {
-              status: 'AVAILABLE',
-              startDate: { lte: startDate },
-              endDate: { gte: queryEndDate },
-            },
-          },
-        },
-        {
-          NOT: {
-            availabilities: {
-              some: {
-                status: { in: ['MAINTENANCE', 'RENTED', 'OUT_OF_SERVICE'] },
-                AND: [
-                  { startDate: { lt: queryEndDate } },
-                  { endDate: { gt: startDate } },
-                ],
-              },
-            },
-          },
-        },
+          startDate: { lte: queryEndDate },
+          endDate: { gte: startDate }
+        }
       ],
-    },
+      status: { in: ['CONFIRMED', 'PENDING'] } // Assuming these statuses block availability
+    }
+  };
+
+  const cars = await prisma.car.findMany({
+    where: whereClause,
     include: {
-      pricingTiers: true,
+      pricingTiers: true
     },
     orderBy: {
-      pricePerDay: 'asc',
-    },
-  }).then((items: any[]) => items.map((car: any) => {
-    // Only use stock images if no image is uploaded
-    let displayImage = car.imageUrl;
-    
-    if (!displayImage) {
-      if (car.make === 'Tesla' && car.model === 'Model 3') {
-        displayImage = "https://imgd.aeplcdn.com/1056x594/n/cw/ec/175993/kushaq-exterior-right-front-three-quarter-2.png?isig=0&q=80&wm=1";
-      } else if (car.make === 'BMW' && car.model === 'X5') {
-        displayImage = "https://imgd.aeplcdn.com/370x208/n/cw/ec/102663/baleno-exterior-right-front-three-quarter-69.png?isig=0&q=80";
-      } else if (car.make === 'Mercedes-Benz' && car.model === 'C-Class') {
-        displayImage = "https://imgd.aeplcdn.com/370x208/n/cw/ec/51909/a4-exterior-right-front-three-quarter-80.png?isig=0&q=80";
-      } else {
-        displayImage = getStockImageUrl(car.make, car.model);
-      }
+      pricePerDay: 'asc'
     }
+  });
 
-    return {
-      ...car,
-      imageUrl: displayImage,
-      pricePerDay: Number(car.pricePerDay),
-      pricingTiers: car.pricingTiers.sort((a: any, b: any) => a.minDays - b.minDays).map((tier: any) => ({
-        ...tier,
-        pricePerDay: Number(tier.pricePerDay),
-        deposit: Number(tier.deposit)
-      }))
-    };
+  const serializedCars = cars.map((car: any) => ({
+    ...car,
+    pricePerDay: Number(car.pricePerDay),
+    deposit: Number(car.deposit),
+    pricingTiers: car.pricingTiers.map((tier: any) => ({
+      ...tier,
+      pricePerDay: Number(tier.pricePerDay),
+      deposit: Number(tier.deposit)
+    }))
   }));
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900 font-sans">
-      {/* Header */}
-      <Header />
-
-      {/* Booking Engine */}
-      <div className="pt-32 pb-8 bg-zinc-50/50">
-        <BookingEngine 
-          key={`${startDate.toISOString()}-${endDate?.toISOString() ?? 'undefined'}`}
-          initialStartDate={startDate}
-          initialEndDate={endDate}
-          className="w-full max-w-6xl mx-auto px-4 mt-0 shadow-none border border-zinc-200"
-          showLabel={false}
-          compact={true}
-        />
-      </div>
-
-      <FleetFilters totalCount={cars.length} />
-
-      {/* Main Content */}
-      <main className="container mx-auto px-6 py-12">
-        <div className="mb-12 text-center">
-          <div className="inline-flex items-center gap-2 bg-zinc-100 px-4 py-2 rounded-full">
-            <span className="text-zinc-500 font-medium">Selected Duration:</span>
-            <span className="font-bold text-red-600">{diffDays} {diffDays === 1 ? 'Day' : 'Days'}</span>
+    <div className="flex flex-col min-h-screen bg-zinc-50">
+      <Header user={session?.user} />
+      
+      <main className="flex-1 container mx-auto px-6 py-24">
+        <div className="flex flex-col md:flex-row justify-between items-start mb-8 gap-4">
+          <div>
+            <h1 className="text-4xl font-black tracking-tight text-zinc-900 mb-2">Our Premium Fleet</h1>
+            <p className="text-zinc-500">
+              Select from our wide range of luxury vehicles.
+              {startDateStr && (
+                <span className="block mt-1 text-red-600 font-medium">
+                  Showing availability for {startDate.toLocaleDateString()} 
+                  {endDate && ` - ${endDate.toLocaleDateString()}`} 
+                  ({diffDays} day{diffDays > 1 ? 's' : ''})
+                </span>
+              )}
+            </p>
           </div>
+          
+          <BookingEngine 
+            className="w-full md:w-auto static translate-y-0 shadow-none border border-zinc-200 bg-white" 
+            compact={true}
+          />
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-col gap-6 mb-12">
-          {/* Category Filter */}
-          <div className="flex justify-center gap-3 overflow-x-auto pb-4">
-            {['All Categories', 'SUV', 'Sedan', 'Sports', 'Luxury'].map((cat) => (
-              <Link 
-                key={cat} 
-                href={cat === 'All Categories' ? `/fleet?startDate=${startDate.toISOString()}&endDate=${queryEndDate.toISOString()}${transmission ? `&transmission=${transmission}` : ''}` : `/fleet?category=${cat}&startDate=${startDate.toISOString()}&endDate=${queryEndDate.toISOString()}${transmission ? `&transmission=${transmission}` : ''}`}
-                className={`px-6 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all shadow-sm ${
-                  (category === cat || (!category && cat === 'All Categories'))
-                    ? 'bg-red-600 text-white shadow-red-600/30 transform scale-105' 
-                    : 'bg-white text-zinc-500 border border-zinc-200 hover:border-red-600 hover:text-red-600'
-                }`}
-              >
-                {cat}
-              </Link>
-            ))}
-          </div>
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Filters Sidebar */}
+          <aside className="w-full lg:w-64 flex-shrink-0">
+             <FleetFilters 
+               currentFilters={{
+                 category: categories,
+                 transmission: transmissions,
+                 fuelType: fuelTypes,
+                 seats: seatCounts,
+                 guaranteedModel: guaranteedModel
+               }}
+               counts={{
+                 total: serializedCars.length
+               }}
+             />
+          </aside>
 
-          {/* Transmission Filter */}
-          <div className="flex justify-center gap-3">
-             {['Any', 'MANUAL', 'AUTOMATIC'].map((trans) => (
-              <Link 
-                key={trans} 
-                href={`/fleet?${category && category !== 'All Categories' ? `category=${category}&` : ''}startDate=${startDate.toISOString()}&endDate=${queryEndDate.toISOString()}${trans !== 'Any' ? `&transmission=${trans}` : ''}`}
-                className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
-                  (transmission === trans || (!transmission && trans === 'Any'))
-                    ? 'bg-zinc-900 text-white' 
-                    : 'bg-white text-zinc-400 border border-zinc-200 hover:border-zinc-900 hover:text-zinc-900'
-                }`}
-              >
-                {trans === 'Any' ? 'Any Gearbox' : trans}
-              </Link>
-            ))}
+          {/* Car Grid */}
+          <div className="flex-1">
+            {serializedCars.length === 0 ? (
+              <div className="text-center py-20 bg-white rounded-xl border border-dashed border-zinc-300">
+                <p className="text-zinc-500 text-lg">No vehicles found matching your criteria.</p>
+                <Button variant="link" className="text-red-600 mt-2" asChild>
+                  <Link href="/fleet">Clear all filters</Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {serializedCars.map((car: any) => (
+                  <FleetCard 
+                    key={car.id} 
+                    car={car} 
+                    searchParams={{
+                      startDate: startDateStr,
+                      endDate: endDateStr
+                    }}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
-
-        {/* Car Grid */}
-        {cars.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-3xl border border-zinc-100 shadow-sm max-w-lg mx-auto">
-            <h3 className="text-xl font-bold text-zinc-900 mb-2">No cars available</h3>
-            <p className="text-zinc-500">Try adjusting your filters or check back later.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {cars.map((car: any) => {
-              const imageUrl = car.imageUrl ?? getStockImageUrl(car.make, car.model);
-              return (
-                <FleetCard 
-                  key={car.id} 
-                  car={car} 
-                  diffDays={diffDays} 
-                  imageUrl={imageUrl} 
-                />
-              );
-            })}
-          </div>
-        )}
       </main>
     </div>
-  );
+  )
 }

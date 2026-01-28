@@ -1,9 +1,7 @@
-import { getSettings, updateSettings } from "./actions"
+import { getSettings } from "./actions"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Clock } from "lucide-react"
+import { SettingsForm } from "@/components/admin/SettingsForm"
 
 export default async function SettingsPage() {
   const settings = await getSettings()
@@ -18,40 +16,11 @@ export default async function SettingsPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Clock className="w-5 h-5 text-red-600" />
-            Business Hours
+            Business Hours (Weekly Schedule)
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form action={updateSettings} className="space-y-4 max-w-md">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="openingTime">Opening Time</Label>
-                <Input 
-                  id="openingTime" 
-                  name="openingTime" 
-                  type="time" 
-                  defaultValue={settings.openingTime} 
-                  required 
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="closingTime">Closing Time</Label>
-                <Input 
-                  id="closingTime" 
-                  name="closingTime" 
-                  type="time" 
-                  defaultValue={settings.closingTime} 
-                  required 
-                />
-              </div>
-            </div>
-            <p className="text-sm text-zinc-500">
-              These hours determine when "After Hours" fees are applied.
-            </p>
-            <Button type="submit" className="bg-zinc-900 text-white hover:bg-zinc-800">
-              Save Settings
-            </Button>
-          </form>
+          <SettingsForm settings={settings} />
         </CardContent>
       </Card>
     </div>

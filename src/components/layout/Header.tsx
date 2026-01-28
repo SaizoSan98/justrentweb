@@ -1,15 +1,17 @@
 "use client"
 
 import Link from "next/link"
-import { Globe, User, Menu } from "lucide-react"
+import { Globe, User, Menu, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AuthModal } from "@/components/auth/AuthModal"
+import { logoutAction } from "@/app/admin/actions"
 
 interface HeaderProps {
   transparent?: boolean
+  user?: any
 }
 
-export function Header({ transparent = false }: HeaderProps) {
+export function Header({ transparent = false, user }: HeaderProps) {
   return (
     <header className={`fixed top-0 w-full z-50 border-b transition-all duration-300 ${
       transparent 
@@ -40,16 +42,35 @@ export function Header({ transparent = false }: HeaderProps) {
           <div className="w-px h-6 bg-zinc-200 hidden md:block" />
 
           {/* Auth Trigger */}
-          <AuthModal 
-            trigger={
-              <Button variant="ghost" className="hidden md:flex items-center gap-2 text-zinc-900 hover:text-red-600 hover:bg-transparent p-0 h-auto transition-colors group font-normal">
-                <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center group-hover:bg-red-50 group-hover:rotate-12 transition-all duration-300 shadow-sm group-hover:shadow-md">
-                  <User className="w-4 h-4" />
-                </div>
-                <span className="text-sm font-bold uppercase group-hover:underline decoration-2 underline-offset-4">Log in | Register</span>
-              </Button>
-            }
-          />
+          {user ? (
+            <div className="flex items-center gap-4">
+              <Link href={user.role === 'ADMIN' ? "/admin" : "/dashboard"}>
+                <Button variant="ghost" className="hidden md:flex items-center gap-2 text-zinc-900 hover:text-red-600 hover:bg-transparent p-0 h-auto transition-colors group font-normal">
+                  <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center group-hover:bg-red-50 group-hover:rotate-12 transition-all duration-300 shadow-sm group-hover:shadow-md">
+                    <User className="w-4 h-4" />
+                  </div>
+                  <span className="text-sm font-bold uppercase group-hover:underline decoration-2 underline-offset-4">My Profile</span>
+                </Button>
+              </Link>
+              <form action={logoutAction}>
+                <Button variant="ghost" size="sm" className="text-zinc-500 hover:text-red-600">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </Button>
+              </form>
+            </div>
+          ) : (
+            <AuthModal 
+              trigger={
+                <Button variant="ghost" className="hidden md:flex items-center gap-2 text-zinc-900 hover:text-red-600 hover:bg-transparent p-0 h-auto transition-colors group font-normal">
+                  <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center group-hover:bg-red-50 group-hover:rotate-12 transition-all duration-300 shadow-sm group-hover:shadow-md">
+                    <User className="w-4 h-4" />
+                  </div>
+                  <span className="text-sm font-bold uppercase group-hover:underline decoration-2 underline-offset-4">Log in | Register</span>
+                </Button>
+              }
+            />
+          )}
 
           {/* Mobile Menu Toggle */}
           <Button variant="ghost" size="icon" className="md:hidden">

@@ -66,7 +66,7 @@ export default async function CheckoutPage({
 
   return (
     <div className="min-h-screen bg-zinc-50">
-      <Header />
+      <Header user={session.user} />
       
       <main className="container mx-auto px-6 pt-32 pb-12">
         <div className="mb-8">

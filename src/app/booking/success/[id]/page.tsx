@@ -6,6 +6,7 @@ import { format } from "date-fns"
 import { CheckCircle, Calendar, MapPin, User, ShieldCheck, Wallet, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { getSession } from "@/lib/auth"
 
 export default async function BookingSuccessPage({
   params,
@@ -13,6 +14,7 @@ export default async function BookingSuccessPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
+  const session = await getSession()
   
   const booking = await prisma.booking.findUnique({
     where: { id },
@@ -30,7 +32,7 @@ export default async function BookingSuccessPage({
 
   return (
     <div className="min-h-screen bg-zinc-50">
-      <Header />
+      <Header user={session?.user} />
       
       <main className="container mx-auto px-6 pt-32 pb-12">
         <div className="max-w-3xl mx-auto space-y-8">
@@ -98,25 +100,22 @@ export default async function BookingSuccessPage({
 
                   <div>
                     <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-                      <ShieldCheck className="w-4 h-4 text-red-600" />
-                      Insurance & Extras
+                      <User className="w-4 h-4 text-red-600" />
+                      Driver Details
                     </h3>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between items-center">
-                        <span className="text-zinc-600">Insurance</span>
-                        <span className={booking.fullInsurance ? "text-green-600 font-bold" : "text-zinc-900"}>
-                          {booking.fullInsurance ? "Full Insurance (Zero Deductible)" : "Basic Insurance"}
-                        </span>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-sm text-zinc-500">Full Name</span>
+                        <span className="text-sm font-medium">{booking.firstName} {booking.lastName}</span>
                       </div>
-                      {booking.extras.map(extra => (
-                        <div key={extra.id} className="flex justify-between items-center">
-                          <span className="text-zinc-600">{extra.name}</span>
-                          <span className="text-zinc-900 font-medium">Included</span>
-                        </div>
-                      ))}
-                      {booking.extras.length === 0 && !booking.fullInsurance && (
-                        <div className="text-zinc-400 italic text-xs">No extras selected</div>
-                      )}
+                      <div className="flex justify-between">
+                        <span className="text-sm text-zinc-500">Email</span>
+                        <span className="text-sm font-medium">{booking.email}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-zinc-500">Phone</span>
+                        <span className="text-sm font-medium">{booking.phone}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -125,79 +124,44 @@ export default async function BookingSuccessPage({
                 <div className="p-6 space-y-6">
                   <div>
                     <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-                      <User className="w-4 h-4 text-red-600" />
-                      Renter Information
+                      <Wallet className="w-4 h-4 text-red-600" />
+                      Payment Breakdown
                     </h3>
-                    <div className="space-y-2 text-sm">
-                      <div className="grid grid-cols-3 gap-2">
-                        <span className="text-zinc-500">Name:</span>
-                        <span className="col-span-2 font-medium">{booking.firstName} {booking.lastName}</span>
+                    <div className="space-y-3">
+                      <div className="flex justify-between">
+                        <span className="text-sm text-zinc-500">Vehicle Rental</span>
+                        <span className="text-sm font-medium">€{Number(booking.totalPrice).toLocaleString()}</span>
                       </div>
-                      <div className="grid grid-cols-3 gap-2">
-                        <span className="text-zinc-500">Email:</span>
-                        <span className="col-span-2 font-medium truncate">{booking.email}</span>
+                      {/* Extras would go here if we stored their individual prices in booking or calculated them */}
+                      <div className="pt-2 border-t border-zinc-100 flex justify-between items-center">
+                        <span className="text-sm font-bold">Total Due</span>
+                        <span className="text-lg font-bold text-red-600">€{Number(booking.totalPrice).toLocaleString()}</span>
                       </div>
-                      <div className="grid grid-cols-3 gap-2">
-                        <span className="text-zinc-500">Phone:</span>
-                        <span className="col-span-2 font-medium">{booking.phone}</span>
-                      </div>
-                      {booking.flightNumber && (
-                        <div className="grid grid-cols-3 gap-2">
-                          <span className="text-zinc-500">Flight:</span>
-                          <span className="col-span-2 font-medium">{booking.flightNumber}</span>
-                        </div>
-                      )}
                     </div>
                   </div>
 
-                  {booking.isCompany && (
-                    <div>
-                      <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <Wallet className="w-4 h-4 text-red-600" />
-                        Billing Details
-                      </h3>
-                      <div className="space-y-2 text-sm">
-                        <div className="grid grid-cols-3 gap-2">
-                          <span className="text-zinc-500">Company:</span>
-                          <span className="col-span-2 font-medium">{booking.companyName}</span>
-                        </div>
-                        <div className="grid grid-cols-3 gap-2">
-                          <span className="text-zinc-500">Tax ID:</span>
-                          <span className="col-span-2 font-medium">{booking.companyTaxId}</span>
-                        </div>
-                        <div className="grid grid-cols-3 gap-2">
-                          <span className="text-zinc-500">Address:</span>
-                          <span className="col-span-2 font-medium">{booking.companyAddress}</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div>
-                    <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-wider mb-4 flex items-center gap-2">
-                      <Wallet className="w-4 h-4 text-red-600" />
-                      Payment Method
-                    </h3>
-                    <div className="bg-zinc-50 p-3 rounded-lg text-sm font-medium text-zinc-900">
-                      {booking.paymentMethod === 'CASH_ON_SITE' ? 'Cash Payment on Site' : 
-                       booking.paymentMethod === 'CARD_ON_SITE' ? 'Card Payment on Site' : 'Prepayment'}
-                    </div>
+                  <div className="bg-zinc-50 p-4 rounded-lg">
+                     <div className="flex gap-3">
+                       <ShieldCheck className="w-5 h-5 text-zinc-400 shrink-0" />
+                       <p className="text-xs text-zinc-500 leading-relaxed">
+                         This is a booking request. No payment has been taken yet. 
+                         You will be contacted by our team to finalize the booking and arrange payment.
+                       </p>
+                     </div>
                   </div>
                 </div>
-
               </div>
             </CardContent>
           </Card>
-
-          <div className="flex justify-center gap-4">
-            <Button asChild variant="outline" className="min-w-[200px]">
-              <Link href="/">Back to Home</Link>
-            </Button>
-            {/* <Button className="min-w-[200px] bg-zinc-900 text-white hover:bg-zinc-800">
-              Download Receipt
-            </Button> */}
+          
+          <div className="text-center">
+            <Link href="/dashboard">
+              <Button variant="outline" className="mr-4">View My Bookings</Button>
+            </Link>
+            <Link href="/">
+              <Button>Return to Home</Button>
+            </Link>
           </div>
-
         </div>
       </main>
     </div>
