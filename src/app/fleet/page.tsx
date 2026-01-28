@@ -177,7 +177,16 @@ export default async function FleetPage({
       orderBy: { seats: 'asc' },
       where: { status: 'AVAILABLE' }
     }),
+    // Fetch Extras for booking flow
+    prisma.extra.findMany({
+      orderBy: { price: 'asc' }
+    })
   ]);
+
+  const extras = extrasData.map(extra => ({
+    ...extra,
+    price: Number(extra.price)
+  }));
 
   const filterOptions = {
     categories: categoriesData.map(c => c.name),
@@ -259,6 +268,7 @@ export default async function FleetPage({
                 <FleetCard 
                   key={car.id} 
                   car={car} 
+                  extras={extras}
                   searchParams={{
                     startDate: startDateStr,
                     endDate: endDateStr

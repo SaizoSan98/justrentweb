@@ -52,17 +52,29 @@ type CarType = {
   deposit?: number
 }
 
+import { Baby, Map, UserPlus, Wifi } from "lucide-react"
+
+type Extra = {
+  id: string
+  name: string
+  price: number
+  priceType: string // PER_DAY or PER_RENTAL
+  icon: string | null
+}
+
 export function FleetCard({ 
   car, 
   searchParams,
-  redirectToFleet
+  redirectToFleet,
+  extras = []
 }: { 
   car: CarType,
   searchParams?: {
     startDate?: string
     endDate?: string
   },
-  redirectToFleet?: boolean
+  redirectToFleet?: boolean,
+  extras?: Extra[]
 }) {
   const startDate = searchParams?.startDate ? new Date(searchParams.startDate) : new Date()
   const endDate = searchParams?.endDate ? new Date(searchParams.endDate) : undefined
@@ -324,6 +336,43 @@ export function FleetCard({
                   </div>
                 </div>
 
+                {/* Extras Selection */}
+                {extras.length > 0 && (
+                  <div className="space-y-2">
+                    <Label className="text-xs font-bold text-zinc-700 uppercase tracking-wider">Add Extras</Label>
+                    <div className="grid grid-cols-1 gap-3">
+                      {extras.map(extra => (
+                        <div 
+                          key={extra.id}
+                          onClick={() => toggleExtra(extra.id)}
+                          className={cn(
+                            "cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 flex items-center justify-between",
+                            selectedExtras.includes(extra.id) ? "border-red-600 bg-red-50/50" : "border-zinc-200 hover:border-zinc-300"
+                          )}
+                        >
+                          <div className="flex items-center gap-3">
+                             <div className={cn(
+                               "w-8 h-8 rounded-full flex items-center justify-center",
+                               selectedExtras.includes(extra.id) ? "bg-red-100 text-red-600" : "bg-zinc-100 text-zinc-500"
+                             )}>
+                               {getExtraIcon(extra.icon)}
+                             </div>
+                             <div>
+                               <div className="font-bold text-zinc-900 text-sm">{extra.name}</div>
+                               <div className="text-[10px] text-zinc-500">
+                                 €{extra.price} {extra.priceType === 'PER_DAY' ? '/ day' : '/ rental'}
+                               </div>
+                             </div>
+                          </div>
+                          <div className={cn("w-4 h-4 rounded-full border-2 flex items-center justify-center", selectedExtras.includes(extra.id) ? "border-red-600" : "border-zinc-300")}>
+                            {selectedExtras.includes(extra.id) && <div className="w-2 h-2 rounded-full bg-red-600" />}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* Price Breakdown */}
                 <div className="bg-zinc-50 rounded-xl p-4 border border-zinc-100 space-y-2 mt-auto">
                   <h4 className="font-bold text-zinc-900 text-xs mb-2">Price Breakdown</h4>
@@ -344,6 +393,13 @@ export function FleetCard({
                     <span className="text-zinc-600">VAT (27%)</span>
                     <span className="font-medium">€{vatAmount.toFixed(2)}</span>
                   </div>
+
+                  {extrasCost > 0 && (
+                    <div className="flex justify-between text-xs pt-1 border-t border-zinc-200/50">
+                       <span className="text-zinc-600">Selected Extras</span>
+                       <span className="font-medium">€{extrasCost.toFixed(2)}</span>
+                    </div>
+                  )}
                   
                   <div className="flex justify-between text-xs pt-1 border-t border-zinc-200/50">
                      <div className="flex items-center gap-1">
