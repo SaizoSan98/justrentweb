@@ -17,7 +17,8 @@ const SEATS = [2, 4, 5, 7, 8, 9]
 export function FleetFilters({ 
   currentFilters, 
   counts,
-  options
+  options,
+  availableCars
 }: { 
   currentFilters?: {
     category?: string[]
@@ -35,6 +36,13 @@ export function FleetFilters({
     fuelTypes: string[]
     seats: number[]
   }
+  availableCars?: {
+    category: string
+    transmission: string
+    fuelType: string
+    seats: number
+    guaranteedModel: boolean
+  }[]
 }) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -63,6 +71,18 @@ export function FleetFilters({
   )
 
   const [isOpen, setIsOpen] = useState(false)
+
+  // Calculate dynamic count based on current selection
+  // If availableCars is provided, we filter client-side. Otherwise fallback to server count.
+  const matchingCount = availableCars ? availableCars.filter(car => {
+    const matchCategory = selectedCategories.length === 0 || selectedCategories.includes(car.category)
+    const matchTransmission = selectedTransmissions.length === 0 || selectedTransmissions.includes(car.transmission)
+    const matchFuel = selectedFuelTypes.length === 0 || selectedFuelTypes.includes(car.fuelType)
+    const matchSeats = selectedSeats.length === 0 || selectedSeats.includes(car.seats.toString())
+    const matchGuaranteed = !guaranteedModel || car.guaranteedModel
+
+    return matchCategory && matchTransmission && matchFuel && matchSeats && matchGuaranteed
+  }).length : (counts?.total || 0)
 
   // Quick filters state (outside sheet)
   const activeFiltersCount = 

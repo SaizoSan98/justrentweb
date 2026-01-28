@@ -87,57 +87,76 @@ export default async function FleetPage({
   // For DB query, if no endDate is set, we just check availability for startDate (1 day)
   const queryEndDate = endDate || new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
 
-  const whereClause: any = {
+  // 1. Define base availability criteria (ignoring UI filters like category/transmission)
+  // This is used for the "Show X offers" counter to calculate potential matches
+  const baseWhereClause: any = {
     status: 'AVAILABLE',
+    bookings: {
+      none: {
+        OR: [
+          {
+            startDate: { lte: queryEndDate },
+            endDate: { gte: startDate }
+          }
+        ],
+        status: { in: ['CONFIRMED', 'PENDING'] } // Assuming these statuses block availability
+      }
+    }
   };
 
+  // 2. Build the full filter for the main grid (includes UI filters)
+  const fullWhereClause = { ...baseWhereClause };
+
   if (categories && categories.length > 0) {
-    whereClause.category = { in: categories };
+    fullWhereClause.category = { in: categories };
   }
 
   if (transmissions && transmissions.length > 0) {
-    whereClause.transmission = { in: transmissions };
+    fullWhereClause.transmission = { in: transmissions };
   }
 
   if (fuelTypes && fuelTypes.length > 0) {
-    whereClause.fuelType = { in: fuelTypes };
+    fullWhereClause.fuelType = { in: fuelTypes };
   }
 
   if (seatCounts && seatCounts.length > 0) {
     // Handling "8+" case if needed, otherwise exact match
     const seatsNumbers = seatCounts.map(s => parseInt(s));
-    whereClause.seats = { in: seatsNumbers };
+    fullWhereClause.seats = { in: seatsNumbers };
   }
 
   if (guaranteedModel) {
-    whereClause.guaranteedModel = true;
+    fullWhereClause.guaranteedModel = true;
   }
 
-  // Filter out cars that are booked in the requested period
-  // We need to check for overlapping bookings
-  whereClause.bookings = {
-    none: {
-      OR: [
-        {
-          startDate: { lte: queryEndDate },
-          endDate: { gte: startDate }
-        }
-      ],
-      status: { in: ['CONFIRMED', 'PENDING'] } // Assuming these statuses block availability
-    }
-  };
+  // 3. Execute queries in parallel
+  const [cars, allAvailableCars, categoriesData, transmissionsData, fuelTypesData, seatsData] = await Promise.all([
+    // Main Grid Query: Filtered by ALL criteria
+    prisma.car.findMany({
+      where: fullWhereClause,
+      include: {
+        pricingTiers: true
+      },
+      orderBy: {
+        pricePerDay: 'asc'
+      }
+    }),
 
-  const cars = await prisma.car.findMany({
-    where: whereClause,
-    include: {
-      pricingTiers: true
-    },
-    orderBy: {
-      pricePerDay: 'asc'
-    }
-  });
+    // Counter Query: Filtered only by AVAILABILITY (ignoring UI filters)
+    // This allows the frontend to calculate "Show X offers" dynamically
+    prisma.car.findMany({
+      where: baseWhereClause,
+      select: {
+        id: true,
+        category: true,
+        transmission: true,
+        fuelType: true,
+        seats: true,
+        guaranteedModel: true,
+      }
+    }),
 
-  const [categoriesData, transmissionsData, fuelTypesData, seatsData] = await Promise.all([
+    // Filter Options
     prisma.category.findMany({ 
       select: { name: true }, 
       orderBy: { name: 'asc' } 
@@ -219,6 +238,7 @@ export default async function FleetPage({
                  total: serializedCars.length
                }}
                options={filterOptions}
+               availableCars={allAvailableCars}
              />
            </div>
         </div>
