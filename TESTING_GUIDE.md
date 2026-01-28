@@ -41,9 +41,14 @@ Ez a dokumentum részletesen leírja, hogyan ellenőrizzük a rendszer egyes fun
 
 ## 4. Admin Felület (Háttérrendszer)
 - [ ] **Bejelentkezés:** `admin@justrent.com` / `admin` adatokkal sikeres.
+- [ ] **UI Layout:** A fejléc (Header) és az oldalsáv (Sidebar) helyesen jelenik meg.
 - [ ] **Dashboard:** Áttekintő adatok megjelennek.
 - [ ] **Autók Kezelése (Fleet):**
-  - [ ] Új autó hozzáadása működik (minden mező, képfeltöltés).
+  - [ ] Új autó hozzáadása (CarForm):
+    - [ ] Validáció működik (kötelező mezők pirosan jeleznek).
+    - [ ] Hibaüzenetek (Toast) megjelennek.
+    - [ ] Sikeres mentés után visszajelzés és átirányítás.
+    - [ ] Adatok (pl. Model, Ár) nem vesznek el a fülek (Tabs) közti váltáskor.
   - [ ] Autó szerkesztése működik.
   - [ ] "Is Featured" kapcsoló működik.
   - [ ] Árak és díjak (pl. Extra km ár) mentésre kerülnek.

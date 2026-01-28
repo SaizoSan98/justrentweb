@@ -33,6 +33,9 @@
 - [x] Pénznem átállítása EUR-ra
 - [x] UI csiszolás (Login gomb, Admin üdvözlés)
 - [x] Demo adatok törlése, tiszta adatbázis
+- [x] Admin UI egységesítés (Header integráció)
+- [x] Fleet szűrő UI modernizálása (Sticky bar, Quick toggles)
+- [x] Jármű létrehozás (CarForm) javítása (State-alapú adatkezelés, Validáció, Visszajelzések)
 - [x] Tesztelési jegyzőkönyv (TESTING_GUIDE.md)
 - [ ] Végső tesztelés és hibajavítás
 - [ ] Élesítés (Deployment)
