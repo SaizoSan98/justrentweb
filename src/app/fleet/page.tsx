@@ -261,6 +261,7 @@ export default async function FleetPage({
           <BookingEngine 
             className="w-full md:w-auto static translate-y-0 shadow-none bg-transparent" 
             compact={true}
+            dictionary={dictionary}
           />
         </div>
 
