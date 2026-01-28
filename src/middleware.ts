@@ -34,7 +34,7 @@ export async function middleware(request: NextRequest) {
   if (isLoginPage && currentUser) {
     try {
       const payload = await decrypt(currentUser);
-      if (payload.user.role === 'ADMIN') {
+      if (payload.user.role === 'ADMIN' || payload.user.role === 'SUPERADMIN') {
         console.log("Already logged in as admin, redirecting to dashboard");
         return NextResponse.redirect(new URL("/admin", request.url));
       }
