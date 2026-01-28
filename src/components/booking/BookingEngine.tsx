@@ -127,9 +127,15 @@ export function BookingEngine({
 
   return (
     <div className={cn("w-full relative z-20", className)}>
-      <Card className="border-0 shadow-2xl shadow-zinc-900/10 bg-white/95 backdrop-blur-xl overflow-hidden rounded-[2rem] ring-1 ring-zinc-900/5">
-        <CardContent className="p-6 md:p-8">
-          {showLabel && (
+      <Card className={cn(
+        "border-0 shadow-2xl shadow-zinc-900/10 bg-white/95 backdrop-blur-xl overflow-hidden rounded-[2rem] ring-1 ring-zinc-900/5",
+        compact && "shadow-xl" // Less shadow for compact mode
+      )}>
+        <CardContent className={cn(
+          "p-6 md:p-8",
+          compact && "p-4" // Less padding for compact mode
+        )}>
+          {showLabel && !compact && (
             <div className="flex items-center gap-2 mb-6">
               <span className="bg-red-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm shadow-red-600/20">{t('car_rental', 'booking')}</span>
             </div>
@@ -140,8 +146,14 @@ export function BookingEngine({
             <div className="lg:col-span-4 space-y-2">
               <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider pl-4">{t('airport', 'hero')}</label>
               <div className="relative group">
-                <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 text-red-600 w-5 h-5 group-hover:scale-110 transition-transform" />
-                <div className="h-16 w-full rounded-2xl bg-zinc-50 border-0 ring-1 ring-zinc-100 focus-within:ring-2 focus-within:ring-red-600/20 pl-14 pr-4 flex items-center font-bold text-zinc-900 transition-all">
+                <MapPin className={cn(
+                  "absolute left-5 top-1/2 -translate-y-1/2 text-red-600 w-5 h-5 group-hover:scale-110 transition-transform",
+                  compact && "left-4 w-4 h-4"
+                )} />
+                <div className={cn(
+                  "h-16 w-full rounded-2xl bg-zinc-50 border-0 ring-1 ring-zinc-100 focus-within:ring-2 focus-within:ring-red-600/20 pl-14 pr-4 flex items-center font-bold text-zinc-900 transition-all",
+                  compact && "h-12 pl-12 text-sm"
+                )}>
                   {location}
                 </div>
               </div>
@@ -151,12 +163,18 @@ export function BookingEngine({
             <div className="lg:col-span-6 grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Pick-up */}
               <div className="flex gap-2">
-                <div className="w-28 shrink-0 space-y-2">
+                <div className={cn("w-28 shrink-0 space-y-2", compact && "w-24")}>
                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider pl-1">{t('time')}</label>
                    <div className="relative">
-                      <Clock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 w-4 h-4" />
+                      <Clock className={cn(
+                        "absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 w-4 h-4",
+                        compact && "left-3"
+                      )} />
                       <select 
-                        className="h-16 w-full rounded-2xl bg-zinc-50 border-0 ring-1 ring-zinc-100 focus:ring-2 focus:ring-red-600/20 pl-10 pr-2 text-sm font-bold text-zinc-900 appearance-none outline-none transition-all cursor-pointer hover:bg-zinc-100"
+                        className={cn(
+                          "h-16 w-full rounded-2xl bg-zinc-50 border-0 ring-1 ring-zinc-100 focus:ring-2 focus:ring-red-600/20 pl-10 pr-2 text-sm font-bold text-zinc-900 appearance-none outline-none transition-all cursor-pointer hover:bg-zinc-100",
+                          compact && "h-12 pl-9"
+                        )}
                         value={startTime}
                         onChange={(e) => setStartTime(e.target.value)}
                       >
@@ -176,10 +194,11 @@ export function BookingEngine({
                         variant={"outline"}
                         className={cn(
                           "w-full h-16 justify-start text-left font-bold text-base rounded-2xl bg-zinc-50 border-0 ring-1 ring-zinc-100 hover:bg-zinc-100 hover:text-zinc-900 transition-all",
-                          !dateRange?.from && "text-muted-foreground"
+                          !dateRange?.from && "text-muted-foreground",
+                          compact && "h-12 text-sm"
                         )}
                       >
-                        <CalendarIcon className="mr-3 h-5 w-5 text-red-600" />
+                        <CalendarIcon className={cn("mr-3 h-5 w-5 text-red-600", compact && "w-4 h-4 mr-2")} />
                         {dateRange?.from ? format(dateRange.from, "MMM d") : <span>{t('pick_date')}</span>}
                       </Button>
                     </PopoverTrigger>
@@ -200,12 +219,18 @@ export function BookingEngine({
 
               {/* Return */}
               <div className="flex gap-2">
-                <div className="w-28 shrink-0 space-y-2">
+                <div className={cn("w-28 shrink-0 space-y-2", compact && "w-24")}>
                    <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider pl-1">{t('time')}</label>
                    <div className="relative">
-                      <Clock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 w-4 h-4" />
+                      <Clock className={cn(
+                        "absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 w-4 h-4",
+                        compact && "left-3"
+                      )} />
                       <select 
-                        className="h-16 w-full rounded-2xl bg-zinc-50 border-0 ring-1 ring-zinc-100 focus:ring-2 focus:ring-red-600/20 pl-10 pr-2 text-sm font-bold text-zinc-900 appearance-none outline-none transition-all cursor-pointer hover:bg-zinc-100"
+                        className={cn(
+                          "h-16 w-full rounded-2xl bg-zinc-50 border-0 ring-1 ring-zinc-100 focus:ring-2 focus:ring-red-600/20 pl-10 pr-2 text-sm font-bold text-zinc-900 appearance-none outline-none transition-all cursor-pointer hover:bg-zinc-100",
+                          compact && "h-12 pl-9"
+                        )}
                         value={endTime}
                         onChange={(e) => setEndTime(e.target.value)}
                       >
@@ -225,10 +250,11 @@ export function BookingEngine({
                         variant={"outline"}
                         className={cn(
                           "w-full h-16 justify-start text-left font-bold text-base rounded-2xl bg-zinc-50 border-0 ring-1 ring-zinc-100 hover:bg-zinc-100 hover:text-zinc-900 transition-all",
-                          !dateRange?.to && "text-muted-foreground"
+                          !dateRange?.to && "text-muted-foreground",
+                          compact && "h-12 text-sm"
                         )}
                       >
-                        <CalendarIcon className="mr-3 h-5 w-5 text-red-600" />
+                        <CalendarIcon className={cn("mr-3 h-5 w-5 text-red-600", compact && "w-4 h-4 mr-2")} />
                         {dateRange?.to ? format(dateRange.to, "MMM d") : <span>{t('pick_date')}</span>}
                       </Button>
                     </PopoverTrigger>
@@ -252,7 +278,10 @@ export function BookingEngine({
             <div className="lg:col-span-2">
               <Button 
                 size="lg" 
-                className="w-full h-16 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-bold text-lg shadow-lg shadow-red-600/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className={cn(
+                  "w-full h-16 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-bold text-lg shadow-lg shadow-red-600/20 transition-all hover:scale-[1.02] active:scale-[0.98]",
+                  compact && "h-12 text-base"
+                )}
                 onClick={handleSearch}
               >
                 {t('show_cars')}
