@@ -216,7 +216,7 @@ export function FleetCard({
                 </div>
              </div>
 
-             <div className="mt-4 pt-4 border-t border-zinc-200">
+             <div className="mt-4 pt-4 border-t border-zinc-200 shrink-0">
                 <h4 className="font-bold text-zinc-900 mb-2 flex items-center gap-2 text-sm">
                   <Info className="w-3.5 h-3.5 text-red-600" /> Rental Details
                 </h4>
@@ -238,7 +238,7 @@ export function FleetCard({
           </div>
 
           {/* RIGHT COLUMN: Configuration & Steps */}
-          <div className="md:col-span-7 p-4 md:p-6 flex flex-col overflow-y-auto h-full">
+          <div className="md:col-span-7 p-4 md:p-6 flex flex-col h-full overflow-visible md:overflow-y-auto">
             
             {step === 1 && (
               <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">

@@ -84,9 +84,91 @@ export function Header({ transparent = false, user }: HeaderProps) {
           )}
 
           {/* Mobile Menu Toggle */}
-          <Button variant="ghost" size="icon" className="md:hidden">
-            <Menu className="w-6 h-6" />
-          </Button>
+          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <Menu className="w-6 h-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-white p-0 flex flex-col">
+              <div className="p-6 border-b border-zinc-100 flex items-center justify-between">
+                <Link href="/" className="text-xl font-black tracking-tighter text-zinc-900 uppercase" onClick={() => setIsMobileMenuOpen(false)}>
+                  Just<span className="text-red-600">Rent</span>
+                </Link>
+                {/* Close button is automatically added by SheetContent, but we can customize if needed */}
+              </div>
+              
+              <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
+                <nav className="flex flex-col gap-4">
+                  <Link 
+                    href="/" 
+                    className="text-lg font-bold text-zinc-900 hover:text-red-600 transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Home
+                  </Link>
+                  <Link 
+                    href="/fleet" 
+                    className="text-lg font-bold text-zinc-900 hover:text-red-600 transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Our Fleet
+                  </Link>
+                  <Link 
+                    href="#contact" 
+                    className="text-lg font-bold text-zinc-900 hover:text-red-600 transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Contact
+                  </Link>
+                </nav>
+
+                <div className="h-px bg-zinc-100 w-full my-2" />
+
+                {/* Mobile Auth */}
+                {user ? (
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-900 font-bold border border-zinc-200">
+                        {getInitials(user.name)}
+                      </div>
+                      <div>
+                        <div className="font-bold text-zinc-900">{user.name || "User"}</div>
+                        <div className="text-xs text-zinc-500">{user.email}</div>
+                      </div>
+                    </div>
+                    
+                    <Link href={user.role === 'ADMIN' ? "/admin" : "/dashboard"} onClick={() => setIsMobileMenuOpen(false)}>
+                      <Button variant="outline" className="w-full justify-start">
+                        <User className="w-4 h-4 mr-2" />
+                        My Profile
+                      </Button>
+                    </Link>
+                    
+                    <form action={async () => {
+                      await logoutAction()
+                      setIsMobileMenuOpen(false)
+                    }}>
+                      <Button variant="ghost" className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50">
+                        <LogOut className="w-4 h-4 mr-2" />
+                        Sign Out
+                      </Button>
+                    </form>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    <AuthModal 
+                      trigger={
+                        <Button className="w-full bg-zinc-900 text-white hover:bg-zinc-800">
+                          Log In / Register
+                        </Button>
+                      }
+                    />
+                  </div>
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </header>
