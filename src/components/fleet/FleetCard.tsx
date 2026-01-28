@@ -53,12 +53,36 @@ type FleetCardProps = {
   imageUrl: string
 }
 
-export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
+export function FleetCard({ 
+  car, 
+  searchParams 
+}: { 
+  car: any,
+  searchParams?: {
+    startDate?: string
+    endDate?: string
+  }
+}) {
+  const startDate = searchParams?.startDate ? new Date(searchParams.startDate) : new Date()
+  const endDate = searchParams?.endDate ? new Date(searchParams.endDate) : undefined
+  
+  // Calculate days
+  const s = new Date(startDate); s.setHours(0,0,0,0)
+  const e = endDate ? new Date(endDate) : new Date(startDate)
+  if (endDate) e.setHours(0,0,0,0)
+  else e.setDate(e.getDate() + 1)
+  
+  const diffTime = Math.max(0, e.getTime() - s.getTime())
+  const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)))
+
+  const imageUrl = car.imageUrl || "https://images.unsplash.com/photo-1550355291-bbee04a92027?q=80&w=1936&auto=format&fit=crop"
+
   const tier = car.pricingTiers.find(
-    (t) => diffDays >= t.minDays && (t.maxDays === null || diffDays <= t.maxDays)
+    (t: any) => diffDays >= t.minDays && (t.maxDays === null || diffDays <= t.maxDays)
   )
   const pricePerDay = tier ? Number(tier.pricePerDay) : Number(car.pricePerDay)
   const totalPrice = pricePerDay * diffDays
+
   
   // Options state
   const [selectedRate, setSelectedRate] = useState<"best" | "flexible">("best")

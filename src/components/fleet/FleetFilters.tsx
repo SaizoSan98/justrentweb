@@ -14,7 +14,21 @@ const TRANSMISSIONS = ["AUTOMATIC", "MANUAL"]
 const FUEL_TYPES = ["PETROL", "DIESEL", "ELECTRIC", "HYBRID"]
 const SEATS = [2, 4, 5, 7, 8, 9]
 
-export function FleetFilters({ totalCount }: { totalCount: number }) {
+export function FleetFilters({ 
+  currentFilters, 
+  counts 
+}: { 
+  currentFilters?: {
+    category?: string[]
+    transmission?: string[]
+    fuelType?: string[]
+    seats?: string[]
+    guaranteedModel?: boolean
+  }
+  counts?: {
+    total: number
+  }
+}) {
   const router = useRouter()
   const searchParams = useSearchParams()
   
@@ -98,6 +112,11 @@ export function FleetFilters({ totalCount }: { totalCount: number }) {
             <h1 className="text-2xl font-black uppercase tracking-tight text-zinc-900">
               Which car would you like to drive?
             </h1>
+            <div className="flex items-center gap-3">
+            <span className="text-zinc-500 text-sm font-medium">
+              {counts?.total || 0} vehicles available
+            </span>
+          </div>
           </div>
 
           <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
@@ -217,7 +236,7 @@ export function FleetFilters({ totalCount }: { totalCount: number }) {
                     className="w-full bg-red-600 hover:bg-red-700 text-white font-bold h-14 text-lg rounded-xl shadow-lg shadow-red-600/20"
                     onClick={applyFilters}
                   >
-                    Show {totalCount} offers
+                    Show {counts?.total || 0} offers
                   </Button>
                 </div>
               </SheetContent>
