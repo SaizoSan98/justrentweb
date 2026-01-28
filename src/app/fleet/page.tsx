@@ -152,7 +152,7 @@ export default async function FleetPage({
         transmission: true,
         fuelType: true,
         seats: true,
-        guaranteedModel: true,
+        orSimilar: true,
       }
     }),
 
