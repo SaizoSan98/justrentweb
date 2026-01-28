@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import Image from "next/image"
 import { Users, Briefcase, Gauge, Info, Check, Shield, Zap, CreditCard, MapPin, Calendar, ArrowRight, ChevronLeft, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -53,13 +54,15 @@ type CarType = {
 
 export function FleetCard({ 
   car, 
-  searchParams 
+  searchParams,
+  redirectToFleet
 }: { 
   car: CarType,
   searchParams?: {
     startDate?: string
     endDate?: string
-  }
+  },
+  redirectToFleet?: boolean
 }) {
   const startDate = searchParams?.startDate ? new Date(searchParams.startDate) : new Date()
   const endDate = searchParams?.endDate ? new Date(searchParams.endDate) : undefined
@@ -97,57 +100,69 @@ export function FleetCard({
   const vatAmount = subTotal * 0.27
   const totalRequired = subTotal + vatAmount + depositValue
 
+  const CardContent = (
+    <div className="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-xl hover:border-red-200 transition-all duration-300 relative border border-zinc-200 flex flex-col cursor-pointer h-full">
+      {/* Main Card Content */}
+      <div className="p-6 relative z-10">
+        <h3 className="text-2xl font-black text-zinc-900 uppercase tracking-tight mb-1">
+          {car.make} {car.model}
+        </h3>
+        <p className="text-zinc-500 text-sm font-medium mb-4">{car.orSimilar ? "or similar | " : ""}{car.category}</p>
+        
+        <div className="flex gap-4 mb-4">
+          <div className="flex items-center gap-1.5 bg-zinc-100 px-2 py-1 rounded text-zinc-600 text-xs font-bold border border-zinc-200">
+            <Users className="w-3.5 h-3.5" /> {car.seats}
+          </div>
+          <div className="flex items-center gap-1.5 bg-zinc-100 px-2 py-1 rounded text-zinc-600 text-xs font-bold border border-zinc-200">
+            <Briefcase className="w-3.5 h-3.5" /> {car.suitcases}
+          </div>
+          <div className="flex items-center gap-1.5 bg-zinc-100 px-2 py-1 rounded text-zinc-600 text-xs font-bold border border-zinc-200">
+            <Gauge className="w-3.5 h-3.5" /> {car.transmission === 'AUTOMATIC' ? 'Auto' : 'Manual'}
+          </div>
+        </div>
+      </div>
+
+      {/* Car Image - Clean on white */}
+      <div className="relative h-48 -mt-8 mb-4 flex items-center justify-center p-4">
+        <Image 
+          src={imageUrl} 
+          alt={`${car.make} ${car.model}`} 
+          fill
+          className="object-contain drop-shadow-xl group-hover:scale-105 transition-transform duration-500 relative z-0"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        />
+      </div>
+
+      {/* Footer Price */}
+      <div className="mt-auto p-6 pt-0 relative z-20">
+         <div className="flex items-center gap-2 mb-2 text-zinc-900 text-xs font-bold">
+            <Check className="w-3 h-3 text-red-600" /> {car.dailyMileageLimit ? `${car.dailyMileageLimit} km / day` : "Unlimited Mileage"}
+         </div>
+         <div className="flex items-end justify-between">
+           <div>
+             <span className="text-2xl font-black text-red-600">€{basePricePerDay.toLocaleString()}</span>
+             <span className="text-zinc-500 text-sm font-medium"> /day</span>
+           </div>
+           <div className="text-zinc-400 text-xs text-right font-medium">
+             {diffDays} days
+           </div>
+         </div>
+      </div>
+    </div>
+  )
+
+  if (redirectToFleet) {
+    return (
+      <Link href="/fleet" className="block h-full">
+        {CardContent}
+      </Link>
+    )
+  }
+
   return (
     <Dialog onOpenChange={(open) => { if(!open) setStep(1) }}>
       <DialogTrigger asChild>
-        <div className="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-xl hover:border-red-200 transition-all duration-300 relative border border-zinc-200 flex flex-col cursor-pointer h-full">
-          {/* Main Card Content */}
-          <div className="p-6 relative z-10">
-            <h3 className="text-2xl font-black text-zinc-900 uppercase tracking-tight mb-1">
-              {car.make} {car.model}
-            </h3>
-            <p className="text-zinc-500 text-sm font-medium mb-4">{car.orSimilar ? "or similar | " : ""}{car.category}</p>
-            
-            <div className="flex gap-4 mb-4">
-              <div className="flex items-center gap-1.5 bg-zinc-100 px-2 py-1 rounded text-zinc-600 text-xs font-bold border border-zinc-200">
-                <Users className="w-3.5 h-3.5" /> {car.seats}
-              </div>
-              <div className="flex items-center gap-1.5 bg-zinc-100 px-2 py-1 rounded text-zinc-600 text-xs font-bold border border-zinc-200">
-                <Briefcase className="w-3.5 h-3.5" /> {car.suitcases}
-              </div>
-              <div className="flex items-center gap-1.5 bg-zinc-100 px-2 py-1 rounded text-zinc-600 text-xs font-bold border border-zinc-200">
-                <Gauge className="w-3.5 h-3.5" /> {car.transmission === 'AUTOMATIC' ? 'Auto' : 'Manual'}
-              </div>
-            </div>
-          </div>
-
-          {/* Car Image - Clean on white */}
-          <div className="relative h-48 -mt-8 mb-4 flex items-center justify-center p-4">
-            <Image 
-              src={imageUrl} 
-              alt={`${car.make} ${car.model}`} 
-              fill
-              className="object-contain drop-shadow-xl group-hover:scale-105 transition-transform duration-500 relative z-0"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            />
-          </div>
-
-          {/* Footer Price */}
-          <div className="mt-auto p-6 pt-0 relative z-20">
-             <div className="flex items-center gap-2 mb-2 text-zinc-900 text-xs font-bold">
-                <Check className="w-3 h-3 text-red-600" /> {car.dailyMileageLimit ? `${car.dailyMileageLimit} km / day` : "Unlimited Mileage"}
-             </div>
-             <div className="flex items-end justify-between">
-               <div>
-                 <span className="text-2xl font-black text-red-600">€{basePricePerDay.toLocaleString()}</span>
-                 <span className="text-zinc-500 text-sm font-medium"> /day</span>
-               </div>
-               <div className="text-zinc-400 text-xs text-right font-medium">
-                 {diffDays} days
-               </div>
-             </div>
-          </div>
-        </div>
+        {CardContent}
       </DialogTrigger>
       
       {/* BOOKING DIALOG CONTENT */}

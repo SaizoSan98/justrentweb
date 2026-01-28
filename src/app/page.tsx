@@ -79,8 +79,8 @@ export default async function LandingPage() {
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                  </div>
                  <div>
-                    <h3 className="font-bold text-zinc-900">Door-to-door Delivery</h3>
-                    <p className="text-zinc-500 text-sm mt-1">We bring your car directly to your doorstep.</p>
+                    <h3 className="font-bold text-zinc-900">Airport Pick-up & Drop-off</h3>
+                    <p className="text-zinc-500 text-sm mt-1">Available for an extra fee for your convenience.</p>
                  </div>
                </li>
             </ul>
@@ -106,7 +106,7 @@ export default async function LandingPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {serializedFeaturedCars.map((car: any) => (
-              <FleetCard key={car.id} car={car} />
+              <FleetCard key={car.id} car={car} redirectToFleet={true} />
             ))}
           </div>
           
