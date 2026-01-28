@@ -48,6 +48,7 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
   const [additionalImages, setAdditionalImages] = useState<string[]>(car?.images || [])
   
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const formRef = useRef<HTMLFormElement>(null)
 
   useEffect(() => {
     if (selectedMake && CAR_MODELS[selectedMake]) {
@@ -96,9 +97,10 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
     }
   }
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const formData = new FormData(e.currentTarget)
+  const handleSave = async () => {
+    if (!formRef.current) return
+
+    const formData = new FormData(formRef.current)
 
     // Log form data for debugging
     console.log("Form Data Entries:")
@@ -151,7 +153,7 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-8">
+    <form ref={formRef} className="space-y-8" onSubmit={(e) => e.preventDefault()}>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-4 lg:w-[600px]">
           <TabsTrigger value="general" className="gap-2"><Car className="w-4 h-4" /> General</TabsTrigger>
@@ -512,9 +514,10 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
           Cancel
         </Button>
         <Button 
-          type="submit" 
+          type="button" 
           className="bg-zinc-900 text-white hover:bg-zinc-800 min-w-[150px]"
           disabled={isSubmitting}
+          onClick={handleSave}
         >
           {isSubmitting ? (
             <>
