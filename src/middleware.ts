@@ -19,7 +19,7 @@ export async function middleware(request: NextRequest) {
   if (isAdminPage && currentUser) {
     try {
       const payload = await decrypt(currentUser);
-      if (payload.user.role !== 'ADMIN') {
+      if (payload.user.role !== 'ADMIN' && payload.user.role !== 'SUPERADMIN') {
         console.log("Admin access denied: Role is", payload.user.role);
         return NextResponse.redirect(new URL("/", request.url));
       }

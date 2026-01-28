@@ -37,7 +37,7 @@ export async function loginAction(formData: FormData) {
   }
 
   // 4. Redirect based on role
-  if (user.role === 'ADMIN') {
+  if (user.role === 'ADMIN' || user.role === 'SUPERADMIN') {
     redirect("/admin")
   } else {
     redirect("/dashboard")
