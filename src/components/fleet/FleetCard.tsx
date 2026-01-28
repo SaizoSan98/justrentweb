@@ -101,6 +101,7 @@ export function FleetCard({
   const [step, setStep] = useState(1)
   const [paymentMethod, setPaymentMethod] = useState<"onsite" | "online">("onsite")
   const [mileageOption, setMileageOption] = useState<"limited" | "unlimited">("limited")
+  const [selectedExtras, setSelectedExtras] = useState<string[]>([])
 
   // Calculations
   const unlimitedDailyPrice = Number(car.unlimitedMileagePrice || 0)
@@ -108,9 +109,39 @@ export function FleetCard({
   const rentalCost = basePricePerDay * diffDays
   const unlimitedCost = mileageOption === "unlimited" ? (unlimitedDailyPrice * diffDays) : 0
   
-  const subTotal = rentalCost + unlimitedCost
+  // Calculate extras cost
+  const extrasCost = selectedExtras.reduce((total, extraId) => {
+    const extra = extras.find(e => e.id === extraId)
+    if (!extra) return total
+    
+    if (extra.priceType === 'PER_DAY') {
+      return total + (extra.price * diffDays)
+    } else {
+      return total + extra.price
+    }
+  }, 0)
+
+  const subTotal = rentalCost + unlimitedCost + extrasCost
   const vatAmount = subTotal * 0.27
   const totalRequired = subTotal + vatAmount + depositValue
+
+  const toggleExtra = (extraId: string) => {
+    setSelectedExtras(prev => 
+      prev.includes(extraId) 
+        ? prev.filter(id => id !== extraId)
+        : [...prev, extraId]
+    )
+  }
+
+  const getExtraIcon = (iconName: string | null) => {
+    switch(iconName) {
+      case 'Baby': return <Baby className="w-5 h-5" />
+      case 'Map': return <Map className="w-5 h-5" />
+      case 'User': return <UserPlus className="w-5 h-5" />
+      case 'Wifi': return <Wifi className="w-5 h-5" />
+      default: return <Zap className="w-5 h-5" />
+    }
+  }
 
   const CardContent = (
     <div className="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-xl hover:border-red-200 transition-all duration-300 relative border border-zinc-200 flex flex-col cursor-pointer h-full">
