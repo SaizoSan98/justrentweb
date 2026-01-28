@@ -57,6 +57,8 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
   const [fullInsurancePrice, setFullInsurancePrice] = useState<string>(car?.fullInsurancePrice?.toString() || "")
   const [pickupAfterHoursPrice, setPickupAfterHoursPrice] = useState<string>(car?.pickupAfterHoursPrice?.toString() || "")
   const [returnAfterHoursPrice, setReturnAfterHoursPrice] = useState<string>(car?.returnAfterHoursPrice?.toString() || "")
+  const [extraKmPrice, setExtraKmPrice] = useState<string>(car?.extraKmPrice?.toString() || "")
+  const [unlimitedMileagePrice, setUnlimitedMileagePrice] = useState<string>(car?.unlimitedMileagePrice?.toString() || "")
   const [dailyMileageLimit, setDailyMileageLimit] = useState<string>(car?.dailyMileageLimit?.toString() || "")
   
   const [availableModels, setAvailableModels] = useState<string[]>([])
@@ -167,6 +169,8 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
       data.append('fullInsurancePrice', fullInsurancePrice)
       data.append('pickupAfterHoursPrice', pickupAfterHoursPrice)
       data.append('returnAfterHoursPrice', returnAfterHoursPrice)
+      data.append('extraKmPrice', extraKmPrice)
+      data.append('unlimitedMileagePrice', unlimitedMileagePrice)
       
       // Attributes
       data.append('dailyMileageLimit', dailyMileageLimit)
@@ -446,7 +450,7 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
               </div>
 
               <div className="grid md:grid-cols-2 gap-6 p-4 bg-zinc-50 rounded-lg border border-zinc-200">
-                 <div className="space-y-2">
+                <div className="space-y-2">
                   <Label htmlFor="pickupAfterHoursPrice">Pickup After Business Hours Price (EUR)</Label>
                   <Input 
                     name="pickupAfterHoursPrice" 
@@ -464,6 +468,26 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
                     value={returnAfterHoursPrice} 
                     onChange={(e) => setReturnAfterHoursPrice(e.target.value)} 
                     placeholder="30" 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="extraKmPrice">Extra KM Price (EUR)</Label>
+                  <Input 
+                    name="extraKmPrice" 
+                    type="number" 
+                    value={extraKmPrice} 
+                    onChange={(e) => setExtraKmPrice(e.target.value)} 
+                    placeholder="0.5" 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="unlimitedMileagePrice">Unlimited Mileage Price (EUR)</Label>
+                  <Input 
+                    name="unlimitedMileagePrice" 
+                    type="number" 
+                    value={unlimitedMileagePrice} 
+                    onChange={(e) => setUnlimitedMileagePrice(e.target.value)} 
+                    placeholder="50" 
                   />
                 </div>
               </div>

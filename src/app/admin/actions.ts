@@ -34,6 +34,8 @@ export async function createCar(formData: FormData) {
   const fullInsurancePrice = parseFloat(formData.get('fullInsurancePrice') as string)
   const pickupAfterHoursPrice = parseFloat(formData.get('pickupAfterHoursPrice') as string) || 0
   const returnAfterHoursPrice = parseFloat(formData.get('returnAfterHoursPrice') as string) || 0
+  const extraKmPrice = parseFloat(formData.get('extraKmPrice') as string) || 0
+  const unlimitedMileagePrice = parseFloat(formData.get('unlimitedMileagePrice') as string) || 0
   
   const seats = parseInt(formData.get('seats') as string)
   const doors = parseInt(formData.get('doors') as string)
@@ -86,6 +88,8 @@ export async function createCar(formData: FormData) {
         fullInsurancePrice,
         pickupAfterHoursPrice,
         returnAfterHoursPrice,
+        extraKmPrice,
+        unlimitedMileagePrice,
         seats,
         doors,
         suitcases,
@@ -134,6 +138,8 @@ export async function updateCar(formData: FormData) {
   const fullInsurancePrice = parseFloat(formData.get('fullInsurancePrice') as string)
   const pickupAfterHoursPrice = parseFloat(formData.get('pickupAfterHoursPrice') as string) || 0
   const returnAfterHoursPrice = parseFloat(formData.get('returnAfterHoursPrice') as string) || 0
+  const extraKmPrice = parseFloat(formData.get('extraKmPrice') as string) || 0
+  const unlimitedMileagePrice = parseFloat(formData.get('unlimitedMileagePrice') as string) || 0
 
   const seats = parseInt(formData.get('seats') as string)
   const doors = parseInt(formData.get('doors') as string)
@@ -185,6 +191,8 @@ export async function updateCar(formData: FormData) {
         fullInsurancePrice,
         pickupAfterHoursPrice,
         returnAfterHoursPrice,
+        extraKmPrice,
+        unlimitedMileagePrice,
         seats,
         doors,
         suitcases,
