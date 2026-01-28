@@ -62,8 +62,9 @@ export async function createCar(formData: FormData) {
         token: process.env.BLOB_READ_WRITE_TOKEN
       })
       imageUrl = blob.url
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to upload image:", error)
+      return { success: false, error: `Image upload failed: ${error.message}` }
     }
   }
 
@@ -165,8 +166,9 @@ export async function updateCar(formData: FormData) {
         token: process.env.BLOB_READ_WRITE_TOKEN
       })
       imageUrl = blob.url
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to upload image:", error)
+      return { success: false, error: `Image upload failed: ${error.message}` }
     }
   }
 

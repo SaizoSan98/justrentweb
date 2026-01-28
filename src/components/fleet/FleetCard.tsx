@@ -73,7 +73,7 @@ export function FleetCard({
   const diffTime = Math.max(0, e.getTime() - s.getTime())
   const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)))
 
-  const imageUrl = car.imageUrl || (car.images && car.images.length > 0 ? car.images[0] : "https://images.unsplash.com/photo-1550355291-bbee04a92027?q=80&w=1936&auto=format&fit=crop")
+  const imageUrl = car.imageUrl || (car.images && car.images.length > 0 ? car.images[0] : "/placeholder-car.jpg")
 
   // Pricing Logic
   const tier = car.pricingTiers.find(
