@@ -37,6 +37,14 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
   
   // Dependent fields state
   const [selectedMake, setSelectedMake] = useState<string>(car?.make || "")
+  const [selectedCategory, setSelectedCategory] = useState<string>(car?.category || "")
+  const [selectedModel, setSelectedModel] = useState<string>(car?.model || "")
+  const [selectedSeats, setSelectedSeats] = useState<string>(car?.seats?.toString() || "")
+  const [selectedDoors, setSelectedDoors] = useState<string>(car?.doors?.toString() || "")
+  const [selectedTransmission, setSelectedTransmission] = useState<string>(car?.transmission || "")
+  const [selectedFuelType, setSelectedFuelType] = useState<string>(car?.fuelType || "")
+  const [selectedFuelPolicy, setSelectedFuelPolicy] = useState<string>(car?.fuelPolicy || "FULL_TO_FULL")
+  
   const [availableModels, setAvailableModels] = useState<string[]>([])
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>(car?.features || [])
 
@@ -112,8 +120,8 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
     }
 
     // Basic validation
-    const make = formData.get('make')
-    const model = formData.get('model')
+    const make = formData.get('make') || selectedMake
+    const model = formData.get('model') || selectedModel
     const price = formData.get('pricePerDay')
     
     if (!make || !model || !price) {
@@ -172,7 +180,8 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="category">Category</Label>
-                  <Select name="category" defaultValue={car?.category} required>
+                  <input type="hidden" name="category" value={selectedCategory} />
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory} required>
                     <SelectTrigger>
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
@@ -186,7 +195,8 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
 
                 <div className="space-y-2">
                   <Label htmlFor="make">Vehicle Make</Label>
-                  <Select name="make" value={selectedMake} onValueChange={handleMakeChange} required>
+                  <input type="hidden" name="make" value={selectedMake} />
+                  <Select value={selectedMake} onValueChange={handleMakeChange} required>
                     <SelectTrigger>
                       <SelectValue placeholder="Select make" />
                     </SelectTrigger>
@@ -201,16 +211,19 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
                 <div className="space-y-2">
                   <Label htmlFor="model">Vehicle Model</Label>
                   {availableModels.length > 0 ? (
-                    <Select name="model" defaultValue={car?.model} required>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select model" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {availableModels.map(model => (
-                          <SelectItem key={model} value={model}>{model}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <>
+                      <input type="hidden" name="model" value={selectedModel} />
+                      <Select value={selectedModel} onValueChange={setSelectedModel} required>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select model" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableModels.map(model => (
+                            <SelectItem key={model} value={model}>{model}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </>
                   ) : (
                     <Input name="model" defaultValue={car?.model} placeholder="Type model manually" required />
                   )}
@@ -233,7 +246,8 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
 
                 <div className="space-y-2">
                   <Label htmlFor="seats">Number of Seats</Label>
-                  <Select name="seats" defaultValue={car?.seats?.toString()}>
+                  <input type="hidden" name="seats" value={selectedSeats} />
+                  <Select value={selectedSeats} onValueChange={setSelectedSeats}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select seats" />
                     </SelectTrigger>
@@ -247,7 +261,8 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
 
                 <div className="space-y-2">
                   <Label htmlFor="doors">Number of Doors</Label>
-                  <Select name="doors" defaultValue={car?.doors?.toString()}>
+                  <input type="hidden" name="doors" value={selectedDoors} />
+                  <Select value={selectedDoors} onValueChange={setSelectedDoors}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select doors" />
                     </SelectTrigger>
@@ -266,7 +281,8 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
 
                 <div className="space-y-2">
                   <Label htmlFor="transmission">Gearbox</Label>
-                  <Select name="transmission" defaultValue={car?.transmission}>
+                  <input type="hidden" name="transmission" value={selectedTransmission} />
+                  <Select value={selectedTransmission} onValueChange={setSelectedTransmission}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select gearbox" />
                     </SelectTrigger>
@@ -279,7 +295,8 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
 
                 <div className="space-y-2">
                   <Label htmlFor="fuelType">Fuel Type</Label>
-                  <Select name="fuelType" defaultValue={car?.fuelType}>
+                  <input type="hidden" name="fuelType" value={selectedFuelType} />
+                  <Select value={selectedFuelType} onValueChange={setSelectedFuelType}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select fuel type" />
                     </SelectTrigger>
@@ -425,7 +442,8 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
 
                 <div className="space-y-2">
                   <Label htmlFor="fuelPolicy">Fuel Policy</Label>
-                  <Select name="fuelPolicy" defaultValue={car?.fuelPolicy}>
+                  <input type="hidden" name="fuelPolicy" value={selectedFuelPolicy} />
+                  <Select value={selectedFuelPolicy} onValueChange={setSelectedFuelPolicy}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select policy" />
                     </SelectTrigger>
