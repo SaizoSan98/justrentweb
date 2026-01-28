@@ -14,6 +14,7 @@ export default async function FleetPage({
 }) {
   const params = await searchParams ?? {};
   const category = typeof params.category === 'string' ? params.category : undefined;
+  const transmission = typeof params.transmission === 'string' ? params.transmission : undefined;
   
   type PricingTier = {
     minDays: number;
@@ -168,20 +169,40 @@ export default async function FleetPage({
         </div>
 
         {/* Filters */}
-        <div className="flex justify-center gap-3 mb-12 overflow-x-auto pb-4">
-          {['All Categories', 'SUV', 'Sedan', 'Sports', 'Luxury'].map((cat) => (
-            <Link 
-              key={cat} 
-              href={cat === 'All Categories' ? `/fleet?startDate=${startDate.toISOString()}&endDate=${queryEndDate.toISOString()}` : `/fleet?category=${cat}&startDate=${startDate.toISOString()}&endDate=${queryEndDate.toISOString()}`}
-              className={`px-6 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all shadow-sm ${
-                (category === cat || (!category && cat === 'All Categories'))
-                  ? 'bg-red-600 text-white shadow-red-600/30 transform scale-105' 
-                  : 'bg-white text-zinc-500 border border-zinc-200 hover:border-red-600 hover:text-red-600'
-              }`}
-            >
-              {cat}
-            </Link>
-          ))}
+        <div className="flex flex-col gap-6 mb-12">
+          {/* Category Filter */}
+          <div className="flex justify-center gap-3 overflow-x-auto pb-4">
+            {['All Categories', 'SUV', 'Sedan', 'Sports', 'Luxury'].map((cat) => (
+              <Link 
+                key={cat} 
+                href={cat === 'All Categories' ? `/fleet?startDate=${startDate.toISOString()}&endDate=${queryEndDate.toISOString()}${transmission ? `&transmission=${transmission}` : ''}` : `/fleet?category=${cat}&startDate=${startDate.toISOString()}&endDate=${queryEndDate.toISOString()}${transmission ? `&transmission=${transmission}` : ''}`}
+                className={`px-6 py-2.5 rounded-full text-sm font-bold whitespace-nowrap transition-all shadow-sm ${
+                  (category === cat || (!category && cat === 'All Categories'))
+                    ? 'bg-red-600 text-white shadow-red-600/30 transform scale-105' 
+                    : 'bg-white text-zinc-500 border border-zinc-200 hover:border-red-600 hover:text-red-600'
+                }`}
+              >
+                {cat}
+              </Link>
+            ))}
+          </div>
+
+          {/* Transmission Filter */}
+          <div className="flex justify-center gap-3">
+             {['Any', 'MANUAL', 'AUTOMATIC'].map((trans) => (
+              <Link 
+                key={trans} 
+                href={`/fleet?${category && category !== 'All Categories' ? `category=${category}&` : ''}startDate=${startDate.toISOString()}&endDate=${queryEndDate.toISOString()}${trans !== 'Any' ? `&transmission=${trans}` : ''}`}
+                className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+                  (transmission === trans || (!transmission && trans === 'Any'))
+                    ? 'bg-zinc-900 text-white' 
+                    : 'bg-white text-zinc-400 border border-zinc-200 hover:border-zinc-900 hover:text-zinc-900'
+                }`}
+              >
+                {trans === 'Any' ? 'Any Gearbox' : trans}
+              </Link>
+            ))}
+          </div>
         </div>
 
         {/* Car Grid */}

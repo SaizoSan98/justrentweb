@@ -37,26 +37,74 @@ model User {
   updatedAt DateTime  @updatedAt
 }
 
+enum FuelType {
+  PETROL
+  DIESEL
+  ELECTRIC
+  HYBRID
+}
+
+enum Transmission {
+  MANUAL
+  AUTOMATIC
+}
+
 model Car {
-  id              String         @id @default(cuid())
-  make            String
-  model           String
-  year            Int
-  licensePlate    String         @unique
-  mileage         Int
-  category        String         // e.g. SUV, Sedan, Luxury
-  pricePerDay     Decimal
-  status          CarStatus      @default(AVAILABLE)
-  imageUrl        String?        // Main image
-  images          String[]       // Additional images (Vercel Blob URLs)
-  features        String[]
-  bookings        Booking[]
-  damageReports   DamageReport[]
-  pricingTiers    PricingTier[]
-  availabilities  Availability[]
-  deposit         Decimal        @default(0)
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  id                 String         @id @default(cuid())
+  make               String
+  model              String
+  year               Int
+  licensePlate       String         @unique
+  mileage            Int            // Current mileage
+  
+  // Technical Details
+  category           String         // e.g. SUV, Sedan, Luxury
+  seats              Int            @default(5)
+  doors              Int            @default(5)
+  suitcases          Int            @default(2)
+  transmission       Transmission   @default(MANUAL)
+  fuelType           FuelType       @default(PETROL)
+  
+  // Attributes
+  orSimilar          Boolean        @default(false)
+  airConditioning    Boolean        @default(true)
+  fuelPolicy         String         @default("FULL_TO_FULL") // FULL_TO_FULL, SAME_TO_SAME
+  dailyMileageLimit  Int?           // null = unlimited
+  
+  // Prices
+  pricePerDay        Decimal
+  deposit            Decimal        @default(0)
+  fullInsurancePrice Decimal        @default(0)
+  pickupAfterHoursPrice Decimal     @default(0)
+  returnAfterHoursPrice Decimal     @default(0)
+  
+  status             CarStatus      @default(AVAILABLE)
+  imageUrl           String?        // Main image
+  images             String[]       // Additional images (Vercel Blob URLs)
+  features           String[]
+  bookings           Booking[]
+  damageReports      DamageReport[]
+  pricingTiers       PricingTier[]
+  availabilities     Availability[]
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Settings {
+  id          String   @id @default("settings") // Singleton
+  openingTime String   @default("08:00")
+  closingTime String   @default("18:00")
+  updatedAt   DateTime @updatedAt
 }
 
 model Extra {
@@ -65,22 +113,51 @@ model Extra {
   description String?
   price       Decimal
   priceType   String    @default("PER_DAY") // PER_DAY, PER_RENTAL
+  icon        String?   // Lucide icon name or emoji
   bookings    Booking[]
 }
 
 model Booking {
-  id          String        @id @default(cuid())
-  startDate   DateTime
-  endDate     DateTime
-  totalPrice  Decimal
-  status      BookingStatus @default(PENDING)
-  userId      String
-  user        User          @relation(fields: [userId], references: [id])
-  carId       String
-  car         Car           @relation(fields: [carId], references: [id])
-  extras      Extra[]
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  id              String        @id @default(cuid())
+  startDate       DateTime
+  endDate         DateTime
+  totalPrice      Decimal
+  status          BookingStatus @default(PENDING)
+  userId          String?       // Optional to allow guest bookings if needed, but schema says relation is mandatory. 
+                              // If we allow guest booking, we might need to create a User or make this optional. 
+                              // For now, let's keep it mandatory and create a user on the fly or require login.
+  user            User?         @relation(fields: [userId], references: [id])
+  
+  carId           String
+  car             Car           @relation(fields: [carId], references: [id])
+  extras          Extra[]
+  
+  // Renter Details
+  firstName       String
+  lastName        String
+  email           String
+  phone           String
+  flightNumber    String?
+  comments        String?
+  
+  // Company Details
+  isCompany       Boolean       @default(false)
+  companyName     String?
+  companyAddress  String?
+  companyTaxId    String?
+  companyEmail    String?
+  companyPhone    String?
+
+  // Payment
+  paymentMethod   String        @default("CASH_ON_SITE") // CASH_ON_SITE, CARD_ON_SITE, PREPAYMENT
+  
+  // Booking Details
+  pickupLocation  String        @default("Budapest Airport")
+  dropoffLocation String        @default("Budapest Airport")
+  fullInsurance   Boolean       @default(false)
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 }
 
 model DamageReport {

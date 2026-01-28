@@ -29,6 +29,14 @@ type CarType = {
   pricePerDay: number
   status: string
   pricingTiers: PricingTier[]
+  // New fields
+  seats?: number
+  suitcases?: number
+  doors?: number
+  transmission?: string
+  fuelType?: string
+  orSimilar?: boolean
+  dailyMileageLimit?: number | null
 }
 
 type FleetCardProps = {
@@ -67,17 +75,17 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
             <h3 className="text-2xl font-black text-zinc-900 uppercase tracking-tight mb-1">
               {car.make} {car.model}
             </h3>
-            <p className="text-zinc-500 text-sm font-medium mb-4">or similar | {car.category}</p>
+            <p className="text-zinc-500 text-sm font-medium mb-4">{car.orSimilar ? "or similar | " : ""}{car.category}</p>
             
             <div className="flex gap-4 mb-4">
               <div className="flex items-center gap-1.5 bg-zinc-100 px-2 py-1 rounded text-zinc-600 text-xs font-bold border border-zinc-200">
-                <Users className="w-3.5 h-3.5" /> 5
+                <Users className="w-3.5 h-3.5" /> {car.seats}
               </div>
               <div className="flex items-center gap-1.5 bg-zinc-100 px-2 py-1 rounded text-zinc-600 text-xs font-bold border border-zinc-200">
-                <Briefcase className="w-3.5 h-3.5" /> 2
+                <Briefcase className="w-3.5 h-3.5" /> {car.suitcases}
               </div>
               <div className="flex items-center gap-1.5 bg-zinc-100 px-2 py-1 rounded text-zinc-600 text-xs font-bold border border-zinc-200">
-                <Gauge className="w-3.5 h-3.5" /> Manual
+                <Gauge className="w-3.5 h-3.5" /> {car.transmission === 'AUTOMATIC' ? 'Auto' : 'Manual'}
               </div>
             </div>
           </div>
@@ -94,7 +102,7 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
           {/* Footer Price */}
           <div className="mt-auto p-6 pt-0 relative z-20">
              <div className="flex items-center gap-2 mb-2 text-zinc-900 text-xs font-bold">
-                <Check className="w-3 h-3 text-red-600" /> Unlimited Mileage
+                <Check className="w-3 h-3 text-red-600" /> {car.dailyMileageLimit ? `${car.dailyMileageLimit} km / day` : "Unlimited Mileage"}
              </div>
              <div className="flex items-end justify-between">
                <div>
@@ -116,7 +124,7 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
           <div className="bg-white p-8 flex flex-col relative text-zinc-900 border-r border-zinc-100">
              <div className="mb-8">
                <h2 className="text-4xl font-black uppercase mb-2">{car.make} {car.model}</h2>
-               <p className="text-zinc-500 font-medium">or similar | {car.category}</p>
+               <p className="text-zinc-500 font-medium">{car.orSimilar ? "or similar | " : ""}{car.category}</p>
              </div>
              
              <div className="flex-grow flex items-center justify-center relative my-8">
@@ -130,19 +138,19 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
              <div className="grid grid-cols-4 gap-4 text-center mt-auto">
                 <div className="flex flex-col items-center gap-2">
                    <Users className="w-6 h-6 text-zinc-400" />
-                   <span className="text-sm font-bold">5 seats</span>
+                   <span className="text-sm font-bold">{car.seats} seats</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                    <Briefcase className="w-6 h-6 text-zinc-400" />
-                   <span className="text-sm font-bold">2 bags</span>
+                   <span className="text-sm font-bold">{car.suitcases} bags</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
                    <Gauge className="w-6 h-6 text-zinc-400" />
-                   <span className="text-sm font-bold">Manual</span>
+                   <span className="text-sm font-bold">{car.transmission === 'AUTOMATIC' ? 'Auto' : 'Manual'}</span>
                 </div>
                 <div className="flex flex-col items-center gap-2">
-                   <div className="w-6 h-6 flex items-center justify-center border-2 border-zinc-400 rounded text-xs font-bold text-zinc-400">5</div>
-                   <span className="text-sm font-bold">5 doors</span>
+                   <div className="w-6 h-6 flex items-center justify-center border-2 border-zinc-400 rounded text-xs font-bold text-zinc-400">{car.doors}</div>
+                   <span className="text-sm font-bold">{car.doors} doors</span>
                 </div>
              </div>
              
@@ -330,7 +338,14 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
                    </Dialog>
                 </div>
                 
-                <Button className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-6 rounded-xl shadow-lg shadow-red-600/20 text-lg uppercase tracking-wide">
+                <Button 
+                  className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-6 rounded-xl shadow-lg shadow-red-600/20 text-lg uppercase tracking-wide"
+                  onClick={() => {
+                    const params = new URLSearchParams(window.location.search)
+                    params.set('carId', car.id)
+                    window.location.href = `/checkout?${params.toString()}`
+                  }}
+                >
                    Next
                 </Button>
              </div>

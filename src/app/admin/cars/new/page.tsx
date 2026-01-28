@@ -1,11 +1,16 @@
+import { prisma } from "@/lib/prisma"
 import { CarForm } from "@/components/admin/CarForm"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 
-export default function NewCarPage() {
+export default async function NewCarPage() {
+  const categories = await prisma.category.findMany({
+    orderBy: { name: 'asc' }
+  })
+
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-8 pb-20">
       <div className="flex items-center gap-4">
         <Link href="/admin/cars">
           <Button variant="ghost" size="icon">
@@ -15,7 +20,7 @@ export default function NewCarPage() {
         <h1 className="text-3xl font-black text-zinc-900 tracking-tight">Add New Car</h1>
       </div>
       
-      <CarForm />
+      <CarForm categories={categories} />
     </div>
   )
 }

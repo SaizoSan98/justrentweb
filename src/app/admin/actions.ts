@@ -31,10 +31,28 @@ export async function createCar(formData: FormData) {
   const category = formData.get('category') as string
   const pricePerDay = parseFloat(formData.get('pricePerDay') as string)
   const deposit = parseFloat(formData.get('deposit') as string)
+  const fullInsurancePrice = parseFloat(formData.get('fullInsurancePrice') as string)
+  const pickupAfterHoursPrice = parseFloat(formData.get('pickupAfterHoursPrice') as string) || 0
+  const returnAfterHoursPrice = parseFloat(formData.get('returnAfterHoursPrice') as string) || 0
   
+  const seats = parseInt(formData.get('seats') as string)
+  const doors = parseInt(formData.get('doors') as string)
+  const suitcases = parseInt(formData.get('suitcases') as string)
+  const transmission = formData.get('transmission') as "MANUAL" | "AUTOMATIC"
+  const fuelType = formData.get('fuelType') as "PETROL" | "DIESEL" | "ELECTRIC" | "HYBRID"
+  
+  const orSimilar = formData.get('orSimilar') === 'true'
+  const airConditioning = formData.get('airConditioning') === 'true'
+  const fuelPolicy = formData.get('fuelPolicy') as string
+  const dailyMileageLimit = formData.get('dailyMileageLimit') ? parseInt(formData.get('dailyMileageLimit') as string) : null
+  
+  const featuresRaw = formData.get('features') as string
+  const features = featuresRaw ? JSON.parse(featuresRaw) : []
+
   let imageUrl = formData.get('imageUrl') as string
   const imageFile = formData.get('image') as File
-  
+  const additionalImagesRaw = formData.get('additionalImages') // Expecting multiple files logic on client but here basic
+
   if (imageFile && imageFile.size > 0) {
     try {
       const blob = await put(imageFile.name, imageFile, { 
@@ -46,6 +64,10 @@ export async function createCar(formData: FormData) {
       console.error("Failed to upload image:", error)
     }
   }
+
+  // Handle multiple images if implemented fully
+  const imagesRaw = formData.get('images') as string
+  const images = imagesRaw ? JSON.parse(imagesRaw) : []
 
   const pricingTiersRaw = formData.get('pricingTiers') as string
   const pricingTiers = pricingTiersRaw ? JSON.parse(pricingTiersRaw) : []
@@ -61,7 +83,21 @@ export async function createCar(formData: FormData) {
         category,
         pricePerDay,
         deposit,
+        fullInsurancePrice,
+        pickupAfterHoursPrice,
+        returnAfterHoursPrice,
+        seats,
+        doors,
+        suitcases,
+        transmission,
+        fuelType,
+        orSimilar,
+        airConditioning,
+        fuelPolicy,
+        dailyMileageLimit,
+        features,
         imageUrl,
+        images,
         status: 'AVAILABLE',
         pricingTiers: {
           create: pricingTiers.map((tier: any) => ({
@@ -91,6 +127,23 @@ export async function updateCar(formData: FormData) {
   const category = formData.get('category') as string
   const pricePerDay = parseFloat(formData.get('pricePerDay') as string)
   const deposit = parseFloat(formData.get('deposit') as string)
+  const fullInsurancePrice = parseFloat(formData.get('fullInsurancePrice') as string)
+  const pickupAfterHoursPrice = parseFloat(formData.get('pickupAfterHoursPrice') as string) || 0
+  const returnAfterHoursPrice = parseFloat(formData.get('returnAfterHoursPrice') as string) || 0
+
+  const seats = parseInt(formData.get('seats') as string)
+  const doors = parseInt(formData.get('doors') as string)
+  const suitcases = parseInt(formData.get('suitcases') as string)
+  const transmission = formData.get('transmission') as "MANUAL" | "AUTOMATIC"
+  const fuelType = formData.get('fuelType') as "PETROL" | "DIESEL" | "ELECTRIC" | "HYBRID"
+  
+  const orSimilar = formData.get('orSimilar') === 'true'
+  const airConditioning = formData.get('airConditioning') === 'true'
+  const fuelPolicy = formData.get('fuelPolicy') as string
+  const dailyMileageLimit = formData.get('dailyMileageLimit') ? parseInt(formData.get('dailyMileageLimit') as string) : null
+  
+  const featuresRaw = formData.get('features') as string
+  const features = featuresRaw ? JSON.parse(featuresRaw) : []
   
   let imageUrl = formData.get('imageUrl') as string // Existing URL if no new file
   const imageFile = formData.get('image') as File
@@ -107,6 +160,9 @@ export async function updateCar(formData: FormData) {
     }
   }
 
+  const imagesRaw = formData.get('images') as string
+  const images = imagesRaw ? JSON.parse(imagesRaw) : []
+
   const pricingTiersRaw = formData.get('pricingTiers') as string
   const pricingTiers = pricingTiersRaw ? JSON.parse(pricingTiersRaw) : []
 
@@ -122,7 +178,21 @@ export async function updateCar(formData: FormData) {
         category,
         pricePerDay,
         deposit,
+        fullInsurancePrice,
+        pickupAfterHoursPrice,
+        returnAfterHoursPrice,
+        seats,
+        doors,
+        suitcases,
+        transmission,
+        fuelType,
+        orSimilar,
+        airConditioning,
+        fuelPolicy,
+        dailyMileageLimit,
+        features,
         imageUrl,
+        images,
         pricingTiers: {
           deleteMany: {}, // Remove existing tiers
           create: pricingTiers.map((tier: any) => ({
@@ -158,6 +228,7 @@ export async function createExtra(formData: FormData) {
   const description = formData.get('description') as string
   const price = parseFloat(formData.get('price') as string)
   const priceType = formData.get('priceType') as string
+  const icon = formData.get('icon') as string
 
   try {
     await prisma.extra.create({
@@ -165,7 +236,8 @@ export async function createExtra(formData: FormData) {
         name,
         description,
         price,
-        priceType
+        priceType,
+        icon
       }
     })
     revalidatePath('/admin/extras')
