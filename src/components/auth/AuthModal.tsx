@@ -34,7 +34,7 @@ export function AuthModal({ trigger }: AuthModalProps) {
       <DialogTrigger asChild>
         {trigger || <Button>Log in</Button>}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[420px] p-0 overflow-hidden bg-white border-0 shadow-2xl rounded-2xl gap-0">
+      <DialogContent className="sm:max-w-[420px] max-h-[90vh] p-0 overflow-y-auto bg-white border-0 shadow-2xl rounded-2xl gap-0">
         {/* Header Section */}
         <div className="bg-zinc-900 p-6 text-center relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-red-600/20 to-transparent opacity-50" />
@@ -79,7 +79,7 @@ export function AuthModal({ trigger }: AuthModalProps) {
         </div>
 
         {/* Form Content */}
-        <div className="p-8">
+        <div className="p-6 md:p-8">
           {activeTab === "login" ? (
             <form action={loginAction} className="space-y-4">
               <div className="space-y-2">
