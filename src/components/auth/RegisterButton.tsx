@@ -10,16 +10,18 @@ export function RegisterButton() {
   return (
     <Button 
       type="submit" 
-      className="w-full bg-red-600 text-white hover:bg-red-700 transition-all active:scale-95 shadow-lg"
+      className="w-full h-11 bg-red-600 hover:bg-red-700 text-white font-bold text-sm uppercase tracking-wide shadow-lg shadow-red-600/20 mt-2"
       disabled={pending}
     >
       {pending ? (
-        <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        <span className="flex items-center gap-2">
+          <Loader2 className="animate-spin w-4 h-4"/>
           Creating Account...
-        </>
+        </span>
       ) : (
-        "Create Account"
+        <span className="flex items-center gap-2">
+          Create Account
+        </span>
       )}
     </Button>
   )

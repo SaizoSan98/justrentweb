@@ -28,6 +28,8 @@ interface CarFormProps {
   isEditing?: boolean
 }
 
+import { toast } from "sonner"
+
 export function CarForm({ car, categories = [], isEditing = false }: CarFormProps) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -100,7 +102,6 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
       // Append complex data
       formData.append('pricingTiers', JSON.stringify(pricingTiers))
       formData.append('features', JSON.stringify(selectedFeatures))
-      // formData.append('images', JSON.stringify(additionalImages)) // For future
       
       // Ensure booleans are strings
       if (!formData.has('orSimilar')) formData.append('orSimilar', 'false')
@@ -109,13 +110,16 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
       if (isEditing && car?.id) {
         formData.append('id', car.id)
         await updateCar(formData)
+        toast.success("Car updated successfully")
       } else {
         await createCar(formData)
+        toast.success("Car created successfully")
       }
       
       // router.push('/admin/cars') // Handled by server action redirect usually, but safety here
     } catch (error) {
       console.error("Error submitting form:", error)
+      toast.error("Failed to save car. Please try again.")
     } finally {
       setIsSubmitting(false)
     }

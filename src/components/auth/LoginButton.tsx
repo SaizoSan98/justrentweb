@@ -10,16 +10,19 @@ export function LoginButton() {
   return (
     <Button 
       type="submit" 
-      className="w-full bg-zinc-900 text-white hover:bg-zinc-800 transition-all active:scale-95 shadow-lg"
+      className="w-full h-11 bg-red-600 hover:bg-red-700 text-white font-bold text-sm uppercase tracking-wide shadow-lg shadow-red-600/20 mt-2"
       disabled={pending}
     >
       {pending ? (
-        <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        <span className="flex items-center gap-2">
+          <Loader2 className="animate-spin w-4 h-4"/>
           Signing in...
-        </>
+        </span>
       ) : (
-        "Sign In"
+        <span className="flex items-center gap-2">
+          Sign In
+          {/* ArrowRight is not imported here, but that's fine for now or we can add it */}
+        </span>
       )}
     </Button>
   )

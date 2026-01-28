@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { put } from "@vercel/blob"
-import { logout } from "@/lib/auth"
+import { logout, login } from "@/lib/auth"
 
 export async function logoutAction() {
   await logout()
@@ -296,11 +296,21 @@ export async function updateUserProfile(formData: FormData) {
   }
 
   try {
-    await prisma.user.update({
+    const updatedUser = await prisma.user.update({
       where: { id },
       data
     })
+    
+    // Update session with new data
+    await login({
+      id: updatedUser.id,
+      email: updatedUser.email,
+      name: updatedUser.name,
+      role: updatedUser.role
+    })
+
     revalidatePath('/admin/users')
+    revalidatePath('/admin') // Refresh layout to show new name
   } catch (error) {
     console.error("Failed to update profile:", error)
   }
