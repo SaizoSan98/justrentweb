@@ -50,7 +50,9 @@ export default async function LandingPage() {
       <Hero dictionary={dictionary} />
 
       {/* Booking Engine */}
-      <BookingEngine className="-mt-48" dictionary={dictionary} />
+      <div className="container mx-auto px-6">
+        <BookingEngine className="-mt-48" dictionary={dictionary} />
+      </div>
 
       {/* About Section */}
       <section id="about" className="pt-32 pb-24 bg-white">
