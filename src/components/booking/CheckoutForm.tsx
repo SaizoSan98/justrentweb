@@ -30,9 +30,10 @@ interface CheckoutFormProps {
   extras: any[]
   startDate: Date
   endDate: Date
+  settings?: any
 }
 
-export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate: initialEndDate }: CheckoutFormProps) {
+export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate: initialEndDate, settings }: CheckoutFormProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   
@@ -86,7 +87,24 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
     return total + price
   }, 0)
 
-  const totalPrice = basePrice + insurancePrice + extrasPrice
+  // After Hours Logic
+  const parseTime = (t: string) => {
+    const [h, m] = t.split(':').map(Number)
+    return h * 60 + m
+  }
+
+  const isAfterHours = (time: string) => {
+    if (!settings) return false
+    const t = parseTime(time)
+    const open = parseTime(settings.openingTime)
+    const close = parseTime(settings.closingTime)
+    return t < open || t > close
+  }
+
+  const pickupFee = (settings && isAfterHours(startTime)) ? Number(car.pickupAfterHoursPrice || 0) : 0
+  const returnFee = (settings && isAfterHours(endTime)) ? Number(car.returnAfterHoursPrice || 0) : 0
+
+  const totalPrice = basePrice + insurancePrice + extrasPrice + pickupFee + returnFee
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -487,6 +505,19 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                   </div>
                 )
               })}
+
+              {pickupFee > 0 && (
+                <div className="flex justify-between text-zinc-300">
+                   <span>After Hours Pickup</span>
+                   <span>+€{pickupFee.toLocaleString()}</span>
+                </div>
+              )}
+              {returnFee > 0 && (
+                <div className="flex justify-between text-zinc-300">
+                   <span>After Hours Return</span>
+                   <span>+€{returnFee.toLocaleString()}</span>
+                </div>
+              )}
 
               <div className="pt-4 border-t border-zinc-800 flex justify-between items-end">
                 <span className="text-zinc-400 font-medium">Total</span>

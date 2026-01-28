@@ -32,6 +32,10 @@ export default async function CheckoutPage({
     orderBy: { name: 'asc' }
   })
 
+  const settings = await prisma.settings.findUnique({
+    where: { id: "settings" }
+  })
+
   const startDate = new Date(startDateStr)
   const endDate = endDateStr ? new Date(endDateStr) : new Date(startDate.getTime() + 24 * 60 * 60 * 1000)
 
@@ -68,6 +72,7 @@ export default async function CheckoutPage({
           extras={serializedExtras}
           startDate={startDate}
           endDate={endDate}
+          settings={settings}
         />
       </main>
     </div>

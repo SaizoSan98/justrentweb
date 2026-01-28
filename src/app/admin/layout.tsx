@@ -7,7 +7,8 @@ import {
   Users, 
   Calendar, 
   PlusCircle,
-  LogOut
+  LogOut,
+  Star
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -26,6 +27,11 @@ export default function AdminLayout({
           <Link href="/" className="text-2xl font-black tracking-tight">
             JUST <span className="text-red-600">RENT</span>
             <span className="text-xs font-normal text-zinc-400 block tracking-widest mt-1">ADMIN PANEL</span>
+            <div className="mt-4 pt-4 border-t border-zinc-800 text-xs">
+              <span className="text-zinc-500 block">Welcome,</span>
+              <span className="text-white font-bold block">Farkas Bence</span>
+              <span className="text-red-600 font-bold text-[10px] uppercase tracking-wider">SUPERADMIN</span>
+            </div>
           </Link>
         </div>
         
@@ -66,9 +72,16 @@ export default function AdminLayout({
             </Button>
           </Link>
           
+          <Link href="/admin/featured">
+            <Button variant="ghost" className="w-full justify-start text-zinc-300 hover:text-white hover:bg-zinc-800">
+              <Star className="mr-3 h-5 w-5" />
+              Featured Vehicles
+            </Button>
+          </Link>
+
           <Link href="/admin/extras">
             <Button variant="ghost" className="w-full justify-start text-zinc-300 hover:text-white hover:bg-zinc-800">
-              <Settings className="mr-3 h-5 w-5" />
+              <Star className="mr-3 h-5 w-5" />
               Extras & Pricing
             </Button>
           </Link>

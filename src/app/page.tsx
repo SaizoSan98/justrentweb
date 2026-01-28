@@ -3,67 +3,33 @@ import { Button } from "@/components/ui/button";
 import { BookingEngine } from "@/components/booking/BookingEngine";
 import { Header } from "@/components/layout/Header";
 import { prisma } from "@/lib/prisma";
+import { FleetCard } from "@/components/fleet/FleetCard"
 
 export const dynamic = 'force-dynamic'
 
 export default async function LandingPage() {
-  const cars = await prisma.car.findMany({
-    take: 3,
-    where: { status: 'AVAILABLE' },
-    orderBy: { pricePerDay: 'asc' }
-  }).then((items: any[]) => items.map((car: any) => {
-    // FORCE OVERRIDE IMAGES as requested by user
-    // Ignoring DB imageUrl to ensure these specific images are used
-    if (car.make === 'Tesla' && car.model === 'Model 3') {
-      return { ...car, imageUrl: "https://imgd.aeplcdn.com/1056x594/n/cw/ec/175993/kushaq-exterior-right-front-three-quarter-2.png?isig=0&q=80&wm=1" };
-    }
-    if (car.make === 'BMW' && car.model === 'X5') {
-      return { ...car, imageUrl: "https://imgd.aeplcdn.com/370x208/n/cw/ec/102663/baleno-exterior-right-front-three-quarter-69.png?isig=0&q=80" };
-    }
-    if (car.make === 'Mercedes-Benz' && car.model === 'C-Class') {
-      return { ...car, imageUrl: "https://imgd.aeplcdn.com/370x208/n/cw/ec/51909/a4-exterior-right-front-three-quarter-80.png?isig=0&q=80" };
-    }
-    return car;
-  }));
+  const featuredCars = await prisma.car.findMany({
+    where: { 
+      status: 'AVAILABLE',
+      isFeatured: true
+    } as any,
+    take: 6,
+    orderBy: { createdAt: 'desc' },
+    include: { pricingTiers: true }
+  })
 
-  type CarItem = {
-    id: string;
-    make: string;
-    model: string;
-    year: number;
-    category: string;
-    imageUrl: string | null;
-    pricePerDay: number;
-    status: string;
-  };
-  function getStockImageUrl(make: string, model: string): string {
-    // Explicit mappings for the 3 test cars as requested by user
-    if (make === 'Tesla' && model === 'Model 3') {
-      return "https://imgd.aeplcdn.com/1056x594/n/cw/ec/175993/kushaq-exterior-right-front-three-quarter-2.png?isig=0&q=80&wm=1";
-    }
-    if (make === 'BMW' && model === 'X5') {
-      return "https://imgd.aeplcdn.com/370x208/n/cw/ec/102663/baleno-exterior-right-front-three-quarter-69.png?isig=0&q=80";
-    }
-    if (make === 'Mercedes-Benz' && model === 'C-Class') {
-      return "https://imgd.aeplcdn.com/370x208/n/cw/ec/51909/a4-exterior-right-front-three-quarter-80.png?isig=0&q=80";
-    }
+  // Serialize complex objects for client component
+  const serializedFeaturedCars = featuredCars.map((car: any) => ({
+    ...car,
+    pricePerDay: Number(car.pricePerDay),
+    deposit: Number(car.deposit),
+    pricingTiers: car.pricingTiers.map((tier: any) => ({
+      ...tier,
+      pricePerDay: Number(tier.pricePerDay),
+      deposit: Number(tier.deposit)
+    }))
+  }))
 
-    const pool = [
-      "https://imgd.aeplcdn.com/1056x594/n/cw/ec/175993/kushaq-exterior-right-front-three-quarter-2.png?isig=0&q=80&wm=1",
-      "https://imgd.aeplcdn.com/370x208/n/cw/ec/102663/baleno-exterior-right-front-three-quarter-69.png?isig=0&q=80",
-      "https://imgd.aeplcdn.com/370x208/n/cw/ec/51909/a4-exterior-right-front-three-quarter-80.png?isig=0&q=80",
-      "https://imgd.aeplcdn.com/370x208/n/cw/ec/39472/a6-exterior-right-front-three-quarter-3.png?isig=0&q=80"
-    ];
-    // Use a deterministic hash based on make+model to pick an image from the pool
-    // This ensures the same car always gets the same random image
-    const str = `${make}${model}`;
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    const index = Math.abs(hash) % pool.length;
-    return pool[index];
-  }
   return (
     <div className="flex flex-col min-h-screen bg-white text-zinc-900 font-sans">
       {/* Navbar */}
@@ -155,30 +121,13 @@ export default async function LandingPage() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {cars.map((car: CarItem) => (
-              <div key={car.id} className="group bg-white border border-zinc-200 rounded-2xl overflow-hidden hover:shadow-xl hover:border-red-200 transition-all duration-300">
-                <div className="h-56 bg-zinc-50 relative overflow-hidden flex items-center justify-center p-4">
-                   <img 
-                     src={car.imageUrl ?? getStockImageUrl(car.make, car.model)} 
-                     alt={`${car.make} ${car.model}`} 
-                     className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
-                   />
-                   <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-zinc-900 shadow-sm border border-zinc-100">
-                     {car.category}
-                   </div>
-                </div>
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-xl font-bold text-zinc-900">{car.make} {car.model}</h3>
-                      <p className="text-sm text-zinc-500">{car.year} • Automatic</p>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center pt-4 border-t border-zinc-100">
-                    <p className="text-red-600 font-bold text-lg">${Number(car.pricePerDay)} <span className="text-sm text-zinc-400 font-normal">/ day</span></p>
-                    <Button size="sm" variant="outline" className="border-zinc-200 text-zinc-600 hover:bg-red-600 hover:text-white hover:border-red-600 rounded-lg">Details</Button>
-                  </div>
-                </div>
+            {serializedFeaturedCars.map((car: any) => (
+              <div key={car.id} className="h-full">
+                <FleetCard 
+                  car={car}
+                  diffDays={1} // Default to 1 day for display
+                  imageUrl={car.imageUrl}
+                />
               </div>
             ))}
           </div>

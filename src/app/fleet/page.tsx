@@ -5,6 +5,8 @@ import { FleetCard } from "@/components/fleet/FleetCard";
 import { Header } from "@/components/layout/Header";
 import { BookingEngine } from "@/components/booking/BookingEngine";
 
+import { FleetFilters } from "@/components/fleet/FleetFilters";
+
 export const dynamic = 'force-dynamic';
 
 export default async function FleetPage({
@@ -14,8 +16,19 @@ export default async function FleetPage({
 }) {
   const params = await searchParams ?? {};
   const category = typeof params.category === 'string' ? params.category : undefined;
-  const transmission = typeof params.transmission === 'string' ? params.transmission : undefined;
+  const categories = typeof params.category === 'object' ? params.category : (category ? [category] : undefined);
   
+  const transmission = typeof params.transmission === 'string' ? params.transmission : undefined;
+  const transmissions = typeof params.transmission === 'object' ? params.transmission : (transmission ? [transmission] : undefined);
+
+  const fuelType = typeof params.fuelType === 'string' ? params.fuelType : undefined;
+  const fuelTypes = typeof params.fuelType === 'object' ? params.fuelType : (fuelType ? [fuelType] : undefined);
+
+  const seats = typeof params.seats === 'string' ? params.seats : undefined;
+  const seatCounts = typeof params.seats === 'object' ? params.seats : (seats ? [seats] : undefined);
+
+  const guaranteedModel = params.guaranteedModel === 'true';
+
   type PricingTier = {
     minDays: number;
     maxDays: number | null;
@@ -72,12 +85,29 @@ export default async function FleetPage({
   // For DB query, if no endDate is set, we just check availability for startDate (1 day)
   const queryEndDate = endDate || new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
 
-  const whereClause: { status: 'AVAILABLE'; category?: string } = {
+  const whereClause: any = {
     status: 'AVAILABLE',
   };
 
-  if (category && category !== 'All Categories') {
-    whereClause.category = category;
+  if (categories && categories.length > 0) {
+    whereClause.category = { in: categories };
+  }
+
+  if (transmissions && transmissions.length > 0) {
+    whereClause.transmission = { in: transmissions };
+  }
+
+  if (fuelTypes && fuelTypes.length > 0) {
+    whereClause.fuelType = { in: fuelTypes };
+  }
+
+  if (seatCounts && seatCounts.length > 0) {
+    whereClause.seats = { in: seatCounts.map(Number) };
+  }
+
+  if (guaranteedModel) {
+    whereClause.orSimilar = false; // "Guaranteed Model" implies orSimilar is FALSE (you get exactly this car)
+    // Or if the logic is reversed in user mind, but usually "Guaranteed" means NO "or similar"
   }
 
   const cars = await prisma.car.findMany({
@@ -158,6 +188,8 @@ export default async function FleetPage({
           compact={true}
         />
       </div>
+
+      <FleetFilters totalCount={cars.length} />
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-12">

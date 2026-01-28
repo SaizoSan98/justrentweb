@@ -8,9 +8,13 @@ async function main() {
   // Delete all existing bookings and damage reports
   await prisma.booking.deleteMany({})
   await prisma.damageReport.deleteMany({})
+  await prisma.availability.deleteMany({}) // Delete availabilities first
   
-  // Note: We are keeping Cars and PricingTiers as requested previously.
-  // But we might want to update the extras.
+  // Delete all cars and pricing tiers to start fresh
+  await prisma.pricingTier.deleteMany({})
+  await prisma.car.deleteMany({})
+
+  // Delete all extras
   await prisma.extra.deleteMany({})
 
   // Delete Users (except if we want to keep one? No, we recreate admin)

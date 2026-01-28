@@ -43,10 +43,10 @@ export function Header({ transparent = false }: HeaderProps) {
           <AuthModal 
             trigger={
               <Button variant="ghost" className="hidden md:flex items-center gap-2 text-zinc-900 hover:text-red-600 hover:bg-transparent p-0 h-auto transition-colors group font-normal">
-                <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center group-hover:bg-red-50 transition-colors">
+                <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center group-hover:bg-red-50 group-hover:rotate-12 transition-all duration-300 shadow-sm group-hover:shadow-md">
                   <User className="w-4 h-4" />
                 </div>
-                <span className="text-sm font-bold uppercase">Log in | Register</span>
+                <span className="text-sm font-bold uppercase group-hover:underline decoration-2 underline-offset-4">Log in | Register</span>
               </Button>
             }
           />

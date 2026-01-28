@@ -38,6 +38,13 @@ type CarType = {
   fuelType?: string
   orSimilar?: boolean
   dailyMileageLimit?: number | null
+  // Dynamic Pricing Fields
+  fullInsurancePrice?: number
+  extraKmPrice?: number
+  unlimitedMileagePrice?: number
+  registrationFee?: number
+  contractFee?: number
+  winterizationFee?: number
 }
 
 type FleetCardProps = {
@@ -58,14 +65,22 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
   const [selectedMileage, setSelectedMileage] = useState<"limited" | "unlimited">("limited")
   
   // Calculations
+  // Fallback to 0 if not set in DB to avoid NaN
   const flexibleSurcharge = Math.round(pricePerDay * 0.15) // 15% extra
-  const unlimitedMileageSurcharge = 115 / diffDays // Fixed total extra spread per day for demo
+  const unlimitedMileageSurcharge = (car.unlimitedMileagePrice || 0) / diffDays 
   
   const finalPricePerDay = pricePerDay + 
     (selectedRate === "flexible" ? flexibleSurcharge : 0) +
     (selectedMileage === "unlimited" ? unlimitedMileageSurcharge : 0)
     
   const finalTotalPrice = Math.round(finalPricePerDay * diffDays)
+
+  const registrationFee = car.registrationFee || 0
+  const contractFee = car.contractFee || 0
+  const winterizationFee = car.winterizationFee || 0
+  const extraKmPrice = car.extraKmPrice || 0
+  
+  const totalFees = registrationFee + contractFee + winterizationFee
 
   return (
     <Dialog>
@@ -257,7 +272,7 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
                             <h4 className="font-bold text-zinc-900">1200 km</h4>
                             <span className="text-xs font-bold bg-zinc-100 px-2 py-1 rounded">Included</span>
                          </div>
-                         <p className="text-xs text-zinc-500">+€0.50 / extra km</p>
+                         <p className="text-xs text-zinc-500">+€{extraKmPrice.toLocaleString()} / extra km</p>
                       </div>
                    </div>
                 </div>
@@ -319,24 +334,33 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
                            <div>
                               <h4 className="font-bold mb-2">Taxes & Fees</h4>
                               <div className="space-y-2 text-sm text-zinc-600">
-                                 <div className="flex justify-between">
-                                    <span>Registration Fee</span>
-                                    <span>€85</span>
-                                 </div>
-                                 <div className="flex justify-between">
-                                    <span>Contract Fee</span>
-                                    <span>€3</span>
-                                 </div>
-                                 <div className="flex justify-between">
-                                    <span>Winterization Fee</span>
-                                    <span>€120</span>
-                                 </div>
+                                 {registrationFee > 0 && (
+                                   <div className="flex justify-between">
+                                      <span>Registration Fee</span>
+                                      <span>€{registrationFee.toLocaleString()}</span>
+                                   </div>
+                                 )}
+                                 {contractFee > 0 && (
+                                   <div className="flex justify-between">
+                                      <span>Contract Fee</span>
+                                      <span>€{contractFee.toLocaleString()}</span>
+                                   </div>
+                                 )}
+                                 {winterizationFee > 0 && (
+                                   <div className="flex justify-between">
+                                      <span>Winterization Fee</span>
+                                      <span>€{winterizationFee.toLocaleString()}</span>
+                                   </div>
+                                 )}
+                                 {totalFees === 0 && (
+                                    <div className="text-zinc-400 italic">No extra fees applied</div>
+                                 )}
                               </div>
                            </div>
 
                            <div className="pt-4 border-t border-zinc-200 flex justify-between items-center">
                               <span className="font-bold text-lg">Total (incl. tax)</span>
-                              <span className="font-black text-2xl">€{(finalTotalPrice + 85 + 3 + 120).toLocaleString()}</span>
+                              <span className="font-black text-2xl">€{(finalTotalPrice + totalFees).toLocaleString()}</span>
                            </div>
                         </div>
                      </DialogContent>

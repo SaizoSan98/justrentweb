@@ -246,15 +246,75 @@ export async function createExtra(formData: FormData) {
   }
 }
 
+export async function updateExtra(formData: FormData) {
+  const id = formData.get('id') as string
+  const name = formData.get('name') as string
+  const description = formData.get('description') as string
+  const price = parseFloat(formData.get('price') as string)
+  const priceType = formData.get('priceType') as string
+  const icon = formData.get('icon') as string
+
+  try {
+    await prisma.extra.update({
+      where: { id },
+      data: {
+        name,
+        description,
+        price,
+        priceType,
+        icon
+      }
+    })
+    revalidatePath('/admin/extras')
+  } catch (error) {
+    console.error("Failed to update extra:", error)
+  }
+}
+
 export async function toggleUserRole(userId: string, currentRole: string) {
   const newRole = currentRole === 'ADMIN' ? 'USER' : 'ADMIN'
   try {
     await prisma.user.update({
       where: { id: userId },
-      data: { role: newRole }
+      data: { role: newRole as any }
     })
     revalidatePath('/admin/users')
   } catch (error) {
     console.error("Failed to update user role:", error)
+  }
+}
+
+export async function updateUserProfile(formData: FormData) {
+  const id = formData.get('id') as string
+  const name = formData.get('name') as string
+  const email = formData.get('email') as string
+  const password = formData.get('password') as string
+
+  const data: any = { name, email }
+  if (password && password.trim() !== '') {
+    data.password = password // In production, hash this!
+  }
+
+  try {
+    await prisma.user.update({
+      where: { id },
+      data
+    })
+    revalidatePath('/admin/users')
+  } catch (error) {
+    console.error("Failed to update profile:", error)
+  }
+}
+
+export async function toggleFeaturedCar(carId: string, isFeatured: boolean) {
+  try {
+    await prisma.car.update({
+      where: { id: carId },
+      data: { isFeatured }
+    })
+    revalidatePath('/admin/featured')
+    revalidatePath('/') // Update homepage
+  } catch (error) {
+    console.error("Failed to toggle featured status:", error)
   }
 }

@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Trash2, Plus, Map, Baby, User, PlaneLanding, PlaneTakeoff, Snowflake, Star } from "lucide-react"
-import { deleteExtra, createExtra } from "../actions"
+import { createExtra } from "../actions"
+import { ExtrasList } from "@/components/admin/ExtrasList"
 
 export const dynamic = 'force-dynamic'
 
@@ -24,6 +25,11 @@ export default async function ExtrasPage() {
   const extras = await prisma.extra.findMany({
     orderBy: { name: 'asc' }
   })
+
+  const serializedExtras = extras.map(e => ({
+    ...e,
+    price: Number(e.price)
+  }))
 
   return (
     <div className="space-y-8">
@@ -92,37 +98,7 @@ export default async function ExtrasPage() {
 
         {/* List */}
         <div className="md:col-span-2 space-y-4">
-          {extras.map((extra: any) => {
-            const IconComponent = ICON_OPTIONS.find(opt => opt.value === extra.icon)?.component || Star
-            return (
-              <Card key={extra.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6 flex justify-between items-center">
-                  <div className="flex items-start gap-4">
-                    <div className="p-2 bg-zinc-100 rounded-lg">
-                      <IconComponent className="w-6 h-6 text-zinc-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-lg">{extra.name}</h3>
-                      <p className="text-sm text-zinc-500">{extra.description}</p>
-                      <div className="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-100 text-zinc-800">
-                        €{Number(extra.price).toLocaleString()} / {extra.priceType === 'PER_DAY' ? 'Day' : 'Rental'}
-                      </div>
-                    </div>
-                  </div>
-                  <form action={deleteExtra.bind(null, extra.id)}>
-                    <Button variant="outline" size="icon" className="hover:bg-red-50 hover:text-red-600 hover:border-red-200">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-            )
-          })}
-          {extras.length === 0 && (
-            <div className="text-center py-12 text-zinc-500 bg-white rounded-xl border border-zinc-200">
-              No extras found.
-            </div>
-          )}
+          <ExtrasList extras={serializedExtras} />
         </div>
       </div>
     </div>

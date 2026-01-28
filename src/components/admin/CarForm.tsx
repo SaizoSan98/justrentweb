@@ -403,11 +403,6 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
                     </SelectContent>
                   </Select>
                 </div>
-
-                <div className="flex items-center space-x-2 pt-8">
-                  <Switch id="airConditioning" name="airConditioning" defaultChecked={car?.airConditioning !== false} />
-                  <Label htmlFor="airConditioning">Air Conditioning</Label>
-                </div>
               </div>
 
               <div className="space-y-4">

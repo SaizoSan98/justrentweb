@@ -1,8 +1,48 @@
 import { prisma } from "@/lib/prisma"
 import { format } from "date-fns"
+import { BookingFilters } from "@/components/admin/BookingFilters"
 
-export default async function BookingsPage() {
+export default async function BookingsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+  const params = await searchParams ?? {}
+  const search = typeof params.search === 'string' ? params.search : undefined
+  const status = typeof params.status === 'string' && params.status !== 'ALL' ? params.status : undefined
+  const date = typeof params.date === 'string' ? params.date : undefined
+
+  const whereClause: any = {}
+
+  if (status) {
+    whereClause.status = status
+  }
+
+  if (date) {
+    const startOfDay = new Date(date)
+    startOfDay.setHours(0, 0, 0, 0)
+    const endOfDay = new Date(date)
+    endOfDay.setHours(23, 59, 59, 999)
+    
+    whereClause.startDate = {
+      gte: startOfDay,
+      lte: endOfDay
+    }
+  }
+
+  if (search) {
+    whereClause.OR = [
+      { firstName: { contains: search, mode: 'insensitive' } },
+      { lastName: { contains: search, mode: 'insensitive' } },
+      { email: { contains: search, mode: 'insensitive' } },
+      { car: { licensePlate: { contains: search, mode: 'insensitive' } } },
+      { car: { make: { contains: search, mode: 'insensitive' } } },
+      { car: { model: { contains: search, mode: 'insensitive' } } }
+    ]
+  }
+
   const bookings = await prisma.booking.findMany({
+    where: whereClause,
     include: { 
       user: true, 
       car: true 
@@ -15,6 +55,8 @@ export default async function BookingsPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-black text-zinc-900 tracking-tight">Bookings</h1>
       </div>
+
+      <BookingFilters />
 
       <div className="bg-white rounded-xl shadow-sm border border-zinc-200 overflow-hidden">
         <div className="overflow-x-auto">
@@ -36,8 +78,8 @@ export default async function BookingsPage() {
                     {booking.id.slice(0, 8)}...
                   </td>
                   <td className="px-6 py-4">
-                    <div className="font-medium text-zinc-900">{booking.user.name || 'Unknown'}</div>
-                    <div className="text-xs text-zinc-500">{booking.user.email}</div>
+                    <div className="font-medium text-zinc-900">{booking.firstName} {booking.lastName}</div>
+                    <div className="text-xs text-zinc-500">{booking.email}</div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="font-medium text-zinc-900">{booking.car.make} {booking.car.model}</div>
