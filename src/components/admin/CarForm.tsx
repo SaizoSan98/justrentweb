@@ -96,7 +96,10 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
     }
   }
 
-  const handleSubmit = async (formData: FormData) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+
     // Basic validation
     const make = formData.get('make')
     const model = formData.get('model')
@@ -140,7 +143,7 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
   }
 
   return (
-    <form action={handleSubmit} className="space-y-8">
+    <form onSubmit={onSubmit} className="space-y-8">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-4 lg:w-[600px]">
           <TabsTrigger value="general" className="gap-2"><Car className="w-4 h-4" /> General</TabsTrigger>
@@ -156,7 +159,7 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="category">Category</Label>
-                  <Select name="category" defaultValue={car?.category || (categories.length > 0 ? categories[0].name : "")} required>
+                  <Select name="category" defaultValue={car?.category} required>
                     <SelectTrigger>
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
@@ -217,9 +220,9 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
 
                 <div className="space-y-2">
                   <Label htmlFor="seats">Number of Seats</Label>
-                  <Select name="seats" defaultValue={car?.seats?.toString() || "5"}>
+                  <Select name="seats" defaultValue={car?.seats?.toString()}>
                     <SelectTrigger>
-                      <SelectValue placeholder="5" />
+                      <SelectValue placeholder="Select seats" />
                     </SelectTrigger>
                     <SelectContent>
                       {[2, 4, 5, 7, 8, 9].map(num => (
@@ -231,9 +234,9 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
 
                 <div className="space-y-2">
                   <Label htmlFor="doors">Number of Doors</Label>
-                  <Select name="doors" defaultValue={car?.doors?.toString() || "5"}>
+                  <Select name="doors" defaultValue={car?.doors?.toString()}>
                     <SelectTrigger>
-                      <SelectValue placeholder="5" />
+                      <SelectValue placeholder="Select doors" />
                     </SelectTrigger>
                     <SelectContent>
                       {[2, 3, 4, 5].map(num => (
@@ -245,12 +248,12 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
 
                 <div className="space-y-2">
                   <Label htmlFor="suitcases">Number of Suitcases</Label>
-                  <Input name="suitcases" type="number" defaultValue={car?.suitcases || 2} placeholder="2" required />
+                  <Input name="suitcases" type="number" defaultValue={car?.suitcases} placeholder="e.g. 2" required />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="transmission">Gearbox</Label>
-                  <Select name="transmission" defaultValue={car?.transmission || "MANUAL"}>
+                  <Select name="transmission" defaultValue={car?.transmission}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select gearbox" />
                     </SelectTrigger>
@@ -263,7 +266,7 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
 
                 <div className="space-y-2">
                   <Label htmlFor="fuelType">Fuel Type</Label>
-                  <Select name="fuelType" defaultValue={car?.fuelType || "PETROL"}>
+                  <Select name="fuelType" defaultValue={car?.fuelType}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select fuel type" />
                     </SelectTrigger>
@@ -305,18 +308,18 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="fullInsurancePrice">Full Insurance Price / Day (EUR)</Label>
-                  <Input name="fullInsurancePrice" type="number" defaultValue={car?.fullInsurancePrice || 0} placeholder="20" required />
+                  <Input name="fullInsurancePrice" type="number" defaultValue={car?.fullInsurancePrice} placeholder="20" required />
                 </div>
               </div>
 
               <div className="grid md:grid-cols-2 gap-6 p-4 bg-zinc-50 rounded-lg border border-zinc-200">
                  <div className="space-y-2">
                   <Label htmlFor="pickupAfterHoursPrice">Pickup After Business Hours Price (EUR)</Label>
-                  <Input name="pickupAfterHoursPrice" type="number" defaultValue={car?.pickupAfterHoursPrice || 0} placeholder="30" />
+                  <Input name="pickupAfterHoursPrice" type="number" defaultValue={car?.pickupAfterHoursPrice} placeholder="30" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="returnAfterHoursPrice">Return After Business Hours Price (EUR)</Label>
-                  <Input name="returnAfterHoursPrice" type="number" defaultValue={car?.returnAfterHoursPrice || 0} placeholder="30" />
+                  <Input name="returnAfterHoursPrice" type="number" defaultValue={car?.returnAfterHoursPrice} placeholder="30" />
                 </div>
               </div>
 
@@ -409,7 +412,7 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
 
                 <div className="space-y-2">
                   <Label htmlFor="fuelPolicy">Fuel Policy</Label>
-                  <Select name="fuelPolicy" defaultValue={car?.fuelPolicy || "FULL_TO_FULL"}>
+                  <Select name="fuelPolicy" defaultValue={car?.fuelPolicy}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select policy" />
                     </SelectTrigger>
