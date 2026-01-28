@@ -44,6 +44,20 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
   const [selectedTransmission, setSelectedTransmission] = useState<string>(car?.transmission || "")
   const [selectedFuelType, setSelectedFuelType] = useState<string>(car?.fuelType || "")
   const [selectedFuelPolicy, setSelectedFuelPolicy] = useState<string>(car?.fuelPolicy || "FULL_TO_FULL")
+  const [orSimilar, setOrSimilar] = useState<boolean>(car?.orSimilar || false)
+  const [airConditioning, setAirConditioning] = useState<boolean>(car?.airConditioning !== false) // default true if undefined? Schema says default true.
+  
+  // Controlled Inputs State
+  const [year, setYear] = useState<string>(car?.year?.toString() || "")
+  const [licensePlate, setLicensePlate] = useState<string>(car?.licensePlate || "")
+  const [mileage, setMileage] = useState<string>(car?.mileage?.toString() || "")
+  const [suitcases, setSuitcases] = useState<string>(car?.suitcases?.toString() || "")
+  const [pricePerDay, setPricePerDay] = useState<string>(car?.pricePerDay?.toString() || "")
+  const [deposit, setDeposit] = useState<string>(car?.deposit?.toString() || "")
+  const [fullInsurancePrice, setFullInsurancePrice] = useState<string>(car?.fullInsurancePrice?.toString() || "")
+  const [pickupAfterHoursPrice, setPickupAfterHoursPrice] = useState<string>(car?.pickupAfterHoursPrice?.toString() || "")
+  const [returnAfterHoursPrice, setReturnAfterHoursPrice] = useState<string>(car?.returnAfterHoursPrice?.toString() || "")
+  const [dailyMileageLimit, setDailyMileageLimit] = useState<string>(car?.dailyMileageLimit?.toString() || "")
   
   const [availableModels, setAvailableModels] = useState<string[]>([])
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>(car?.features || [])
@@ -120,31 +134,67 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
     }
 
     // Basic validation
-    const make = formData.get('make') || selectedMake
-    const model = formData.get('model') || selectedModel
-    const price = formData.get('pricePerDay')
-    
-    if (!make || !model || !price) {
+    // Use state values directly instead of formData because Tabs unmount content!
+    if (!selectedMake || !selectedModel || !pricePerDay) {
       toast.error("Please fill in all required fields (Make, Model, Price)")
       return
     }
 
     setIsSubmitting(true)
     try {
-      // Append complex data
-      formData.append('pricingTiers', JSON.stringify(pricingTiers))
-      formData.append('features', JSON.stringify(selectedFeatures))
+      // Manually construct FormData from state to ensure all fields are present
+      // regardless of active tab (which unmounts other tabs' inputs)
+      const data = new FormData()
       
-      // Ensure booleans are strings
-      if (!formData.has('orSimilar')) formData.append('orSimilar', 'false')
-      if (!formData.has('airConditioning')) formData.append('airConditioning', 'false')
+      // General
+      data.append('category', selectedCategory)
+      data.append('make', selectedMake)
+      data.append('model', selectedModel)
+      data.append('year', year)
+      data.append('licensePlate', licensePlate)
+      data.append('mileage', mileage)
+      data.append('seats', selectedSeats)
+      data.append('doors', selectedDoors)
+      data.append('suitcases', suitcases)
+      data.append('transmission', selectedTransmission)
+      data.append('fuelType', selectedFuelType)
+      data.append('orSimilar', orSimilar ? 'true' : 'false')
+      data.append('airConditioning', airConditioning ? 'true' : 'false')
       
-      let result
+      // Prices
+      data.append('pricePerDay', pricePerDay)
+      data.append('deposit', deposit)
+      data.append('fullInsurancePrice', fullInsurancePrice)
+      data.append('pickupAfterHoursPrice', pickupAfterHoursPrice)
+      data.append('returnAfterHoursPrice', returnAfterHoursPrice)
+      
+      // Attributes
+      data.append('dailyMileageLimit', dailyMileageLimit)
+      data.append('fuelPolicy', selectedFuelPolicy)
+      
+      // Complex data
+      data.append('pricingTiers', JSON.stringify(pricingTiers))
+      data.append('features', JSON.stringify(selectedFeatures))
+      
+      // Handle Image manually
+      if (fileInputRef.current?.files?.[0]) {
+        data.append('image', fileInputRef.current.files[0])
+      }
+      // If editing and no new image, we might need to handle keeping existing URL logic on server,
+      // or pass imageUrl if we had it in state. Server action handles this if 'image' is missing but we need to pass 'imageUrl' hidden input?
+      // Better: pass the existing imageUrl string if we have it.
+      if (car?.imageUrl) {
+        data.append('imageUrl', car.imageUrl)
+      }
+
+      // Switches (Fixing previous comment logic)
+       
+       let result
       if (isEditing && car?.id) {
-        formData.append('id', car.id)
-        result = await updateCar(formData)
+        data.append('id', car.id)
+        result = await updateCar(data)
       } else {
-        result = await createCar(formData)
+        result = await createCar(data)
       }
 
       console.log("Server Result:", result)
@@ -231,17 +281,37 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
 
                 <div className="space-y-2">
                   <Label htmlFor="year">Year</Label>
-                  <Input name="year" type="number" defaultValue={car?.year} placeholder="2024" required />
+                  <Input 
+                    name="year" 
+                    type="number" 
+                    value={year} 
+                    onChange={(e) => setYear(e.target.value)} 
+                    placeholder="2024" 
+                    required 
+                  />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="licensePlate">License Plate</Label>
-                  <Input name="licensePlate" defaultValue={car?.licensePlate} placeholder="ABC-123" required />
+                  <Input 
+                    name="licensePlate" 
+                    value={licensePlate} 
+                    onChange={(e) => setLicensePlate(e.target.value)} 
+                    placeholder="ABC-123" 
+                    required 
+                  />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="mileage">Current Mileage (km)</Label>
-                  <Input name="mileage" type="number" defaultValue={car?.mileage} placeholder="0" required />
+                  <Input 
+                    name="mileage" 
+                    type="number" 
+                    value={mileage} 
+                    onChange={(e) => setMileage(e.target.value)} 
+                    placeholder="0" 
+                    required 
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -276,7 +346,14 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
 
                 <div className="space-y-2">
                   <Label htmlFor="suitcases">Number of Suitcases</Label>
-                  <Input name="suitcases" type="number" defaultValue={car?.suitcases} placeholder="e.g. 2" required />
+                  <Input 
+                    name="suitcases" 
+                    type="number" 
+                    value={suitcases} 
+                    onChange={(e) => setSuitcases(e.target.value)} 
+                    placeholder="e.g. 2" 
+                    required 
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -311,7 +388,12 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
 
                 <div className="space-y-2 flex flex-col justify-end pb-2">
                   <div className="flex items-center space-x-2">
-                    <Switch id="orSimilar" name="orSimilar" defaultChecked={car?.orSimilar} />
+                    <Switch 
+                      id="orSimilar" 
+                      name="orSimilar" 
+                      checked={orSimilar} 
+                      onCheckedChange={setOrSimilar} 
+                    />
                     <Label htmlFor="orSimilar">Show "Or Similar" label</Label>
                   </div>
                   <p className="text-xs text-zinc-500 mt-1">If enabled, customers see "or similar" next to model name.</p>
@@ -330,26 +412,59 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="pricePerDay">Base Rental Price / Day (EUR)</Label>
-                  <Input name="pricePerDay" type="number" defaultValue={car?.pricePerDay} placeholder="60" required />
+                  <Input 
+                    name="pricePerDay" 
+                    type="number" 
+                    value={pricePerDay} 
+                    onChange={(e) => setPricePerDay(e.target.value)} 
+                    placeholder="60" 
+                    required 
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="deposit">Security Deposit (EUR)</Label>
-                  <Input name="deposit" type="number" defaultValue={car?.deposit} placeholder="500" required />
+                  <Input 
+                    name="deposit" 
+                    type="number" 
+                    value={deposit} 
+                    onChange={(e) => setDeposit(e.target.value)} 
+                    placeholder="500" 
+                    required 
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="fullInsurancePrice">Full Insurance Price / Day (EUR)</Label>
-                  <Input name="fullInsurancePrice" type="number" defaultValue={car?.fullInsurancePrice} placeholder="20" required />
+                  <Input 
+                    name="fullInsurancePrice" 
+                    type="number" 
+                    value={fullInsurancePrice} 
+                    onChange={(e) => setFullInsurancePrice(e.target.value)} 
+                    placeholder="20" 
+                    required 
+                  />
                 </div>
               </div>
 
               <div className="grid md:grid-cols-2 gap-6 p-4 bg-zinc-50 rounded-lg border border-zinc-200">
                  <div className="space-y-2">
                   <Label htmlFor="pickupAfterHoursPrice">Pickup After Business Hours Price (EUR)</Label>
-                  <Input name="pickupAfterHoursPrice" type="number" defaultValue={car?.pickupAfterHoursPrice} placeholder="30" />
+                  <Input 
+                    name="pickupAfterHoursPrice" 
+                    type="number" 
+                    value={pickupAfterHoursPrice} 
+                    onChange={(e) => setPickupAfterHoursPrice(e.target.value)} 
+                    placeholder="30" 
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="returnAfterHoursPrice">Return After Business Hours Price (EUR)</Label>
-                  <Input name="returnAfterHoursPrice" type="number" defaultValue={car?.returnAfterHoursPrice} placeholder="30" />
+                  <Input 
+                    name="returnAfterHoursPrice" 
+                    type="number" 
+                    value={returnAfterHoursPrice} 
+                    onChange={(e) => setReturnAfterHoursPrice(e.target.value)} 
+                    placeholder="30" 
+                  />
                 </div>
               </div>
 
@@ -437,7 +552,13 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="dailyMileageLimit">Daily Mileage Limit (km)</Label>
-                  <Input name="dailyMileageLimit" type="number" defaultValue={car?.dailyMileageLimit || ""} placeholder="Leave empty for Unlimited" />
+                  <Input 
+                    name="dailyMileageLimit" 
+                    type="number" 
+                    value={dailyMileageLimit} 
+                    onChange={(e) => setDailyMileageLimit(e.target.value)} 
+                    placeholder="Leave empty for Unlimited" 
+                  />
                 </div>
 
                 <div className="space-y-2">
