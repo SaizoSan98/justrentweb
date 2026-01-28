@@ -14,12 +14,16 @@ import {
 import { Button } from "@/components/ui/button"
 
 import { logoutAction } from "./actions"
+import { getSession } from "@/lib/auth"
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const session = await getSession()
+  const user = session?.user
+
   return (
     <div className="flex min-h-screen bg-zinc-50">
       {/* Sidebar */}
@@ -31,8 +35,8 @@ export default function AdminLayout({
           </Link>
           <div className="mt-4 pt-4 border-t border-zinc-800 text-xs">
             <span className="text-zinc-500 block">Welcome,</span>
-            <span className="text-white font-bold block">Farkas Bence</span>
-            <span className="text-red-600 font-bold text-[10px] uppercase tracking-wider">SUPERADMIN</span>
+            <span className="text-white font-bold block">{user?.name || 'Admin User'}</span>
+            <span className="text-red-600 font-bold text-[10px] uppercase tracking-wider">{user?.role || 'ADMIN'}</span>
           </div>
         </div>
         

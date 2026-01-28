@@ -146,7 +146,6 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
                       {categories.map(cat => (
                         <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
                       ))}
-                      {categories.length === 0 && <SelectItem value="Other">Other</SelectItem>}
                     </SelectContent>
                   </Select>
                 </div>

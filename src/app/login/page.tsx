@@ -11,14 +11,19 @@ function LoginForm({ searchParams }: { searchParams?: { error?: string } }) {
   const error = searchParams?.error
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-black text-center">Admin Login</CardTitle>
-        <CardDescription className="text-center">
-          Enter your credentials to access the admin panel
+    <Card className="w-full max-w-md shadow-2xl border-zinc-200">
+      <CardHeader className="space-y-2 pb-6">
+        <div className="text-center mb-4">
+            <span className="text-3xl font-black tracking-tight text-zinc-900">
+                JUST <span className="text-red-600">RENT</span>
+            </span>
+        </div>
+        <CardTitle className="text-xl font-bold text-center text-zinc-800">Welcome Back</CardTitle>
+        <CardDescription className="text-center text-zinc-500">
+          Sign in to your admin account
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-6">
         {error && (
           <div className="bg-red-50 text-red-600 text-sm p-3 rounded-md mb-4 border border-red-100 text-center font-medium">
             {error === 'invalid_credentials' && "Invalid email or password"}
@@ -50,7 +55,7 @@ export default async function LoginPage({
   const error = typeof params?.error === 'string' ? params.error : undefined
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-zinc-100 p-4">
       <Suspense>
         <LoginForm searchParams={{ error }} />
       </Suspense>
