@@ -207,13 +207,11 @@ export default async function FleetPage({
             <h1 className="text-4xl font-black tracking-tight text-zinc-900 mb-2">Our Premium Fleet</h1>
             <p className="text-zinc-500">
               Select from our wide range of luxury vehicles.
-              {startDateStr && (
-                <span className="block mt-1 text-red-600 font-medium">
-                  Showing availability for {startDate.toLocaleDateString()} 
-                  {endDate && ` - ${endDate.toLocaleDateString()}`} 
-                  ({diffDays} day{diffDays > 1 ? 's' : ''})
-                </span>
-              )}
+              <span className="block mt-1 text-red-600 font-medium">
+                Showing availability for {startDate.toLocaleDateString()} 
+                {endDate && ` - ${endDate.toLocaleDateString()}`} 
+                ({diffDays} day{diffDays > 1 ? 's' : ''})
+              </span>
             </p>
           </div>
           
