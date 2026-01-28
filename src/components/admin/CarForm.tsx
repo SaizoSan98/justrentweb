@@ -97,7 +97,10 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
     }
   }
 
-  const handleSave = async () => {
+  const handleSave = async (e: React.MouseEvent) => {
+    e.preventDefault() // Stop any default behavior
+    e.stopPropagation()
+
     if (!formRef.current) return
 
     const formData = new FormData(formRef.current)
