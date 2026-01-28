@@ -1,8 +1,20 @@
 "use client"
 
 import { motion } from "framer-motion"
+import { Dictionary } from "@/lib/dictionary"
 
-export function Hero() {
+export function Hero({ dictionary }: { dictionary?: Dictionary }) {
+  const t = dictionary?.hero || {
+    title: "Premium Car Rental",
+    subtitle: "Experience the thrill of driving the world's finest automobiles.",
+    cta: "View Fleet",
+    pickup_return: "Pick-up & Return",
+    pickup_date: "Pick-up Date",
+    return_date: "Return Date",
+    time: "Time",
+    show_cars: "Show Cars"
+  }
+
   return (
     <section className="relative h-[85vh] flex items-center justify-center overflow-hidden bg-zinc-900">
       {/* Background Image */}
@@ -32,8 +44,7 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }}
           className="text-xl md:text-2xl text-zinc-200 max-w-2xl mb-12 font-light leading-relaxed drop-shadow-md"
         >
-          Experience the thrill of driving the world&#39;s finest automobiles.
-          Seamless booking, exceptional service.
+          {t.subtitle}
         </motion.p>
       </div>
     </section>

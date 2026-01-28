@@ -6,11 +6,17 @@ import { prisma } from "@/lib/prisma";
 import { FleetCard } from "@/components/fleet/FleetCard"
 import { getSession } from "@/lib/auth"
 import { Hero } from "@/components/home/Hero"
+import { cookies } from "next/headers"
+import { dictionaries } from "@/lib/dictionary"
 
 export const dynamic = 'force-dynamic'
 
 export default async function LandingPage() {
   const session = await getSession()
+  const cookieStore = await cookies()
+  const lang = cookieStore.get("NEXT_LOCALE")?.value || "en"
+  const dictionary = dictionaries[lang as keyof typeof dictionaries] || dictionaries.en
+
   const featuredCars = await prisma.car.findMany({
     where: { 
       status: 'AVAILABLE',
@@ -36,10 +42,10 @@ export default async function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen bg-white text-zinc-900 font-sans">
       {/* Navbar */}
-      <Header transparent={true} user={session?.user} />
+      <Header transparent={true} user={session?.user} dictionary={dictionary} lang={lang} />
 
       {/* Hero Section */}
-      <Hero />
+      <Hero dictionary={dictionary} />
 
       {/* Booking Engine */}
       <BookingEngine className="-mt-48" />

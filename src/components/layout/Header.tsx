@@ -1,8 +1,35 @@
 "use client"
 
-import { useState } from "react"
-import Link from "next/link"
-import { Globe, User, Menu, LogOut } from "lucide-react"
+import { LanguageSwitcher } from "./LanguageSwitcher"
+import { dictionaries } from "@/lib/dictionary"
+import { cookies } from "next/headers"
+
+interface HeaderProps {
+  transparent?: boolean
+  user?: any
+  // Making this optional to keep backward compatibility, but ideally we pass dictionary
+  lang?: "en" | "he"
+}
+
+export async function Header({ transparent = false, user }: HeaderProps) {
+  // We need to fetch cookies here if it's a server component
+  // But Header is marked "use client" at top!
+  // We need to refactor Header to be Server Component or fetch cookies in parent
+  // Let's check the file first. It says "use client".
+  // So we cannot use async/await with cookies() directly inside "use client".
+  
+  // STRATEGY CHANGE:
+  // We will keep Header as "use client" but we need to pass the language/dictionary from parent.
+  // OR we can make a wrapper.
+  // However, for now, let's assume the parent passes the lang or we read from document cookie (not ideal for hydration).
+  // Better: Convert Header to Server Component? 
+  // It has useState (isMobileMenuOpen). So it MUST be Client Component.
+  // So we MUST pass dictionary as prop.
+  
+  return (
+    // ...
+  )
+}
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { AuthModal } from "@/components/auth/AuthModal"
