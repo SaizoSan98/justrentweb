@@ -118,12 +118,38 @@ export function AuthModal({ trigger }: AuthModalProps) {
           ) : (
             <form action={registerAction} className="space-y-4">
                <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-500 uppercase">Full Name</label>
+                <label className="text-xs font-bold text-zinc-500 uppercase">Name / Company Name</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                   <Input 
                     name="name"
-                    placeholder="John Doe" 
+                    placeholder="John Doe / Acme Corp" 
+                    className="pl-10 h-11 border-zinc-200 focus:ring-red-600 focus:border-red-600 bg-zinc-50/50" 
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-zinc-500 uppercase">Tax ID (Optional)</label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                  <Input 
+                    name="taxId"
+                    placeholder="12345678-1-42" 
+                    className="pl-10 h-11 border-zinc-200 focus:ring-red-600 focus:border-red-600 bg-zinc-50/50" 
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-zinc-500 uppercase">Phone Number</label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                  <Input 
+                    name="phone"
+                    type="tel"
+                    placeholder="+36 30 123 4567" 
                     className="pl-10 h-11 border-zinc-200 focus:ring-red-600 focus:border-red-600 bg-zinc-50/50" 
                     required
                   />

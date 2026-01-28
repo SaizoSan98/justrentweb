@@ -334,6 +334,10 @@ export async function updateExtra(formData: FormData) {
 }
 
 export async function toggleUserRole(userId: string, currentRole: string) {
+  // Logic: USER -> ADMIN -> USER. 
+  // SUPERADMIN cannot be changed via this simple toggle (needs special handling if we want to downgrade superadmin)
+  if (currentRole === 'SUPERADMIN') return
+
   const newRole = currentRole === 'ADMIN' ? 'USER' : 'ADMIN'
   try {
     await prisma.user.update({
@@ -343,6 +347,54 @@ export async function toggleUserRole(userId: string, currentRole: string) {
     revalidatePath('/admin/users')
   } catch (error) {
     console.error("Failed to update user role:", error)
+  }
+}
+
+export async function banUser(userId: string, reason: string) {
+  try {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { isBanned: true, banReason: reason }
+    })
+    revalidatePath('/admin/users')
+  } catch (error) {
+    console.error("Failed to ban user:", error)
+  }
+}
+
+export async function unbanUser(userId: string) {
+  try {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { isBanned: false, banReason: null }
+    })
+    revalidatePath('/admin/users')
+  } catch (error) {
+    console.error("Failed to unban user:", error)
+  }
+}
+
+export async function updateUserByAdmin(formData: FormData) {
+  const id = formData.get('id') as string
+  const name = formData.get('name') as string
+  const email = formData.get('email') as string
+  const phone = formData.get('phone') as string
+  const taxId = formData.get('taxId') as string
+  const password = formData.get('password') as string
+
+  const data: any = { name, email, phone, taxId }
+  if (password && password.trim() !== '') {
+    data.password = password
+  }
+
+  try {
+    await prisma.user.update({
+      where: { id },
+      data
+    })
+    revalidatePath('/admin/users')
+  } catch (error) {
+    console.error("Failed to update user:", error)
   }
 }
 

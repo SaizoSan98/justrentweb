@@ -10,6 +10,7 @@ datasource db {
 enum Role {
   USER
   ADMIN
+  SUPERADMIN
 }
 
 enum CarStatus {
@@ -31,6 +32,11 @@ model User {
   email     String    @unique
   name      String?
   password  String?   // Hashed
+  phone     String?
+  taxId     String?
+  companyName String?
+  isBanned  Boolean   @default(false)
+  banReason String?
   role      Role      @default(USER)
   bookings  Booking[]
   createdAt DateTime  @default(now())

@@ -209,11 +209,11 @@ export function FleetCard({
       </DialogTrigger>
       
       {/* BOOKING DIALOG CONTENT */}
-      <DialogContent className="max-w-5xl p-0 bg-white gap-0 overflow-hidden border-0 h-[85vh] md:h-auto md:max-h-[800px] flex flex-col md:block">
-        <div className="grid md:grid-cols-12 h-full">
+      <DialogContent className="max-w-5xl p-0 bg-white gap-0 overflow-y-auto md:overflow-hidden border-0 max-h-[90vh] md:h-auto md:max-h-[800px] flex flex-col md:block w-[95vw] md:w-full rounded-2xl md:rounded-xl">
+        <div className="flex flex-col md:grid md:grid-cols-12 md:h-full">
           
           {/* LEFT COLUMN: Car Details & Image */}
-          <div className="md:col-span-5 bg-zinc-50 p-4 md:p-6 flex flex-col border-r border-zinc-100 overflow-y-auto">
+          <div className="md:col-span-5 bg-zinc-50 p-4 md:p-6 flex flex-col border-b md:border-b-0 md:border-r border-zinc-100 h-auto md:h-full md:overflow-y-auto shrink-0">
              <div className="mb-4">
                <h2 className="text-2xl font-black uppercase text-zinc-900 leading-none mb-1">{car.make} {car.model}</h2>
                <p className="text-zinc-500 font-medium text-sm">{car.orSimilar ? "or similar | " : ""}{car.category}</p>
@@ -269,7 +269,7 @@ export function FleetCard({
           </div>
 
           {/* RIGHT COLUMN: Configuration & Steps */}
-          <div className="md:col-span-7 p-4 md:p-6 flex flex-col h-full overflow-visible md:overflow-y-auto">
+          <div className="md:col-span-7 p-4 md:p-6 flex flex-col h-auto md:h-full md:overflow-y-auto">
             
             {step === 1 && (
               <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">

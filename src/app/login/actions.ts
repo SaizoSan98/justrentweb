@@ -18,7 +18,12 @@ export async function loginAction(formData: FormData) {
     redirect("/login?error=invalid_credentials")
   }
 
-  // 3. Create session
+  // 3. Check if banned
+  if (user.isBanned) {
+    redirect(`/login?error=banned&reason=${encodeURIComponent(user.banReason || 'Account suspended')}`)
+  }
+
+  // 4. Create session
   try {
     await login({
       id: user.id,
@@ -43,6 +48,8 @@ export async function registerAction(formData: FormData) {
   const name = formData.get("name") as string
   const email = formData.get("email") as string
   const password = formData.get("password") as string
+  const phone = formData.get("phone") as string
+  const taxId = formData.get("taxId") as string | null
   
   // 1. Check if user exists
   const existingUser = await prisma.user.findUnique({
@@ -60,6 +67,8 @@ export async function registerAction(formData: FormData) {
         name,
         email,
         password, // In production hash this!
+        phone,
+        taxId,
         role: 'USER'
       }
     })

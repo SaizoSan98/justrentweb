@@ -1,8 +1,10 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import { Globe, User, Menu, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { AuthModal } from "@/components/auth/AuthModal"
 import { logoutAction } from "@/app/admin/actions"
 
@@ -12,6 +14,8 @@ interface HeaderProps {
 }
 
 export function Header({ transparent = false, user }: HeaderProps) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
   const getInitials = (name: string) => {
     return name
       ?.split(' ')
