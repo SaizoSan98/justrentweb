@@ -129,7 +129,7 @@ export default async function LandingPage() {
             <Button size="lg" className="bg-red-600 hover:bg-red-700 text-white">
               Call Us Now
             </Button>
-            <Button size="lg" variant="outline" className="text-white border-zinc-700 hover:bg-zinc-800 hover:text-white">
+            <Button size="lg" variant="outline" className="text-white border-zinc-700 bg-transparent hover:bg-zinc-800 hover:text-white">
               Send an Email
             </Button>
           </div>
