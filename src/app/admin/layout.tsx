@@ -1,5 +1,6 @@
 import { getSession } from "@/lib/auth"
 import { AdminSidebar } from "@/components/admin/AdminSidebar"
+import { Header } from "@/components/layout/Header"
 
 export default async function AdminLayout({
   children,
@@ -10,14 +11,18 @@ export default async function AdminLayout({
   const user = session?.user
 
   return (
-    <div className="flex min-h-screen bg-zinc-50">
-      {/* Sidebar */}
-      <AdminSidebar user={user} />
+    <div className="min-h-screen bg-zinc-50">
+      <Header user={user} />
       
-      {/* Main Content */}
-      <main className="flex-1 ml-64 p-8">
-        {children}
-      </main>
+      <div className="flex pt-20">
+        {/* Sidebar */}
+        <AdminSidebar user={user} />
+        
+        {/* Main Content */}
+        <main className="flex-1 ml-64 p-8">
+          {children}
+        </main>
+      </div>
     </div>
   )
 }

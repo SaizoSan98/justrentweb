@@ -30,13 +30,12 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
   const isStartsWith = (path: string) => pathname?.startsWith(path)
 
   return (
-    <aside className="w-64 bg-zinc-900 text-white flex flex-col fixed h-full z-50">
+    <aside className="w-64 bg-zinc-900 text-white flex flex-col fixed top-20 bottom-0 z-40">
       <div className="p-6 border-b border-zinc-800">
-        <Link href="/" className="text-2xl font-black tracking-tight block">
-          JUST <span className="text-red-600">RENT</span>
-          <span className="text-xs font-normal text-zinc-400 block tracking-widest mt-1">ADMIN PANEL</span>
-        </Link>
-        <div className="mt-4 pt-4 border-t border-zinc-800 text-xs">
+        <div className="text-xs font-black text-zinc-400 block tracking-widest uppercase mb-4">
+          Admin Panel
+        </div>
+        <div className="text-xs">
           <span className="text-zinc-500 block">Welcome,</span>
           <span className="text-white font-bold block">{user?.name || 'Admin User'}</span>
           <span className="text-red-600 font-bold text-[10px] uppercase tracking-wider">{user?.role || 'ADMIN'}</span>

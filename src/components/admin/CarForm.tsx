@@ -97,6 +97,16 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
   }
 
   const handleSubmit = async (formData: FormData) => {
+    // Basic validation
+    const make = formData.get('make')
+    const model = formData.get('model')
+    const price = formData.get('pricePerDay')
+    
+    if (!make || !model || !price) {
+      toast.error("Please fill in all required fields (Make, Model, Price)")
+      return
+    }
+
     setIsSubmitting(true)
     try {
       // Append complex data
@@ -146,7 +156,7 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="category">Category</Label>
-                  <Select name="category" defaultValue={car?.category}>
+                  <Select name="category" defaultValue={car?.category || (categories.length > 0 ? categories[0].name : "")} required>
                     <SelectTrigger>
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
@@ -160,7 +170,7 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
 
                 <div className="space-y-2">
                   <Label htmlFor="make">Vehicle Make</Label>
-                  <Select name="make" value={selectedMake} onValueChange={handleMakeChange}>
+                  <Select name="make" value={selectedMake} onValueChange={handleMakeChange} required>
                     <SelectTrigger>
                       <SelectValue placeholder="Select make" />
                     </SelectTrigger>
@@ -175,7 +185,7 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
                 <div className="space-y-2">
                   <Label htmlFor="model">Vehicle Model</Label>
                   {availableModels.length > 0 ? (
-                    <Select name="model" defaultValue={car?.model}>
+                    <Select name="model" defaultValue={car?.model} required>
                       <SelectTrigger>
                         <SelectValue placeholder="Select model" />
                       </SelectTrigger>

@@ -199,14 +199,14 @@ export default async function FleetPage({
           </div>
           
           <BookingEngine 
-            className="w-full md:w-auto static translate-y-0 shadow-none border border-zinc-200 bg-white" 
+            className="w-full md:w-auto static translate-y-0 shadow-none bg-transparent" 
             compact={true}
           />
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Filters Sidebar */}
-          <aside className="w-full lg:w-64 flex-shrink-0">
+        {/* Filters Bar - Sticky */}
+        <div className="sticky top-20 z-30 -mx-6 px-6 bg-zinc-50/80 backdrop-blur-md border-b border-zinc-200/50 mb-8 py-2">
+           <div className="container mx-auto">
              <FleetFilters 
                currentFilters={{
                  category: categories,
@@ -220,32 +220,32 @@ export default async function FleetPage({
                }}
                options={filterOptions}
              />
-          </aside>
+           </div>
+        </div>
 
-          {/* Car Grid */}
-          <div className="flex-1">
-            {serializedCars.length === 0 ? (
-              <div className="text-center py-20 bg-white rounded-xl border border-dashed border-zinc-300">
-                <p className="text-zinc-500 text-lg">No vehicles found matching your criteria.</p>
-                <Button variant="link" className="text-red-600 mt-2" asChild>
-                  <Link href="/fleet">Clear all filters</Link>
-                </Button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {serializedCars.map((car: any) => (
-                  <FleetCard 
-                    key={car.id} 
-                    car={car} 
-                    searchParams={{
-                      startDate: startDateStr,
-                      endDate: endDateStr
-                    }}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+        {/* Car Grid */}
+        <div className="flex-1">
+          {serializedCars.length === 0 ? (
+            <div className="text-center py-20 bg-white rounded-xl border border-dashed border-zinc-300">
+              <p className="text-zinc-500 text-lg">No vehicles found matching your criteria.</p>
+              <Button variant="link" className="text-red-600 mt-2" asChild>
+                <Link href="/fleet">Clear all filters</Link>
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {serializedCars.map((car: any) => (
+                <FleetCard 
+                  key={car.id} 
+                  car={car} 
+                  searchParams={{
+                    startDate: startDateStr,
+                    endDate: endDateStr
+                  }}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </main>
     </div>

@@ -118,29 +118,18 @@ export function FleetFilters({
   }
 
   return (
-    <div className="w-full bg-white border-b border-zinc-200 sticky top-20 z-40">
-      <div className="container mx-auto px-6 py-4">
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-black uppercase tracking-tight text-zinc-900">
-              Which car would you like to drive?
-            </h1>
-            <div className="flex items-center gap-3">
-            <span className="text-zinc-500 text-sm font-medium">
-              {counts?.total || 0} vehicles available
-            </span>
-          </div>
-          </div>
-
-          <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            {/* Main Filter Button */}
+    <div className="w-full">
+      <div className="flex items-center justify-between gap-4">
+          
+          {/* Left: Filters & Count */}
+          <div className="flex items-center gap-4">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="outline" className="border-zinc-300 hover:border-zinc-900 hover:bg-zinc-50 rounded-full h-10 px-4 gap-2 shrink-0">
+                <Button variant="outline" className="bg-white border-zinc-200 hover:bg-zinc-100 hover:border-zinc-300 rounded-full h-10 px-4 gap-2 shrink-0 font-bold text-zinc-900 shadow-sm">
                   <SlidersHorizontal className="w-4 h-4" />
                   Filters
                   {activeFiltersCount > 0 && (
-                    <span className="bg-zinc-900 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] h-[18px] flex items-center justify-center">
+                    <span className="bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] h-[18px] flex items-center justify-center">
                       {activeFiltersCount}
                     </span>
                   )}
@@ -246,7 +235,7 @@ export function FleetFilters({
 
                 <div className="p-6 border-t border-zinc-100 bg-white">
                   <Button 
-                    className="w-full bg-red-600 hover:bg-red-700 text-white font-bold h-14 text-lg rounded-xl shadow-lg shadow-red-600/20"
+                    className="w-full bg-red-600 hover:bg-red-700 text-white font-bold h-12 text-lg rounded-xl"
                     onClick={applyFilters}
                   >
                     Show {counts?.total || 0} offers
@@ -255,64 +244,46 @@ export function FleetFilters({
               </SheetContent>
             </Sheet>
 
-            {/* Quick Filters */}
-            <div 
-              className={cn(
-                "border rounded-full px-4 py-2 cursor-pointer transition-all text-sm font-bold flex items-center gap-2 whitespace-nowrap",
-                selectedTransmissions.includes("AUTOMATIC")
-                  ? "border-zinc-900 bg-zinc-900 text-white" 
-                  : "border-zinc-200 hover:border-zinc-900 bg-white text-zinc-700"
-              )}
-              onClick={() => {
-                const newT = selectedTransmissions.includes("AUTOMATIC") ? [] : ["AUTOMATIC"]
-                setSelectedTransmissions(newT)
-                const params = new URLSearchParams(searchParams.toString())
-                params.delete("transmission")
-                if(newT.length) params.append("transmission", "AUTOMATIC")
-                router.push(`/fleet?${params.toString()}`)
-              }}
-            >
-              <Gauge className="w-4 h-4" /> Automatic
-            </div>
+            <div className="h-6 w-px bg-zinc-200"></div>
 
-            <div 
-              className={cn(
-                "border rounded-full px-4 py-2 cursor-pointer transition-all text-sm font-bold flex items-center gap-2 whitespace-nowrap",
-                selectedFuelTypes.includes("HYBRID")
-                  ? "border-zinc-900 bg-zinc-900 text-white" 
-                  : "border-zinc-200 hover:border-zinc-900 bg-white text-zinc-700"
-              )}
-              onClick={() => {
-                const newF = selectedFuelTypes.includes("HYBRID") ? [] : ["HYBRID"]
-                setSelectedFuelTypes(newF)
-                const params = new URLSearchParams(searchParams.toString())
-                params.delete("fuelType")
-                if(newF.length) params.append("fuelType", "HYBRID")
-                router.push(`/fleet?${params.toString()}`)
-              }}
-            >
-              <Fuel className="w-4 h-4" /> Hybrid
-            </div>
-             <div 
-              className={cn(
-                "border rounded-full px-4 py-2 cursor-pointer transition-all text-sm font-bold flex items-center gap-2 whitespace-nowrap",
-                guaranteedModel
-                  ? "border-zinc-900 bg-zinc-900 text-white" 
-                  : "border-zinc-200 hover:border-zinc-900 bg-white text-zinc-700"
-              )}
-              onClick={() => {
-                const newVal = !guaranteedModel
-                setGuaranteedModel(newVal)
-                const params = new URLSearchParams(searchParams.toString())
-                if(newVal) params.set("guaranteedModel", "true")
-                else params.delete("guaranteedModel")
-                router.push(`/fleet?${params.toString()}`)
-              }}
-            >
-              <Check className="w-4 h-4" /> Guaranteed Model
-            </div>
+            <span className="text-zinc-500 text-sm font-medium">
+              {counts?.total || 0} vehicles available
+            </span>
           </div>
-        </div>
+
+          {/* Right: Quick Toggles (Horizontal Scroll) */}
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide flex-1 justify-end">
+             {/* Only show categories as quick filters */}
+             {categoriesList.slice(0, 4).map(cat => (
+                <div 
+                  key={cat}
+                  className={cn(
+                    "px-3 py-1.5 rounded-full cursor-pointer transition-all text-xs font-bold whitespace-nowrap border",
+                    selectedCategories.includes(cat) 
+                      ? "bg-zinc-900 text-white border-zinc-900" 
+                      : "bg-white text-zinc-600 border-zinc-200 hover:border-zinc-400"
+                  )}
+                  onClick={() => {
+                    toggleSelection(selectedCategories, cat, setSelectedCategories)
+                    // Auto apply for quick filters? Or wait? 
+                    // Better to just toggle state here, but apply needs router push.
+                    // For quick filters usually instant apply is expected.
+                    // Let's implement instant apply for these specific clicks
+                    const newCats = selectedCategories.includes(cat) 
+                      ? selectedCategories.filter(c => c !== cat)
+                      : [...selectedCategories, cat]
+                    
+                    const params = new URLSearchParams(searchParams.toString())
+                    params.delete("category")
+                    newCats.forEach(c => params.append("category", c))
+                    router.push(`/fleet?${params.toString()}`)
+                  }}
+                >
+                  {cat}
+                </div>
+              ))}
+          </div>
+
       </div>
     </div>
   )

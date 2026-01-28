@@ -92,40 +92,40 @@ export function BookingEngine({
   }
 
   if (compact && !isExpanded) {
-    return (
-      <div className={cn("w-full max-w-6xl mx-auto px-4 relative z-20", className)}>
-        <Card className="border-0 shadow-sm bg-white rounded-xl p-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-6">
-             <div className="flex items-center gap-3">
-                <CalendarIcon className="w-5 h-5 text-red-600" />
-                <div className="flex flex-col">
-                   <span className="text-xs font-bold text-zinc-400 uppercase">Dates</span>
-                   <span className="font-bold text-zinc-900">
-                     {dateRange?.from ? format(dateRange.from, "MMM d.") : "Select"} - {dateRange?.to ? format(dateRange.to, "MMM d.") : "Select"}
-                   </span>
-                </div>
-             </div>
-             <div className="w-px h-8 bg-zinc-200 hidden sm:block"></div>
-             <div className="flex items-center gap-3 hidden sm:flex">
-                <Clock className="w-5 h-5 text-red-600" />
-                <div className="flex flex-col">
-                   <span className="text-xs font-bold text-zinc-400 uppercase">Time</span>
-                   <span className="font-bold text-zinc-900">{startTime} - {endTime}</span>
-                </div>
-             </div>
+      return (
+        <div className={cn("w-full relative z-20", className)}>
+          <div className="flex items-center justify-between gap-4 py-2">
+            <div className="flex items-center gap-6">
+               <div className="flex items-center gap-3">
+                  <CalendarIcon className="w-5 h-5 text-red-600" />
+                  <div className="flex flex-col">
+                     <span className="text-xs font-bold text-zinc-400 uppercase">Dates</span>
+                     <span className="font-bold text-zinc-900">
+                       {dateRange?.from ? format(dateRange.from, "MMM d.") : "Select"} - {dateRange?.to ? format(dateRange.to, "MMM d.") : "Select"}
+                     </span>
+                  </div>
+               </div>
+               <div className="w-px h-8 bg-zinc-200 hidden sm:block"></div>
+               <div className="flex items-center gap-3 hidden sm:flex">
+                  <Clock className="w-5 h-5 text-red-600" />
+                  <div className="flex flex-col">
+                     <span className="text-xs font-bold text-zinc-400 uppercase">Time</span>
+                     <span className="font-bold text-zinc-900">{startTime} - {endTime}</span>
+                  </div>
+               </div>
+            </div>
+            
+            <Button 
+              onClick={() => setIsExpanded(true)}
+              variant="ghost"
+              className="text-red-600 hover:bg-red-50 hover:text-red-700 font-bold"
+            >
+              Change Dates
+            </Button>
           </div>
-          
-          <Button 
-            onClick={() => setIsExpanded(true)}
-            variant="outline"
-            className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 font-bold"
-          >
-            Change Dates
-          </Button>
-        </Card>
-      </div>
-    )
-  }
+        </div>
+      )
+    }
 
   return (
     <div className={cn("w-full max-w-6xl mx-auto -mt-24 relative z-20 px-4", className)}>
