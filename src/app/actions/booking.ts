@@ -3,9 +3,15 @@
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
+import { getSession } from "@/lib/auth"
 
 export async function createBooking(prevState: any, formData: FormData) {
   try {
+    const session = await getSession()
+    if (!session?.user?.id) {
+        return { error: 'You must be logged in to create a booking.' }
+    }
+
     // Extract data from formData
     const carId = formData.get('carId') as string
     const startDate = new Date(formData.get('startDate') as string)
@@ -30,22 +36,8 @@ export async function createBooking(prevState: any, formData: FormData) {
     const paymentMethod = formData.get('paymentMethod') as string
     const selectedExtras = JSON.parse(formData.get('selectedExtras') as string) as string[]
 
-    // 1. Create or Update User
-    // For now, we'll just check if user exists by email, if not create a "guest" user
-    // In a real app, we might want to handle auth better
-    let user = await prisma.user.findUnique({
-      where: { email }
-    })
-
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          email,
-          name: `${firstName} ${lastName}`,
-          role: 'USER'
-        }
-      })
-    }
+    // Use logged in user ID
+    const userId = session.user.id
 
     // 2. Create Booking
     const booking = await prisma.booking.create({
@@ -56,7 +48,7 @@ export async function createBooking(prevState: any, formData: FormData) {
         pickupLocation,
         dropoffLocation,
         status: 'PENDING',
-        userId: user.id,
+        userId,
         carId,
         firstName,
         lastName,

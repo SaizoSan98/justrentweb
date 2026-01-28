@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma"
 import { notFound, redirect } from "next/navigation"
 import { CheckoutForm } from "@/components/booking/CheckoutForm"
 import { Header } from "@/components/layout/Header"
+import { getSession } from "@/lib/auth"
 
 export const dynamic = 'force-dynamic'
 
@@ -10,6 +11,12 @@ export default async function CheckoutPage({
 }: {
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
+  // 1. Check Auth
+  const session = await getSession()
+  if (!session?.user) {
+    redirect('/login?tab=register&error=login_required_for_booking')
+  }
+
   const params = await searchParams ?? {}
   const carId = typeof params.carId === 'string' ? params.carId : undefined
   const startDateStr = typeof params.startDate === 'string' ? params.startDate : undefined
