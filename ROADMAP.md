@@ -36,6 +36,7 @@
 - [x] Admin UI egységesítés (Header integráció)
 - [x] Fleet szűrő UI modernizálása (Sticky bar, Quick toggles)
 - [x] Jármű létrehozás (CarForm) javítása (State-alapú adatkezelés, Validáció, Visszajelzések)
+- [x] Képfeltöltés stabilizálása (Vercel Blob + Helyi Fallback)
 - [x] Tesztelési jegyzőkönyv (TESTING_GUIDE.md)
 - [ ] Végső tesztelés és hibajavítás
 - [ ] Élesítés (Deployment)
