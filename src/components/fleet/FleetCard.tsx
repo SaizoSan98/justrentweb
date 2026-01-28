@@ -367,45 +367,11 @@ export function FleetCard({
                   </div>
                 </div>
 
-                {/* Extras Selection */}
-                {extras.length > 0 && (
-                  <div className="space-y-2">
-                    <Label className="text-xs font-bold text-zinc-700 uppercase tracking-wider">Add Extras</Label>
-                    <div className="grid grid-cols-1 gap-3">
-                      {extras.map(extra => (
-                        <div 
-                          key={extra.id}
-                          onClick={() => toggleExtra(extra.id)}
-                          className={cn(
-                            "cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 flex items-center justify-between",
-                            selectedExtras.includes(extra.id) ? "border-red-600 bg-red-50/50" : "border-zinc-200 hover:border-zinc-300"
-                          )}
-                        >
-                          <div className="flex items-center gap-3">
-                             <div className={cn(
-                               "w-8 h-8 rounded-full flex items-center justify-center",
-                               selectedExtras.includes(extra.id) ? "bg-red-100 text-red-600" : "bg-zinc-100 text-zinc-500"
-                             )}>
-                               {getExtraIcon(extra.icon)}
-                             </div>
-                             <div>
-                               <div className="font-bold text-zinc-900 text-sm">{extra.name}</div>
-                               <div className="text-[10px] text-zinc-500">
-                                 €{extra.price} {extra.priceType === 'PER_DAY' ? '/ day' : '/ rental'}
-                               </div>
-                             </div>
-                          </div>
-                          <div className={cn("w-4 h-4 rounded-full border-2 flex items-center justify-center", selectedExtras.includes(extra.id) ? "border-red-600" : "border-zinc-300")}>
-                            {selectedExtras.includes(extra.id) && <div className="w-2 h-2 rounded-full bg-red-600" />}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                {/* Extras Selection (Moved to Step 2) */}
+                {/* REMOVED FROM STEP 1 */}
 
                 {/* Price Breakdown */}
-                <div className="bg-zinc-50 rounded-xl p-4 border border-zinc-100 space-y-2 mt-auto">
+                <div className="bg-zinc-50 rounded-xl p-4 border border-zinc-100 space-y-2 mt-auto mb-16 md:mb-0">
                   <h4 className="font-bold text-zinc-900 text-xs mb-2">Price Breakdown</h4>
                   
                   <div className="flex justify-between text-xs">
@@ -451,26 +417,68 @@ export function FleetCard({
                   </div>
                 </div>
 
-                <Button 
-                  onClick={() => setStep(2)} 
-                  className="w-full h-10 text-sm font-bold bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/20"
-                >
-                  Next Step <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
+                <div className="fixed bottom-0 left-0 w-full p-4 bg-white border-t border-zinc-200 md:static md:p-0 md:bg-transparent md:border-0 z-50">
+                  <Button 
+                    onClick={() => setStep(2)} 
+                    className="w-full h-12 md:h-10 text-base md:text-sm font-bold bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/20"
+                  >
+                    Next Step <ArrowRight className="w-5 h-5 md:w-4 md:h-4 ml-2" />
+                  </Button>
+                </div>
               </div>
             )}
 
             {step === 2 && (
-              <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+              <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300 pb-20 md:pb-0">
                  <div>
                     <Button variant="ghost" size="sm" onClick={() => setStep(1)} className="-ml-2 mb-1 h-8 text-zinc-500 hover:text-zinc-900">
                        <ChevronLeft className="w-4 h-4 mr-1" /> Back to Options
                     </Button>
-                    <h3 className="text-lg font-bold text-zinc-900 mb-0.5">Your Details</h3>
-                    <p className="text-zinc-500 text-xs">Please fill in your information.</p>
+                    <h3 className="text-lg font-bold text-zinc-900 mb-0.5">Customize Extras & Details</h3>
+                    <p className="text-zinc-500 text-xs">Add extras and fill in your details.</p>
                  </div>
 
+                 {/* Extras Selection (Now in Step 2) */}
+                 {extras.length > 0 && (
+                  <div className="space-y-2">
+                    <Label className="text-xs font-bold text-zinc-700 uppercase tracking-wider">Add Extras</Label>
+                    <div className="grid grid-cols-1 gap-3">
+                      {extras.map(extra => (
+                        <div 
+                          key={extra.id}
+                          onClick={() => toggleExtra(extra.id)}
+                          className={cn(
+                            "cursor-pointer p-3 rounded-lg border-2 transition-all duration-200 flex items-center justify-between",
+                            selectedExtras.includes(extra.id) ? "border-red-600 bg-red-50/50" : "border-zinc-200 hover:border-zinc-300"
+                          )}
+                        >
+                          <div className="flex items-center gap-3">
+                             <div className={cn(
+                               "w-8 h-8 rounded-full flex items-center justify-center",
+                               selectedExtras.includes(extra.id) ? "bg-red-100 text-red-600" : "bg-zinc-100 text-zinc-500"
+                             )}>
+                               {getExtraIcon(extra.icon)}
+                             </div>
+                             <div>
+                               <div className="font-bold text-zinc-900 text-sm">{extra.name}</div>
+                               <div className="text-[10px] text-zinc-500">
+                                 €{extra.price} {extra.priceType === 'PER_DAY' ? '/ day' : '/ rental'}
+                               </div>
+                             </div>
+                          </div>
+                          <div className={cn("w-4 h-4 rounded-full border-2 flex items-center justify-center", selectedExtras.includes(extra.id) ? "border-red-600" : "border-zinc-300")}>
+                            {selectedExtras.includes(extra.id) && <div className="w-2 h-2 rounded-full bg-red-600" />}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                 )}
+                 
+                 <div className="h-px bg-zinc-100 my-4" />
+
                  <div className="space-y-3">
+                    <h3 className="text-sm font-bold text-zinc-900">Personal Information</h3>
                     <div className="grid md:grid-cols-2 gap-3">
                        <div className="space-y-1">
                           <Label className="text-xs">First Name</Label>
