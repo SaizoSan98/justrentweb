@@ -130,7 +130,7 @@ export default async function FleetPage({
   }
 
   // 3. Execute queries in parallel
-  const [cars, allAvailableCars, categoriesData, transmissionsData, fuelTypesData, seatsData] = await Promise.all([
+  const [cars, allAvailableCars, categoriesData, transmissionsData, fuelTypesData, seatsData, extrasData] = await Promise.all([
     // Main Grid Query: Filtered by ALL criteria
     prisma.car.findMany({
       where: fullWhereClause,
