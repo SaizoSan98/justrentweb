@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -26,11 +27,12 @@ interface CarFormProps {
   car?: any // Replace with proper type
   categories?: { id: string, name: string }[]
   isEditing?: boolean
+  translations?: any[]
 }
 
 import { toast } from "sonner"
 
-export function CarForm({ car, categories = [], isEditing = false }: CarFormProps) {
+export function CarForm({ car, categories = [], isEditing = false, translations = [] }: CarFormProps) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [activeTab, setActiveTab] = useState("general")
@@ -45,6 +47,8 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
   const [selectedFuelType, setSelectedFuelType] = useState<string>(car?.fuelType || "")
   const [selectedFuelPolicy, setSelectedFuelPolicy] = useState<string>(car?.fuelPolicy || "FULL_TO_FULL")
   const [orSimilar, setOrSimilar] = useState<boolean>(car?.orSimilar || false)
+  const [description, setDescription] = useState<string>(car?.description || "")
+  const [descriptionHe, setDescriptionHe] = useState<string>(translations?.find((t: any) => t.field === 'description' && t.language === 'he')?.value || "")
   const [airConditioning, setAirConditioning] = useState<boolean>(car?.airConditioning !== false) // default true if undefined? Schema says default true.
   
   // Controlled Inputs State
@@ -152,6 +156,8 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
       data.append('category', selectedCategory)
       data.append('make', selectedMake)
       data.append('model', selectedModel)
+      data.append('description', description)
+      data.append('description_he', descriptionHe)
       data.append('year', year)
       data.append('licensePlate', licensePlate)
       data.append('mileage', mileage)
@@ -388,6 +394,32 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
                       <SelectItem value="HYBRID">Hybrid</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+
+                <div className="md:col-span-2 space-y-2">
+                  <Label htmlFor="description">Description (English)</Label>
+                  <Textarea 
+                    id="description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Enter vehicle description..."
+                    rows={3}
+                  />
+                </div>
+
+                <div className="md:col-span-2 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="descriptionHe">Description (Hebrew)</Label>
+                    <span className="text-xs text-zinc-500">Auto-translated if left empty</span>
+                  </div>
+                  <Textarea 
+                    id="descriptionHe"
+                    value={descriptionHe}
+                    onChange={(e) => setDescriptionHe(e.target.value)}
+                    placeholder="Hebrew translation..."
+                    dir="rtl"
+                    rows={3}
+                  />
                 </div>
 
                 <div className="space-y-2 flex flex-col justify-end pb-2">

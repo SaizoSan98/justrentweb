@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma"
+import { getTranslations } from "@/lib/translation"
 import { CarForm } from "@/components/admin/CarForm"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
@@ -20,6 +21,8 @@ export default async function EditCarPage({ params }: PageProps) {
   const categories = await prisma.category.findMany({
     orderBy: { name: 'asc' }
   })
+
+  const translations = await getTranslations([id], 'Car', 'he')
 
   if (!car) {
     notFound()
@@ -51,7 +54,7 @@ export default async function EditCarPage({ params }: PageProps) {
         <h1 className="text-3xl font-black text-zinc-900 tracking-tight">Edit Car</h1>
       </div>
       
-      <CarForm car={serializedCar} categories={categories} isEditing={true} />
+      <CarForm car={serializedCar} categories={categories} isEditing={true} translations={translations} />
     </div>
   )
 }

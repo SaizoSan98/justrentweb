@@ -1,5 +1,6 @@
 
 import { prisma } from "@/lib/prisma"
+import { getTranslations } from "@/lib/translation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -26,6 +27,8 @@ export default async function ExtrasPage() {
     orderBy: { name: 'asc' }
   })
 
+  const translations = await getTranslations(extras.map(e => e.id), 'Extra', 'he')
+
   const serializedExtras = extras.map(e => ({
     ...e,
     price: Number(e.price)
@@ -47,9 +50,17 @@ export default async function ExtrasPage() {
             <CardContent>
               <form action={createExtra} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Name</Label>
+                  <Label htmlFor="name">Name (English)</Label>
                   <Input id="name" name="name" placeholder="e.g. GPS" required />
                 </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <Label htmlFor="name_he">Name (Hebrew)</Label>
+                    <span className="text-xs text-zinc-500">Auto-translate</span>
+                  </div>
+                  <Input id="name_he" name="name_he" placeholder="Optional" dir="rtl" />
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="price">Price (EUR)</Label>
                   <Input id="price" name="price" type="number" placeholder="15" required />
@@ -85,9 +96,17 @@ export default async function ExtrasPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
+                  <Label htmlFor="description">Description (English)</Label>
                   <Input id="description" name="description" placeholder="Optional details" />
                 </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <Label htmlFor="description_he">Description (Hebrew)</Label>
+                    <span className="text-xs text-zinc-500">Auto-translate</span>
+                  </div>
+                  <Input id="description_he" name="description_he" placeholder="Optional" dir="rtl" />
+                </div>
+
                 <Button type="submit" className="w-full bg-zinc-900 text-white">
                   <Plus className="mr-2 h-4 w-4" /> Add Extra
                 </Button>
@@ -98,7 +117,7 @@ export default async function ExtrasPage() {
 
         {/* List */}
         <div className="md:col-span-2 space-y-4">
-          <ExtrasList extras={serializedExtras} />
+          <ExtrasList extras={serializedExtras} translations={translations} />
         </div>
       </div>
     </div>

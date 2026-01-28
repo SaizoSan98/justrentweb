@@ -59,6 +59,7 @@ model Car {
   id                 String         @id @default(cuid())
   make               String
   model              String
+  description        String?
   year               Int
   licensePlate       String         @unique
   mileage            Int            // Current mileage
@@ -202,4 +203,17 @@ model Availability {
   endDate   DateTime
   status    CarStatus
   createdAt DateTime  @default(now())
+}
+
+model Translation {
+  id          String   @id @default(cuid())
+  entityId    String   // ID of the entity being translated (Car ID, Extra ID, etc.)
+  entityType  String   // "Car", "Extra", "Category", etc.
+  field       String   // Field name (e.g., "description", "name")
+  language    String   // "he", "en", etc.
+  value       String   // The translated text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([entityId, entityType, field, language])
 }

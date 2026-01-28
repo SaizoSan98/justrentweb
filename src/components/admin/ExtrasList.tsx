@@ -29,9 +29,14 @@ interface Extra {
   icon: string | null
 }
 
-export function ExtrasList({ extras }: { extras: any[] }) {
+export function ExtrasList({ extras, translations = [] }: { extras: any[], translations?: any[] }) {
   const [editingExtra, setEditingExtra] = useState<Extra | null>(null)
   const [isEditOpen, setIsEditOpen] = useState(false)
+
+  // Helpers to get translation
+  const getTrans = (id: string, field: string) => {
+    return translations?.find((t: any) => t.entityId === id && t.field === field && t.language === 'he')?.value || ""
+  }
 
   return (
     <div className="space-y-4">
@@ -77,8 +82,15 @@ export function ExtrasList({ extras }: { extras: any[] }) {
                     }} className="space-y-4">
                       <input type="hidden" name="id" value={extra.id} />
                       <div className="space-y-2">
-                        <Label htmlFor="edit-name">Name</Label>
+                        <Label htmlFor="edit-name">Name (English)</Label>
                         <Input id="edit-name" name="name" defaultValue={extra.name} required />
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <Label htmlFor="edit-name_he">Name (Hebrew)</Label>
+                          <span className="text-xs text-zinc-500">Auto-translate</span>
+                        </div>
+                        <Input id="edit-name_he" name="name_he" defaultValue={getTrans(extra.id, 'name')} dir="rtl" />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="edit-price">Price (EUR)</Label>
@@ -115,8 +127,15 @@ export function ExtrasList({ extras }: { extras: any[] }) {
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="edit-description">Description</Label>
+                        <Label htmlFor="edit-description">Description (English)</Label>
                         <Input id="edit-description" name="description" defaultValue={extra.description || ""} />
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <Label htmlFor="edit-description_he">Description (Hebrew)</Label>
+                          <span className="text-xs text-zinc-500">Auto-translate</span>
+                        </div>
+                        <Input id="edit-description_he" name="description_he" defaultValue={getTrans(extra.id, 'description')} dir="rtl" />
                       </div>
                       <Button type="submit" className="w-full bg-zinc-900 text-white">
                         Save Changes

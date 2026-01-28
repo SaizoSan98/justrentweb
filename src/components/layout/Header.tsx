@@ -1,35 +1,9 @@
 "use client"
 
+import { useState } from "react"
+import Link from "next/link"
+import { Menu, X, User, LogOut, Globe } from "lucide-react"
 import { LanguageSwitcher } from "./LanguageSwitcher"
-import { dictionaries } from "@/lib/dictionary"
-import { cookies } from "next/headers"
-
-interface HeaderProps {
-  transparent?: boolean
-  user?: any
-  // Making this optional to keep backward compatibility, but ideally we pass dictionary
-  lang?: "en" | "he"
-}
-
-export async function Header({ transparent = false, user }: HeaderProps) {
-  // We need to fetch cookies here if it's a server component
-  // But Header is marked "use client" at top!
-  // We need to refactor Header to be Server Component or fetch cookies in parent
-  // Let's check the file first. It says "use client".
-  // So we cannot use async/await with cookies() directly inside "use client".
-  
-  // STRATEGY CHANGE:
-  // We will keep Header as "use client" but we need to pass the language/dictionary from parent.
-  // OR we can make a wrapper.
-  // However, for now, let's assume the parent passes the lang or we read from document cookie (not ideal for hydration).
-  // Better: Convert Header to Server Component? 
-  // It has useState (isMobileMenuOpen). So it MUST be Client Component.
-  // So we MUST pass dictionary as prop.
-  
-  return (
-    // ...
-  )
-}
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { AuthModal } from "@/components/auth/AuthModal"
@@ -38,10 +12,17 @@ import { logoutAction } from "@/app/admin/actions"
 interface HeaderProps {
   transparent?: boolean
   user?: any
+  dictionary?: any
+  lang?: string
 }
 
-export function Header({ transparent = false, user }: HeaderProps) {
+export function Header({ transparent = false, user, dictionary = {}, lang = "en" }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  
+  // Helper to safely get dictionary value
+  const t = (key: string, section: string = "nav") => {
+    return dictionary?.[section]?.[key] || key
+  }
 
   const getInitials = (name: string) => {
     return name
@@ -66,18 +47,15 @@ export function Header({ transparent = false, user }: HeaderProps) {
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex gap-8 text-sm font-bold tracking-wide uppercase">
-          <Link href="/" className="text-zinc-600 hover:text-red-600 transition-colors">Home</Link>
-          <Link href="/fleet" className="text-zinc-600 hover:text-red-600 transition-colors">Our Fleet</Link>
-          <Link href="#contact" className="text-zinc-600 hover:text-red-600 transition-colors">Contact</Link>
+          <Link href="/" className="text-zinc-600 hover:text-red-600 transition-colors">{t('home')}</Link>
+          <Link href="/fleet" className="text-zinc-600 hover:text-red-600 transition-colors">{t('fleet')}</Link>
+          <Link href="#contact" className="text-zinc-600 hover:text-red-600 transition-colors">{t('contact')}</Link>
         </nav>
 
         {/* Right Actions */}
         <div className="flex items-center gap-6">
-          {/* Language Selector (Visual Only) */}
-          <div className="hidden md:flex items-center gap-2 text-zinc-600 hover:text-zinc-900 cursor-pointer transition-colors group">
-            <Globe className="w-5 h-5 group-hover:text-red-600 transition-colors" />
-            <span className="text-sm font-bold">ENG | EUR</span>
-          </div>
+          {/* Language Selector */}
+          <LanguageSwitcher currentLang={lang} />
 
           <div className="w-px h-6 bg-zinc-200 hidden md:block" />
 
@@ -90,14 +68,14 @@ export function Header({ transparent = false, user }: HeaderProps) {
                     {getInitials(user.name)}
                   </div>
                   <span className="text-sm font-bold uppercase group-hover:underline decoration-2 underline-offset-4">
-                    Welcome, {getInitials(user.name)}
+                    {t('welcome')}, {getInitials(user.name)}
                   </span>
                 </Button>
               </Link>
               <form action={logoutAction}>
                 <Button variant="ghost" size="sm" className="text-zinc-500 hover:text-red-600">
                   <LogOut className="w-4 h-4 mr-2" />
-                  Sign Out
+                  {t('signout')}
                 </Button>
               </form>
             </div>
@@ -108,7 +86,7 @@ export function Header({ transparent = false, user }: HeaderProps) {
                   <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center group-hover:bg-red-50 group-hover:rotate-12 transition-all duration-300 shadow-sm group-hover:shadow-md">
                     <User className="w-4 h-4" />
                   </div>
-                  <span className="text-sm font-bold uppercase group-hover:underline decoration-2 underline-offset-4">Log in | Register</span>
+                  <span className="text-sm font-bold uppercase group-hover:underline decoration-2 underline-offset-4">{t('login')} | {t('register')}</span>
                 </Button>
               }
             />
@@ -136,21 +114,21 @@ export function Header({ transparent = false, user }: HeaderProps) {
                     className="text-lg font-bold text-zinc-900 hover:text-red-600 transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    Home
+                    {t('home')}
                   </Link>
                   <Link 
                     href="/fleet" 
                     className="text-lg font-bold text-zinc-900 hover:text-red-600 transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    Our Fleet
+                    {t('fleet')}
                   </Link>
                   <Link 
                     href="#contact" 
                     className="text-lg font-bold text-zinc-900 hover:text-red-600 transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    Contact
+                    {t('contact')}
                   </Link>
                 </nav>
 
@@ -172,7 +150,7 @@ export function Header({ transparent = false, user }: HeaderProps) {
                     <Link href={user.role === 'ADMIN' ? "/admin" : "/dashboard"} onClick={() => setIsMobileMenuOpen(false)}>
                       <Button variant="outline" className="w-full justify-start">
                         <User className="w-4 h-4 mr-2" />
-                        My Profile
+                        {t('profile')}
                       </Button>
                     </Link>
                     
@@ -182,7 +160,7 @@ export function Header({ transparent = false, user }: HeaderProps) {
                     }}>
                       <Button variant="ghost" className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50">
                         <LogOut className="w-4 h-4 mr-2" />
-                        Sign Out
+                        {t('signout')}
                       </Button>
                     </form>
                   </div>
@@ -191,7 +169,7 @@ export function Header({ transparent = false, user }: HeaderProps) {
                     <AuthModal 
                       trigger={
                         <Button className="w-full bg-zinc-900 text-white hover:bg-zinc-800">
-                          Log In / Register
+                          {t('login')} / {t('register')}
                         </Button>
                       }
                     />

@@ -8,6 +8,10 @@ import { getSession } from "@/lib/auth";
 
 import { FleetFilters } from "@/components/fleet/FleetFilters";
 
+import { getTranslations } from "@/lib/translation"
+import { cookies } from "next/headers"
+import { dictionaries } from "@/lib/dictionary"
+
 export const dynamic = 'force-dynamic';
 
 export default async function FleetPage({
@@ -16,6 +20,10 @@ export default async function FleetPage({
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
   const session = await getSession();
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("NEXT_LOCALE")?.value || "en";
+  const dictionary = dictionaries[lang as keyof typeof dictionaries] || dictionaries.en
+  
   const params = await searchParams ?? {};
   const category = typeof params.category === 'string' ? params.category : undefined;
   const categories = typeof params.category === 'object' ? params.category : (category ? [category] : undefined);
@@ -188,6 +196,13 @@ export default async function FleetPage({
     price: Number(extra.price)
   }));
 
+  // Fetch Translations if not English
+  let translations: any[] = [];
+  if (lang !== 'en') {
+    const carIds = cars.map(c => c.id);
+    translations = await getTranslations(carIds, 'Car', lang);
+  }
+
   const filterOptions = {
     categories: categoriesData.map(c => c.name),
     transmissions: transmissionsData.map(t => t.transmission),
@@ -195,31 +210,50 @@ export default async function FleetPage({
     seats: seatsData.map(s => s.seats)
   };
 
-  const serializedCars = cars.map((car: any) => ({
-    ...car,
-    pricePerDay: Number(car.pricePerDay),
-    deposit: Number(car.deposit),
-    pricingTiers: car.pricingTiers.map((tier: any) => ({
-      ...tier,
-      pricePerDay: Number(tier.pricePerDay),
-      deposit: Number(tier.deposit)
-    }))
-  }));
+  const serializedCars = cars.map((car: any) => {
+    // Apply translations
+    let translatedCar = { ...car };
+    if (lang !== 'en') {
+      const carTranslations = translations.filter((t: any) => t.entityId === car.id);
+      carTranslations.forEach((t: any) => {
+        // Safe override of fields if they exist in translation
+        // For now we might translate 'category', 'transmission', 'fuelType' if we want deep localization
+        // But mainly 'make', 'model' are usually kept as is, but maybe 'description' if we had one.
+        // Let's assume we translate technical terms for now via helper or DB
+        // Actually, for dropdowns like transmission, we usually translate the VALUE, not replace the field in DB usually.
+        // But if we use the translation table:
+        if (t.field === 'transmission') translatedCar.transmission = t.value;
+        if (t.field === 'fuelType') translatedCar.fuelType = t.value;
+        if (t.field === 'category') translatedCar.category = t.value;
+      });
+    }
+
+    return {
+      ...translatedCar,
+      pricePerDay: Number(car.pricePerDay),
+      deposit: Number(car.deposit),
+      pricingTiers: car.pricingTiers.map((tier: any) => ({
+        ...tier,
+        pricePerDay: Number(tier.pricePerDay),
+        deposit: Number(tier.deposit)
+      }))
+    }
+  });
 
   return (
     <div className="flex flex-col min-h-screen bg-zinc-50">
-      <Header user={session?.user} />
+      <Header user={session?.user} dictionary={dictionary} lang={lang} />
       
       <main className="flex-1 container mx-auto px-6 py-24">
         <div className="flex flex-col md:flex-row justify-between items-start mb-8 gap-4">
           <div>
-            <h1 className="text-4xl font-black tracking-tight text-zinc-900 mb-2">Our Premium Fleet</h1>
+            <h1 className="text-4xl font-black tracking-tight text-zinc-900 mb-2">{dictionary.fleet.title}</h1>
             <p className="text-zinc-500">
-              Select from our wide range of luxury vehicles.
+              {dictionary.fleet.subtitle}
               <span className="block mt-1 text-red-600 font-medium">
-                Showing availability for {startDate.toLocaleDateString()} 
+                {dictionary.hero.show_cars} {startDate.toLocaleDateString()} 
                 {endDate && ` - ${endDate.toLocaleDateString()}`} 
-                ({diffDays} day{diffDays > 1 ? 's' : ''})
+                ({diffDays} {diffDays > 1 ? dictionary.common.days : dictionary.common.day})
               </span>
             </p>
           </div>
@@ -249,6 +283,7 @@ export default async function FleetPage({
                  ...car,
                  guaranteedModel: !car.orSimilar
                }))}
+               dictionary={dictionary}
              />
            </div>
         </div>
@@ -273,6 +308,7 @@ export default async function FleetPage({
                     startDate: startDateStr,
                     endDate: endDateStr
                   }}
+                  dictionary={dictionary}
                 />
               ))}
             </div>

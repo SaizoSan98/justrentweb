@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from "@/lib/prisma"
+import { saveTranslation, translateText } from "@/lib/translation"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { put } from "@vercel/blob"
@@ -72,6 +73,8 @@ export async function deleteCar(id: string) {
 export async function createCar(formData: FormData) {
   const make = formData.get('make') as string
   const model = formData.get('model') as string
+  const description = formData.get('description') as string
+  const descriptionHe = formData.get('description_he') as string
   const year = parseInt(formData.get('year') as string)
   const licensePlate = formData.get('licensePlate') as string
   const mileage = parseInt(formData.get('mileage') as string)
@@ -122,10 +125,11 @@ export async function createCar(formData: FormData) {
   const pricingTiers = pricingTiersRaw ? JSON.parse(pricingTiersRaw) : []
 
   try {
-    await prisma.car.create({
+    const car = await prisma.car.create({
       data: {
         make,
         model,
+        description,
         year,
         licensePlate,
         mileage,
@@ -160,6 +164,13 @@ export async function createCar(formData: FormData) {
         }
       }
     })
+
+    // Save translations
+    if (description) {
+      const finalHe = descriptionHe || await translateText(description, 'he')
+      await saveTranslation(car.id, 'Car', 'description', 'he', finalHe)
+    }
+
     revalidatePath('/admin/cars')
     return { success: true }
   } catch (error: any) {
@@ -176,6 +187,8 @@ export async function updateCar(formData: FormData) {
   const id = formData.get('id') as string
   const make = formData.get('make') as string
   const model = formData.get('model') as string
+  const description = formData.get('description') as string
+  const descriptionHe = formData.get('description_he') as string
   const year = parseInt(formData.get('year') as string)
   const licensePlate = formData.get('licensePlate') as string
   const mileage = parseInt(formData.get('mileage') as string)
@@ -229,6 +242,7 @@ export async function updateCar(formData: FormData) {
       data: {
         make,
         model,
+        description,
         year,
         licensePlate,
         mileage,
@@ -263,6 +277,13 @@ export async function updateCar(formData: FormData) {
         }
       }
     })
+
+    // Save translations
+    if (description) {
+      const finalHe = descriptionHe || await translateText(description, 'he')
+      await saveTranslation(id, 'Car', 'description', 'he', finalHe)
+    }
+
     revalidatePath('/admin/cars')
     return { success: true }
   } catch (error: any) {
@@ -287,13 +308,15 @@ export async function deleteExtra(id: string) {
 
 export async function createExtra(formData: FormData) {
   const name = formData.get('name') as string
+  const nameHe = formData.get('name_he') as string
   const description = formData.get('description') as string
+  const descriptionHe = formData.get('description_he') as string
   const price = parseFloat(formData.get('price') as string)
   const priceType = formData.get('priceType') as string
   const icon = formData.get('icon') as string
 
   try {
-    await prisma.extra.create({
+    const extra = await prisma.extra.create({
       data: {
         name,
         description,
@@ -302,6 +325,18 @@ export async function createExtra(formData: FormData) {
         icon
       }
     })
+
+    // Save Translations
+    if (name) {
+      const finalNameHe = nameHe || await translateText(name, 'he')
+      await saveTranslation(extra.id, 'Extra', 'name', 'he', finalNameHe)
+    }
+
+    if (description) {
+      const finalDescHe = descriptionHe || await translateText(description, 'he')
+      await saveTranslation(extra.id, 'Extra', 'description', 'he', finalDescHe)
+    }
+
     revalidatePath('/admin/extras')
   } catch (error) {
     console.error("Failed to create extra:", error)
@@ -311,7 +346,9 @@ export async function createExtra(formData: FormData) {
 export async function updateExtra(formData: FormData) {
   const id = formData.get('id') as string
   const name = formData.get('name') as string
+  const nameHe = formData.get('name_he') as string
   const description = formData.get('description') as string
+  const descriptionHe = formData.get('description_he') as string
   const price = parseFloat(formData.get('price') as string)
   const priceType = formData.get('priceType') as string
   const icon = formData.get('icon') as string
@@ -327,6 +364,18 @@ export async function updateExtra(formData: FormData) {
         icon
       }
     })
+
+    // Save Translations
+    if (name) {
+      const finalNameHe = nameHe || await translateText(name, 'he')
+      await saveTranslation(id, 'Extra', 'name', 'he', finalNameHe)
+    }
+
+    if (description) {
+      const finalDescHe = descriptionHe || await translateText(description, 'he')
+      await saveTranslation(id, 'Extra', 'description', 'he', finalDescHe)
+    }
+
     revalidatePath('/admin/extras')
   } catch (error) {
     console.error("Failed to update extra:", error)

@@ -18,7 +18,8 @@ export function FleetFilters({
   currentFilters, 
   counts,
   options,
-  availableCars
+  availableCars,
+  dictionary = {}
 }: { 
   currentFilters?: {
     category?: string[]
@@ -43,9 +44,13 @@ export function FleetFilters({
     seats: number
     guaranteedModel: boolean
   }[]
+  dictionary?: any
 }) {
   const router = useRouter()
   const searchParams = useSearchParams()
+
+  const t = (key: string, section: string = "fleet") => dictionary?.[section]?.[key] || key
+  const tCommon = (key: string) => dictionary?.common?.[key?.toLowerCase()] || key
 
   // Use props or fallbacks (though props should be provided)
   const categoriesList = options?.categories || CATEGORIES
@@ -145,9 +150,9 @@ export function FleetFilters({
           <div className="flex items-center gap-4">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="outline" className="bg-white border-zinc-200 hover:bg-zinc-100 hover:border-zinc-300 rounded-full h-10 px-4 gap-2 shrink-0 font-bold text-zinc-900 shadow-sm">
+                <Button variant="outline" size="sm" className="gap-2 h-9 border-zinc-200 hover:border-zinc-300 bg-white">
                   <SlidersHorizontal className="w-4 h-4" />
-                  Filters
+                  {t('filters')}
                   {activeFiltersCount > 0 && (
                     <span className="bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] h-[18px] flex items-center justify-center">
                       {activeFiltersCount}
@@ -157,16 +162,16 @@ export function FleetFilters({
               </SheetTrigger>
               <SheetContent side="left" className="w-full sm:w-[400px] p-0 flex flex-col h-full bg-white">
                 <div className="p-6 border-b border-zinc-100 flex items-center justify-between bg-white">
-                  <h2 className="text-xl font-black uppercase">Filters</h2>
+                  <h2 className="text-xl font-black uppercase">{t('filters')}</h2>
                   <Button variant="ghost" size="sm" onClick={clearFilters} className="text-zinc-500 hover:text-red-600">
-                    Clear all
+                    {tCommon('clear_all')}
                   </Button>
                 </div>
                 
                 <div className="flex-1 overflow-y-auto p-6 space-y-8">
                   {/* Vehicle Type */}
                   <div className="space-y-4">
-                    <h3 className="font-bold text-sm uppercase text-zinc-500 tracking-wider">Vehicle Type</h3>
+                    <h3 className="font-bold text-sm uppercase text-zinc-500 tracking-wider">{t('category')}</h3>
                     <div className="grid grid-cols-2 gap-3">
                       {categoriesList.map(cat => (
                         <div 
@@ -187,7 +192,7 @@ export function FleetFilters({
 
                   {/* Features */}
                   <div className="space-y-4">
-                    <h3 className="font-bold text-sm uppercase text-zinc-500 tracking-wider">Features</h3>
+                    <h3 className="font-bold text-sm uppercase text-zinc-500 tracking-wider">{t('features')}</h3>
                     <div className="flex flex-wrap gap-3">
                        <div 
                         className={cn(
@@ -198,7 +203,7 @@ export function FleetFilters({
                         )}
                         onClick={() => setGuaranteedModel(!guaranteedModel)}
                       >
-                        <Check className="w-4 h-4" /> Guaranteed Model
+                        <Check className="w-4 h-4" /> {t('guaranteed_model')}
                       </div>
                       {transmissionsList.map(t => (
                         <div 
@@ -211,7 +216,7 @@ export function FleetFilters({
                           )}
                           onClick={() => toggleSelection(selectedTransmissions, t, setSelectedTransmissions)}
                         >
-                          <Gauge className="w-4 h-4" /> {t === 'AUTOMATIC' ? 'Automatic' : 'Manual'}
+                          <Gauge className="w-4 h-4" /> {t === 'AUTOMATIC' ? tCommon('automatic') : tCommon('manual')}
                         </div>
                       ))}
                        {fuelTypesList.map(f => (
@@ -225,7 +230,7 @@ export function FleetFilters({
                           )}
                           onClick={() => toggleSelection(selectedFuelTypes, f, setSelectedFuelTypes)}
                         >
-                          <Fuel className="w-4 h-4" /> {f.charAt(0) + f.slice(1).toLowerCase()}
+                          <Fuel className="w-4 h-4" /> {tCommon(f.toLowerCase())}
                         </div>
                       ))}
                     </div>
@@ -233,7 +238,7 @@ export function FleetFilters({
 
                   {/* Seats */}
                   <div className="space-y-4">
-                    <h3 className="font-bold text-sm uppercase text-zinc-500 tracking-wider">Seats</h3>
+                    <h3 className="font-bold text-sm uppercase text-zinc-500 tracking-wider">{t('seats')}</h3>
                     <div className="flex flex-wrap gap-3">
                       {seatsList.map(num => (
                         <div 
@@ -246,7 +251,7 @@ export function FleetFilters({
                           )}
                           onClick={() => toggleSelection(selectedSeats, num.toString(), setSelectedSeats)}
                         >
-                          <Users className="w-4 h-4" /> {num} Seats
+                          <Users className="w-4 h-4" /> {num} {t('seats')}
                         </div>
                       ))}
                     </div>
