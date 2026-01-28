@@ -10,7 +10,7 @@ const categorySchema = z.object({
   description: z.string().optional(),
 })
 
-export async function createCategory(prevState: any, formData: FormData) {
+export async function createCategory(formData: FormData) {
   try {
     const data = {
       name: formData.get("name") as string,
@@ -25,9 +25,10 @@ export async function createCategory(prevState: any, formData: FormData) {
     })
 
     revalidatePath("/admin/categories")
-    return { success: true }
+    // return { success: true }
   } catch (error) {
-    return { error: "Failed to create category" }
+    // return { error: "Failed to create category" }
+    console.error("Failed to create category:", error)
   }
 }
 
@@ -35,8 +36,9 @@ export async function deleteCategory(id: string) {
   try {
     await prisma.category.delete({ where: { id } })
     revalidatePath("/admin/categories")
-    return { success: true }
+    // return { success: true }
   } catch (error) {
-    return { error: "Failed to delete category" }
+    // return { error: "Failed to delete category" }
+    console.error("Failed to delete category:", error)
   }
 }

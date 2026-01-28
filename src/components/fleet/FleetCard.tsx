@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { Users, Briefcase, Gauge, Info, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -92,10 +93,12 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
 
           {/* Car Image - Clean on white */}
           <div className="relative h-48 -mt-8 mb-4 flex items-center justify-center p-4">
-            <img 
+            <Image 
               src={imageUrl} 
               alt={`${car.make} ${car.model}`} 
-              className="w-full h-full object-contain drop-shadow-xl group-hover:scale-105 transition-transform duration-500 relative z-0"
+              fill
+              className="object-contain drop-shadow-xl group-hover:scale-105 transition-transform duration-500 relative z-0"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           </div>
 
@@ -127,11 +130,13 @@ export function FleetCard({ car, diffDays, imageUrl }: FleetCardProps) {
                <p className="text-zinc-500 font-medium">{car.orSimilar ? "or similar | " : ""}{car.category}</p>
              </div>
              
-             <div className="flex-grow flex items-center justify-center relative my-8">
-                <img 
+             <div className="flex-grow flex items-center justify-center relative my-8 h-64">
+                <Image 
                   src={imageUrl} 
                   alt={`${car.make} ${car.model}`} 
-                  className="w-full object-contain drop-shadow-2xl scale-110"
+                  fill
+                  className="object-contain drop-shadow-2xl scale-110"
+                  sizes="(max-width: 768px) 100vw, 50vw"
                 />
              </div>
 

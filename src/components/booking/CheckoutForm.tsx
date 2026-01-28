@@ -419,7 +419,14 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
             <div className="p-6 border-b border-zinc-800">
               <h3 className="text-lg font-bold mb-4">Booking Summary</h3>
               <div className="flex items-start gap-4 mb-6">
-                <img src={car.imageUrl} alt={car.model} className="w-24 h-16 object-cover rounded-lg bg-white" />
+                <div className="relative w-24 h-16 bg-white rounded-lg overflow-hidden">
+                  <Image 
+                    src={car.imageUrl} 
+                    alt={car.model} 
+                    fill
+                    className="object-cover"
+                  />
+                </div>
                 <div>
                   <div className="font-black uppercase text-lg leading-tight">{car.make} {car.model}</div>
                   <div className="text-zinc-400 text-sm">{car.category}</div>
