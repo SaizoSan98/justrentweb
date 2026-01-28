@@ -17,6 +17,7 @@ export const dictionaries = {
       pickup_return: "Pick-up & Return",
       pickup_date: "Pick-up Date",
       return_date: "Return Date",
+      pick_date: "Pick a date",
       time: "Time",
       show_cars: "Show Cars",
       why_choose: "Why Choose JustRent?",
@@ -59,7 +60,8 @@ export const dictionaries = {
       deposit: "Security Deposit",
       excess: "Insurance Excess",
       bags: "Bags",
-      guaranteed_model: "Guaranteed Model"
+      guaranteed_model: "Guaranteed Model",
+      unlimited_mileage: "Unlimited Mileage"
     },
     booking: {
       customize_title: "Customize Your Booking",
