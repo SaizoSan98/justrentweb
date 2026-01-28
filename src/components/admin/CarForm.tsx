@@ -100,6 +100,12 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
 
+    // Log form data for debugging
+    console.log("Form Data Entries:")
+    for (const [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`)
+    }
+
     // Basic validation
     const make = formData.get('make')
     const model = formData.get('model')
@@ -128,15 +134,17 @@ export function CarForm({ car, categories = [], isEditing = false }: CarFormProp
         result = await createCar(formData)
       }
 
+      console.log("Server Result:", result)
+
       if (result.success) {
         toast.success(isEditing ? "Car updated successfully" : "Car created successfully")
         router.push('/admin/cars')
       } else {
         throw new Error(result.error || "Unknown error")
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting form:", error)
-      toast.error("Failed to save car. Please try again.")
+      toast.error(`Failed to save car: ${error.message}`)
     } finally {
       setIsSubmitting(false)
     }
