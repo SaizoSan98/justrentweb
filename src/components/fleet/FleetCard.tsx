@@ -159,7 +159,7 @@ export function FleetCard({
         <h3 className="text-2xl font-black text-zinc-900 uppercase tracking-tight mb-1">
           {car.make} {car.model}
         </h3>
-        <p className="text-zinc-500 text-sm font-medium mb-4">{car.orSimilar ? "or similar | " : ""}{car.category}</p>
+        <p className="text-zinc-500 text-sm font-medium mb-4">{car.orSimilar ? `${t('similar')} | ` : ""}{car.category}</p>
         
         <div className="flex gap-4 mb-4">
           <div className="flex items-center gap-1.5 bg-zinc-100 px-2 py-1 rounded text-zinc-600 text-xs font-bold border border-zinc-200">
@@ -169,7 +169,7 @@ export function FleetCard({
             <Briefcase className="w-3.5 h-3.5" /> {car.suitcases}
           </div>
           <div className="flex items-center gap-1.5 bg-zinc-100 px-2 py-1 rounded text-zinc-600 text-xs font-bold border border-zinc-200">
-            <Settings className="w-3.5 h-3.5" /> {car.transmission === 'AUTOMATIC' ? 'Automatic' : 'Manual'}
+            <Settings className="w-3.5 h-3.5" /> {tCommon(car.transmission === 'AUTOMATIC' ? 'automatic' : 'manual')}
           </div>
         </div>
       </div>
@@ -188,15 +188,15 @@ export function FleetCard({
       {/* Footer Price */}
       <div className="mt-auto p-6 pt-0 relative z-20">
          <div className="flex items-center gap-2 mb-2 text-zinc-900 text-xs font-bold">
-            <Check className="w-3 h-3 text-red-600" /> {car.dailyMileageLimit ? `${car.dailyMileageLimit} km / day` : "Unlimited Mileage"}
+            <Check className="w-3 h-3 text-red-600" /> {car.dailyMileageLimit ? `${car.dailyMileageLimit} ${tCommon('km')} / ${tCommon('day')}` : t('unlimited_mileage')}
          </div>
          <div className="flex items-end justify-between">
            <div>
              <span className="text-2xl font-black text-red-600">€{basePricePerDay.toLocaleString()}</span>
-             <span className="text-zinc-500 text-sm font-medium"> /day</span>
+             <span className="text-zinc-500 text-sm font-medium"> /{tCommon('day')}</span>
            </div>
            <div className="text-zinc-400 text-xs text-right font-medium">
-             {diffDays} days
+             {diffDays} {tCommon('days')}
            </div>
          </div>
       </div>
