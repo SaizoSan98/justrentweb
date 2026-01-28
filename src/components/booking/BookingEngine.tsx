@@ -275,7 +275,7 @@ export function BookingEngine({
             </div>
 
             {/* Search Button - 2 cols */}
-            <div className="lg:col-span-2">
+            <div className={cn("lg:col-span-2", compact && "lg:col-span-12 md:col-span-12")}>
               <Button 
                 size="lg" 
                 className={cn(
