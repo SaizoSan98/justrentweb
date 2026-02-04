@@ -17,8 +17,6 @@ import {
 } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 
-import { createBooking } from "@/app/fleet/actions"
-
 type PricingTier = {
   minDays: number
   maxDays: number | null
