@@ -48,9 +48,9 @@ async function uploadImage(file: File): Promise<string | null> {
     
     // Return public URL
     return `/uploads/${filename}`
-  } catch (error) {
+  } catch (error: any) {
     console.error("Local file upload failed:", error)
-    throw new Error("Failed to save image locally")
+    throw new Error(`Failed to save image locally: ${error.message}`)
   }
 }
 

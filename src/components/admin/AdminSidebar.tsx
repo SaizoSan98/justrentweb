@@ -13,7 +13,8 @@ import {
   Tag,
   Settings,
   Users,
-  Shield
+  Shield,
+  ArrowLeft
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -35,6 +36,12 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
   return (
     <aside className="w-64 bg-white border-r border-zinc-100 text-zinc-900 flex flex-col fixed top-0 bottom-0 z-40 overflow-y-auto">
       <div className="p-6 border-b border-zinc-100">
+        <Link href="/" className="mb-4 block">
+          <Button variant="outline" size="sm" className="w-full mb-4 border-zinc-200 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50">
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Home
+          </Button>
+        </Link>
         <div className="mb-4">
           <Logo variant="dark" className="scale-100 origin-left" />
         </div>

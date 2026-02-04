@@ -7,7 +7,8 @@ import {
   Calendar, 
   User, 
   LogOut,
-  Car
+  Car,
+  ArrowLeft
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { logoutAction } from "@/app/admin/actions" // Reuse logout
@@ -32,6 +33,12 @@ export default async function DashboardLayout({
       {/* Sidebar - Sticky & Scrollable */}
       <aside className="w-64 bg-white border-r border-zinc-200 hidden md:flex flex-col fixed top-0 left-0 bottom-0 z-50 overflow-y-auto">
         <div className="p-6 border-b border-zinc-100">
+          <Link href="/" className="mb-4 block">
+            <Button variant="outline" size="sm" className="w-full mb-4 border-zinc-200 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Home
+            </Button>
+          </Link>
           <Link href="/" className="block">
             <div className="mb-2">
               <Logo variant="dark" />
@@ -91,8 +98,9 @@ export default async function DashboardLayout({
         <main className="flex-1 p-4 md:p-8 overflow-y-auto">
           {/* Mobile Header */}
           <div className="md:hidden flex justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-zinc-200">
-             <Link href="/" className="text-xl font-black tracking-tight">
-              JUST <span className="text-red-600">RENT</span>
+             <Link href="/" className="text-xl font-black tracking-tight flex items-center gap-2">
+              <ArrowLeft className="w-5 h-5 text-zinc-500" />
+              <span>JUST <span className="text-red-600">RENT</span></span>
             </Link>
              <form action={logoutAction}>
               <Button variant="ghost" size="sm">

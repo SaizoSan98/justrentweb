@@ -2,7 +2,7 @@
 "use client"
 
 import * as React from "react"
-import { Calendar as CalendarIcon, MapPin, Clock, ArrowRightArrowLeft, ChevronDown } from "lucide-react"
+import { Calendar as CalendarIcon, MapPin, Clock, ArrowRightLeft, ChevronDown } from "lucide-react"
 import { format, differenceInDays, isBefore, startOfDay, addHours } from "date-fns"
 import { useRouter } from "next/navigation"
 import { DateRange } from "react-day-picker"
@@ -210,7 +210,7 @@ export function BookingEngine({
                 onClick={handleSearch}
                 className="bg-black hover:bg-zinc-800 text-white rounded-xl px-8 h-12 font-bold w-full md:w-auto"
             >
-                Search <ArrowRightArrowLeft className="w-4 h-4 ml-2" />
+                Search <ArrowRightLeft className="w-4 h-4 ml-2" />
             </Button>
          </div>
       </div>

@@ -495,7 +495,7 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
               </div>
               
               <div className="grid gap-6">
-                {insurancePlans.filter(p => !p.name.toLowerCase().includes('basic')).map((plan: any) => (
+                {insurancePlans.filter(p => p.name !== 'Basic').map((plan: any) => (
                   <div key={plan.id} className="grid md:grid-cols-3 gap-4 p-4 border rounded-lg bg-zinc-50/50">
                     <div className="flex flex-col justify-center">
                       <h4 className="font-bold">{plan.name}</h4>
