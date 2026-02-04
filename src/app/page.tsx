@@ -44,15 +44,15 @@ export default async function LandingPage() {
   const t = (key: string, section: string = "hero") => (dictionary as any)?.[section]?.[key] || key
 
   return (
-    <div className="flex flex-col min-h-screen bg-white font-sans selection:bg-black selection:text-white">
-      {/* Navbar */}
+    <div className="flex flex-col min-h-screen bg-zinc-50 font-sans selection:bg-black selection:text-white">
+      {/* Navbar - Now floating inside/above the hero via CSS */}
       <Header transparent={true} user={session?.user} dictionary={dictionary} lang={lang} />
 
-      {/* Hero Section */}
+      {/* Hero Section - The Card */}
       <Hero dictionary={dictionary} />
 
       {/* Floating Booking Engine - Bridging Hero & Content */}
-      <div className="container mx-auto px-6 relative z-30 -mt-32 mb-32">
+      <div className="container mx-auto px-6 relative z-30 -mt-24 mb-32">
         <div className="bg-white/70 backdrop-blur-xl border border-white/40 p-1 rounded-[2.5rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.1)]">
           <div className="bg-white rounded-[2rem] p-6 border border-zinc-100/50">
              <BookingEngine dictionary={dictionary} />

@@ -25,7 +25,7 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50)
+      setIsScrolled(window.scrollY > 20)
     }
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
@@ -45,76 +45,63 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
       .slice(0, 2) || "U";
   }
 
-  const isTransparent = transparent && !isScrolled
-  const textColor = isTransparent ? "text-white" : "text-zinc-900"
-  const navHoverColor = isTransparent ? "hover:text-red-400" : "hover:text-red-600"
-
+  // Always white text on transparent, black on white background
+  // Floating pill style logic
+  const isFloating = true; 
+  
   return (
-    <header className={cn(
-      "fixed top-0 w-full z-50 transition-all duration-300 border-b",
-      isTransparent 
-        ? "bg-transparent border-transparent py-4" 
-        : "bg-white/95 backdrop-blur-md border-zinc-200 py-2 shadow-sm"
-    )}>
-      <div className="container mx-auto px-6 flex items-center justify-between">
-        {/* Logo */}
-        <Link href="/" className="flex items-center group">
-          <Logo 
-            className="scale-125 origin-left transition-transform group-hover:scale-110" 
-            variant={isTransparent ? "light" : "dark"} 
-          />
-        </Link>
+    <div className="fixed top-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
+      <header className={cn(
+        "pointer-events-auto transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+        "flex items-center justify-between px-2 py-2 rounded-full",
+        "bg-white/90 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.12)]",
+        isScrolled ? "w-[90%] md:w-[70%] lg:w-[50%]" : "w-[95%] md:w-[85%] lg:w-[1200px]"
+      )}>
+        <div className="flex items-center gap-1 pl-4">
+          {/* Logo */}
+          <Link href="/" className="flex items-center group mr-8">
+             <Logo variant="dark" className="scale-90 origin-left" />
+          </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex gap-8 text-sm font-bold tracking-wide uppercase">
-          <Link href="/" className={cn("transition-colors", textColor, navHoverColor)}>{t('home')}</Link>
-          <Link href="/fleet" className={cn("transition-colors", textColor, navHoverColor)}>{t('fleet')}</Link>
-          <Link href="#contact" className={cn("transition-colors", textColor, navHoverColor)}>{t('contact')}</Link>
-        </nav>
+          {/* Desktop Nav - Now Pill Style */}
+          <nav className="hidden md:flex items-center bg-zinc-100/50 rounded-full px-1 py-1">
+            {[
+              { href: "/", label: t('home') },
+              { href: "/fleet", label: t('fleet') },
+              { href: "/contact", label: t('contact') }
+            ].map((link) => (
+              <Link 
+                key={link.href}
+                href={link.href} 
+                className="px-5 py-2 rounded-full text-sm font-bold text-zinc-600 hover:text-zinc-900 hover:bg-white transition-all duration-300"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-2 pr-2">
           {/* Language Selector */}
-          <div className={isTransparent ? "text-white" : "text-zinc-900"}>
+          <div className="hidden sm:block text-zinc-900">
             <LanguageSwitcher currentLang={lang} />
           </div>
 
-          <div className={cn("w-px h-6 hidden md:block", isTransparent ? "bg-white/20" : "bg-zinc-200")} />
-
           {/* Auth Trigger */}
           {user ? (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
               <Link href={user.role === 'ADMIN' ? "/admin" : "/dashboard"}>
-                <Button variant="ghost" className={cn("hidden md:flex items-center gap-2 hover:bg-transparent p-0 h-auto transition-colors group font-normal", textColor, navHoverColor)}>
-                  <div className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 shadow-sm group-hover:shadow-md text-xs font-bold",
-                    isTransparent ? "bg-white/10 text-white group-hover:bg-white/20" : "bg-zinc-100 text-zinc-900 group-hover:bg-red-50"
-                  )}>
-                    {getInitials(user.name)}
-                  </div>
-                  <span className="text-sm font-bold uppercase group-hover:underline decoration-2 underline-offset-4">
-                    {t('welcome')}, {getInitials(user.name)}
-                  </span>
+                <Button variant="ghost" className="rounded-full w-10 h-10 p-0 bg-zinc-900 text-white hover:bg-zinc-800 hover:scale-105 transition-all">
+                   <span className="text-xs font-bold">{getInitials(user.name)}</span>
                 </Button>
               </Link>
-              <form action={logoutAction}>
-                <Button variant="ghost" size="sm" className={cn("hover:text-red-600", isTransparent ? "text-zinc-300" : "text-zinc-500")}>
-                  <LogOut className="w-4 h-4 mr-2" />
-                  {t('signout')}
-                </Button>
-              </form>
             </div>
           ) : (
             <AuthModal 
               trigger={
-                <Button variant="ghost" className={cn("hidden md:flex items-center gap-2 hover:bg-transparent p-0 h-auto transition-colors group font-normal", textColor, navHoverColor)}>
-                  <div className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 shadow-sm group-hover:shadow-md",
-                    isTransparent ? "bg-white/10 text-white group-hover:bg-white/20" : "bg-zinc-100 text-zinc-900 group-hover:bg-red-50"
-                  )}>
-                    <User className="w-4 h-4" />
-                  </div>
-                  <span className="text-sm font-bold uppercase group-hover:underline decoration-2 underline-offset-4">{t('login')} | {t('register')}</span>
+                <Button className="rounded-full bg-zinc-900 text-white hover:bg-zinc-800 px-6 font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+                  {t('login')}
                 </Button>
               }
             />
@@ -123,91 +110,29 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
           {/* Mobile Menu Toggle */}
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className={cn("md:hidden", textColor)}>
-                <Menu className="w-6 h-6" />
+              <Button variant="ghost" size="icon" className="md:hidden text-zinc-900 rounded-full w-10 h-10 hover:bg-zinc-100">
+                <Menu className="w-5 h-5" />
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-white p-0 flex flex-col">
+              {/* ... existing mobile menu content ... */}
               <div className="p-6 border-b border-zinc-100 flex items-center justify-between">
                 <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
                   <Logo variant="dark" />
                 </Link>
-                {/* Close button is automatically added by SheetContent, but we can customize if needed */}
               </div>
               
               <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
                 <nav className="flex flex-col gap-4">
-                  <Link 
-                    href="/" 
-                    className="text-lg font-bold text-zinc-900 hover:text-red-600 transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {t('home')}
-                  </Link>
-                  <Link 
-                    href="/fleet" 
-                    className="text-lg font-bold text-zinc-900 hover:text-red-600 transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {t('fleet')}
-                  </Link>
-                  <Link 
-                    href="#contact" 
-                    className="text-lg font-bold text-zinc-900 hover:text-red-600 transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {t('contact')}
-                  </Link>
+                  <Link href="/" className="text-lg font-bold text-zinc-900" onClick={() => setIsMobileMenuOpen(false)}>{t('home')}</Link>
+                  <Link href="/fleet" className="text-lg font-bold text-zinc-900" onClick={() => setIsMobileMenuOpen(false)}>{t('fleet')}</Link>
+                  <Link href="/contact" className="text-lg font-bold text-zinc-900" onClick={() => setIsMobileMenuOpen(false)}>{t('contact')}</Link>
                 </nav>
-
-                <div className="h-px bg-zinc-100 w-full my-2" />
-
-                {/* Mobile Auth */}
-                {user ? (
-                  <div className="flex flex-col gap-4">
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-900 font-bold border border-zinc-200">
-                        {getInitials(user.name)}
-                      </div>
-                      <div>
-                        <div className="font-bold text-zinc-900">{user.name || "User"}</div>
-                        <div className="text-xs text-zinc-500">{user.email}</div>
-                      </div>
-                    </div>
-                    
-                    <Link href={user.role === 'ADMIN' ? "/admin" : "/dashboard"} onClick={() => setIsMobileMenuOpen(false)}>
-                      <Button variant="outline" className="w-full justify-start">
-                        <User className="w-4 h-4 mr-2" />
-                        {t('profile')}
-                      </Button>
-                    </Link>
-                    
-                    <form action={async () => {
-                      await logoutAction()
-                      setIsMobileMenuOpen(false)
-                    }}>
-                      <Button variant="ghost" className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50">
-                        <LogOut className="w-4 h-4 mr-2" />
-                        {t('signout')}
-                      </Button>
-                    </form>
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-3">
-                    <AuthModal 
-                      trigger={
-                        <Button className="w-full bg-zinc-900 text-white hover:bg-zinc-800">
-                          {t('login')} / {t('register')}
-                        </Button>
-                      }
-                    />
-                  </div>
-                )}
               </div>
             </SheetContent>
           </Sheet>
         </div>
-      </div>
-    </header>
+      </header>
+    </div>
   )
 }
