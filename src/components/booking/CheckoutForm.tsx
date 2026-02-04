@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react"
 import Image from "next/image"
 import { differenceInDays, format, addDays } from "date-fns"
-import { Calendar, MapPin, Check, ShieldCheck, CreditCard, Wallet, PlaneLanding, PlaneTakeoff, Baby, User, Map as MapIcon, Snowflake, Star, Clock, Edit2, Gauge } from "lucide-react"
+import { Calendar as CalendarIcon, MapPin, Check, ShieldCheck, CreditCard, Wallet, PlaneLanding, PlaneTakeoff, Baby, User, Map as MapIcon, Snowflake, Star, Clock, Edit2, Gauge } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -14,6 +14,12 @@ import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
 import { createBooking } from "@/app/actions/booking"
 import { useRouter } from "next/navigation"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Calendar } from "@/components/ui/calendar"
 
 const ICON_MAP: Record<string, any> = {
   Map: MapIcon,
@@ -61,6 +67,12 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
   const [termsAccepted, setTermsAccepted] = useState(false)
   
   // Calculation Logic
+  const TIME_OPTIONS = Array.from({ length: 48 }).map((_, i) => {
+    const h = Math.floor(i / 2)
+    const m = i % 2 === 0 ? "00" : "30"
+    return `${h.toString().padStart(2, '0')}:${m}`
+  })
+
   const calculateDays = () => {
     if (!endDate) return 1
     // Combine date and time
@@ -565,18 +577,76 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
               
               <div className="space-y-4 text-sm">
                 <div className="flex items-center gap-3">
-                  <Calendar className="w-4 h-4 text-red-500" />
+                  <CalendarIcon className="w-4 h-4 text-red-500" />
                   <div>
                     <div className="text-zinc-400 text-xs">Pick-up</div>
-                    <div className="font-bold">{format(startDate, 'MMM d, yyyy')} {startTime}</div>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <button className="font-bold hover:bg-zinc-100 px-1 -ml-1 rounded transition-colors text-left">
+                                {format(startDate, 'MMM d, yyyy')} {startTime}
+                            </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-4 flex gap-4" align="start">
+                            <Calendar
+                                mode="single"
+                                selected={startDate}
+                                onSelect={(date) => date && setStartDate(date)}
+                                disabled={(date) => date < new Date()}
+                            />
+                            <div className="h-[300px] w-px bg-zinc-100" />
+                            <div className="h-[300px] overflow-y-auto w-24 space-y-1 pr-2">
+                                {TIME_OPTIONS.map(time => (
+                                    <button
+                                        key={time}
+                                        onClick={() => setStartTime(time)}
+                                        className={cn(
+                                            "w-full text-xs font-bold py-2 rounded-md hover:bg-zinc-100 transition-colors",
+                                            startTime === time ? "bg-black text-white hover:bg-black" : "text-zinc-600"
+                                        )}
+                                    >
+                                        {time}
+                                    </button>
+                                ))}
+                            </div>
+                        </PopoverContent>
+                    </Popover>
                     <div className="text-zinc-500 text-xs">{pickupLocation}</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Calendar className="w-4 h-4 text-red-500" />
+                  <CalendarIcon className="w-4 h-4 text-red-500" />
                   <div>
                     <div className="text-zinc-400 text-xs">Drop-off</div>
-                    <div className="font-bold">{endDate ? format(endDate, 'MMM d, yyyy') : 'Select Date'} {endTime}</div>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <button className="font-bold hover:bg-zinc-100 px-1 -ml-1 rounded transition-colors text-left">
+                                {endDate ? format(endDate, 'MMM d, yyyy') : 'Select Date'} {endTime}
+                            </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-4 flex gap-4" align="start">
+                            <Calendar
+                                mode="single"
+                                selected={endDate}
+                                onSelect={(date) => date && setEndDate(date)}
+                                disabled={(date) => date < startDate}
+                            />
+                            <div className="h-[300px] w-px bg-zinc-100" />
+                            <div className="h-[300px] overflow-y-auto w-24 space-y-1 pr-2">
+                                {TIME_OPTIONS.map(time => (
+                                    <button
+                                        key={time}
+                                        onClick={() => setEndTime(time)}
+                                        className={cn(
+                                            "w-full text-xs font-bold py-2 rounded-md hover:bg-zinc-100 transition-colors",
+                                            endTime === time ? "bg-black text-white hover:bg-black" : "text-zinc-600"
+                                        )}
+                                    >
+                                        {time}
+                                    </button>
+                                ))}
+                            </div>
+                        </PopoverContent>
+                    </Popover>
                     <div className="text-zinc-500 text-xs">{dropoffLocation}</div>
                   </div>
                 </div>

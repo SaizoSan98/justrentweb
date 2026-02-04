@@ -195,15 +195,14 @@ export default async function FleetPage({
          <div className="container mx-auto px-4 md:px-6">
             {/* Top Search & Filter Bar */}
             <div className="mb-12">
-                <div className="bg-white rounded-3xl p-2 shadow-sm mb-12">
-                     <BookingEngine 
-                        initialStartDate={startDate} 
-                        initialEndDate={endDate} 
-                        compact={true} 
-                        className="!p-0 !shadow-none !bg-transparent" 
-                        dictionary={dictionary} 
-                     />
-                </div>
+                 <BookingEngine 
+                    initialStartDate={startDate} 
+                    initialEndDate={endDate}
+                    compact={true}
+                    className="!p-0 !shadow-none !bg-transparent"
+                    dictionary={dictionary}
+                 />
+            </div>
 
                 <div className="flex flex-col md:flex-row justify-between items-end gap-4 border-b border-zinc-100 pb-4">
                     <div className="flex-1">

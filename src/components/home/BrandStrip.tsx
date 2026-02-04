@@ -16,7 +16,7 @@ export function BrandStrip() {
     { name: "Peugeot", slug: "peugeot" },
     { name: "Renault", slug: "renault" },
     { name: "Citroën", slug: "citroen" },
-    { name: "Range Rover", slug: "landrover" }, // Using Land Rover logo for Range Rover
+    { name: "Land Rover", slug: "landrover" }, 
     { name: "Nissan", slug: "nissan" },
     { name: "Mazda", slug: "mazda" },
     { name: "Toyota", slug: "toyota" },
