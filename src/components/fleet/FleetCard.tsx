@@ -150,82 +150,84 @@ export function FleetCard({
       extras={extras}
     />
 
-    <div className="group relative bg-white border border-zinc-100 hover:border-zinc-200 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-      <div className="p-6">
+    <div className="group relative bg-white border border-zinc-100 hover:border-zinc-200 rounded-[2rem] overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+      <div className="p-8">
         {/* Header */}
-        <div className="flex justify-between items-start mb-4">
-            <div>
-                <h3 className="text-2xl font-bold text-zinc-900 mb-1">{car.make} {car.model}</h3>
-                <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider border border-zinc-200 px-2 py-0.5 rounded-sm">
-                        Or Similar {car.categories?.map(c => c.name).join(', ')}
+        <div className="flex justify-between items-start mb-6">
+            <div className="space-y-2">
+                <h3 className="text-3xl font-black text-zinc-900 tracking-tight">{car.make} {car.model}</h3>
+                <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest border border-zinc-200 px-3 py-1 rounded-full">
+                        OR SIMILAR {car.categories?.map(c => c.name).join(', ').toUpperCase()}
                     </span>
-                    <span className="text-xs font-bold text-white bg-red-600 px-2 py-0.5 rounded-sm">
+                    <span className="text-[10px] font-bold text-white bg-[#ff5f00] px-3 py-1 rounded-full uppercase tracking-widest">
                         ADVICE OF THE DAY
                     </span>
                 </div>
             </div>
-            {/* Icons */}
-            <div className="flex gap-4 text-zinc-400">
-                <div className="flex flex-col items-center">
-                    <Users className="w-4 h-4 mb-1" />
-                    <span className="text-[10px] font-bold">{car.seats}</span>
+            
+            {/* ACRISS Icons - Minimalist */}
+            <div className="flex gap-6 text-zinc-400">
+                <div className="flex flex-col items-center gap-1">
+                    <Users className="w-5 h-5 stroke-[1.5]" />
+                    <span className="text-xs font-bold">{car.seats}</span>
                 </div>
-                <div className="flex flex-col items-center">
-                    <Briefcase className="w-4 h-4 mb-1" />
-                    <span className="text-[10px] font-bold">{car.suitcases}</span>
+                <div className="flex flex-col items-center gap-1">
+                    <Briefcase className="w-5 h-5 stroke-[1.5]" />
+                    <span className="text-xs font-bold">{car.suitcases}</span>
                 </div>
-                <div className="flex flex-col items-center">
-                    <Gauge className="w-4 h-4 mb-1" />
-                    <span className="text-[10px] font-bold">{car.transmission === 'AUTOMATIC' ? 'A' : 'M'}</span>
+                <div className="flex flex-col items-center gap-1">
+                    <Gauge className="w-5 h-5 stroke-[1.5]" />
+                    <span className="text-xs font-bold">{car.transmission === 'AUTOMATIC' ? 'A' : 'M'}</span>
                 </div>
             </div>
         </div>
 
         {/* Content Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             {/* Image */}
-            <div className="relative aspect-[16/9] w-full">
+            <div className="relative aspect-[16/10] w-full flex items-center justify-center p-4">
                 <Image
                   src={car.imageUrl || "/placeholder-car.png"}
                   alt={`${car.make} ${car.model}`}
                   fill
-                  className="object-contain"
+                  className="object-contain hover:scale-105 transition-transform duration-500"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
             </div>
 
             {/* Pricing & CTA */}
-            <div className="flex flex-col justify-between h-full py-4">
-                <div className="space-y-1">
-                    <div className="flex items-baseline gap-1">
-                        <span className="text-3xl font-bold text-zinc-900">{pricePerDay.toLocaleString()} €</span>
-                        <span className="text-sm text-zinc-500">/ day</span>
+            <div className="flex flex-col justify-center h-full space-y-8 pl-4 border-l border-zinc-100/0 md:border-zinc-100">
+                <div className="space-y-1 text-right md:text-left">
+                    <div className="flex items-baseline justify-end md:justify-start gap-1">
+                        <span className="text-5xl font-black text-zinc-900 tracking-tighter">{pricePerDay.toLocaleString()} €</span>
+                        <span className="text-lg font-medium text-zinc-400">/ day</span>
                     </div>
-                    <div className="text-sm text-zinc-500">
-                        {totalPrice.toLocaleString()} € TOTAL PRICE
+                    <div className="text-sm font-medium text-zinc-400 uppercase tracking-wide">
+                        {totalPrice.toLocaleString()} € Total Price
                     </div>
-                    <div className="text-xs text-zinc-600 mt-2">
+                    <div className="text-sm font-medium text-zinc-900 mt-2">
                         {car.dailyMileageLimit ? `${car.dailyMileageLimit} km per rental` : 'Unlimited Mileage'}
                     </div>
                 </div>
 
-                <div className="mt-8 space-y-3">
-                    <div className="flex items-center gap-2 text-xs text-green-600 font-bold">
-                        <Check className="w-3 h-3" />
+                <div className="space-y-3">
+                    <div className="flex items-center justify-end md:justify-start gap-2 text-xs font-bold text-green-600 uppercase tracking-wide">
+                        <Check className="w-4 h-4" />
                         <span>Free Cancellation</span>
                     </div>
-                    <div className="flex items-center gap-2 text-xs text-green-600 font-bold">
-                        <Check className="w-3 h-3" />
+                    <div className="flex items-center justify-end md:justify-start gap-2 text-xs font-bold text-green-600 uppercase tracking-wide">
+                        <Check className="w-4 h-4" />
                         <span>Instant Confirmation</span>
                     </div>
-                    
-                    <Button 
-                        onClick={handleBooking}
-                        className="w-full mt-4 bg-zinc-900 text-white hover:bg-zinc-800 font-bold rounded-xl h-12 text-lg"
-                    >
-                        CHOOSE
-                    </Button>
                 </div>
+
+                <Button 
+                    onClick={handleBooking}
+                    className="w-full bg-[#1a1a1a] text-white hover:bg-black font-bold rounded-xl h-14 text-lg uppercase tracking-wider shadow-lg hover:shadow-xl transition-all"
+                >
+                    CHOOSE
+                </Button>
             </div>
         </div>
       </div>

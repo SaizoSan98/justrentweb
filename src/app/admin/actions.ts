@@ -29,6 +29,13 @@ async function uploadImage(file: File): Promise<string | null> {
   }
 
     // 2. Local Storage Fallback
+    // WARNING: This will NOT work in Vercel Production environments.
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(
+        "Vercel Blob is not configured. Please add BLOB_READ_WRITE_TOKEN to your environment variables to enable image uploads in production."
+      )
+    }
+
     try {
       const bytes = await file.arrayBuffer()
       const buffer = Buffer.from(bytes)

@@ -113,7 +113,7 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
   // Mileage Cost
   const mileageCost = mileageOption === 'UNLIMITED' ? ((car.unlimitedMileagePrice || 0) * days) : 0
 
-  // Insurance Cost & Deposit
+  // Insurance Cost
   const selectedInsurance = car.insuranceOptions?.find((o: any) => o.planId === selectedInsuranceId)
   const insuranceCost = selectedInsurance ? selectedInsurance.pricePerDay * days : 0
   const currentDeposit = selectedInsurance ? selectedInsurance.deposit : (car.deposit || 0)
@@ -170,7 +170,7 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-5xl h-[90vh] overflow-hidden flex flex-col p-0 gap-0 bg-zinc-50 border-none">
+      <DialogContent className="max-w-5xl h-[90vh] overflow-hidden flex flex-col p-0 gap-0 bg-zinc-50 border-none [&>button]:hidden">
         
         {/* Header / Stepper */}
         <div className="bg-white border-b border-zinc-100 p-6 flex justify-between items-center shrink-0">
@@ -243,7 +243,7 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                                      </div>
                                      <div>
                                         <div className="font-bold text-zinc-900">{basicInsurance.plan.name}</div>
-                                        <div className="text-xs text-zinc-500">Deposit: {basicInsurance.deposit.toLocaleString()} Ft</div>
+                                        <div className="text-xs text-zinc-500">Deposit: {basicInsurance.deposit?.toLocaleString() ?? 0} Ft</div>
                                      </div>
                                   </div>
                                   <span className="font-bold text-sm">Included</span>
@@ -265,7 +265,7 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                                      </div>
                                      <div>
                                         <div className="font-bold text-zinc-900">{basicPlusInsurance.plan.name}</div>
-                                        <div className="text-xs text-zinc-500">Deposit: {basicPlusInsurance.deposit.toLocaleString()} Ft</div>
+                                        <div className="text-xs text-zinc-500">Deposit: {basicPlusInsurance.deposit?.toLocaleString() ?? 0} Ft</div>
                                      </div>
                                   </div>
                                   <span className="font-bold text-sm">+{Math.round(basicPlusInsurance.pricePerDay * days).toLocaleString()} Ft</span>
@@ -348,7 +348,7 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                                    <div className="font-bold text-lg">{ins.plan.name}</div>
                                    <div className="text-sm text-zinc-500">{ins.plan.description || "Standard coverage"}</div>
                                    <div className="mt-2 flex gap-4 text-xs font-medium text-zinc-700">
-                                      <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> Deposit: {ins.deposit.toLocaleString()} Ft</span>
+                                      <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> Deposit: {ins.deposit?.toLocaleString() ?? 0} Ft</span>
                                    </div>
                                 </div>
                              </div>

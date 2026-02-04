@@ -18,19 +18,19 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
 
   return (
     <div className="pt-24 px-4 pb-4 md:px-6 md:pb-6 bg-zinc-50">
-      <section className="relative h-[85vh] min-h-[700px] flex flex-col justify-start md:justify-center items-center overflow-hidden rounded-[2.5rem] shadow-2xl pt-20 md:pt-0">
+      <section className="relative h-[65vh] min-h-[500px] flex flex-col justify-center items-center overflow-hidden rounded-[2.5rem] shadow-2xl">
         
         {/* Background Image with Parallax-like feel */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/budapest.jpg"
+            src="/budapest2.jpg"
             alt="Car Rental Budapest"
             fill
             className="object-cover"
             priority
           />
           {/* Gradient Overlay for Text Readability */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/40" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/50" />
         </div>
 
         {/* Floating Glassmorphic Elements (Decorations) */}

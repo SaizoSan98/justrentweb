@@ -74,8 +74,8 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
     <div className="fixed top-0 left-0 right-0 z-50 flex justify-center w-full pointer-events-none">
       <header className={cn(
         "pointer-events-auto transition-all duration-300 ease-in-out w-full",
-        isScrolled 
-          ? "bg-white/90 backdrop-blur-md border-b border-zinc-200/50 py-3 shadow-sm text-zinc-900" 
+        (isScrolled || !transparent)
+          ? "bg-white/95 backdrop-blur-md border-b border-zinc-200/50 py-3 shadow-sm text-zinc-900" 
           : "bg-transparent py-6 text-white"
       )}>
         <div className="container mx-auto px-6 flex items-center justify-between">
@@ -83,7 +83,7 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
           <div className="flex items-center gap-12">
             {/* Logo */}
             <Link href="/" className="flex items-center group">
-               {isScrolled ? <Logo variant="dark" /> : <Logo variant="light" />}
+               {(isScrolled || !transparent) ? <Logo variant="dark" /> : <Logo variant="light" />}
             </Link>
 
             {/* Desktop Nav */}
@@ -97,8 +97,8 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
                   key={link.href}
                   href={link.href} 
                   className={cn(
-                    "text-sm font-medium transition-colors hover:opacity-80",
-                    isScrolled ? "text-zinc-600 hover:text-zinc-900" : "text-white/90 hover:text-white"
+                    "text-sm font-bold uppercase tracking-wide transition-colors hover:opacity-80",
+                    (isScrolled || !transparent) ? "text-zinc-800 hover:text-black" : "text-white/90 hover:text-white"
                   )}
                 >
                   {link.label}
@@ -110,8 +110,8 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
           {/* Center Search Bar (Visible on larger screens) */}
           <div className={cn(
             "hidden lg:flex flex-1 max-w-md mx-12 items-center px-4 py-2.5 rounded-full transition-all duration-300",
-            isScrolled 
-              ? "bg-zinc-100/80 border border-zinc-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-zinc-200" 
+            (isScrolled || !transparent)
+              ? "bg-zinc-100 border border-zinc-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-zinc-900 focus-within:border-transparent" 
               : "bg-white/10 backdrop-blur-md border border-white/20 focus-within:bg-white/20"
           )}>
             <form onSubmit={handleSearch} className="flex-1 flex items-center w-full">
@@ -122,12 +122,12 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className={cn(
                     "flex-1 bg-transparent border-none outline-none text-sm placeholder:text-zinc-400 w-full",
-                    isScrolled ? "text-zinc-900" : "text-white placeholder:text-white/60"
+                    (isScrolled || !transparent) ? "text-zinc-900 placeholder:text-zinc-500" : "text-white placeholder:text-white/60"
                   )}
                 />
                 <button type="submit" className={cn(
                    "ml-2",
-                   isScrolled ? "text-zinc-400 hover:text-zinc-900" : "text-white/60 hover:text-white"
+                   (isScrolled || !transparent) ? "text-zinc-500 hover:text-zinc-900" : "text-white/60 hover:text-white"
                 )}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                 </button>
@@ -148,7 +148,7 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className={cn(
                         "rounded-full w-10 h-10 p-0 hover:scale-105 transition-all cursor-pointer",
-                        isScrolled ? "bg-zinc-900 text-white hover:bg-zinc-800" : "bg-white text-zinc-900 hover:bg-white/90"
+                        (isScrolled || !transparent) ? "bg-zinc-900 text-white hover:bg-zinc-800" : "bg-white text-zinc-900 hover:bg-white/90"
                     )}>
                        <span className="text-xs font-bold">{getInitials(user.name)}</span>
                     </Button>
@@ -191,7 +191,7 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
                   trigger={
                     <button className={cn(
                         "text-sm font-bold transition-colors hover:opacity-80 hidden sm:block",
-                        isScrolled ? "text-zinc-900" : "text-white"
+                        (isScrolled || !transparent) ? "text-zinc-900" : "text-white"
                     )}>
                       Log In
                     </button>
