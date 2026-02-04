@@ -62,9 +62,9 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
            <Image 
             src="/jrlogo.PNG" 
             alt="JustRent Logo" 
-            width={400} 
-            height={150} 
-            className="h-24 md:h-32 w-auto object-contain brightness-0 invert"
+            width={600} 
+            height={225} 
+            className="h-40 md:h-64 w-auto object-contain brightness-0 invert"
             priority
           />
         </motion.div>
