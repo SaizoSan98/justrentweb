@@ -186,11 +186,11 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
                 </DropdownMenu>
               </div>
             ) : (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 sm:gap-4">
                 <AuthModal 
                   trigger={
                     <button className={cn(
-                        "text-sm font-bold transition-colors hover:opacity-80 hidden sm:block",
+                        "text-sm font-bold transition-colors hover:opacity-80",
                         (isScrolled || !transparent) ? "text-zinc-900" : "text-white"
                     )}>
                       Log In
@@ -200,7 +200,7 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
                 <AuthModal 
                   trigger={
                     <Button className={cn(
-                        "rounded-lg px-6 font-bold shadow-sm hover:shadow-md hover:scale-105 transition-all",
+                        "rounded-lg px-4 sm:px-6 font-bold shadow-sm hover:shadow-md hover:scale-105 transition-all text-xs sm:text-sm h-9 sm:h-10",
                         isScrolled ? "bg-zinc-900 text-white hover:bg-zinc-800" : "bg-white text-zinc-900 hover:bg-white/90"
                     )}>
                       Sign Up
