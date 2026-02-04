@@ -158,6 +158,16 @@ export function BookingEngine({
                 </div>
               </div>
             </div>
+            
+            <div className="lg:col-span-4 space-y-2 lg:hidden">
+               <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider pl-4">Return Location</label>
+               <div className="relative group">
+                <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-400 w-5 h-5" />
+                <div className="h-16 w-full rounded-2xl bg-zinc-50 border-0 ring-1 ring-zinc-100 pl-14 pr-4 flex items-center font-bold text-zinc-900 opacity-60">
+                   Same as Pick-up
+                </div>
+               </div>
+            </div>
 
             {/* Date & Time Selection - 6 cols */}
             <div className="lg:col-span-6 grid grid-cols-1 md:grid-cols-2 gap-4">

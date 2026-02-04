@@ -18,7 +18,7 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
 
   return (
     <div className="pt-24 px-4 pb-4 md:px-6 md:pb-6 bg-zinc-50">
-      <section className="relative h-[85vh] min-h-[700px] flex flex-col justify-center items-center overflow-hidden rounded-[2.5rem] shadow-2xl">
+      <section className="relative h-[85vh] min-h-[700px] flex flex-col justify-start md:justify-center items-center overflow-hidden rounded-[2.5rem] shadow-2xl pt-20 md:pt-0">
         
         {/* Background Image with Parallax-like feel */}
         <div className="absolute inset-0 z-0">
@@ -84,12 +84,12 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
              <span className="text-white/90 text-xs font-bold tracking-widest uppercase">Available Now in Budapest</span>
           </div>
           
-          <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-white tracking-tighter leading-[0.9] mb-8 drop-shadow-2xl">
+          <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-black text-white tracking-tighter leading-[0.9] mb-6 md:mb-8 drop-shadow-2xl text-left md:text-center">
             RENT A CAR <br/>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-zinc-400">BUDAPEST</span>
           </h1>
             
-            <p className="text-lg md:text-2xl text-white/80 max-w-2xl mx-auto leading-relaxed font-medium drop-shadow-lg">
+            <p className="text-base sm:text-lg md:text-2xl text-white/80 max-w-2xl mx-auto leading-relaxed font-medium drop-shadow-lg text-left md:text-center mb-12 md:mb-0">
               Unlock the city with our elite fleet. Seamless digital booking, delivered to your door.
             </p>
           </motion.div>

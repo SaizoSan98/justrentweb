@@ -33,25 +33,25 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">
-        <Card className="bg-gradient-to-br from-zinc-900 to-zinc-800 text-white border-0 shadow-xl">
+        <Card className="bg-white text-zinc-900 border-zinc-200 shadow-sm hover:shadow-md transition-all duration-300">
           <CardContent className="p-6">
             <div className="flex justify-between items-start mb-4">
-              <div className="p-2 bg-white/10 rounded-lg">
-                <Calendar className="w-6 h-6 text-red-500" />
+              <div className="p-2 bg-red-50 rounded-lg">
+                <Calendar className="w-6 h-6 text-red-600" />
               </div>
             </div>
             <div className="space-y-1">
               <span className="text-4xl font-bold">{upcomingBookings.length}</span>
-              <p className="text-zinc-400 text-sm">Upcoming Bookings</p>
+              <p className="text-zinc-500 text-sm">Upcoming Bookings</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-zinc-200 shadow-sm">
+        <Card className="bg-white text-zinc-900 border-zinc-200 shadow-sm hover:shadow-md transition-all duration-300">
           <CardContent className="p-6">
              <div className="flex justify-between items-start mb-4">
-              <div className="p-2 bg-red-50 rounded-lg">
-                <Car className="w-6 h-6 text-red-600" />
+              <div className="p-2 bg-zinc-50 rounded-lg">
+                <Car className="w-6 h-6 text-zinc-600" />
               </div>
             </div>
              <div className="space-y-1">
