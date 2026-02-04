@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { VehicleCounter } from "@/components/home/VehicleCounter"
 import { getAvailableCarCount } from "@/app/actions/cars"
 
+import Image from "next/image"
+
 export async function FeatureGrid() {
   const initialCount = await getAvailableCarCount()
 
@@ -42,7 +44,12 @@ export async function FeatureGrid() {
            {/* Right Column: Large Image */}
            <div className="lg:col-span-7 h-full min-h-[400px]">
               <div className="relative w-full h-full rounded-3xl overflow-hidden bg-zinc-900 text-white group">
-                  <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1603584173870-7b231416e800?q=80&w=2071&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
+                  <Image 
+                    src="/audi1.jpeg" 
+                    alt="Audi Feature" 
+                    fill 
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                   
                   <div className="absolute bottom-0 left-0 p-10 md:p-14 max-w-xl">

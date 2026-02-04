@@ -10,6 +10,8 @@ interface VehicleCounterProps {
   className?: string
 }
 
+import Image from "next/image"
+
 export function VehicleCounter({ initialCount, className }: VehicleCounterProps) {
   const [count, setCount] = React.useState(initialCount)
 
@@ -25,7 +27,12 @@ export function VehicleCounter({ initialCount, className }: VehicleCounterProps)
 
   return (
     <div className={cn("relative overflow-hidden rounded-3xl bg-black text-white p-8 h-full flex flex-col justify-end group", className)}>
-       <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1571221791244-6720d23c2805?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center opacity-60 transition-transform duration-700 group-hover:scale-105" />
+       <Image 
+         src="/audi2.jpeg" 
+         alt="Vehicle Counter Background" 
+         fill 
+         className="object-cover opacity-60 transition-transform duration-700 group-hover:scale-105"
+       />
        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
        
        <div className="relative z-10">
