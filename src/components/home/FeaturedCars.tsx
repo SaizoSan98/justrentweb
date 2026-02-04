@@ -33,9 +33,9 @@ export function FeaturedCars({ cars }: FeaturedCarsProps) {
         <p className="text-zinc-500">Experience the epitome of amazing journey with our top picks.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {cars.map((car) => (
-          <div key={car.id} className="group relative bg-white rounded-[2rem] p-4 transition-all duration-300 hover:shadow-xl border border-transparent hover:border-zinc-100">
+          <div key={car.id} className="group relative bg-white rounded-[2rem] p-6 transition-all duration-300 hover:shadow-2xl border-2 border-transparent hover:border-black/5 hover:-translate-y-1">
              {/* Badge */}
              <div className="absolute top-6 left-6 z-10">
                 <span className="px-3 py-1.5 rounded-full bg-zinc-100 text-xs font-bold text-zinc-600 uppercase tracking-wide">

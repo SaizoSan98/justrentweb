@@ -21,14 +21,18 @@ export default async function CheckoutPage({
   const carId = typeof params.carId === 'string' ? params.carId : undefined
   const startDateStr = typeof params.startDate === 'string' ? params.startDate : undefined
   const endDateStr = typeof params.endDate === 'string' ? params.endDate : undefined
+  
+  // New params for pre-selection
+  const initialInsurance = typeof params.insurance === 'string' ? params.insurance : undefined
+  const initialMileage = typeof params.mileage === 'string' ? params.mileage : undefined
 
-  if (!carId || !startDateStr) {
+  if (!carId) {
     redirect('/fleet')
   }
 
   const car = await prisma.car.findUnique({
     where: { id: carId },
-    include: { pricingTiers: true }
+    include: { pricingTiers: true, insuranceOptions: { include: { plan: true } } }
   })
 
   if (!car) {
@@ -43,8 +47,8 @@ export default async function CheckoutPage({
     where: { id: "settings" }
   })
 
-  const startDate = new Date(startDateStr)
-  const endDate = endDateStr ? new Date(endDateStr) : new Date(startDate.getTime() + 24 * 60 * 60 * 1000)
+  const startDate = startDateStr ? new Date(startDateStr) : new Date()
+  const endDate = endDateStr ? new Date(endDateStr) : undefined
 
   // Serialize complex objects for client component
   const serializedCar = {
@@ -52,10 +56,17 @@ export default async function CheckoutPage({
     pricePerDay: Number(car.pricePerDay),
     deposit: Number(car.deposit),
     fullInsurancePrice: Number(car.fullInsurancePrice),
+    unlimitedMileagePrice: Number(car.unlimitedMileagePrice || 0),
     pricingTiers: car.pricingTiers.map(tier => ({
       ...tier,
       pricePerDay: Number(tier.pricePerDay),
       deposit: Number(tier.deposit)
+    })),
+    insuranceOptions: car.insuranceOptions.map(opt => ({
+      ...opt,
+      pricePerDay: Number(opt.pricePerDay),
+      deposit: Number(opt.deposit),
+      plan: opt.plan
     }))
   }
 
@@ -80,6 +91,8 @@ export default async function CheckoutPage({
           startDate={startDate}
           endDate={endDate}
           settings={settings}
+          initialInsurance={initialInsurance}
+          initialMileage={initialMileage}
         />
       </main>
     </div>

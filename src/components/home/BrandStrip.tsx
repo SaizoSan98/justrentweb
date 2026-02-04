@@ -13,7 +13,15 @@ export function BrandStrip() {
     { name: "Mini", slug: "mini" },
     { name: "KIA", slug: "kia" },
     { name: "Hyundai", slug: "hyundai" },
-    { name: "CUPRA", slug: "cupra" } // Cupra might not be in simple icons, checking fallbacks
+    { name: "Peugeot", slug: "peugeot" },
+    { name: "Renault", slug: "renault" },
+    { name: "Citroën", slug: "citroen" },
+    { name: "Range Rover", slug: "landrover" }, // Using Land Rover logo for Range Rover
+    { name: "Nissan", slug: "nissan" },
+    { name: "Mazda", slug: "mazda" },
+    { name: "Toyota", slug: "toyota" },
+    { name: "Volkswagen", slug: "volkswagen" },
+    { name: "CUPRA", slug: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Cupra_Logo.svg/1200px-Cupra_Logo.svg.png" } 
   ]
 
   return (
@@ -24,7 +32,7 @@ export function BrandStrip() {
             <div key={`${brand.name}-${i}`} className="flex items-center gap-3 opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300 shrink-0">
                <div className="w-8 h-8 relative">
                  <Image 
-                    src={`https://cdn.simpleicons.org/${brand.slug}/000000`} 
+                    src={brand.slug.startsWith('http') ? brand.slug : `https://cdn.simpleicons.org/${brand.slug}/000000`} 
                     alt={brand.name}
                     fill
                     className="object-contain"

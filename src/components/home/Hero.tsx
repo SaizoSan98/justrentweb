@@ -19,8 +19,8 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
   }
 
   return (
-    <div className="pt-24 px-4 pb-4 md:px-6 md:pb-6 bg-zinc-50">
-      <section className="relative h-[800px] flex flex-col justify-start pt-32 items-center overflow-hidden rounded-[2.5rem] shadow-2xl">
+    <div className="pb-4 md:pb-6 bg-zinc-50 relative">
+      <section className="relative h-[900px] flex flex-col justify-start pt-48 items-center overflow-hidden rounded-b-[2.5rem] shadow-2xl">
         
         {/* Background Image with Parallax-like feel */}
         <div className="absolute inset-0 z-0">
@@ -40,21 +40,23 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 1, duration: 0.5 }}
-          className="absolute top-[20%] left-[10%] hidden lg:flex flex-col items-center gap-2 group cursor-pointer"
+          className="absolute top-[35%] left-[10%] hidden lg:flex flex-col items-center gap-2 group cursor-pointer z-30"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
         >
            <div className="relative">
-              <span className="absolute -inset-1 rounded-full bg-white/30 animate-ping" />
-              <div className="w-3 h-3 bg-white rounded-full relative z-10" />
-              <div className="h-12 w-px bg-gradient-to-b from-white to-transparent absolute top-3 left-1/2 -translate-x-1/2" />
+              <span className="absolute -inset-2 rounded-full bg-white/30 animate-ping" />
+              <div className="w-4 h-4 bg-white rounded-full relative z-10 shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
+              <div className="h-16 w-px bg-gradient-to-b from-white via-white/50 to-transparent absolute top-4 left-1/2 -translate-x-1/2" />
            </div>
-           <div className="bg-black/40 backdrop-blur-md border border-white/10 p-3 rounded-xl transform translate-y-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
-              <div className="flex items-center gap-3">
-                 <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                    <Car className="w-4 h-4 text-white" />
+           <div className="bg-black/60 backdrop-blur-xl border border-white/20 p-4 rounded-2xl transform translate-y-4 opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-2xl">
+              <div className="flex items-center gap-4">
+                 <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/10">
+                    <Car className="w-5 h-5 text-white" />
                  </div>
                  <div>
-                    <div className="text-white font-bold text-sm">50+ Cars</div>
-                    <div className="text-white/60 text-[10px] uppercase tracking-wider">Available Now</div>
+                    <div className="text-white font-bold text-base">50+ Cars</div>
+                    <div className="text-white/60 text-[10px] uppercase tracking-wider font-medium">Available Now</div>
                  </div>
               </div>
            </div>
@@ -64,21 +66,23 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 1.2, duration: 0.5 }}
-          className="absolute top-[30%] right-[15%] hidden lg:flex flex-col items-center gap-2 group cursor-pointer"
+          className="absolute top-[45%] right-[15%] hidden lg:flex flex-col items-center gap-2 group cursor-pointer z-30"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
         >
            <div className="relative">
-              <span className="absolute -inset-1 rounded-full bg-white/30 animate-ping delay-300" />
-              <div className="w-3 h-3 bg-white rounded-full relative z-10" />
-              <div className="h-12 w-px bg-gradient-to-b from-white to-transparent absolute top-3 left-1/2 -translate-x-1/2" />
+              <span className="absolute -inset-2 rounded-full bg-white/30 animate-ping delay-300" />
+              <div className="w-4 h-4 bg-white rounded-full relative z-10 shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
+              <div className="h-16 w-px bg-gradient-to-b from-white via-white/50 to-transparent absolute top-4 left-1/2 -translate-x-1/2" />
            </div>
-           <div className="bg-black/40 backdrop-blur-md border border-white/10 p-3 rounded-xl transform translate-y-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
-              <div className="flex items-center gap-3">
-                 <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                    <Gauge className="w-4 h-4 text-white" />
+           <div className="bg-black/60 backdrop-blur-xl border border-white/20 p-4 rounded-2xl transform translate-y-4 opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-2xl">
+              <div className="flex items-center gap-4">
+                 <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/10">
+                    <Gauge className="w-5 h-5 text-white" />
                  </div>
                  <div>
-                    <div className="text-white font-bold text-sm">20k+ km</div>
-                    <div className="text-white/60 text-[10px] uppercase tracking-wider">Total Distance</div>
+                    <div className="text-white font-bold text-base">20k+ km</div>
+                    <div className="text-white/60 text-[10px] uppercase tracking-wider font-medium">Total Distance</div>
                  </div>
               </div>
            </div>
@@ -88,21 +92,23 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 1.4, duration: 0.5 }}
-          className="absolute bottom-[20%] left-[20%] hidden lg:flex flex-col items-center gap-2 group cursor-pointer"
+          className="absolute bottom-[25%] left-[20%] hidden lg:flex flex-col items-center gap-2 group cursor-pointer z-30"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
         >
            <div className="relative">
-              <span className="absolute -inset-1 rounded-full bg-white/30 animate-ping delay-700" />
-              <div className="w-3 h-3 bg-white rounded-full relative z-10" />
-              <div className="h-12 w-px bg-gradient-to-t from-white to-transparent absolute bottom-3 left-1/2 -translate-x-1/2" />
+              <span className="absolute -inset-2 rounded-full bg-white/30 animate-ping delay-700" />
+              <div className="w-4 h-4 bg-white rounded-full relative z-10 shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
+              <div className="h-16 w-px bg-gradient-to-t from-white via-white/50 to-transparent absolute bottom-4 left-1/2 -translate-x-1/2" />
            </div>
-           <div className="bg-black/40 backdrop-blur-md border border-white/10 p-3 rounded-xl transform -translate-y-20 opacity-0 group-hover:opacity-100 transition-all duration-300">
-              <div className="flex items-center gap-3">
-                 <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                    <MapPin className="w-4 h-4 text-white" />
+           <div className="bg-black/60 backdrop-blur-xl border border-white/20 p-4 rounded-2xl transform -translate-y-24 opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-2xl">
+              <div className="flex items-center gap-4">
+                 <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/10">
+                    <MapPin className="w-5 h-5 text-white" />
                  </div>
                  <div>
-                    <div className="text-white font-bold text-sm">Budapest</div>
-                    <div className="text-white/60 text-[10px] uppercase tracking-wider">Free Delivery</div>
+                    <div className="text-white font-bold text-base">Budapest</div>
+                    <div className="text-white/60 text-[10px] uppercase tracking-wider font-medium">Free Delivery</div>
                  </div>
               </div>
            </div>

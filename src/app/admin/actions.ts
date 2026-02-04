@@ -53,13 +53,14 @@ async function uploadImage(file: File): Promise<string | null> {
         await mkdir(uploadDir, { recursive: true })
       } catch (err: any) {
         if (err.code !== 'EEXIST') {
-           // If we can't create directory, we might be in a read-only env.
-           // In this case, we can try /tmp for temporary storage or fail gracefully.
-           // However, user specifically asked to fix this error.
-           console.error("Could not create upload directory. Are you on a read-only filesystem?", err)
-           // If we can't write to public, we can't persist.
-           // But maybe we can just return a placeholder or fail silently for now if the user insists.
-           // But the user complained about the error message.
+           console.error("Could not create upload directory:", err)
+           // Fallback to /tmp in serverless environment if public is read-only
+           // Note: This file will NOT be accessible via public URL, so this is a desperate fallback
+           // to prevent crashing, but the image won't load on the frontend.
+           if (process.env.NODE_ENV === 'production') {
+             throw new Error("Vercel Blob is not configured and local filesystem is read-only. Please configure BLOB_READ_WRITE_TOKEN.")
+           }
+           throw err
         }
       }
       

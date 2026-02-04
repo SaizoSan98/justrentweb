@@ -78,7 +78,7 @@ export function BookingEngine({
   // New Slim Design
   return (
     <div className={cn("w-full relative z-20 max-w-5xl mx-auto", className)}>
-      <div className="bg-white rounded-full shadow-2xl p-2 flex flex-col md:flex-row items-center">
+      <div className="bg-white rounded-full shadow-2xl p-2 flex flex-col md:flex-row items-center border-none ring-0 outline-none">
          
          {/* Location */}
          <div className="flex-1 w-full px-6 py-3 md:py-2 relative group cursor-pointer hover:bg-zinc-50 rounded-full transition-colors">

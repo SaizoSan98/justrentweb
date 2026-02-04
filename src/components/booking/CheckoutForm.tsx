@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react"
 import Image from "next/image"
 import { differenceInDays, format, addDays } from "date-fns"
-import { Calendar, MapPin, Check, ShieldCheck, CreditCard, Wallet, PlaneLanding, PlaneTakeoff, Baby, User, Map as MapIcon, Snowflake, Star, Clock, Edit2 } from "lucide-react"
+import { Calendar, MapPin, Check, ShieldCheck, CreditCard, Wallet, PlaneLanding, PlaneTakeoff, Baby, User, Map as MapIcon, Snowflake, Star, Clock, Edit2, Gauge } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -29,32 +29,40 @@ interface CheckoutFormProps {
   car: any
   extras: any[]
   startDate: Date
-  endDate: Date
+  endDate?: Date
   settings?: any
+  initialInsurance?: string
+  initialMileage?: string
 }
 
-export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate: initialEndDate, settings }: CheckoutFormProps) {
+export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate: initialEndDate, settings, initialInsurance, initialMileage }: CheckoutFormProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   
   // Booking Details State
   const [startDate, setStartDate] = useState<Date>(initialStartDate)
-  const [endDate, setEndDate] = useState<Date>(initialEndDate)
+  const [endDate, setEndDate] = useState<Date | undefined>(initialEndDate)
   const [startTime, setStartTime] = useState(format(initialStartDate, "HH:mm"))
-  const [endTime, setEndTime] = useState(format(initialEndDate, "HH:mm"))
+  const [endTime, setEndTime] = useState(initialEndDate ? format(initialEndDate, "HH:mm") : "10:00")
   const [pickupLocation, setPickupLocation] = useState("Budapest Airport")
   const [dropoffLocation, setDropoffLocation] = useState("Budapest Airport")
   const [isEditingDetails, setIsEditingDetails] = useState(false)
 
   // Extras & Payment State
   const [selectedExtras, setSelectedExtras] = useState<string[]>([])
-  const [fullInsurance, setFullInsurance] = useState(false)
+  
+  // Insurance State Logic
+  const [selectedInsuranceId, setSelectedInsuranceId] = useState<string>(initialInsurance || (car.insuranceOptions?.[0]?.planId || ""))
+  const [mileageOption, setMileageOption] = useState<'LIMITED' | 'UNLIMITED'>(initialMileage as 'LIMITED' | 'UNLIMITED' || 'LIMITED')
+  
+  const [fullInsurance, setFullInsurance] = useState(false) // Legacy, keeping for compatibility or removing if fully replaced by tiered insurance
   const [isCompany, setIsCompany] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState("CASH_ON_SITE")
   const [termsAccepted, setTermsAccepted] = useState(false)
   
   // Calculation Logic
   const calculateDays = () => {
+    if (!endDate) return 1
     // Combine date and time
     const start = new Date(`${format(startDate, 'yyyy-MM-dd')}T${startTime}`)
     const end = new Date(`${format(endDate, 'yyyy-MM-dd')}T${endTime}`)
@@ -78,7 +86,13 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
 
   const pricePerDay = getPricePerDay()
   const basePrice = pricePerDay * days
-  const insurancePrice = fullInsurance ? (car.fullInsurancePrice * days) : 0
+  
+  // Calculate Insurance Price
+  const selectedInsurance = car.insuranceOptions?.find((opt: any) => opt.planId === selectedInsuranceId)
+  const insurancePrice = selectedInsurance ? (selectedInsurance.pricePerDay * days) : 0
+  
+  // Calculate Mileage Price
+  const mileagePrice = mileageOption === 'UNLIMITED' ? ((car.unlimitedMileagePrice || 0) * days) : 0
   
   const extrasPrice = selectedExtras.reduce((total, id) => {
     const extra = extras.find(e => e.id === id)
@@ -93,8 +107,8 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
     return h * 60 + m
   }
 
-  const isAfterHours = (date: Date, time: string) => {
-    if (!settings) return false
+  const isAfterHours = (date: Date | undefined, time: string) => {
+    if (!settings || !date) return false
     
     // Parse weekly settings
     let weeklyHours = settings.weeklyHours
@@ -137,12 +151,16 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
   const pickupFee = (settings && isAfterHours(startDate, startTime)) ? Number(car.pickupAfterHoursPrice || 0) : 0
   const returnFee = (settings && isAfterHours(endDate, endTime)) ? Number(car.returnAfterHoursPrice || 0) : 0
 
-  const totalPrice = basePrice + insurancePrice + extrasPrice + pickupFee + returnFee
+  const totalPrice = basePrice + insurancePrice + mileagePrice + extrasPrice + pickupFee + returnFee
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     
     if (!termsAccepted) return
+    if (!endDate) {
+        alert("Please select a return date.")
+        return
+    }
 
     const formData = new FormData(e.currentTarget)
     
@@ -154,7 +172,9 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
     formData.append('dropoffLocation', dropoffLocation)
     formData.append('totalPrice', totalPrice.toString())
     formData.append('isCompany', isCompany.toString())
-    formData.append('fullInsurance', fullInsurance.toString())
+    // Pass selected plan ID instead of boolean
+    formData.append('insurancePlanId', selectedInsuranceId)
+    formData.append('mileageOption', mileageOption)
     formData.append('paymentMethod', paymentMethod)
     formData.append('selectedExtras', JSON.stringify(selectedExtras))
 
@@ -234,7 +254,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
               {/* Drop-off */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-sm font-bold text-zinc-900">
-                  <div className="w-2 h-2 rounded-full bg-zinc-900" />
+                  <div className="w-2 h-2 rounded-full bg-red-600" />
                   Drop-off
                 </div>
                 <div className="space-y-3 pl-4 border-l-2 border-zinc-100">
@@ -243,10 +263,11 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                     <div className="flex gap-2">
                       <Input 
                         type="date" 
-                        value={format(endDate, 'yyyy-MM-dd')}
-                        onChange={(e) => setEndDate(new Date(e.target.value))}
+                        value={endDate ? format(endDate, 'yyyy-MM-dd') : ''}
+                        onChange={(e) => setEndDate(e.target.value ? new Date(e.target.value) : undefined)}
                         disabled={!isEditingDetails}
-                        className="font-medium"
+                        className={cn("font-medium", !endDate && "border-red-500")}
+                        required
                       />
                       <Input 
                         type="time" 
@@ -336,6 +357,14 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                 <Label>Tax Number (Adószám) *</Label>
                 <Input name="companyTaxId" required={isCompany} />
               </div>
+              <div className="space-y-2">
+                <Label>Company Email *</Label>
+                <Input name="companyEmail" type="email" required={isCompany} />
+              </div>
+              <div className="space-y-2">
+                <Label>Company Phone *</Label>
+                <Input name="companyPhone" type="tel" required={isCompany} />
+              </div>
               <div className="md:col-span-2 space-y-2">
                 <Label>Company Address *</Label>
                 <Input name="companyAddress" required={isCompany} />
@@ -344,31 +373,80 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
           )}
         </Card>
 
-        {/* Insurance */}
+        {/* Insurance & Mileage - New Tiered UI */}
         <Card className="border-0 shadow-sm overflow-hidden ring-1 ring-zinc-200">
           <CardHeader className="border-b border-zinc-100 bg-white">
             <CardTitle className="text-xl font-bold flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-red-600" />
-              Insurance
+              Insurance Plan
+            </CardTitle>
+          </CardHeader>
+          <div className="p-6 space-y-4">
+             {car.insuranceOptions?.sort((a: any, b: any) => (a.plan?.order || 0) - (b.plan?.order || 0)).map((ins: any) => (
+                <div 
+                  key={ins.planId}
+                  className={cn(
+                    "border-2 rounded-xl p-4 cursor-pointer transition-all flex items-start gap-4",
+                    selectedInsuranceId === ins.planId ? "border-black bg-zinc-50" : "border-zinc-200 hover:border-zinc-300"
+                  )}
+                  onClick={() => setSelectedInsuranceId(ins.planId)}
+                >
+                  <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center mt-1 shrink-0", selectedInsuranceId === ins.planId ? "border-black" : "border-zinc-300")}>
+                    {selectedInsuranceId === ins.planId && <div className="w-3 h-3 bg-black rounded-full" />}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex justify-between items-center mb-1">
+                      <h4 className="font-bold text-zinc-900">{ins.plan.name}</h4>
+                      <span className="font-bold text-zinc-900">{ins.pricePerDay === 0 ? "Included" : `+€${Math.round(ins.pricePerDay * days)}`}</span>
+                    </div>
+                    <p className="text-sm text-zinc-500">{ins.plan.description || "Basic coverage with standard deposit."}</p>
+                  </div>
+                </div>
+             ))}
+          </div>
+        </Card>
+
+        <Card className="border-0 shadow-sm overflow-hidden ring-1 ring-zinc-200">
+          <CardHeader className="border-b border-zinc-100 bg-white">
+            <CardTitle className="text-xl font-bold flex items-center gap-2">
+              <Gauge className="w-5 h-5 text-red-600" />
+              Mileage
             </CardTitle>
           </CardHeader>
           <div className="p-6 space-y-4">
              <div 
                className={cn(
                  "border-2 rounded-xl p-4 cursor-pointer transition-all flex items-start gap-4",
-                 fullInsurance ? "border-red-600 bg-red-50/10" : "border-zinc-200 hover:border-zinc-300"
+                 mileageOption === 'LIMITED' ? "border-black bg-zinc-50" : "border-zinc-200 hover:border-zinc-300"
                )}
-               onClick={() => setFullInsurance(!fullInsurance)}
+               onClick={() => setMileageOption('LIMITED')}
              >
-               <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center mt-1 shrink-0", fullInsurance ? "border-red-600 bg-red-600" : "border-zinc-300")}>
-                 {fullInsurance && <Check className="w-4 h-4 text-white" />}
+               <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center mt-1 shrink-0", mileageOption === 'LIMITED' ? "border-black" : "border-zinc-300")}>
+                 {mileageOption === 'LIMITED' && <div className="w-3 h-3 bg-black rounded-full" />}
                </div>
                <div className="flex-1">
                  <div className="flex justify-between items-center mb-1">
-                   <h4 className="font-bold text-zinc-900">Full Insurance (Zero Deductible)</h4>
-                   <span className="text-red-600 font-bold">+€{car.fullInsurancePrice} / day</span>
+                   <h4 className="font-bold text-zinc-900">{car.dailyMileageLimit || 300} km / day</h4>
+                   <span className="font-bold text-zinc-900">Included</span>
                  </div>
-                 <p className="text-sm text-zinc-500">Complete peace of mind. Covers all damages with €0 deductible.</p>
+               </div>
+             </div>
+
+             <div 
+               className={cn(
+                 "border-2 rounded-xl p-4 cursor-pointer transition-all flex items-start gap-4",
+                 mileageOption === 'UNLIMITED' ? "border-black bg-zinc-50" : "border-zinc-200 hover:border-zinc-300"
+               )}
+               onClick={() => setMileageOption('UNLIMITED')}
+             >
+               <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center mt-1 shrink-0", mileageOption === 'UNLIMITED' ? "border-black" : "border-zinc-300")}>
+                 {mileageOption === 'UNLIMITED' && <div className="w-3 h-3 bg-black rounded-full" />}
+               </div>
+               <div className="flex-1">
+                 <div className="flex justify-between items-center mb-1">
+                   <h4 className="font-bold text-zinc-900">Unlimited km</h4>
+                   <span className="font-bold text-zinc-900">+{Math.round((car.unlimitedMileagePrice || 0) * days)} €</span>
+                 </div>
                </div>
              </div>
           </div>
