@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect } from "react"
@@ -77,257 +78,173 @@ export function FleetFilters({
 
   const [isOpen, setIsOpen] = useState(false)
 
-  const [isScrolled, setIsScrolled] = useState(false)
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20)
-    }
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
-
-  // Calculate dynamic count based on current selection
-  // If availableCars is provided, we filter client-side. Otherwise fallback to server count.
-  const matchingCount = availableCars ? availableCars.filter(car => {
-    const matchCategory = selectedCategories.length === 0 || selectedCategories.includes(car.category)
-    const matchTransmission = selectedTransmissions.length === 0 || selectedTransmissions.includes(car.transmission)
-    const matchFuel = selectedFuelTypes.length === 0 || selectedFuelTypes.includes(car.fuelType)
-    const matchSeats = selectedSeats.length === 0 || selectedSeats.includes(car.seats.toString())
-    const matchGuaranteed = !guaranteedModel || car.guaranteedModel
-
-    return matchCategory && matchTransmission && matchFuel && matchSeats && matchGuaranteed
-  }).length : (counts?.total || 0)
-
-  // Quick filters state (outside sheet)
-  const activeFiltersCount = 
-    selectedCategories.length + 
-    selectedTransmissions.length + 
-    selectedFuelTypes.length + 
-    selectedSeats.length + 
-    (guaranteedModel ? 1 : 0)
-
-  const applyFilters = () => {
+  // Update URL helper
+  const updateFilters = (newFilters: Partial<typeof currentFilters>) => {
     const params = new URLSearchParams(searchParams.toString())
     
-    // Reset all filter params
-    params.delete("category")
-    params.delete("transmission")
-    params.delete("fuelType")
-    params.delete("seats")
-    params.delete("guaranteedModel")
-
-    // Re-add selected
-    selectedCategories.forEach(c => params.append("category", c))
-    selectedTransmissions.forEach(t => params.append("transmission", t))
-    selectedFuelTypes.forEach(f => params.append("fuelType", f))
-    selectedSeats.forEach(s => params.append("seats", s))
-    if (guaranteedModel) params.set("guaranteedModel", "true")
-
-    router.push(`/fleet?${params.toString()}`)
-    setIsOpen(false)
-  }
-
-  const clearFilters = () => {
-    setSelectedCategories([])
-    setSelectedTransmissions([])
-    setSelectedFuelTypes([])
-    setSelectedSeats([])
-    setGuaranteedModel(false)
-    
-    const params = new URLSearchParams(searchParams.toString())
-    params.delete("category")
-    params.delete("transmission")
-    params.delete("fuelType")
-    params.delete("seats")
-    params.delete("guaranteedModel")
-    router.push(`/fleet?${params.toString()}`)
-  }
-
-  const toggleSelection = (list: string[], item: string, setList: (l: string[]) => void) => {
-    if (list.includes(item)) {
-      setList(list.filter(i => i !== item))
-    } else {
-      setList([...list, item])
+    // Helper to update array params
+    const updateArrayParam = (key: string, values: string[] | undefined) => {
+      params.delete(key)
+      values?.forEach(v => params.append(key, v))
     }
+
+    if ('category' in newFilters) updateArrayParam('category', newFilters.category)
+    if ('transmission' in newFilters) updateArrayParam('transmission', newFilters.transmission)
+    if ('fuelType' in newFilters) updateArrayParam('fuelType', newFilters.fuelType)
+    if ('seats' in newFilters) updateArrayParam('seats', newFilters.seats)
+    if ('guaranteedModel' in newFilters) {
+        if (newFilters.guaranteedModel) params.set('guaranteedModel', 'true')
+        else params.delete('guaranteedModel')
+    }
+
+    router.push(`/fleet?${params.toString()}`, { scroll: false })
   }
 
   return (
-    <div className="flex justify-center w-full pointer-events-none sticky top-24 z-40 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]">
-      <div className={cn(
-        "pointer-events-auto transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
-        "flex items-center gap-4 bg-white/90 backdrop-blur-xl border border-zinc-200/50 shadow-[0_8px_32px_rgba(0,0,0,0.08)]",
-        isScrolled 
-          ? "w-[90%] md:w-[70%] lg:w-[60%] rounded-full px-4 py-2" 
-          : "w-full rounded-2xl px-6 py-4"
-      )}>
-          {/* Left: Main Filter Button */}
-          <div className="flex items-center gap-4 flex-shrink-0">
-            <Sheet open={isOpen} onOpenChange={setIsOpen}>
-              <SheetTrigger asChild>
-                <Button variant="outline" className={cn(
-                  "border-zinc-200 bg-white hover:bg-zinc-50 font-bold gap-2 text-zinc-700",
-                  isScrolled ? "rounded-full h-10 px-4" : "rounded-xl h-12 px-6"
-                )}>
-                  <SlidersHorizontal className="w-4 h-4" />
-                  {tCommon('filters') || "Filters"}
-                  {activeFiltersCount > 0 && (
-                    <span className="bg-red-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full ml-1">
-                      {activeFiltersCount}
-                    </span>
-                  )}
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-[400px] p-0 flex flex-col bg-zinc-50">
-                <div className="p-6 border-b border-zinc-100 flex items-center justify-between bg-white">
-                  <h2 className="text-xl font-black uppercase">{t('filters')}</h2>
-                  <Button variant="ghost" size="sm" onClick={clearFilters} className="text-zinc-500 hover:text-red-600">
-                    {tCommon('clear_all')}
-                  </Button>
-                </div>
-                
-                <div className="flex-1 overflow-y-auto p-6 space-y-8">
-                  {/* Vehicle Type */}
-                  <div className="space-y-4">
-                    <h3 className="font-bold text-sm uppercase text-zinc-500 tracking-wider">{t('category')}</h3>
-                    <div className="grid grid-cols-2 gap-3">
-                      {categoriesList.map(cat => (
-                        <div 
-                          key={cat}
-                          className={cn(
-                            "border-2 rounded-xl p-3 cursor-pointer transition-all text-center text-sm font-bold flex items-center justify-center gap-2",
-                            selectedCategories.includes(cat) 
-                              ? "border-zinc-900 bg-zinc-900 text-white" 
-                              : "border-zinc-100 hover:border-zinc-300 text-zinc-700"
-                          )}
-                          onClick={() => toggleSelection(selectedCategories, cat, setSelectedCategories)}
-                        >
-                          {cat}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Features */}
-                  <div className="space-y-4">
-                    <h3 className="font-bold text-sm uppercase text-zinc-500 tracking-wider">{t('features')}</h3>
-                    <div className="flex flex-wrap gap-3">
-                       <div 
-                        className={cn(
-                          "border-2 rounded-full px-4 py-2 cursor-pointer transition-all text-sm font-bold flex items-center gap-2",
-                          guaranteedModel
-                            ? "border-zinc-900 bg-zinc-900 text-white" 
-                            : "border-zinc-100 hover:border-zinc-300 text-zinc-700"
-                        )}
-                        onClick={() => setGuaranteedModel(!guaranteedModel)}
-                      >
-                        <Check className="w-4 h-4" /> {t('guaranteed_model')}
-                      </div>
-                      {transmissionsList.map(t => (
-                        <div 
-                          key={t}
-                          className={cn(
-                            "border-2 rounded-full px-4 py-2 cursor-pointer transition-all text-sm font-bold flex items-center gap-2",
-                            selectedTransmissions.includes(t)
-                              ? "border-zinc-900 bg-zinc-900 text-white" 
-                              : "border-zinc-100 hover:border-zinc-300 text-zinc-700"
-                          )}
-                          onClick={() => toggleSelection(selectedTransmissions, t, setSelectedTransmissions)}
-                        >
-                          <Gauge className="w-4 h-4" /> {t === 'AUTOMATIC' ? tCommon('automatic') : tCommon('manual')}
-                        </div>
-                      ))}
-                       {fuelTypesList.map(f => (
-                        <div 
-                          key={f}
-                          className={cn(
-                            "border-2 rounded-full px-4 py-2 cursor-pointer transition-all text-sm font-bold flex items-center gap-2",
-                            selectedFuelTypes.includes(f)
-                              ? "border-zinc-900 bg-zinc-900 text-white" 
-                              : "border-zinc-100 hover:border-zinc-300 text-zinc-700"
-                          )}
-                          onClick={() => toggleSelection(selectedFuelTypes, f, setSelectedFuelTypes)}
-                        >
-                          <Fuel className="w-4 h-4" /> {tCommon(f.toLowerCase())}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Seats */}
-                  <div className="space-y-4">
-                    <h3 className="font-bold text-sm uppercase text-zinc-500 tracking-wider">{t('seats')}</h3>
-                    <div className="flex flex-wrap gap-3">
-                      {seatsList.map(num => (
-                        <div 
-                          key={num}
-                          className={cn(
-                            "border-2 rounded-full px-4 py-2 cursor-pointer transition-all text-sm font-bold flex items-center gap-2",
-                            selectedSeats.includes(num.toString()) 
-                              ? "border-zinc-900 bg-zinc-900 text-white" 
-                              : "border-zinc-100 hover:border-zinc-300 text-zinc-700"
-                          )}
-                          onClick={() => toggleSelection(selectedSeats, num.toString(), setSelectedSeats)}
-                        >
-                          <Users className="w-4 h-4" /> {num} {t('seats')}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-6 border-t border-zinc-100 bg-white">
-                  <Button 
-                    className="w-full bg-red-600 hover:bg-red-700 text-white font-bold h-12 text-lg rounded-xl"
-                    onClick={applyFilters}
-                  >
-                    Show {counts?.total || 0} offers
-                  </Button>
-                </div>
-              </SheetContent>
-            </Sheet>
-
-            <div className={cn("h-6 w-px bg-zinc-200", isScrolled ? "hidden sm:block" : "block")}></div>
-
-            <span className="text-zinc-500 text-sm font-medium whitespace-nowrap">
-              {counts?.total || 0} {isScrolled ? "cars" : "vehicles available"}
-            </span>
-          </div>
-
-          {/* Right: Quick Toggles (Horizontal Scroll) */}
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide flex-1 justify-end mask-image-gradient">
-             {/* Only show categories as quick filters */}
-             {categoriesList.slice(0, 4).map(cat => (
-                <div 
-                  key={cat}
-                  className={cn(
-                    "px-3 py-1.5 rounded-full cursor-pointer transition-all text-xs font-bold whitespace-nowrap border",
-                    selectedCategories.includes(cat) 
-                      ? "bg-zinc-900 text-white border-zinc-900" 
-                      : "bg-white text-zinc-600 border-zinc-200 hover:border-zinc-400"
-                  )}
-                  onClick={() => {
-                    toggleSelection(selectedCategories, cat, setSelectedCategories)
-                    // Auto apply for quick filters? Or wait? 
-                    // Better to just toggle state here, but apply needs router push.
-                    // For quick filters usually instant apply is expected.
-                    // Let's implement instant apply for these specific clicks
-                    const newCats = selectedCategories.includes(cat) 
-                      ? selectedCategories.filter(c => c !== cat)
-                      : [...selectedCategories, cat]
-                    
-                    const params = new URLSearchParams(searchParams.toString())
-                    params.delete("category")
-                    newCats.forEach(c => params.append("category", c))
-                    router.push(`/fleet?${params.toString()}`)
-                  }}
-                >
-                  {cat}
-                </div>
-              ))}
-          </div>
-
+    <div className={cn("space-y-8 text-white", isOpen ? "block" : "hidden md:block")}>
+      <div className="flex items-center justify-between md:hidden mb-4">
+        <h2 className="text-xl font-bold">Filters</h2>
+        <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
+          <Check className="w-5 h-5" />
+        </Button>
       </div>
+
+      {/* Filter Header */}
+      <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
+        <h3 className="text-2xl font-black text-white">Filter</h3>
+        <button onClick={() => {
+            setSelectedCategories([])
+            setSelectedTransmissions([])
+            setSelectedFuelTypes([])
+            setSelectedSeats([])
+            setGuaranteedModel(false)
+            router.push('/fleet')
+        }} className="text-xs text-zinc-500 hover:text-white uppercase font-bold tracking-wider">
+            Clear All Filters
+        </button>
+      </div>
+
+      {/* Price Range */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between cursor-pointer group">
+            <h4 className="font-bold text-sm uppercase tracking-wider text-zinc-300 group-hover:text-white">Price Range</h4>
+            <div className="text-zinc-500 group-hover:text-white">^</div>
+        </div>
+        <div className="space-y-2 pl-2">
+            {[
+                { label: "€0 - €50", val: "0-50" },
+                { label: "€50 - €100", val: "50-100" },
+                { label: "€100 - €150", val: "100-150" },
+                { label: "€150 - €200", val: "150-200" },
+                { label: "€200 +", val: "200-plus" },
+            ].map((range) => (
+                <div key={range.val} className="flex items-center space-x-3">
+                    <Checkbox id={`price-${range.val}`} className="border-zinc-700 data-[state=checked]:bg-white data-[state=checked]:text-black" />
+                    <label htmlFor={`price-${range.val}`} className="text-sm text-zinc-400 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer hover:text-white transition-colors">
+                        {range.label}
+                    </label>
+                </div>
+            ))}
+        </div>
+      </div>
+
+      {/* Vehicle Category */}
+      <div className="space-y-4 pt-4 border-t border-zinc-800">
+         <div className="flex items-center justify-between cursor-pointer group">
+            <h4 className="font-bold text-sm uppercase tracking-wider text-zinc-300 group-hover:text-white">Vehicle Category</h4>
+            <div className="text-zinc-500 group-hover:text-white">^</div>
+        </div>
+        <div className="space-y-2 pl-2">
+          {categoriesList.map((category) => (
+            <div key={category} className="flex items-center space-x-3 group">
+              <Checkbox 
+                id={category} 
+                checked={selectedCategories.includes(category)}
+                onCheckedChange={(checked) => {
+                  const newCategories = checked 
+                    ? [...selectedCategories, category]
+                    : selectedCategories.filter((c) => c !== category)
+                  setSelectedCategories(newCategories)
+                  updateFilters({ category: newCategories })
+                }}
+                className="border-zinc-700 data-[state=checked]:bg-white data-[state=checked]:text-black"
+              />
+              <label
+                htmlFor={category}
+                className="text-sm text-zinc-400 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex-1 flex justify-between group-hover:text-white transition-colors"
+              >
+                <span>{category}</span>
+                {/* <span className="text-zinc-600 text-xs">(12)</span> */}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Transmission - Renamed to Gear Shift */}
+      <div className="space-y-4 pt-4 border-t border-zinc-800">
+         <div className="flex items-center justify-between cursor-pointer group">
+            <h4 className="font-bold text-sm uppercase tracking-wider text-zinc-300 group-hover:text-white">Gear Shift</h4>
+            <div className="text-zinc-500 group-hover:text-white">^</div>
+        </div>
+        <div className="space-y-2 pl-2">
+          {transmissionsList.map((transmission) => (
+            <div key={transmission} className="flex items-center space-x-3">
+              <Checkbox 
+                id={transmission} 
+                checked={selectedTransmissions.includes(transmission)}
+                onCheckedChange={(checked) => {
+                  const newTransmissions = checked 
+                    ? [...selectedTransmissions, transmission]
+                    : selectedTransmissions.filter((t) => t !== transmission)
+                  setSelectedTransmissions(newTransmissions)
+                  updateFilters({ transmission: newTransmissions })
+                }}
+                className="border-zinc-700 data-[state=checked]:bg-white data-[state=checked]:text-black"
+              />
+              <label
+                htmlFor={transmission}
+                className="text-sm text-zinc-400 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer hover:text-white transition-colors"
+              >
+                {transmission}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Fuel Type */}
+      <div className="space-y-4 pt-4 border-t border-zinc-800">
+         <div className="flex items-center justify-between cursor-pointer group">
+            <h4 className="font-bold text-sm uppercase tracking-wider text-zinc-300 group-hover:text-white">Fuel Type</h4>
+            <div className="text-zinc-500 group-hover:text-white">^</div>
+        </div>
+        <div className="space-y-2 pl-2">
+          {fuelTypesList.map((fuel) => (
+            <div key={fuel} className="flex items-center space-x-3">
+              <Checkbox 
+                id={fuel} 
+                checked={selectedFuelTypes.includes(fuel)}
+                onCheckedChange={(checked) => {
+                  const newFuelTypes = checked 
+                    ? [...selectedFuelTypes, fuel]
+                    : selectedFuelTypes.filter((f) => f !== fuel)
+                  setSelectedFuelTypes(newFuelTypes)
+                  updateFilters({ fuelType: newFuelTypes })
+                }}
+                className="border-zinc-700 data-[state=checked]:bg-white data-[state=checked]:text-black"
+              />
+              <label
+                htmlFor={fuel}
+                className="text-sm text-zinc-400 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer hover:text-white transition-colors"
+              >
+                {fuel}
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+      
     </div>
   )
 }

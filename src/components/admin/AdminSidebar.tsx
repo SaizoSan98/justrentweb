@@ -12,7 +12,8 @@ import {
   Star,
   Tag,
   Settings,
-  Users
+  Users,
+  Shield
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -88,6 +89,19 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
           >
             <Tag className="mr-3 h-5 w-5" />
             Categories
+          </Button>
+        </Link>
+
+        <Link href="/admin/insurances">
+          <Button 
+            variant="ghost" 
+            className={cn(
+              "w-full justify-start text-zinc-300 hover:text-white hover:bg-zinc-800",
+              isActive('/admin/insurances') && "bg-zinc-800 text-white border-l-2 border-red-600 rounded-l-none"
+            )}
+          >
+            <Shield className="mr-3 h-5 w-5" />
+            Insurances
           </Button>
         </Link>
 

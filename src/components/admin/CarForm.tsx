@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Trash2, Plus, Upload, Loader2, Car, Banknote, Tags, Image as ImageIcon } from "lucide-react"
+import { Trash2, Plus, Upload, Loader2, Car, Banknote, Tags, Image as ImageIcon, Shield } from "lucide-react"
 import { createCar, updateCar } from "@/app/admin/actions"
 import { CAR_MAKES, CAR_MODELS, CAR_FEATURES, FUEL_POLICIES } from "@/lib/car-data"
 
@@ -26,13 +26,14 @@ interface PricingTier {
 interface CarFormProps {
   car?: any // Replace with proper type
   categories?: { id: string, name: string }[]
+  insurancePlans?: any[]
   isEditing?: boolean
   translations?: any[]
 }
 
 import { toast } from "sonner"
 
-export function CarForm({ car, categories = [], isEditing = false, translations = [] }: CarFormProps) {
+export function CarForm({ car, categories = [], insurancePlans = [], isEditing = false, translations = [] }: CarFormProps) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [activeTab, setActiveTab] = useState("general")
@@ -74,6 +75,40 @@ export function CarForm({ car, categories = [], isEditing = false, translations 
   )
   const [imagePreview, setImagePreview] = useState<string | null>(car?.imageUrl || null)
   const [additionalImages, setAdditionalImages] = useState<string[]>(car?.images || [])
+  
+  // Insurance Plans State
+  const [insuranceValues, setInsuranceValues] = useState<Record<string, { price: string, deposit: string }>>({})
+
+  useEffect(() => {
+    if (car?.insuranceOptions) {
+      const initial: Record<string, { price: string, deposit: string }> = {}
+      car.insuranceOptions.forEach((opt: any) => {
+        initial[opt.planId] = { 
+            price: opt.pricePerDay?.toString() || "0", 
+            deposit: opt.deposit?.toString() || "0" 
+        }
+      })
+      setInsuranceValues(initial)
+    } else if (insurancePlans.length > 0 && !isEditing) {
+        // Initialize with defaults if new car? Maybe not needed, fields can be empty/0
+        // But helpful to prepopulate keys
+        const initial: Record<string, { price: string, deposit: string }> = {}
+        insurancePlans.forEach((plan: any) => {
+             initial[plan.id] = { price: "0", deposit: "0" }
+        })
+        setInsuranceValues(initial)
+    }
+  }, [car, insurancePlans, isEditing])
+
+  const handleInsuranceChange = (planId: string, field: 'price' | 'deposit', value: string) => {
+    setInsuranceValues(prev => ({
+        ...prev,
+        [planId]: {
+            ...prev[planId],
+            [field]: value
+        }
+    }))
+  }
   
   const fileInputRef = useRef<HTMLInputElement>(null)
   const formRef = useRef<HTMLFormElement>(null)
@@ -226,8 +261,9 @@ export function CarForm({ car, categories = [], isEditing = false, translations 
   return (
     <form ref={formRef} className="space-y-8" onSubmit={(e) => e.preventDefault()}>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 lg:w-[600px]">
+        <TabsList className="grid w-full grid-cols-5 lg:w-[750px]">
           <TabsTrigger value="general" className="gap-2"><Car className="w-4 h-4" /> General</TabsTrigger>
+          <TabsTrigger value="insurance" className="gap-2"><Shield className="w-4 h-4" /> Insurance</TabsTrigger>
           <TabsTrigger value="prices" className="gap-2"><Banknote className="w-4 h-4" /> Prices</TabsTrigger>
           <TabsTrigger value="attributes" className="gap-2"><Tags className="w-4 h-4" /> Attributes</TabsTrigger>
           <TabsTrigger value="images" className="gap-2"><ImageIcon className="w-4 h-4" /> Images</TabsTrigger>
@@ -435,6 +471,53 @@ export function CarForm({ car, categories = [], isEditing = false, translations 
                   <p className="text-xs text-zinc-500 mt-1">If enabled, customers see "or similar" next to model name.</p>
                 </div>
 
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Insurance & Deposits */}
+        <TabsContent value="insurance" className="space-y-6">
+          <Card>
+            <CardContent className="pt-6 space-y-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Shield className="w-5 h-5 text-zinc-500" />
+                <h3 className="font-bold text-lg">Insurance Plans & Deposits</h3>
+              </div>
+              
+              <div className="grid gap-6">
+                {insurancePlans.map((plan: any) => (
+                  <div key={plan.id} className="grid md:grid-cols-3 gap-4 p-4 border rounded-lg bg-zinc-50/50">
+                    <div className="flex flex-col justify-center">
+                      <h4 className="font-bold">{plan.name}</h4>
+                      {plan.isDefault && <span className="text-xs text-zinc-500">Default Plan</span>}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`ins-price-${plan.id}`}>Daily Price Add-on (€)</Label>
+                      <Input 
+                        id={`ins-price-${plan.id}`}
+                        type="number" 
+                        min="0"
+                        placeholder="0"
+                        value={insuranceValues[plan.id]?.price || ""}
+                        onChange={(e) => handleInsuranceChange(plan.id, 'price', e.target.value)}
+                      />
+                      <input type="hidden" name={`insurance_price_${plan.id}`} value={insuranceValues[plan.id]?.price || "0"} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`ins-deposit-${plan.id}`}>Deposit Required (€)</Label>
+                      <Input 
+                        id={`ins-deposit-${plan.id}`}
+                        type="number" 
+                        min="0"
+                        placeholder="0"
+                        value={insuranceValues[plan.id]?.deposit || ""}
+                        onChange={(e) => handleInsuranceChange(plan.id, 'deposit', e.target.value)}
+                      />
+                      <input type="hidden" name={`insurance_deposit_${plan.id}`} value={insuranceValues[plan.id]?.deposit || "0"} />
+                    </div>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>

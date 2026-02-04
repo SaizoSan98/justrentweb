@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { BookingEngine } from "@/components/booking/BookingEngine";
 import { Header } from "@/components/layout/Header";
 import { prisma } from "@/lib/prisma";
-import { FleetCard } from "@/components/fleet/FleetCard"
+import { FeaturedCars } from "@/components/home/FeaturedCars"
 import { getSession } from "@/lib/auth"
 import { Hero } from "@/components/home/Hero"
 import { cookies } from "next/headers"
@@ -138,41 +138,8 @@ export default async function LandingPage() {
         </section>
       </div>
 
-      {/* Fleet Section - Floating Card */}
-      <div className="px-4 pb-4 md:px-6 md:pb-6">
-        <section className="py-32 bg-white rounded-[2.5rem] shadow-xl">
-          <div className="container mx-auto px-6">
-            <div className="flex flex-col md:flex-row justify-between items-end mb-20">
-              <div className="max-w-xl">
-                <span className="text-red-600 font-bold tracking-widest uppercase text-sm mb-4 block">Popular Cars</span>
-                <h2 className="text-5xl md:text-6xl font-black text-zinc-900 tracking-tighter leading-[0.9]">
-                  DRIVE <br/> THE BEST.
-                </h2>
-              </div>
-              <Link href="/fleet" className="hidden md:block">
-                <Button variant="ghost" className="text-lg hover:bg-transparent hover:text-red-600 p-0 flex items-center gap-4 group">
-                  View Full Fleet 
-                  <div className="w-12 h-12 rounded-full border border-zinc-200 flex items-center justify-center group-hover:border-red-600 group-hover:bg-red-600 group-hover:text-white transition-all">
-                    <ArrowRight className="w-5 h-5" />
-                  </div>
-                </Button>
-              </Link>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {serializedFeaturedCars.map((car: any) => (
-                <FleetCard key={car.id} car={car} redirectToFleet={true} dictionary={dictionary} variant="light" />
-              ))}
-            </div>
-
-            <div className="mt-16 text-center md:hidden">
-              <Link href="/fleet">
-                <Button size="lg" className="w-full bg-black text-white rounded-full">View Full Fleet</Button>
-              </Link>
-            </div>
-          </div>
-        </section>
-      </div>
+      {/* Popular Cars - New Component */}
+      <FeaturedCars cars={serializedFeaturedCars} />
 
       {/* CTA - Floating Card */}
       <div className="px-4 pb-4 md:px-6 md:pb-6">

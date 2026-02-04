@@ -15,11 +15,18 @@ export default async function EditCarPage({ params }: PageProps) {
   
   const car = await prisma.car.findUnique({
     where: { id },
-    include: { pricingTiers: true }
+    include: { 
+        pricingTiers: true,
+        insuranceOptions: true
+    }
   })
 
   const categories = await prisma.category.findMany({
     orderBy: { name: 'asc' }
+  })
+  
+  const insurancePlans = await prisma.insurancePlan.findMany({
+    orderBy: { order: 'asc' }
   })
 
   const translations = await getTranslations([id], 'Car', 'he')
@@ -40,6 +47,11 @@ export default async function EditCarPage({ params }: PageProps) {
       ...tier,
       pricePerDay: Number(tier.pricePerDay),
       deposit: Number(tier.deposit)
+    })),
+    insuranceOptions: car.insuranceOptions.map((opt: any) => ({
+        ...opt,
+        pricePerDay: Number(opt.pricePerDay),
+        deposit: Number(opt.deposit)
     }))
   }
 
@@ -54,7 +66,13 @@ export default async function EditCarPage({ params }: PageProps) {
         <h1 className="text-3xl font-black text-zinc-900 tracking-tight">Edit Car</h1>
       </div>
       
-      <CarForm car={serializedCar} categories={categories} isEditing={true} translations={translations} />
+      <CarForm 
+        car={serializedCar} 
+        categories={categories} 
+        insurancePlans={insurancePlans}
+        isEditing={true} 
+        translations={translations} 
+      />
     </div>
   )
 }

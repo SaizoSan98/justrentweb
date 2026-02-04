@@ -123,6 +123,8 @@ export async function createCar(formData: FormData) {
 
   const pricingTiersRaw = formData.get('pricingTiers') as string
   const pricingTiers = pricingTiersRaw ? JSON.parse(pricingTiersRaw) : []
+  
+  const insurancePlans = await prisma.insurancePlan.findMany()
 
   try {
     const car = await prisma.car.create({
@@ -161,6 +163,13 @@ export async function createCar(formData: FormData) {
             pricePerDay: tier.pricePerDay,
             deposit: tier.deposit
           }))
+        },
+        insuranceOptions: {
+            create: insurancePlans.map((plan) => ({
+                planId: plan.id,
+                pricePerDay: parseFloat(formData.get(`insurance_price_${plan.id}`) as string) || 0,
+                deposit: parseFloat(formData.get(`insurance_deposit_${plan.id}`) as string) || 0
+            }))
         }
       }
     })
@@ -236,6 +245,8 @@ export async function updateCar(formData: FormData) {
   const pricingTiersRaw = formData.get('pricingTiers') as string
   const pricingTiers = pricingTiersRaw ? JSON.parse(pricingTiersRaw) : []
 
+  const insurancePlans = await prisma.insurancePlan.findMany()
+
   try {
     await prisma.car.update({
       where: { id },
@@ -274,6 +285,14 @@ export async function updateCar(formData: FormData) {
             pricePerDay: tier.pricePerDay,
             deposit: tier.deposit
           }))
+        },
+        insuranceOptions: {
+            deleteMany: {},
+            create: insurancePlans.map((plan) => ({
+                planId: plan.id,
+                pricePerDay: parseFloat(formData.get(`insurance_price_${plan.id}`) as string) || 0,
+                deposit: parseFloat(formData.get(`insurance_deposit_${plan.id}`) as string) || 0
+            }))
         }
       }
     })

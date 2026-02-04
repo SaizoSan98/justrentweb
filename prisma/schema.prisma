@@ -100,6 +100,7 @@ model Car {
   damageReports      DamageReport[]
   pricingTiers       PricingTier[]
   availabilities     Availability[]
+  insuranceOptions   CarInsurance[]
   createdAt          DateTime       @default(now())
   updatedAt          DateTime       @updatedAt
 }
@@ -130,6 +131,32 @@ model Extra {
   priceType   String    @default("PER_DAY") // PER_DAY, PER_RENTAL
   icon        String?   // Lucide icon name or emoji
   bookings    Booking[]
+}
+
+model InsurancePlan {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  isDefault   Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  carInsurances CarInsurance[]
+  bookings      Booking[]
+}
+
+model CarInsurance {
+  id          String        @id @default(cuid())
+  carId       String
+  car         Car           @relation(fields: [carId], references: [id], onDelete: Cascade)
+  planId      String
+  plan        InsurancePlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  
+  pricePerDay Decimal       @default(0)
+  deposit     Decimal       @default(0)
+  
+  @@unique([carId, planId])
 }
 
 model Booking {
@@ -170,6 +197,8 @@ model Booking {
   pickupLocation  String        @default("Budapest Airport")
   dropoffLocation String        @default("Budapest Airport")
   fullInsurance   Boolean       @default(false)
+  insurancePlanId String?
+  insurancePlan   InsurancePlan? @relation(fields: [insurancePlanId], references: [id])
   
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt

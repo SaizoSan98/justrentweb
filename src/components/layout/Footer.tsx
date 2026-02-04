@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Logo } from "@/components/ui/logo";
-import { ArrowRight, MapPin, Phone, Mail } from "lucide-react";
+import { ArrowRight, MapPin, Phone, Mail, Facebook, Instagram, MessageCircle } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 export function Footer() {
@@ -25,12 +25,15 @@ export function Footer() {
               Experience the freedom of Budapest with our premium car rental service. Transparent pricing, instant booking, and a fleet that defines excellence.
             </p>
             <div className="flex gap-4">
-              {['Facebook', 'Instagram', 'LinkedIn'].map((social) => (
-                <div key={social} className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-red-600 hover:border-red-600 transition-all cursor-pointer group">
-                  <span className="sr-only">{social}</span>
-                  <ArrowRight className="w-5 h-5 -rotate-45 group-hover:text-white text-zinc-400" />
-                </div>
-              ))}
+              <a href="#" className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[#1877F2] hover:border-[#1877F2] transition-all cursor-pointer group">
+                <Facebook className="w-5 h-5 group-hover:text-white text-zinc-400" />
+              </a>
+              <a href="#" className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[#25D366] hover:border-[#25D366] transition-all cursor-pointer group">
+                <MessageCircle className="w-5 h-5 group-hover:text-white text-zinc-400" />
+              </a>
+              <a href="#" className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[#E4405F] hover:border-[#E4405F] transition-all cursor-pointer group">
+                <Instagram className="w-5 h-5 group-hover:text-white text-zinc-400" />
+              </a>
             </div>
           </div>
 

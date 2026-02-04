@@ -8,6 +8,10 @@ export default async function NewCarPage() {
   const categories = await prisma.category.findMany({
     orderBy: { name: 'asc' }
   })
+  
+  const insurancePlans = await prisma.insurancePlan.findMany({
+    orderBy: { order: 'asc' }
+  })
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-20">
@@ -20,7 +24,7 @@ export default async function NewCarPage() {
         <h1 className="text-3xl font-black text-zinc-900 tracking-tight">Add New Car</h1>
       </div>
       
-      <CarForm categories={categories} />
+      <CarForm categories={categories} insurancePlans={insurancePlans} />
     </div>
   )
 }

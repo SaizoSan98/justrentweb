@@ -143,7 +143,7 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
             <AuthModal 
               trigger={
                 <Button className="rounded-full bg-zinc-900 text-white hover:bg-zinc-800 px-6 font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all">
-                  {t('login')}
+                  Log In / Register
                 </Button>
               }
             />

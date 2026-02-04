@@ -43,6 +43,20 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // 4. Redirect Admins from /dashboard to /admin to avoid flicker
+  const isDashboardPage = request.nextUrl.pathname.startsWith("/dashboard");
+  if (isDashboardPage && currentUser) {
+    try {
+      const payload = await decrypt(currentUser);
+      if (payload.user.role === 'ADMIN' || payload.user.role === 'SUPERADMIN') {
+        console.log("Admin accessing user dashboard, redirecting to admin dashboard");
+        return NextResponse.redirect(new URL("/admin", request.url));
+      }
+    } catch (error) {
+      // Invalid token
+    }
+  }
+
   // Handle session update
   // We do this LAST so we can attach the cookie to the response we are about to return
   // But wait, if we returned a redirect above, we missed this.
