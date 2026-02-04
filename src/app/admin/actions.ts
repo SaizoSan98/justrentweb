@@ -21,7 +21,8 @@ async function uploadImage(file: File): Promise<string | null> {
     try {
       const blob = await put(file.name, file, { 
         access: 'public',
-        token: blobToken
+        token: blobToken,
+        addRandomSuffix: true
       })
       return blob.url
     } catch (error: any) {
