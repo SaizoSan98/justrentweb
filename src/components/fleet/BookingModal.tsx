@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 // import { createBooking } from "@/app/actions/booking" // We will create this
-import { useToast } from "@/components/ui/use-toast"
 
 // Types
 type CarType = {
@@ -30,19 +29,19 @@ type CarType = {
   deposit?: number
   pricingTiers: any[]
   insuranceOptions?: any[]
-  seats: number
-  suitcases: number
-  transmission: string
-  fuelType: string
-  dailyMileageLimit: number | null
-  extraKmPrice: number
-  unlimitedMileagePrice: number
-  fullInsurancePrice: number
-  registrationFee: number
-  contractFee: number
-  winterizationFee: number
-  pickupAfterHoursPrice: number
-  returnAfterHoursPrice: number
+  seats?: number
+  suitcases?: number
+  transmission?: string
+  fuelType?: string
+  dailyMileageLimit?: number | null
+  extraKmPrice?: number
+  unlimitedMileagePrice?: number
+  fullInsurancePrice?: number
+  registrationFee?: number
+  contractFee?: number
+  winterizationFee?: number
+  pickupAfterHoursPrice?: number
+  returnAfterHoursPrice?: number
 }
 
 type Extra = {
@@ -112,7 +111,7 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
   const rentalCost = basePricePerDay * days
 
   // Mileage Cost
-  const mileageCost = mileageOption === 'UNLIMITED' ? (car.unlimitedMileagePrice * days) : 0
+  const mileageCost = mileageOption === 'UNLIMITED' ? ((car.unlimitedMileagePrice || 0) * days) : 0
 
   // Insurance Cost & Deposit
   const selectedInsurance = car.insuranceOptions?.find((o: any) => o.planId === selectedInsuranceId)
@@ -316,7 +315,7 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                                       <div className="text-xs text-zinc-500">Drive without limits</div>
                                    </div>
                                 </div>
-                                <span className="font-bold text-sm">+{Math.round(car.unlimitedMileagePrice * days).toLocaleString()} Ft</span>
+                                <span className="font-bold text-sm">+{Math.round((car.unlimitedMileagePrice || 0) * days).toLocaleString()} Ft</span>
                              </div>
                           </div>
                        </div>
