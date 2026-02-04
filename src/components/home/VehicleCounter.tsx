@@ -31,6 +31,7 @@ export function VehicleCounter({ initialCount, className }: VehicleCounterProps)
          src="/audi2.jpeg" 
          alt="Vehicle Counter Background" 
          fill 
+         sizes="(max-width: 768px) 100vw, 50vw"
          className="object-cover opacity-60 transition-transform duration-700 group-hover:scale-105"
        />
        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />

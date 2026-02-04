@@ -16,6 +16,8 @@ import { Footer } from "@/components/layout/Footer"
 import { BrandStrip } from "@/components/home/BrandStrip"
 import { FeatureGrid } from "@/components/home/FeatureGrid"
 
+import { Logo } from "@/components/ui/logo"
+
 export const dynamic = 'force-dynamic'
 
 export default async function LandingPage() {
@@ -42,8 +44,8 @@ export default async function LandingPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30" />
         
         <div className="container mx-auto px-6 relative z-10 h-full flex flex-col justify-end pb-48 items-center text-center">
-           <div className="mb-6 relative w-64 h-24">
-              <Image src="/jrlogo.PNG" alt="JustRent Logo" fill className="object-contain brightness-0 invert" />
+           <div className="mb-10 scale-[2.5] origin-bottom">
+              <Logo variant="dark" />
            </div>
            <h1 className="text-4xl md:text-6xl font-bold text-white mb-8 max-w-4xl leading-tight uppercase tracking-wide">
              Rent a Car BUDAPEST

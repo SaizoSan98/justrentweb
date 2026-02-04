@@ -28,7 +28,7 @@ export async function FeatureGrid() {
                   <div className="relative z-10">
                       <h3 className="text-3xl font-bold mb-2 leading-tight">Explore more to get your comfort zone</h3>
                       <p className="text-zinc-300 mb-6 text-sm">Book your perfect stay with us.</p>
-                      <Button asChild className="bg-white text-black hover:bg-zinc-200 rounded-full px-6 font-bold">
+                      <Button asChild variant="skewed" className="px-6">
                         <Link href="/fleet">Booking Now <ArrowRight className="w-4 h-4 ml-2" /></Link>
                       </Button>
                   </div>
@@ -48,6 +48,7 @@ export async function FeatureGrid() {
                     src="/audi1.jpeg" 
                     alt="Audi Feature" 
                     fill 
+                    sizes="(max-width: 768px) 100vw, 60vw"
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />

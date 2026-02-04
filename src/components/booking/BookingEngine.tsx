@@ -289,7 +289,8 @@ export function BookingEngine({
          <div className="flex flex-col md:flex-row justify-end items-center gap-6 pt-4 border-t border-zinc-100">
             <Button 
                 onClick={handleSearch}
-                className="bg-black hover:bg-zinc-800 text-white rounded-xl px-8 h-12 font-bold w-full md:w-auto"
+                variant="skewed"
+                className="px-8 h-12 w-full md:w-auto text-base"
             >
                 Search <ArrowRightLeft className="w-4 h-4 ml-2" />
             </Button>

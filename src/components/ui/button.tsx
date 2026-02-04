@@ -18,6 +18,7 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        skewed: "bg-teal-400 text-black font-black uppercase tracking-wider transform -skew-x-12 hover:bg-teal-300 rounded-none",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -42,6 +43,32 @@ export interface ButtonProps
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
+    
+    // If skewed, we might want to unskew the content if it's text, 
+    // but typically CSS skew applies to everything. 
+    // To unskew text, we'd need a child span with skew-x-12.
+    // For simplicity, let's just apply the skew to the button container.
+    // Users can wrap content in a span with skew-x-12 if needed.
+    
+    // However, looking at the user request image, the text seems to follow the skew or is just normal.
+    // Let's implement un-skewing for children automatically if variant is skewed.
+    
+    const isSkewed = variant === 'skewed';
+
+    if (isSkewed && !asChild) {
+        return (
+            <Comp
+                className={cn(buttonVariants({ variant, size, className }))}
+                ref={ref}
+                {...props}
+            >
+                <span className="transform skew-x-12 inline-flex items-center gap-2">
+                    {props.children}
+                </span>
+            </Comp>
+        )
+    }
+
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
