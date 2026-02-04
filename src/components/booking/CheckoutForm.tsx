@@ -576,7 +576,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                   <Calendar className="w-4 h-4 text-red-500" />
                   <div>
                     <div className="text-zinc-400 text-xs">Drop-off</div>
-                    <div className="font-bold">{format(endDate, 'MMM d, yyyy')} {endTime}</div>
+                    <div className="font-bold">{endDate ? format(endDate, 'MMM d, yyyy') : 'Select Date'} {endTime}</div>
                     <div className="text-zinc-500 text-xs">{dropoffLocation}</div>
                   </div>
                 </div>
