@@ -23,7 +23,7 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
         {/* Background Image with Parallax-like feel */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/budapest2.jpg"
+            src="/rs6.avif"
             alt="Car Rental Budapest"
             fill
             className="object-cover"

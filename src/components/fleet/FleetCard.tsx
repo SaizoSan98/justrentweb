@@ -153,16 +153,16 @@ export function FleetCard({
     <div className="group relative bg-white border border-zinc-100 hover:border-zinc-200 rounded-[2rem] overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
       <div className="p-8">
         {/* Header */}
-        <div className="flex justify-between items-start mb-6">
+        <div className="flex justify-between items-start mb-2">
             <div className="space-y-2">
                 <h3 className="text-3xl font-black text-zinc-900 tracking-tight">{car.make} {car.model}</h3>
                 <div className="flex flex-wrap items-center gap-2">
                     <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest border border-zinc-200 px-3 py-1 rounded-full">
                         OR SIMILAR {car.categories?.map(c => c.name).join(', ').toUpperCase()}
                     </span>
-                    <span className="text-[10px] font-bold text-white bg-[#ff5f00] px-3 py-1 rounded-full uppercase tracking-widest">
+                    {/* <span className="text-[10px] font-bold text-white bg-[#ff5f00] px-3 py-1 rounded-full uppercase tracking-widest">
                         ADVICE OF THE DAY
-                    </span>
+                    </span> */}
                 </div>
             </div>
             
@@ -184,7 +184,7 @@ export function FleetCard({
         </div>
 
         {/* Content Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
             {/* Image */}
             <div className="relative aspect-[16/10] w-full flex items-center justify-center p-4">
                 <Image
@@ -197,7 +197,7 @@ export function FleetCard({
             </div>
 
             {/* Pricing & CTA */}
-            <div className="flex flex-col justify-center h-full space-y-8 pl-4 border-l border-zinc-100/0 md:border-zinc-100">
+            <div className="flex flex-col justify-center h-full space-y-4 pl-4 border-l border-zinc-100/0 md:border-zinc-100">
                 <div className="space-y-1 text-right md:text-left">
                     <div className="flex items-baseline justify-end md:justify-start gap-1">
                         <span className="text-5xl font-black text-zinc-900 tracking-tighter">{pricePerDay.toLocaleString()} €</span>
@@ -211,7 +211,7 @@ export function FleetCard({
                     </div>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-2">
                     <div className="flex items-center justify-end md:justify-start gap-2 text-xs font-bold text-green-600 uppercase tracking-wide">
                         <Check className="w-4 h-4" />
                         <span>Free Cancellation</span>

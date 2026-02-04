@@ -101,7 +101,7 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
   const diffTime = Math.max(0, e.getTime() - s.getTime())
   const days = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)))
 
-  // Base Price (Tiered)
+  // Calculate price based on duration
   let basePricePerDay = car.pricePerDay
   const matchingTier = car.pricingTiers?.find(
     (t: any) => days >= t.minDays && (t.maxDays === null || days <= t.maxDays)
@@ -113,7 +113,7 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
   // Mileage Cost
   const mileageCost = mileageOption === 'UNLIMITED' ? ((car.unlimitedMileagePrice || 0) * days) : 0
 
-  // Insurance Cost
+  // Insurance Cost & Deposit
   const selectedInsurance = car.insuranceOptions?.find((o: any) => o.planId === selectedInsuranceId)
   const insuranceCost = selectedInsurance ? selectedInsurance.pricePerDay * days : 0
   const currentDeposit = selectedInsurance ? selectedInsurance.deposit : (car.deposit || 0)
@@ -222,55 +222,35 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                     </div>
 
                     <div className="space-y-6">
-                       {/* Insurance Quick Select (Basic vs Basic+) */}
+                          {/* Insurance Quick Select (List all options) */}
                        <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden">
                           <div className="p-4 border-b border-zinc-100 bg-zinc-50/50">
                              <h3 className="font-bold text-zinc-900">Insurance & Deposit</h3>
                           </div>
                           <div className="p-4 space-y-3">
-                            {/* Basic */}
-                            {basicInsurance && (
+                            {sortedInsurance.map((ins) => (
                                <div 
-                                 onClick={() => setSelectedInsuranceId(basicInsurance.planId)}
+                                 key={ins.planId}
+                                 onClick={() => setSelectedInsuranceId(ins.planId)}
                                  className={cn(
                                    "flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all",
-                                   selectedInsuranceId === basicInsurance.planId ? "border-black bg-zinc-50" : "border-zinc-100 hover:border-zinc-200"
+                                   selectedInsuranceId === ins.planId ? "border-black bg-zinc-50" : "border-zinc-100 hover:border-zinc-200"
                                  )}
                                >
                                   <div className="flex items-center gap-3">
-                                     <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", selectedInsuranceId === basicInsurance.planId ? "border-black" : "border-zinc-300")}>
-                                        {selectedInsuranceId === basicInsurance.planId && <div className="w-2.5 h-2.5 rounded-full bg-black" />}
+                                     <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", selectedInsuranceId === ins.planId ? "border-black" : "border-zinc-300")}>
+                                        {selectedInsuranceId === ins.planId && <div className="w-2.5 h-2.5 rounded-full bg-black" />}
                                      </div>
                                      <div>
-                                        <div className="font-bold text-zinc-900">{basicInsurance.plan.name}</div>
-                                        <div className="text-xs text-zinc-500">Deposit: {basicInsurance.deposit?.toLocaleString() ?? 0} Ft</div>
+                                        <div className="font-bold text-zinc-900">{ins.plan.name}</div>
+                                        <div className="text-xs text-zinc-500">Deposit: {ins.deposit?.toLocaleString() ?? 0} Ft</div>
                                      </div>
                                   </div>
-                                  <span className="font-bold text-sm">Included</span>
+                                  <span className="font-bold text-sm">
+                                    {ins.pricePerDay === 0 ? "Included" : `+${Math.round(ins.pricePerDay * days).toLocaleString()} Ft`}
+                                  </span>
                                </div>
-                            )}
-
-                            {/* Basic+ */}
-                            {basicPlusInsurance && (
-                               <div 
-                                 onClick={() => setSelectedInsuranceId(basicPlusInsurance.planId)}
-                                 className={cn(
-                                   "flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all",
-                                   selectedInsuranceId === basicPlusInsurance.planId ? "border-black bg-zinc-50" : "border-zinc-100 hover:border-zinc-200"
-                                 )}
-                               >
-                                  <div className="flex items-center gap-3">
-                                     <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", selectedInsuranceId === basicPlusInsurance.planId ? "border-black" : "border-zinc-300")}>
-                                        {selectedInsuranceId === basicPlusInsurance.planId && <div className="w-2.5 h-2.5 rounded-full bg-black" />}
-                                     </div>
-                                     <div>
-                                        <div className="font-bold text-zinc-900">{basicPlusInsurance.plan.name}</div>
-                                        <div className="text-xs text-zinc-500">Deposit: {basicPlusInsurance.deposit?.toLocaleString() ?? 0} Ft</div>
-                                     </div>
-                                  </div>
-                                  <span className="font-bold text-sm">+{Math.round(basicPlusInsurance.pricePerDay * days).toLocaleString()} Ft</span>
-                               </div>
-                            )}
+                            ))}
                           </div>
                        </div>
 

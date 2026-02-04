@@ -90,17 +90,24 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
             deposit: opt.deposit?.toString() || "0" 
         }
       })
+      
+      // Also ensure plans not in car.insuranceOptions but in insurancePlans are initialized
+      insurancePlans.forEach((plan: any) => {
+          if (!initial[plan.id]) {
+              initial[plan.id] = { price: "0", deposit: "0" }
+          }
+      })
+      
       setInsuranceValues(initial)
-    } else if (insurancePlans.length > 0 && !isEditing) {
-        // Initialize with defaults if new car? Maybe not needed, fields can be empty/0
-        // But helpful to prepopulate keys
+    } else if (insurancePlans.length > 0) {
+        // Initialize with defaults if new car or no existing options
         const initial: Record<string, { price: string, deposit: string }> = {}
         insurancePlans.forEach((plan: any) => {
              initial[plan.id] = { price: "0", deposit: "0" }
         })
         setInsuranceValues(initial)
     }
-  }, [car, insurancePlans, isEditing])
+  }, [car, insurancePlans])
 
   const handleInsuranceChange = (planId: string, field: 'price' | 'deposit', value: string) => {
     setInsuranceValues(prev => ({
@@ -233,6 +240,12 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
       if (car?.imageUrl) {
         data.append('imageUrl', car.imageUrl)
       }
+
+      // Insurance Options (Fix: Properly map insuranceValues to form fields)
+      Object.keys(insuranceValues).forEach(planId => {
+          data.append(`insurance_price_${planId}`, insuranceValues[planId].price)
+          data.append(`insurance_deposit_${planId}`, insuranceValues[planId].deposit)
+      })
 
       // Switches (Fixing previous comment logic)
        

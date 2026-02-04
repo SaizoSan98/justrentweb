@@ -195,8 +195,7 @@ export default async function FleetPage({
          <div className="container mx-auto px-4 md:px-6">
             {/* Top Search & Filter Bar */}
             <div className="mb-12">
-                <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-zinc-100 mb-8">
-                     <h2 className="text-xl font-bold mb-4">Modify Search</h2>
+                <div className="bg-white rounded-3xl p-2 shadow-sm border border-zinc-100 mb-12">
                      <BookingEngine 
                         initialStartDate={startDate} 
                         initialEndDate={endDate} 
@@ -207,13 +206,18 @@ export default async function FleetPage({
                 </div>
 
                 <div className="flex flex-col md:flex-row justify-between items-end gap-4 border-b border-zinc-100 pb-4">
-                    <div>
+                    <div className="flex-1">
                         <h1 className="text-4xl font-bold mb-2">Our Fleet</h1>
-                        <p className="text-zinc-500">Choose from our premium collection of vehicles.</p>
+                        <p className="text-zinc-500 mb-4">Choose from our premium collection of vehicles.</p>
+                        
+                        {/* Active Filters Display Moved Here */}
+                        <div className="mb-2">
+                            <ActiveFilters />
+                        </div>
                     </div>
                     
-                    {/* Filter Toggle - Using Client Component for Interactivity would be ideal, but for now using a details/summary approach or just server rendered initial state */}
-                    <div className="flex items-center gap-3">
+                    {/* Filter Toggle */}
+                    <div className="flex items-center gap-3 shrink-0">
                         <span className="text-zinc-400 text-sm font-bold">{serializedCars.length} vehicles available</span>
                         <details className="relative group">
                             <summary className="list-none">
@@ -258,9 +262,9 @@ export default async function FleetPage({
                 </div>
 
                 {/* Active Filters Display */}
-                <div className="mt-4">
+                {/* <div className="mt-4">
                     <ActiveFilters />
-                </div>
+                </div> */}
             </div>
 
             {/* Cars Grid */}

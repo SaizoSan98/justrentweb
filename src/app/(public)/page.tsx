@@ -35,7 +35,7 @@ export default async function LandingPage() {
       {/* Hero Section - Full Width Image */}
       <div className="relative w-full h-[800px] bg-zinc-900">
         <Image 
-          src="/budapest.jpg" 
+          src="/rs6.avif" 
           alt="Hero" 
           fill 
           className="object-cover opacity-80"
@@ -44,9 +44,6 @@ export default async function LandingPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30" />
         
         <div className="container mx-auto px-6 relative z-10 h-full flex flex-col justify-end pb-48 items-center text-center">
-           <div className="mb-10 scale-[2.5] origin-bottom">
-              <Logo variant="dark" />
-           </div>
            <h1 className="text-4xl md:text-6xl font-bold text-white mb-8 max-w-4xl leading-tight uppercase tracking-wide">
              Rent a Car BUDAPEST
            </h1>
