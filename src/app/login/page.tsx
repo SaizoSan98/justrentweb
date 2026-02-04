@@ -22,9 +22,9 @@ function AuthForm({ searchParams }: { searchParams?: { error?: string, tab?: str
             <Image 
               src="/jrlogo.PNG" 
               alt="JustRent Logo" 
-              width={300} 
-              height={100} 
-              className="h-20 w-auto object-contain" 
+              width={360} 
+              height={120} 
+              className="h-24 w-auto object-contain" 
             />
         </div>
         <CardTitle className="text-xl font-bold text-center text-zinc-800">Welcome</CardTitle>

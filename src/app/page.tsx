@@ -151,9 +151,9 @@ export default async function LandingPage() {
              <NextImage 
                src="/jrlogo.PNG" 
                alt="JustRent Logo" 
-               width={160} 
-               height={55} 
-               className="h-12 w-auto object-contain brightness-0 invert" 
+               width={200} 
+               height={70} 
+               className="h-14 w-auto object-contain brightness-0 invert" 
              />
              <span className="ml-2">© 2024</span>
           </div>
