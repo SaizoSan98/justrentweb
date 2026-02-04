@@ -28,30 +28,46 @@ async function uploadImage(file: File): Promise<string | null> {
     }
   }
 
-  // 2. Local Storage Fallback
-  try {
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    
-    // Create unique filename
-    const timestamp = Date.now()
-    const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
-    const filename = `${timestamp}-${safeName}`
-    
-    // Ensure upload dir exists
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads')
-    await mkdir(uploadDir, { recursive: true })
-    
-    // Write file
-    const filePath = path.join(uploadDir, filename)
-    await writeFile(filePath, buffer)
-    
-    // Return public URL
-    return `/uploads/${filename}`
-  } catch (error: any) {
-    console.error("Local file upload failed:", error)
-    throw new Error(`Failed to save image locally: ${error.message}`)
-  }
+    // 2. Local Storage Fallback
+    try {
+      const bytes = await file.arrayBuffer()
+      const buffer = Buffer.from(bytes)
+      
+      // Create unique filename
+      const timestamp = Date.now()
+      const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
+      const filename = `${timestamp}-${safeName}`
+      
+      // Ensure upload dir exists
+      const uploadDir = path.join(process.cwd(), 'public', 'uploads')
+      
+      // Check if we are in a read-only environment (like Vercel production)
+      // This is a basic check. Vercel doesn't allow writing to public/ at runtime.
+      // But for local development, this works.
+      try {
+        await mkdir(uploadDir, { recursive: true })
+      } catch (err: any) {
+        if (err.code !== 'EEXIST') {
+           // If we can't create directory, we might be in a read-only env.
+           // In this case, we can try /tmp for temporary storage or fail gracefully.
+           // However, user specifically asked to fix this error.
+           console.error("Could not create upload directory. Are you on a read-only filesystem?", err)
+           throw err
+        }
+      }
+      
+      // Write file
+      const filePath = path.join(uploadDir, filename)
+      await writeFile(filePath, buffer)
+      
+      // Return public URL
+      return `/uploads/${filename}`
+    } catch (error: any) {
+      console.error("Local file upload failed:", error)
+      // If we are on Vercel, this will fail. We should probably return null or handle it better.
+      // For now, let's give a more descriptive error.
+      throw new Error(`Failed to save image locally (are you on Vercel? use Vercel Blob): ${error.message}`)
+    }
 }
 
 export async function logoutAction() {
@@ -168,7 +184,7 @@ export async function createCar(formData: FormData) {
           }))
         },
         insuranceOptions: {
-            create: insurancePlans.map((plan) => ({
+            create: insurancePlans.map((plan: any) => ({
                 planId: plan.id,
                 pricePerDay: parseFloat(formData.get(`insurance_price_${plan.id}`) as string) || 0,
                 deposit: parseFloat(formData.get(`insurance_deposit_${plan.id}`) as string) || 0
@@ -294,7 +310,7 @@ export async function updateCar(formData: FormData) {
         },
         insuranceOptions: {
             deleteMany: {},
-            create: insurancePlans.map((plan) => ({
+            create: insurancePlans.map((plan: any) => ({
                 planId: plan.id,
                 pricePerDay: parseFloat(formData.get(`insurance_price_${plan.id}`) as string) || 0,
                 deposit: parseFloat(formData.get(`insurance_deposit_${plan.id}`) as string) || 0

@@ -12,7 +12,9 @@ import { FleetFilters } from "@/components/fleet/FleetFilters";
 import { getTranslations } from "@/lib/translation"
 import { cookies } from "next/headers"
 import { dictionaries } from "@/lib/dictionary"
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, SlidersHorizontal, X } from "lucide-react";
+import { Footer } from "@/components/layout/Footer";
+import { BookingEngine } from "@/components/booking/BookingEngine";
 
 export const dynamic = 'force-dynamic';
 
@@ -170,58 +172,85 @@ export default async function FleetPage({
       guaranteedModel: !car.orSimilar
   }));
 
+  const hasActiveFilters = (categories?.length || 0) > 0 || 
+                           (transmissions?.length || 0) > 0 || 
+                           (fuelTypes?.length || 0) > 0 || 
+                           (seatCounts?.length || 0) > 0 || 
+                           guaranteedModel;
+
   return (
-    <div className="flex flex-col min-h-screen bg-zinc-50 text-zinc-900 font-sans selection:bg-red-600 selection:text-white">
+    <div className="flex flex-col min-h-screen bg-white text-zinc-900 font-sans selection:bg-red-600 selection:text-white">
       <Header transparent={false} user={session?.user} dictionary={dictionary} lang={lang} />
       
-      {/* Top Bar / Stepper */}
-      <div className="pt-24">
-        <FleetTopBar searchParams={params as any} />
-      </div>
-
-      <div className="flex-1 container mx-auto px-4 md:px-6 py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
-          
-          {/* Sidebar Filters */}
-          <aside className="w-full lg:w-64 shrink-0">
-             <div className="bg-white rounded-2xl p-6 border border-zinc-100 shadow-sm sticky top-32">
-                <FleetFilters 
-                    currentFilters={{
-                        category: categories as string[],
-                        transmission: transmissions as string[],
-                        fuelType: fuelTypes as string[],
-                        seats: seatCounts as string[],
-                        guaranteedModel
-                    }}
-                    counts={{
-                        total: allAvailableCars.length
-                    }}
-                    options={{
-                        categories: availableCategories,
-                        transmissions: availableTransmissions,
-                        fuelTypes: availableFuelTypes,
-                        seats: availableSeats
-                    }}
-                    availableCars={availableCarsSerialized}
-                    dictionary={dictionary}
-                />
-             </div>
-          </aside>
-
-          {/* Main Content */}
-          <main className="flex-1">
-             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold">Choose your vehicle <span className="text-zinc-500 text-lg font-normal ml-2">{serializedCars.length} available</span></h1>
-                <div className="flex items-center gap-2">
-                    <span className="text-sm text-zinc-400 uppercase tracking-wider font-bold">Sort By</span>
-                    <Button variant="outline" className="bg-zinc-900 border-zinc-800 text-white hover:bg-zinc-800 hover:text-white">
-                        Most Popular First
-                        <ChevronDown className="w-4 h-4 ml-2" />
-                    </Button>
+      <main className="flex-1 pt-24 pb-20">
+         <div className="container mx-auto px-4 md:px-6">
+            {/* Top Search & Filter Bar */}
+            <div className="mb-12">
+                <div className="bg-zinc-50 rounded-3xl p-6 md:p-8 shadow-sm border border-zinc-100 mb-8">
+                     <h2 className="text-xl font-bold mb-4">Modify Search</h2>
+                     <BookingEngine 
+                        initialStartDate={startDate} 
+                        initialEndDate={endDate} 
+                        compact={true} 
+                        className="!p-0 !shadow-none !bg-transparent" 
+                        dictionary={dictionary} 
+                     />
                 </div>
-             </div>
 
-             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <div className="flex flex-col md:flex-row justify-between items-end gap-4 border-b border-zinc-100 pb-4">
+                    <div>
+                        <h1 className="text-4xl font-bold mb-2">Our Fleet</h1>
+                        <p className="text-zinc-500">Choose from our premium collection of vehicles.</p>
+                    </div>
+                    
+                    {/* Filter Toggle - Using Client Component for Interactivity would be ideal, but for now using a details/summary approach or just server rendered initial state */}
+                    <div className="flex items-center gap-3">
+                        <span className="text-zinc-400 text-sm font-bold">{serializedCars.length} vehicles available</span>
+                        <details className="relative group">
+                            <summary className="list-none">
+                                <div className="inline-flex items-center justify-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-bold cursor-pointer hover:bg-zinc-800 transition-colors">
+                                    <SlidersHorizontal className="w-4 h-4" />
+                                    Filters
+                                    {hasActiveFilters && <span className="bg-red-600 w-2 h-2 rounded-full" />}
+                                </div>
+                            </summary>
+                            <div className="absolute right-0 top-full mt-2 w-80 md:w-96 bg-white rounded-2xl shadow-xl border border-zinc-100 p-6 z-50 animate-in fade-in zoom-in-95 duration-200">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="font-bold">Filter Vehicles</h3>
+                                    {hasActiveFilters && (
+                                        <Link href="/fleet" className="text-xs text-red-600 font-bold hover:underline">
+                                            Reset All
+                                        </Link>
+                                    )}
+                                </div>
+                                <FleetFilters 
+                                    currentFilters={{
+                                        category: categories as string[],
+                                        transmission: transmissions as string[],
+                                        fuelType: fuelTypes as string[],
+                                        seats: seatCounts as string[],
+                                        guaranteedModel
+                                    }}
+                                    counts={{
+                                        total: allAvailableCars.length
+                                    }}
+                                    options={{
+                                        categories: availableCategories,
+                                        transmissions: availableTransmissions,
+                                        fuelTypes: availableFuelTypes,
+                                        seats: availableSeats
+                                    }}
+                                    availableCars={availableCarsSerialized}
+                                    dictionary={dictionary}
+                                />
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+
+            {/* Cars Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                 {serializedCars.map((car: any) => (
                   <FleetCard 
                     key={car.id} 
@@ -232,26 +261,27 @@ export default async function FleetPage({
                     }}
                     extras={extras}
                     dictionary={dictionary}
-                    variant="dark"
+                    variant="light" // Using light variant for clean look
                   />
                 ))}
-             </div>
+            </div>
              
              {serializedCars.length === 0 && (
-                <div className="text-center py-20 bg-white rounded-2xl border border-zinc-100 shadow-sm">
-                    <h3 className="text-2xl font-bold text-zinc-900 mb-2">No cars available</h3>
-                    <p className="text-zinc-500">Try adjusting your dates or filters to see more results.</p>
+                <div className="text-center py-20 bg-zinc-50 rounded-3xl border border-zinc-100">
+                    <h3 className="text-2xl font-bold text-zinc-900 mb-2">No cars match your filters</h3>
+                    <p className="text-zinc-500 mb-6">Try adjusting your criteria to see more results.</p>
                     <Button 
                         asChild
-                        className="mt-6 bg-zinc-900 text-white hover:bg-zinc-800"
+                        className="bg-black text-white hover:bg-zinc-800 rounded-xl px-8"
                     >
-                        <Link href="/fleet">Clear Filters</Link>
+                        <Link href="/fleet">Clear All Filters</Link>
                     </Button>
                 </div>
              )}
-          </main>
-        </div>
-      </div>
+         </div>
+      </main>
+
+      <Footer />
     </div>
   );
 }

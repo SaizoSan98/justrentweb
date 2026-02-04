@@ -13,14 +13,14 @@ export function Footer() {
   }
 
   return (
-    <div className="px-4 pb-4 md:px-6 md:pb-6 bg-zinc-50">
-      <footer className="bg-zinc-950 text-white pt-24 pb-12 rounded-[2.5rem] shadow-2xl">
+    <div className="bg-black">
+      <footer className="bg-black text-white pt-24 pb-12">
         <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-16 mb-24">
           
           {/* Brand Column */}
           <div className="lg:col-span-4 space-y-8">
-            <Logo variant="light" className="scale-125 origin-left" />
+            <h2 className="text-2xl font-bold text-white">JustRent<span className="text-red-600">.</span></h2>
             <p className="text-zinc-400 text-lg leading-relaxed max-w-sm">
               Experience the freedom of Budapest with our premium car rental service. Transparent pricing, instant booking, and a fleet that defines excellence.
             </p>
@@ -41,10 +41,9 @@ export function Footer() {
           <div className="lg:col-span-2 space-y-6">
             <h4 className="font-bold text-white text-lg">Explore</h4>
             <ul className="space-y-4 text-zinc-400">
-              <li><Link href="/fleet" className="hover:text-red-500 transition-colors">Popular Cars</Link></li>
-              <li><Link href="/#why-choose-us" className="hover:text-red-500 transition-colors">Why Choose Us</Link></li>
+              <li><Link href="/fleet" className="hover:text-red-500 transition-colors">Our Fleet</Link></li>
               <li><Link href="/contact" className="hover:text-red-500 transition-colors">Locations</Link></li>
-              <li><Link href="/contact" className="hover:text-red-500 transition-colors">Travel Blog</Link></li>
+              <li><Link href="/contact" className="hover:text-red-500 transition-colors">About Us</Link></li>
             </ul>
           </div>
 
