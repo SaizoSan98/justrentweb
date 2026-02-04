@@ -4,6 +4,28 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import { Dictionary } from "@/lib/dictionary"
 
+const BG_TEXT = "JUST RENT • RENT A CAR • BUDAPEST • FAIR PRICES • AIRPORT PICK UP • AIRPORT DROP OFF • NEW CARS • "
+
+function MarqueeRow({ index }: { index: number }) {
+  return (
+    <motion.div 
+      className="flex whitespace-nowrap text-7xl font-black text-zinc-800 uppercase tracking-tighter"
+      initial={{ x: "-50%" }}
+      animate={{ x: "0%" }}
+      transition={{ 
+        duration: 30, 
+        repeat: Infinity, 
+        ease: "linear",
+        delay: -index * 2 // Offset to make it look less uniform if desired, or keep 0 for synced
+      }}
+    >
+      {[...Array(8)].map((_, i) => (
+        <span key={i} className="mx-4">{BG_TEXT}</span>
+      ))}
+    </motion.div>
+  )
+}
+
 export function Hero({ dictionary }: { dictionary?: Dictionary }) {
   const t = dictionary?.hero || {
     title: "Premium Car Rental",
@@ -17,17 +39,18 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
   }
 
   return (
-    <section className="relative h-[85vh] flex items-center justify-center overflow-hidden bg-zinc-900">
-      {/* Background Image */}
-      <motion.div 
-        initial={{ scale: 1.1, opacity: 0 }}
-        animate={{ scale: 1, opacity: 0.7 }}
-        transition={{ duration: 1.5, ease: "easeOut" }}
-        className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1736310305983-5efe64f5bb23?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')] bg-cover bg-center"
-      />
+    <section className="relative h-[85vh] flex items-center justify-center overflow-hidden bg-zinc-950">
+      {/* Animated Text Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-[-100%] rotate-[-15deg] flex flex-col gap-4 justify-center items-center opacity-10 select-none">
+          {[...Array(20)].map((_, i) => (
+            <MarqueeRow key={i} index={i} />
+          ))}
+        </div>
+      </div>
       
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
+      {/* Overlay for better readability */}
+      <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent"></div>
       
       <div className="relative container mx-auto px-6 flex flex-col items-center text-center z-10 pt-20 pb-32">
         <motion.div 
