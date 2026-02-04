@@ -29,9 +29,13 @@ interface HeaderProps {
   lang?: string
 }
 
+import { useRouter } from "next/navigation"
+
 export function Header({ transparent = false, user, dictionary = {}, lang = "en" }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const router = useRouter()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,6 +45,13 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
   
+  const handleSearch = (e?: React.FormEvent) => {
+    e?.preventDefault()
+    if (searchQuery.trim()) {
+        router.push(`/fleet?category=${encodeURIComponent(searchQuery.trim())}`)
+    }
+  }
+
   // Helper to safely get dictionary value
   const t = (key: string, section: string = "nav") => {
     return dictionary?.[section]?.[key] || key
@@ -103,20 +114,24 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
               ? "bg-zinc-100/80 border border-zinc-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-zinc-200" 
               : "bg-white/10 backdrop-blur-md border border-white/20 focus-within:bg-white/20"
           )}>
-            <input 
-              type="text" 
-              placeholder="Search destination..." 
-              className={cn(
-                "flex-1 bg-transparent border-none outline-none text-sm placeholder:text-zinc-400 w-full",
-                isScrolled ? "text-zinc-900" : "text-white placeholder:text-white/60"
-              )}
-            />
-            <button className={cn(
-               "ml-2",
-               isScrolled ? "text-zinc-400 hover:text-zinc-900" : "text-white/60 hover:text-white"
-            )}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-            </button>
+            <form onSubmit={handleSearch} className="flex-1 flex items-center w-full">
+                <input 
+                  type="text" 
+                  placeholder="Search Car..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className={cn(
+                    "flex-1 bg-transparent border-none outline-none text-sm placeholder:text-zinc-400 w-full",
+                    isScrolled ? "text-zinc-900" : "text-white placeholder:text-white/60"
+                  )}
+                />
+                <button type="submit" className={cn(
+                   "ml-2",
+                   isScrolled ? "text-zinc-400 hover:text-zinc-900" : "text-white/60 hover:text-white"
+                )}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                </button>
+            </form>
           </div>
 
           {/* Right Actions */}
