@@ -59,7 +59,7 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
           </motion.div>
         </div>
 
-        {/* Right Content - Booking Engine */}
+        {/* Right Content - Booking Engine - REMOVED AS PER REQUEST
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -74,6 +74,7 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
             <BookingEngine dictionary={dictionary} showLabel={true} compact={false} />
           </div>
         </motion.div>
+        */}
 
       </div>
     </section>
