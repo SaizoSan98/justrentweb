@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import { Logo } from "@/components/ui/logo"
 import { Menu, X, User, LogOut, Globe } from "lucide-react"
 import { LanguageSwitcher } from "./LanguageSwitcher"
 import { Button } from "@/components/ui/button"
@@ -42,15 +43,8 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
     }`}>
       <div className="container mx-auto px-6 h-20 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center">
-          <Image 
-            src="/jrlogo.PNG" 
-            alt="JustRent Logo" 
-            width={180} 
-            height={60} 
-            className="h-12 w-auto object-contain"
-            priority
-          />
+        <Link href="/" className="flex items-center group">
+          <Logo className="scale-125 origin-left transition-transform group-hover:scale-110" variant="dark" />
         </Link>
 
         {/* Desktop Nav */}
@@ -110,13 +104,7 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
             <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-white p-0 flex flex-col">
               <div className="p-6 border-b border-zinc-100 flex items-center justify-between">
                 <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Image 
-                    src="/jrlogo.PNG" 
-                    alt="JustRent Logo" 
-                    width={120} 
-                    height={40} 
-                    className="h-8 w-auto object-contain"
-                  />
+                  <Logo variant="dark" />
                 </Link>
                 {/* Close button is automatically added by SheetContent, but we can customize if needed */}
               </div>

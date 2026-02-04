@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Image from "next/image"
+import { Logo } from "@/components/ui/logo"
 import { X, Mail, Lock, User, ArrowRight, Github, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { loginAction, registerAction } from "@/app/login/actions"
@@ -40,13 +41,7 @@ export function AuthModal({ trigger }: AuthModalProps) {
         <div className="bg-zinc-900 p-6 text-center relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-red-600/20 to-transparent opacity-50" />
           <div className="relative z-10 flex justify-center mb-2">
-            <Image 
-              src="/jrlogo.PNG" 
-              alt="JustRent Logo" 
-              width={200} 
-              height={70} 
-              className="h-12 w-auto object-contain brightness-0 invert" 
-            />
+            <Logo variant="light" className="scale-125" />
           </div>
           <p className="text-zinc-400 text-sm mt-2 relative z-10">
             Access your premium fleet journey

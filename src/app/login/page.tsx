@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Image from "next/image"
+import { Logo } from "@/components/ui/logo"
 import { loginAction, registerAction } from "./actions"
 import { LoginButton } from "@/components/auth/LoginButton"
 import { RegisterButton } from "@/components/auth/RegisterButton"
@@ -19,13 +20,7 @@ function AuthForm({ searchParams }: { searchParams?: { error?: string, tab?: str
     <Card className="w-full max-w-md shadow-2xl border-zinc-200 overflow-hidden">
       <CardHeader className="space-y-2 pb-6 bg-zinc-50 border-b border-zinc-100">
         <div className="text-center mb-4 flex justify-center">
-            <Image 
-              src="/jrlogo.PNG" 
-              alt="JustRent Logo" 
-              width={220} 
-              height={75} 
-              className="h-14 w-auto object-contain" 
-            />
+            <Logo variant="dark" className="scale-125" />
         </div>
         <CardTitle className="text-xl font-bold text-center text-zinc-800">Welcome</CardTitle>
         <CardDescription className="text-center text-zinc-500">

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import Image from "next/image"
+import { Logo } from "@/components/ui/logo"
 import { Dictionary } from "@/lib/dictionary"
 import { BookingEngine } from "@/components/booking/BookingEngine"
 
@@ -18,64 +19,63 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
   }
 
   return (
-    <section className="relative min-h-[90vh] flex items-center bg-zinc-50 overflow-hidden">
-      <div className="container mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center relative z-10 pt-20 pb-20">
+    <section className="relative min-h-screen flex flex-col justify-end pb-32 overflow-hidden bg-zinc-950">
+      
+      {/* Background Video/Image */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="https://images.unsplash.com/photo-1503376763036-066120622c74?q=80&w=2940&auto=format&fit=crop"
+          alt="Premium Car Background"
+          fill
+          className="object-cover opacity-60"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/80 via-transparent to-transparent" />
+      </div>
+
+      <div className="container mx-auto px-6 relative z-10 grid lg:grid-cols-2 gap-12 items-end">
         
         {/* Left Content */}
-        <div className="space-y-8">
+        <div className="space-y-8 max-w-2xl">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
           >
-             <Image 
-              src="/jrlogo.PNG" 
-              alt="JustRent Logo" 
-              width={400} 
-              height={150} 
-              className="h-24 md:h-32 w-auto object-contain mb-8"
-              priority
-            />
-            <h1 className="text-5xl md:text-7xl font-black text-zinc-900 tracking-tight leading-[0.9] mb-6">
-              RENT THE <br/>
-              <span className="text-red-600">EXCEPTIONAL.</span>
+            <div className="mb-6 flex items-center gap-3">
+               <div className="h-[1px] w-12 bg-red-600"></div>
+               <span className="text-red-500 font-bold tracking-widest uppercase text-sm">Premium Car Rental</span>
+            </div>
+            
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tighter leading-[0.9] mb-8">
+              DRIVE THE <br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-zinc-500">EXTRAORDINARY.</span>
             </h1>
-            <p className="text-xl text-zinc-600 max-w-lg leading-relaxed">
+            
+            <p className="text-lg md:text-xl text-zinc-300 max-w-lg leading-relaxed font-light border-l-2 border-zinc-800 pl-6">
               {t.subtitle}
             </p>
           </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="bg-white p-2 rounded-2xl shadow-xl border border-zinc-100 max-w-xl"
-          >
-            <BookingEngine dictionary={dictionary} showLabel={true} compact={false} />
-          </motion.div>
         </div>
 
-        {/* Right Image */}
+        {/* Right Content - Booking Engine */}
         <motion.div
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="relative h-[50vh] lg:h-[80vh] w-full"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+          className="w-full"
         >
-           <div className="absolute inset-0 bg-gradient-to-l from-transparent to-zinc-50/20 z-10" />
-           <Image
-             src="https://images.unsplash.com/photo-1617788138017-80ad40651399?q=80&w=2070&auto=format&fit=crop"
-             alt="Luxury Car"
-             fill
-             className="object-cover rounded-3xl shadow-2xl"
-             priority
-           />
+          <div className="bg-white/10 backdrop-blur-md p-6 rounded-3xl border border-white/10 shadow-2xl">
+            <h3 className="text-white font-bold text-lg mb-4 flex items-center gap-2">
+              <span className="bg-red-600 w-2 h-2 rounded-full block"></span>
+              Find your perfect ride
+            </h3>
+            <BookingEngine dictionary={dictionary} showLabel={true} compact={false} />
+          </div>
         </motion.div>
 
       </div>
-      
-      {/* Decorative Background Elements */}
-      <div className="absolute top-0 right-0 w-1/3 h-full bg-zinc-100 -skew-x-12 translate-x-1/4 -z-0" />
     </section>
   )
 }

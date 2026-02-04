@@ -9,6 +9,7 @@ import { Hero } from "@/components/home/Hero"
 import { cookies } from "next/headers"
 import { dictionaries } from "@/lib/dictionary"
 import NextImage from "next/image"
+import { Logo } from "@/components/ui/logo"
 
 export const dynamic = 'force-dynamic'
 
@@ -148,13 +149,7 @@ export default async function LandingPage() {
       <footer className="bg-zinc-950 py-12 border-t border-zinc-900 text-sm text-zinc-500">
         <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
-             <NextImage 
-               src="/jrlogo.PNG" 
-               alt="JustRent Logo" 
-               width={140} 
-               height={50} 
-               className="h-10 w-auto object-contain brightness-0 invert" 
-             />
+             <Logo variant="light" className="scale-90" />
              <span className="ml-2">© 2024</span>
           </div>
           <div className="flex gap-8">
