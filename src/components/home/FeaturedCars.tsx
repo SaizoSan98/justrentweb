@@ -18,6 +18,7 @@ interface Car {
   transmission: string
   fuelType: string
   seats: number
+  category: string
 }
 
 interface FeaturedCarsProps {
