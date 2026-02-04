@@ -9,7 +9,7 @@ const BG_TEXT = "JUST RENT • RENT A CAR • BUDAPEST • FAIR PRICES • AIRPO
 function MarqueeRow({ index }: { index: number }) {
   return (
     <motion.div 
-      className="flex whitespace-nowrap text-7xl font-black text-zinc-800 uppercase tracking-tighter"
+      className="flex whitespace-nowrap text-7xl font-black text-zinc-700 uppercase tracking-tighter"
       initial={{ x: "-50%" }}
       animate={{ x: "0%" }}
       transition={{ 
@@ -42,7 +42,7 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
     <section className="relative h-[85vh] flex items-center justify-center overflow-hidden bg-zinc-950">
       {/* Animated Text Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-[-100%] rotate-[-15deg] flex flex-col gap-4 justify-center items-center opacity-10 select-none">
+        <div className="absolute inset-[-100%] rotate-[-15deg] flex flex-col gap-4 justify-center items-center opacity-20 select-none">
           {[...Array(20)].map((_, i) => (
             <MarqueeRow key={i} index={i} />
           ))}
