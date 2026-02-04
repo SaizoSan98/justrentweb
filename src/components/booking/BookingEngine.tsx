@@ -130,8 +130,7 @@ export function BookingEngine({
                       <Calendar
                         mode="single"
                         selected={dateRange?.from}
-                        onSelect={(date) => setDateRange(prev => ({ ...prev, from: date }))}
-                        initialFocus
+                        onSelect={(date) => setDateRange(prev => ({ from: date, to: prev?.to }))}
                       />
                     </PopoverContent>
                   </Popover>
@@ -162,8 +161,7 @@ export function BookingEngine({
                       <Calendar
                         mode="single"
                         selected={dateRange?.to}
-                        onSelect={(date) => setDateRange(prev => ({ ...prev, to: date }))}
-                        initialFocus
+                        onSelect={(date) => setDateRange(prev => ({ from: prev?.from, to: date }))}
                       />
                     </PopoverContent>
                   </Popover>
