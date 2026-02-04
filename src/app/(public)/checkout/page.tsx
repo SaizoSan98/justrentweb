@@ -47,8 +47,8 @@ export default async function CheckoutPage({
     where: { id: "settings" }
   })
 
-  const startDate = startDateStr ? new Date(startDateStr) : new Date()
-  const endDate = endDateStr ? new Date(endDateStr) : undefined
+  const startDate = (startDateStr && startDateStr !== 'undefined') ? new Date(startDateStr) : new Date()
+  const endDate = (endDateStr && endDateStr !== 'undefined') ? new Date(endDateStr) : undefined
 
   // Serialize complex objects for client component
   const serializedCar = {

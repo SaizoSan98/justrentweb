@@ -19,8 +19,8 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
   }
 
   return (
-    <div className="pb-4 md:pb-6 bg-zinc-50 relative">
-      <section className="relative h-[900px] flex flex-col justify-start pt-48 items-center overflow-hidden rounded-b-[2.5rem] shadow-2xl">
+    <div className="md:pb-6 bg-zinc-50 relative">
+      <section className="relative h-[900px] flex flex-col justify-start pt-28 md:pt-48 items-center overflow-hidden rounded-b-3xl md:rounded-b-[2.5rem] shadow-2xl">
         
         {/* Background Image with Parallax-like feel */}
         <div className="absolute inset-0 z-0">
@@ -116,14 +116,14 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
 
         {/* Original Floating Elements (kept as requested or replaced? User said "pin them on random places". I'll keep the new pins primarily but maybe keep one floating element if it looks good. Actually the new pins are better. I'll remove the old ones to avoid clutter.) */}
 
-        <div className="container mx-auto px-6 relative z-20 text-center h-full flex flex-col items-center">
+        <div className="container mx-auto px-4 md:px-6 relative z-20 text-center h-full flex flex-col items-center">
             
             {/* Search Widget - Top Positioned */}
             <motion.div 
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
-                className="w-full mb-12 md:mb-24"
+                className="w-full mb-8 md:mb-24"
             >
                <BookingEngine dictionary={dictionary} />
             </motion.div>
