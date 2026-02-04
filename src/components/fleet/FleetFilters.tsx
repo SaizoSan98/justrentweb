@@ -88,11 +88,11 @@ export function FleetFilters({
       values?.forEach(v => params.append(key, v))
     }
 
-    if ('category' in newFilters) updateArrayParam('category', newFilters.category)
-    if ('transmission' in newFilters) updateArrayParam('transmission', newFilters.transmission)
-    if ('fuelType' in newFilters) updateArrayParam('fuelType', newFilters.fuelType)
-    if ('seats' in newFilters) updateArrayParam('seats', newFilters.seats)
-    if ('guaranteedModel' in newFilters) {
+    if (newFilters && 'category' in newFilters) updateArrayParam('category', newFilters.category)
+    if (newFilters && 'transmission' in newFilters) updateArrayParam('transmission', newFilters.transmission)
+    if (newFilters && 'fuelType' in newFilters) updateArrayParam('fuelType', newFilters.fuelType)
+    if (newFilters && 'seats' in newFilters) updateArrayParam('seats', newFilters.seats)
+    if (newFilters && 'guaranteedModel' in newFilters) {
         if (newFilters.guaranteedModel) params.set('guaranteedModel', 'true')
         else params.delete('guaranteedModel')
     }
