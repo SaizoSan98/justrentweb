@@ -23,9 +23,9 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
       
       {/* Background Video/Image */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-zinc-950/50 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent z-10" />
         <Image
-          src="https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?q=80&w=2940&auto=format&fit=crop"
+          src="/budapest1.jpg"
           alt="Car Rental Budapest"
           fill
           className="object-cover"
@@ -46,7 +46,7 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
              <div className="h-[1px] w-12 bg-red-600"></div>
           </div>
           
-          <h1 className="text-5xl md:text-7xl lg:text-9xl font-black text-white tracking-tighter leading-[0.9] mb-8">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white tracking-tighter leading-[0.9] mb-8">
             RENT A CAR <br/>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-zinc-400">BUDAPEST</span>
           </h1>

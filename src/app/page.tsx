@@ -61,7 +61,7 @@ export default async function LandingPage() {
       </div>
 
       {/* Why Us Section - Seamless Transition */}
-      <section id="about" className="py-24 relative overflow-hidden">
+      <section id="about" className="py-24 relative overflow-hidden bg-white">
         {/* Background Elements - Fade from Hero */}
         <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-transparent to-white pointer-events-none" />
 
@@ -93,8 +93,8 @@ export default async function LandingPage() {
                 desc: "Our fleet is meticulously maintained and detailed before every rental."
               }
             ].map((item, i) => (
-              <div key={i} className="group p-8 rounded-2xl bg-white border border-zinc-100 hover:border-red-100 hover:shadow-xl transition-all duration-500 hover:-translate-y-2">
-                <div className="mb-6 bg-red-50 w-16 h-16 rounded-xl flex items-center justify-center border border-red-100 group-hover:bg-red-100 transition-colors">
+              <div key={i} className="group p-8 rounded-2xl bg-zinc-50 border border-zinc-100 hover:border-red-100 hover:shadow-xl transition-all duration-500 hover:-translate-y-2">
+                <div className="mb-6 bg-white w-16 h-16 rounded-xl flex items-center justify-center border border-zinc-100 group-hover:border-red-100 group-hover:bg-red-50 transition-colors shadow-sm">
                   {item.icon}
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-zinc-900">{item.title}</h3>
@@ -137,22 +137,19 @@ export default async function LandingPage() {
       </section>
 
       {/* Modern CTA Section */}
-      <section id="contact" className="py-32 relative overflow-hidden bg-zinc-900 text-white">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1494976388531-d1058494cdd8?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-20" />
-        <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/80 to-transparent" />
-        
+      <section id="contact" className="py-32 relative overflow-hidden bg-white text-zinc-900">
         <div className="container mx-auto px-6 relative z-10 text-center">
           <h2 className="text-5xl md:text-7xl font-black mb-8 tracking-tighter">
             READY TO <span className="text-red-600">DRIVE?</span>
           </h2>
-          <p className="text-zinc-300 text-xl mb-12 max-w-2xl mx-auto font-light">
+          <p className="text-zinc-500 text-xl mb-12 max-w-2xl mx-auto font-light">
             Book your car in minutes or contact our premium support team for special requirements.
           </p>
           <div className="flex flex-col md:flex-row justify-center gap-6">
-            <Button size="lg" className="bg-red-600 hover:bg-red-700 text-white rounded-full px-10 py-8 text-lg font-bold shadow-lg shadow-red-900/20 hover:shadow-red-900/40 transition-all">
+            <Button size="lg" className="bg-red-600 hover:bg-red-700 text-white rounded-full px-10 py-8 text-lg font-bold shadow-lg shadow-red-600/20 hover:shadow-red-600/40 transition-all">
               {t('call_us')}
             </Button>
-            <Button size="lg" variant="outline" className="border-white/20 text-white bg-white/5 hover:bg-white hover:text-black rounded-full px-10 py-8 text-lg font-bold backdrop-blur-sm">
+            <Button size="lg" variant="outline" className="border-zinc-200 text-zinc-900 bg-white hover:bg-zinc-50 hover:text-black rounded-full px-10 py-8 text-lg font-bold">
               {t('send_email')}
             </Button>
           </div>
@@ -160,18 +157,18 @@ export default async function LandingPage() {
       </section>
 
       {/* Extreme Modern Footer */}
-      <footer className="bg-black py-20 border-t border-zinc-900">
+      <footer className="bg-zinc-50 py-20 border-t border-zinc-200">
         <div className="container mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-12 mb-16">
             <div className="col-span-2">
-               <Logo variant="dark" className="scale-125 origin-left mb-8" />
+               <Logo variant="light" className="scale-125 origin-left mb-8" />
                <p className="text-zinc-500 max-w-sm leading-relaxed mb-8">
                  JustRent provides a seamless car rental experience in Budapest. 
                  Premium service, transparent pricing, and unforgettable journeys.
                </p>
                <div className="flex gap-4">
                  {[1, 2, 3].map((i) => (
-                   <div key={i} className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-400 hover:bg-red-600 hover:text-white transition-all cursor-pointer">
+                   <div key={i} className="w-10 h-10 rounded-full bg-white border border-zinc-200 flex items-center justify-center text-zinc-400 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all cursor-pointer shadow-sm">
                      <div className="w-4 h-4 bg-current rounded-full" />
                    </div>
                  ))}
@@ -179,36 +176,36 @@ export default async function LandingPage() {
             </div>
             
             <div>
-              <h4 className="font-bold text-white mb-6 tracking-widest uppercase text-sm">Navigation</h4>
+              <h4 className="font-bold text-zinc-900 mb-6 tracking-widest uppercase text-sm">Navigation</h4>
               <ul className="space-y-4 text-zinc-500">
-                <li><Link href="/" className="hover:text-red-500 transition-colors">Home</Link></li>
-                <li><Link href="/fleet" className="hover:text-red-500 transition-colors">Fleet</Link></li>
-                <li><Link href="#contact" className="hover:text-red-500 transition-colors">Contact</Link></li>
-                <li><Link href="/login" className="hover:text-red-500 transition-colors">Client Portal</Link></li>
+                <li><Link href="/" className="hover:text-red-600 transition-colors">Home</Link></li>
+                <li><Link href="/fleet" className="hover:text-red-600 transition-colors">Fleet</Link></li>
+                <li><Link href="#contact" className="hover:text-red-600 transition-colors">Contact</Link></li>
+                <li><Link href="/login" className="hover:text-red-600 transition-colors">Client Portal</Link></li>
               </ul>
             </div>
             
             <div>
-              <h4 className="font-bold text-white mb-6 tracking-widest uppercase text-sm">Contact</h4>
+              <h4 className="font-bold text-zinc-900 mb-6 tracking-widest uppercase text-sm">Contact</h4>
               <ul className="space-y-4 text-zinc-500">
                 <li className="flex items-center gap-3">
-                  <MapPin className="w-4 h-4 text-red-500" /> Budapest, Hungary
+                  <MapPin className="w-4 h-4 text-red-600" /> Budapest, Hungary
                 </li>
                 <li className="flex items-center gap-3">
-                  <Phone className="w-4 h-4 text-red-500" /> +36 1 234 5678
+                  <Phone className="w-4 h-4 text-red-600" /> +36 1 234 5678
                 </li>
                 <li className="flex items-center gap-3">
-                  <Mail className="w-4 h-4 text-red-500" /> hello@justrent.hu
+                  <Mail className="w-4 h-4 text-red-600" /> hello@justrent.hu
                 </li>
               </ul>
             </div>
           </div>
           
-          <div className="pt-8 border-t border-zinc-900 flex flex-col md:flex-row justify-between items-center gap-6 text-zinc-600 text-sm">
+          <div className="pt-8 border-t border-zinc-200 flex flex-col md:flex-row justify-between items-center gap-6 text-zinc-500 text-sm">
              <div>© 2024 JustRent. All rights reserved.</div>
              <div className="flex gap-8">
-                <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>
-                <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>
+                <Link href="#" className="hover:text-zinc-900 transition-colors">Privacy Policy</Link>
+                <Link href="#" className="hover:text-zinc-900 transition-colors">Terms of Service</Link>
              </div>
           </div>
         </div>
