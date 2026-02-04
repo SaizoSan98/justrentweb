@@ -27,7 +27,7 @@ type CarType = {
   model: string
   imageUrl: string | null
   pricePerDay: number
-  deposit: number
+  deposit?: number
   pricingTiers: any[]
   insuranceOptions: any[]
   seats: number
@@ -117,7 +117,7 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
   // Insurance Cost & Deposit
   const selectedInsurance = car.insuranceOptions?.find((o: any) => o.planId === selectedInsuranceId)
   const insuranceCost = selectedInsurance ? selectedInsurance.pricePerDay * days : 0
-  const currentDeposit = selectedInsurance ? selectedInsurance.deposit : car.deposit
+  const currentDeposit = selectedInsurance ? selectedInsurance.deposit : (car.deposit || 0)
 
   // Extras Cost
   const extrasCost = selectedExtras.reduce((acc, id) => {
