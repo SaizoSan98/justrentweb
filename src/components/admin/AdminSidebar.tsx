@@ -37,9 +37,9 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
           <Image 
             src="/jrlogo.PNG" 
             alt="JustRent Logo" 
-            width={220} 
-            height={75} 
-            className="h-16 w-auto object-contain brightness-0 invert" 
+            width={160} 
+            height={55} 
+            className="h-10 w-auto object-contain brightness-0 invert" 
           />
         </div>
         <div className="text-xs font-black text-zinc-400 block tracking-widest uppercase mb-4">

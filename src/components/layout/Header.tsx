@@ -46,9 +46,9 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
           <Image 
             src="/jrlogo.PNG" 
             alt="JustRent Logo" 
-            width={300} 
-            height={90} 
-            className="h-20 w-auto object-contain"
+            width={180} 
+            height={60} 
+            className="h-12 w-auto object-contain"
             priority
           />
         </Link>

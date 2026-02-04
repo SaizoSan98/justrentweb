@@ -43,9 +43,9 @@ export function AuthModal({ trigger }: AuthModalProps) {
             <Image 
               src="/jrlogo.PNG" 
               alt="JustRent Logo" 
-              width={300} 
-              height={100} 
-              className="h-20 w-auto object-contain brightness-0 invert" 
+              width={200} 
+              height={70} 
+              className="h-12 w-auto object-contain brightness-0 invert" 
             />
           </div>
           <p className="text-zinc-400 text-sm mt-2 relative z-10">

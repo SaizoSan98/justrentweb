@@ -35,9 +35,9 @@ export default async function DashboardLayout({
             <Image 
               src="/jrlogo.PNG" 
               alt="JustRent Logo" 
-              width={240} 
-              height={80} 
-              className="h-16 w-auto object-contain mb-2"
+              width={160} 
+              height={55} 
+              className="h-10 w-auto object-contain mb-2"
             />
             <span className="text-xs font-normal text-zinc-400 block tracking-widest mt-1">CLIENT PORTAL</span>
           </Link>
