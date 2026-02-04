@@ -56,8 +56,6 @@ type CarType = {
   }[]
 }
 
-import { Baby, Map, UserPlus, Wifi } from "lucide-react"
-
 type Extra = {
   id: string
   name: string
