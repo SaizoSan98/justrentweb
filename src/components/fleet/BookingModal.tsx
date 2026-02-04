@@ -29,7 +29,7 @@ type CarType = {
   pricePerDay: number
   deposit?: number
   pricingTiers: any[]
-  insuranceOptions: any[]
+  insuranceOptions?: any[]
   seats: number
   suitcases: number
   transmission: string
