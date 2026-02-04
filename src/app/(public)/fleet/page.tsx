@@ -199,7 +199,7 @@ export default async function FleetPage({
                         category: categories as string[],
                         transmission: transmissions as string[],
                         fuelType: fuelTypes as string[],
-                        seats: seats as string[],
+                        seats: seatCounts as string[],
                         guaranteedModel
                     }}
                     counts={{
