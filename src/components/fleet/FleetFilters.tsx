@@ -77,6 +77,16 @@ export function FleetFilters({
 
   const [isOpen, setIsOpen] = useState(false)
 
+  const [isScrolled, setIsScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20)
+    }
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
   // Calculate dynamic count based on current selection
   // If availableCars is provided, we filter client-side. Otherwise fallback to server count.
   const matchingCount = availableCars ? availableCars.filter(car => {
@@ -143,24 +153,32 @@ export function FleetFilters({
   }
 
   return (
-    <div className="w-full">
-      <div className="flex items-center justify-between gap-4">
-          
-          {/* Left: Filters & Count */}
-          <div className="flex items-center gap-4">
+    <div className="flex justify-center w-full pointer-events-none sticky top-24 z-40 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]">
+      <div className={cn(
+        "pointer-events-auto transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+        "flex items-center gap-4 bg-white/90 backdrop-blur-xl border border-zinc-200/50 shadow-[0_8px_32px_rgba(0,0,0,0.08)]",
+        isScrolled 
+          ? "w-[90%] md:w-[70%] lg:w-[60%] rounded-full px-4 py-2" 
+          : "w-full rounded-2xl px-6 py-4"
+      )}>
+          {/* Left: Main Filter Button */}
+          <div className="flex items-center gap-4 flex-shrink-0">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 h-9 border-zinc-200 hover:border-zinc-300 bg-white">
+                <Button variant="outline" className={cn(
+                  "border-zinc-200 bg-white hover:bg-zinc-50 font-bold gap-2 text-zinc-700",
+                  isScrolled ? "rounded-full h-10 px-4" : "rounded-xl h-12 px-6"
+                )}>
                   <SlidersHorizontal className="w-4 h-4" />
-                  {t('filters')}
+                  {tCommon('filters') || "Filters"}
                   {activeFiltersCount > 0 && (
-                    <span className="bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] h-[18px] flex items-center justify-center">
+                    <span className="bg-red-600 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full ml-1">
                       {activeFiltersCount}
                     </span>
                   )}
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-full sm:w-[400px] p-0 flex flex-col h-full bg-white">
+              <SheetContent side="left" className="w-[400px] p-0 flex flex-col bg-zinc-50">
                 <div className="p-6 border-b border-zinc-100 flex items-center justify-between bg-white">
                   <h2 className="text-xl font-black uppercase">{t('filters')}</h2>
                   <Button variant="ghost" size="sm" onClick={clearFilters} className="text-zinc-500 hover:text-red-600">
@@ -269,15 +287,15 @@ export function FleetFilters({
               </SheetContent>
             </Sheet>
 
-            <div className="h-6 w-px bg-zinc-200"></div>
+            <div className={cn("h-6 w-px bg-zinc-200", isScrolled ? "hidden sm:block" : "block")}></div>
 
-            <span className="text-zinc-500 text-sm font-medium">
-              {counts?.total || 0} vehicles available
+            <span className="text-zinc-500 text-sm font-medium whitespace-nowrap">
+              {counts?.total || 0} {isScrolled ? "cars" : "vehicles available"}
             </span>
           </div>
 
           {/* Right: Quick Toggles (Horizontal Scroll) */}
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide flex-1 justify-end">
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide flex-1 justify-end mask-image-gradient">
              {/* Only show categories as quick filters */}
              {categoriesList.slice(0, 4).map(cat => (
                 <div 
