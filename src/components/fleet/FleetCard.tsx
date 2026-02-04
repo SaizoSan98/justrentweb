@@ -150,85 +150,69 @@ export function FleetCard({
       extras={extras}
     />
 
-    <div className="group relative bg-white border border-zinc-100 hover:border-zinc-200 rounded-[2rem] overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-      <div className="p-8">
+    <div className="group relative bg-white border border-zinc-100 hover:border-zinc-200 rounded-[2rem] overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full flex flex-col">
+      <div className="p-4 flex flex-col h-full">
         {/* Header */}
         <div className="flex justify-between items-start mb-2">
-            <div className="space-y-2">
-                <h3 className="text-3xl font-black text-zinc-900 tracking-tight">{car.make} {car.model}</h3>
+            <div className="space-y-1">
+                <h3 className="text-xl font-black text-zinc-900 tracking-tight leading-none">{car.make} <span className="text-zinc-500 font-bold">{car.model}</span></h3>
                 <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest border border-zinc-200 px-3 py-1 rounded-full">
-                        OR SIMILAR {car.categories?.map(c => c.name).join(', ').toUpperCase()}
+                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                        OR SIMILAR
                     </span>
-                    {/* <span className="text-[10px] font-bold text-white bg-[#ff5f00] px-3 py-1 rounded-full uppercase tracking-widest">
-                        ADVICE OF THE DAY
-                    </span> */}
                 </div>
             </div>
             
-            {/* ACRISS Icons - Minimalist */}
-            <div className="flex gap-6 text-zinc-400">
-                <div className="flex flex-col items-center gap-1">
-                    <Users className="w-5 h-5 stroke-[1.5]" />
-                    <span className="text-xs font-bold">{car.seats}</span>
-                </div>
-                <div className="flex flex-col items-center gap-1">
-                    <Briefcase className="w-5 h-5 stroke-[1.5]" />
-                    <span className="text-xs font-bold">{car.suitcases}</span>
-                </div>
-                <div className="flex flex-col items-center gap-1">
-                    <Gauge className="w-5 h-5 stroke-[1.5]" />
-                    <span className="text-xs font-bold">{car.transmission === 'AUTOMATIC' ? 'A' : 'M'}</span>
-                </div>
+            {/* Price Badge */}
+            <div className="text-right">
+                 <span className="text-2xl font-black text-zinc-900 tracking-tighter block leading-none">{pricePerDay.toLocaleString()} €</span>
+                 <span className="text-[10px] font-bold text-zinc-400 uppercase">/ day</span>
             </div>
         </div>
 
-        {/* Content Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-            {/* Image */}
-            <div className="relative aspect-[16/10] w-full flex items-center justify-center p-4">
-                <Image
-                  src={car.imageUrl || "/placeholder-car.png"}
-                  alt={`${car.make} ${car.model}`}
-                  fill
-                  className="object-contain hover:scale-105 transition-transform duration-500"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
+        {/* Image */}
+        <div className="relative aspect-[16/9] w-full flex items-center justify-center my-2 bg-zinc-50 rounded-xl overflow-hidden">
+            <Image
+              src={car.imageUrl || "/placeholder-car.png"}
+              alt={`${car.make} ${car.model}`}
+              fill
+              className="object-contain p-2 hover:scale-105 transition-transform duration-500"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+        </div>
+
+        {/* Specs - Compact Grid */}
+        <div className="grid grid-cols-4 gap-2 mb-4">
+            <div className="flex flex-col items-center justify-center p-2 bg-zinc-50 rounded-lg">
+                <Users className="w-4 h-4 text-zinc-900 mb-1" />
+                <span className="text-[10px] font-bold text-zinc-500">{car.seats}</span>
             </div>
-
-            {/* Pricing & CTA */}
-            <div className="flex flex-col justify-center h-full space-y-4 pl-4 border-l border-zinc-100/0 md:border-zinc-100">
-                <div className="space-y-1 text-right md:text-left">
-                    <div className="flex items-baseline justify-end md:justify-start gap-1">
-                        <span className="text-5xl font-black text-zinc-900 tracking-tighter">{pricePerDay.toLocaleString()} €</span>
-                        <span className="text-lg font-medium text-zinc-400">/ day</span>
-                    </div>
-                    <div className="text-sm font-medium text-zinc-400 uppercase tracking-wide">
-                        {totalPrice.toLocaleString()} € Total Price
-                    </div>
-                    <div className="text-sm font-medium text-zinc-900 mt-2">
-                        {car.dailyMileageLimit ? `${car.dailyMileageLimit} km per rental` : 'Unlimited Mileage'}
-                    </div>
-                </div>
-
-                <div className="space-y-2">
-                    <div className="flex items-center justify-end md:justify-start gap-2 text-xs font-bold text-green-600 uppercase tracking-wide">
-                        <Check className="w-4 h-4" />
-                        <span>Free Cancellation</span>
-                    </div>
-                    <div className="flex items-center justify-end md:justify-start gap-2 text-xs font-bold text-green-600 uppercase tracking-wide">
-                        <Check className="w-4 h-4" />
-                        <span>Instant Confirmation</span>
-                    </div>
-                </div>
-
-                <Button 
-                    onClick={handleBooking}
-                    className="w-full bg-[#1a1a1a] text-white hover:bg-black font-bold rounded-xl h-14 text-lg uppercase tracking-wider shadow-lg hover:shadow-xl transition-all"
-                >
-                    CHOOSE
-                </Button>
+            <div className="flex flex-col items-center justify-center p-2 bg-zinc-50 rounded-lg">
+                <Briefcase className="w-4 h-4 text-zinc-900 mb-1" />
+                <span className="text-[10px] font-bold text-zinc-500">{car.suitcases}</span>
             </div>
+            <div className="flex flex-col items-center justify-center p-2 bg-zinc-50 rounded-lg">
+                <Gauge className="w-4 h-4 text-zinc-900 mb-1" />
+                <span className="text-[10px] font-bold text-zinc-500">{car.transmission === 'AUTOMATIC' ? 'Auto' : 'Man'}</span>
+            </div>
+            <div className="flex flex-col items-center justify-center p-2 bg-zinc-50 rounded-lg">
+                <Fuel className="w-4 h-4 text-zinc-900 mb-1" />
+                <span className="text-[10px] font-bold text-zinc-500">{car.fuelType}</span>
+            </div>
+        </div>
+
+        {/* Footer Actions */}
+        <div className="mt-auto pt-2 border-t border-zinc-100 flex items-center justify-between gap-4">
+             <div className="text-[10px] font-bold text-zinc-400">
+                Total: {totalPrice.toLocaleString()} €
+             </div>
+             <Button 
+                onClick={handleBooking}
+                size="sm"
+                className="bg-black text-white hover:bg-zinc-800 font-bold rounded-lg px-6 h-9 text-xs uppercase tracking-wider"
+            >
+                Select
+            </Button>
         </div>
       </div>
     </div>

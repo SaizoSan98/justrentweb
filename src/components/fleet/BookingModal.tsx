@@ -243,11 +243,11 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                                      </div>
                                      <div>
                                         <div className="font-bold text-zinc-900">{ins.plan.name}</div>
-                                        <div className="text-xs text-zinc-500">Deposit: {ins.deposit?.toLocaleString() ?? 0} Ft</div>
+                                        <div className="text-xs text-zinc-500">Deposit: {ins.deposit?.toLocaleString() ?? 0} €</div>
                                      </div>
                                   </div>
                                   <span className="font-bold text-sm">
-                                    {ins.pricePerDay === 0 ? "Included" : `+${Math.round(ins.pricePerDay * days).toLocaleString()} Ft`}
+                                    {ins.pricePerDay === 0 ? "Included" : `+${Math.round(ins.pricePerDay * days).toLocaleString()} €`}
                                   </span>
                                </div>
                             ))}
@@ -295,7 +295,7 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                                       <div className="text-xs text-zinc-500">Drive without limits</div>
                                    </div>
                                 </div>
-                                <span className="font-bold text-sm">+{Math.round((car.unlimitedMileagePrice || 0) * days).toLocaleString()} Ft</span>
+                                <span className="font-bold text-sm">+{Math.round((car.unlimitedMileagePrice || 0) * days).toLocaleString()} €</span>
                              </div>
                           </div>
                        </div>
@@ -527,7 +527,7 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
            <div className="flex items-center gap-4">
               <div className="text-right hidden sm:block">
                  <div className="text-xs text-zinc-500">Total Estimate</div>
-                 <div className="font-bold text-lg">{totalCost.toLocaleString()} Ft</div>
+                 <div className="font-bold text-lg">{totalCost.toLocaleString()} €</div>
               </div>
               {step < 5 ? (
                  <Button onClick={handleNext} className="bg-black text-white hover:bg-zinc-800 gap-2 px-8">
