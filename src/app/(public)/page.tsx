@@ -1,4 +1,6 @@
 
+"use client"
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { BookingEngine } from "@/components/booking/BookingEngine";
@@ -28,38 +30,52 @@ export default async function LandingPage() {
 
   const t = (key: string, section: string = "hero") => (dictionary as any)?.[section]?.[key] || key
 
+  // Fetch Featured Cars
+  const featuredCars = await prisma.car.findMany({
+    where: { 
+        isFeatured: true,
+        status: 'AVAILABLE'
+    },
+    take: 4,
+    include: { categories: true }
+  })
+
+  // Serialize cars to avoid Decimal issues
+  const serializedFeaturedCars = featuredCars.map(car => ({
+    ...car,
+    pricePerDay: Number(car.pricePerDay),
+    deposit: Number(car.deposit),
+    fullInsurancePrice: Number(car.fullInsurancePrice),
+    extraKmPrice: Number(car.extraKmPrice),
+    unlimitedMileagePrice: Number(car.unlimitedMileagePrice),
+    registrationFee: Number(car.registrationFee),
+    contractFee: Number(car.contractFee),
+    winterizationFee: Number(car.winterizationFee),
+    pickupAfterHoursPrice: Number(car.pickupAfterHoursPrice),
+    returnAfterHoursPrice: Number(car.returnAfterHoursPrice),
+    pricingTiers: [], // Not needed for featured card
+    insuranceOptions: [] // Not needed for featured card
+  }))
+
   return (
     <div className="flex flex-col min-h-screen bg-white font-sans selection:bg-blue-100 selection:text-blue-900">
       <Header transparent={true} user={session?.user} dictionary={dictionary} lang={lang} />
 
-      {/* Hero Section - Full Width Image */}
-      <div className="relative w-full h-[800px] bg-zinc-900">
-        <Image 
-          src="/rs6.avif" 
-          alt="Hero" 
-          fill 
-          className="object-cover opacity-80"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30" />
-        
-        <div className="container mx-auto px-6 relative z-10 h-full flex flex-col pt-32 items-center text-center">
-            {/* Search Widget - Top Positioned */}
-            <div className="w-full mb-12 md:mb-24">
-               <BookingEngine dictionary={dictionary} />
-            </div>
+      {/* Hero Section */}
+      <Hero dictionary={dictionary} />
 
-           <h1 className="text-4xl md:text-6xl font-bold text-white mb-8 max-w-4xl leading-tight uppercase tracking-wide">
-             Rent a Car BUDAPEST
-           </h1>
-        </div>
-      </div>
-
-      {/* Spacer for Search Widget */}
-      <div className="h-32 md:h-24 bg-white" />
+      {/* Spacer for Search Widget - Removed since it's now inside Hero */}
+      {/* <div className="h-32 md:h-24 bg-white" /> */}
 
       {/* Brand Strip */}
       <BrandStrip />
+
+      {/* Popular Cars Section */}
+      {serializedFeaturedCars.length > 0 && (
+          <div className="container mx-auto px-6 py-24">
+             <FeaturedCars cars={serializedFeaturedCars} />
+          </div>
+      )}
 
       {/* Feature Grid */}
       <FeatureGrid />

@@ -85,6 +85,7 @@ export function FleetCard({
   const [isExpanded, setIsExpanded] = useState(false)
   const [selectedInsuranceId, setSelectedInsuranceId] = useState<string>("")
   const [mileageOption, setMileageOption] = useState<'LIMITED' | 'UNLIMITED'>('LIMITED')
+  const [showBreakdown, setShowBreakdown] = useState(false)
 
   const startDate = searchParams?.startDate ? new Date(searchParams.startDate) : new Date()
   const endDate = searchParams?.endDate ? new Date(searchParams.endDate) : undefined
@@ -130,7 +131,7 @@ export function FleetCard({
   return (
     <div className={cn(
         "group relative bg-white border border-zinc-100 rounded-[2rem] overflow-hidden transition-all duration-300",
-        isExpanded ? "shadow-2xl ring-1 ring-zinc-200" : "hover:border-zinc-200 hover:shadow-xl hover:-translate-y-1"
+        isExpanded ? "shadow-2xl ring-1 ring-zinc-200 col-span-1 md:col-span-2 xl:col-span-3" : "hover:border-zinc-200 hover:shadow-xl hover:-translate-y-1"
     )}>
       
       {/* --- COLLAPSED STATE (DEFAULT CARD) --- */}
@@ -186,7 +187,7 @@ export function FleetCard({
 
         {/* Footer Actions */}
         <div className="mt-auto pt-2 border-t border-zinc-100 flex items-center justify-between gap-4">
-             <div className="text-[10px] font-bold text-zinc-400">
+             <div className="text-xl font-black text-zinc-900">
                 Total: {totalPrice.toLocaleString()} €
              </div>
              <Button 
@@ -203,13 +204,13 @@ export function FleetCard({
       {isExpanded && (
         <div className="flex flex-col md:flex-row h-auto min-h-[500px]">
            {/* LEFT SIDE: DARK (Image + Specs) */}
-           <div className="w-full md:w-[55%] bg-[#0a0a0a] text-white p-8 relative flex flex-col justify-between">
+           <div className="w-full md:w-[55%] bg-white md:bg-[#0a0a0a] text-zinc-900 md:text-white p-8 relative flex flex-col justify-between">
               
               {/* Header */}
               <div className="space-y-1 relative z-10">
                  <h2 className="text-3xl font-black uppercase tracking-tight">{car.make} {car.model}</h2>
-                 <p className="text-zinc-400 text-sm font-bold uppercase tracking-widest">or similar class</p>
-                 <p className="text-white/60 text-sm mt-1">{car.categories?.[0]?.name} {car.transmission} {car.fuelType}</p>
+                 <p className="text-zinc-500 md:text-zinc-400 text-sm font-bold uppercase tracking-widest">or similar class</p>
+                 <p className="text-zinc-500 md:text-white/60 text-sm mt-1">{car.categories?.[0]?.name} {car.transmission} {car.fuelType}</p>
               </div>
 
               {/* Hero Image */}
@@ -224,28 +225,28 @@ export function FleetCard({
 
               {/* Specs Grid */}
               <div className="grid grid-cols-4 gap-4 relative z-10">
-                  <div className="flex items-center gap-2 text-zinc-300">
+                  <div className="flex items-center gap-2 text-zinc-600 md:text-zinc-300">
                      <Users className="w-4 h-4" /> <span className="text-sm font-bold">{car.seats} Seats</span>
                   </div>
-                  <div className="flex items-center gap-2 text-zinc-300">
+                  <div className="flex items-center gap-2 text-zinc-600 md:text-zinc-300">
                      <Briefcase className="w-4 h-4" /> <span className="text-sm font-bold">{car.suitcases} Bags</span>
                   </div>
-                  <div className="flex items-center gap-2 text-zinc-300">
+                  <div className="flex items-center gap-2 text-zinc-600 md:text-zinc-300">
                      <Gauge className="w-4 h-4" /> <span className="text-sm font-bold">{car.transmission === 'AUTOMATIC' ? 'Auto' : 'Manual'}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-zinc-300">
+                  <div className="flex items-center gap-2 text-zinc-600 md:text-zinc-300">
                      <Fuel className="w-4 h-4" /> <span className="text-sm font-bold">{car.fuelType}</span>
                   </div>
               </div>
               
               {/* Age Restriction Note */}
-              <div className="flex items-center gap-2 mt-6 text-zinc-500 text-xs font-bold uppercase tracking-wider">
+              <div className="flex items-center gap-2 mt-6 text-zinc-400 md:text-zinc-500 text-xs font-bold uppercase tracking-wider">
                   <CreditCard className="w-3 h-3" />
                   <span>Minimum driver age: 21 years</span>
               </div>
 
               {/* Background Gradient */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80 pointer-events-none" />
+              <div className="hidden md:block absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80 pointer-events-none" />
            </div>
 
            {/* RIGHT SIDE: WHITE (Options + Total) */}
@@ -353,9 +354,37 @@ export function FleetCard({
                         </Button>
                       </Link>
                   </div>
-                  <button className="text-[10px] font-bold text-zinc-400 underline uppercase tracking-wider hover:text-zinc-600">
-                      Price Breakdown
+                  <button 
+                      onClick={() => setShowBreakdown(!showBreakdown)}
+                      className="text-[10px] font-bold text-zinc-400 underline uppercase tracking-wider hover:text-zinc-600"
+                  >
+                      {showBreakdown ? 'Hide Breakdown' : 'Price Breakdown'}
                   </button>
+                  
+                  {showBreakdown && (
+                    <div className="mt-4 p-4 bg-zinc-50 rounded-xl space-y-2 text-xs animate-in slide-in-from-top-2">
+                        <div className="flex justify-between">
+                            <span className="text-zinc-500">Base Rental ({diffDays} days)</span>
+                            <span className="font-bold text-zinc-900">{totalPrice.toLocaleString()} €</span>
+                        </div>
+                        {selectedOption && (
+                             <div className="flex justify-between">
+                                <span className="text-zinc-500">Insurance ({selectedOption.plan.name})</span>
+                                <span className="font-bold text-zinc-900">+{Math.round(insuranceCost).toLocaleString()} €</span>
+                            </div>
+                        )}
+                        {mileageOption === 'UNLIMITED' && (
+                             <div className="flex justify-between">
+                                <span className="text-zinc-500">Unlimited Mileage</span>
+                                <span className="font-bold text-zinc-900">+{Math.round(mileageCost).toLocaleString()} €</span>
+                            </div>
+                        )}
+                        <div className="flex justify-between pt-2 border-t border-zinc-200">
+                             <span className="font-bold text-zinc-900">Total</span>
+                             <span className="font-bold text-zinc-900">{finalTotal.toLocaleString()} €</span>
+                        </div>
+                    </div>
+                  )}
               </div>
 
            </div>

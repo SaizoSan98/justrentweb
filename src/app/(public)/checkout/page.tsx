@@ -11,11 +11,11 @@ export default async function CheckoutPage({
 }: {
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-  // 1. Check Auth
+  // 1. Check Auth (Removed strict redirect per user request)
   const session = await getSession()
-  if (!session?.user) {
-    redirect('/login?tab=register&error=login_required_for_booking')
-  }
+  // if (!session?.user) {
+  //   redirect('/login?tab=register&error=login_required_for_booking')
+  // }
 
   const params = await searchParams ?? {}
   const carId = typeof params.carId === 'string' ? params.carId : undefined

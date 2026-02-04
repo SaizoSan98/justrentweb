@@ -28,6 +28,7 @@ export function BrandStrip() {
                     alt={brand.name}
                     fill
                     className="object-contain"
+                    unoptimized
                  />
                </div>
                <span className="text-lg font-black text-zinc-900 uppercase tracking-tighter hidden md:block">
