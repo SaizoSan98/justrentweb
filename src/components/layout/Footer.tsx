@@ -1,8 +1,17 @@
+"use client"
+
 import Link from "next/link";
 import { Logo } from "@/components/ui/logo";
 import { ArrowRight, MapPin, Phone, Mail } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export function Footer() {
+  const pathname = usePathname();
+  
+  if (pathname?.startsWith("/admin") || pathname?.startsWith("/dashboard")) {
+    return null;
+  }
+
   return (
     <div className="px-4 pb-4 md:px-6 md:pb-6 bg-zinc-50">
       <footer className="bg-zinc-950 text-white pt-24 pb-12 rounded-[2.5rem] shadow-2xl">

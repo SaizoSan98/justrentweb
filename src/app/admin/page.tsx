@@ -23,52 +23,52 @@ export default async function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Link href="/admin/cars" className="block transition-transform hover:scale-105">
-          <Card className="h-full hover:shadow-md transition-shadow cursor-pointer">
+        <Link href="/admin/cars" className="block group">
+          <Card className="h-full border-zinc-100 hover:border-zinc-200 hover:shadow-lg transition-all duration-300 rounded-2xl bg-white overflow-hidden group-hover:-translate-y-1">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Cars</CardTitle>
-              <Car className="h-4 w-4 text-zinc-500" />
+              <CardTitle className="text-sm font-bold text-zinc-600">Total Cars</CardTitle>
+              <Car className="h-5 w-5 text-zinc-400 group-hover:text-zinc-900 transition-colors" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{carsCount}</div>
-              <p className="text-xs text-zinc-500">Active in fleet</p>
+              <div className="text-4xl font-black text-zinc-900 mb-1">{carsCount}</div>
+              <p className="text-xs text-zinc-500 font-medium">Active in fleet</p>
             </CardContent>
           </Card>
         </Link>
         
-        <Link href="/admin/bookings" className="block transition-transform hover:scale-105">
-          <Card className="h-full hover:shadow-md transition-shadow cursor-pointer">
+        <Link href="/admin/bookings" className="block group">
+          <Card className="h-full border-zinc-100 hover:border-zinc-200 hover:shadow-lg transition-all duration-300 rounded-2xl bg-white overflow-hidden group-hover:-translate-y-1">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Bookings</CardTitle>
-              <Calendar className="h-4 w-4 text-zinc-500" />
+              <CardTitle className="text-sm font-bold text-zinc-600">Active Bookings</CardTitle>
+              <Calendar className="h-5 w-5 text-zinc-400 group-hover:text-zinc-900 transition-colors" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{bookingsCount}</div>
-              <p className="text-xs text-zinc-500">Currently booked</p>
+              <div className="text-4xl font-black text-zinc-900 mb-1">{bookingsCount}</div>
+              <p className="text-xs text-zinc-500 font-medium">Currently booked</p>
             </CardContent>
           </Card>
         </Link>
 
-        <Card className="h-full opacity-70">
+        <Card className="h-full border-zinc-100 rounded-2xl bg-white/50 grayscale opacity-70 cursor-not-allowed">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-zinc-500" />
+            <CardTitle className="text-sm font-bold text-zinc-600">Total Revenue</CardTitle>
+            <DollarSign className="h-5 w-5 text-zinc-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$0</div>
-            <p className="text-xs text-zinc-500">This month</p>
+            <div className="text-4xl font-black text-zinc-900 mb-1">$0</div>
+            <p className="text-xs text-zinc-500 font-medium">This month</p>
           </CardContent>
         </Card>
 
-        <Link href="/admin/users" className="block transition-transform hover:scale-105">
-          <Card className="h-full hover:shadow-md transition-shadow cursor-pointer">
+        <Link href="/admin/users" className="block group">
+          <Card className="h-full border-zinc-100 hover:border-zinc-200 hover:shadow-lg transition-all duration-300 rounded-2xl bg-white overflow-hidden group-hover:-translate-y-1">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Users</CardTitle>
-              <Users className="h-4 w-4 text-zinc-500" />
+              <CardTitle className="text-sm font-bold text-zinc-600">Users</CardTitle>
+              <Users className="h-5 w-5 text-zinc-400 group-hover:text-zinc-900 transition-colors" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{usersCount}</div>
-              <p className="text-xs text-zinc-500">Registered accounts</p>
+              <div className="text-4xl font-black text-zinc-900 mb-1">{usersCount}</div>
+              <p className="text-xs text-zinc-500 font-medium">Registered accounts</p>
             </CardContent>
           </Card>
         </Link>
