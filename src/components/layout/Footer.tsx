@@ -4,8 +4,9 @@ import { ArrowRight, MapPin, Phone, Mail } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="bg-zinc-950 text-white pt-24 pb-12">
-      <div className="container mx-auto px-6">
+    <div className="px-4 pb-4 md:px-6 md:pb-6 bg-zinc-50">
+      <footer className="bg-zinc-950 text-white pt-24 pb-12 rounded-[2.5rem] shadow-2xl">
+        <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-16 mb-24">
           
           {/* Brand Column */}
@@ -72,6 +73,7 @@ export function Footer() {
           </div>
         </div>
       </div>
-    </footer>
+      </footer>
+    </div>
   );
 }
