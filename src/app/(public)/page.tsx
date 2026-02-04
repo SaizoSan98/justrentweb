@@ -29,6 +29,11 @@ export default async function LandingPage() {
 
   const t = (key: string, section: string = "hero") => (dictionary as any)?.[section]?.[key] || key
 
+  // Fetch Car Count
+  const carCount = await prisma.car.count({
+    where: { status: 'AVAILABLE' }
+  })
+
   // Fetch Featured Cars
   const featuredCars = await prisma.car.findMany({
     where: { 
@@ -42,6 +47,7 @@ export default async function LandingPage() {
   // Serialize cars to avoid Decimal issues
   const serializedFeaturedCars = featuredCars.map(car => ({
     ...car,
+    categories: car.categories,
     pricePerDay: Number(car.pricePerDay),
     deposit: Number(car.deposit),
     fullInsurancePrice: Number(car.fullInsurancePrice),
@@ -61,7 +67,7 @@ export default async function LandingPage() {
       <Header transparent={true} user={session?.user} dictionary={dictionary} lang={lang} />
 
       {/* Hero Section */}
-      <Hero dictionary={dictionary} />
+      <Hero dictionary={dictionary} carCount={carCount} />
 
       {/* Spacer for Search Widget - Removed since it's now inside Hero */}
       {/* <div className="h-32 md:h-24 bg-white" /> */}
@@ -71,9 +77,7 @@ export default async function LandingPage() {
 
       {/* Popular Cars Section */}
       {serializedFeaturedCars.length > 0 && (
-          <div className="container mx-auto px-6 py-24">
-             <FeaturedCars cars={serializedFeaturedCars} />
-          </div>
+          <FeaturedCars cars={serializedFeaturedCars} />
       )}
 
       {/* Feature Grid */}

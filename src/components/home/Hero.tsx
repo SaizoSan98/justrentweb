@@ -6,7 +6,7 @@ import { Dictionary } from "@/lib/dictionary"
 import { BookingEngine } from "@/components/booking/BookingEngine"
 import { MapPin, Car, Gauge } from "lucide-react"
 
-export function Hero({ dictionary }: { dictionary?: Dictionary }) {
+export function Hero({ dictionary, carCount }: { dictionary?: Dictionary; carCount?: number }) {
   const t = dictionary?.hero || {
     title: "Premium Car Rental",
     subtitle: "Experience the thrill of driving the world's finest automobiles.",
@@ -55,7 +55,7 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
                     <Car className="w-5 h-5 text-white" />
                  </div>
                  <div>
-                    <div className="text-white font-bold text-base">50+ Cars</div>
+                    <div className="text-white font-bold text-base">{carCount || 50}+ Cars</div>
                     <div className="text-white/60 text-[10px] uppercase tracking-wider font-medium">Available Now</div>
                  </div>
               </div>
