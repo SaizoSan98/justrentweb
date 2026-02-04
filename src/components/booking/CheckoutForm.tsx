@@ -275,8 +275,8 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                     <Label className="text-xs text-zinc-500">Location</Label>
                     <Input 
                       value={pickupLocation}
-                      onChange={(e) => setPickupLocation(e.target.value)}
-                      className="font-medium"
+                      readOnly
+                      className="font-medium bg-zinc-50 text-zinc-500 cursor-not-allowed border-zinc-200 focus-visible:ring-0"
                     />
                   </div>
                 </div>
@@ -335,8 +335,8 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                     <Label className="text-xs text-zinc-500">Location</Label>
                     <Input 
                       value={dropoffLocation}
-                      onChange={(e) => setDropoffLocation(e.target.value)}
-                      className="font-medium"
+                      readOnly
+                      className="font-medium bg-zinc-50 text-zinc-500 cursor-not-allowed border-zinc-200 focus-visible:ring-0"
                     />
                   </div>
                 </div>
@@ -718,9 +718,9 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                         </div>
                     </button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="sm:max-w-[425px] bg-white text-zinc-900 border-zinc-200">
                     <DialogHeader>
-                        <DialogTitle>Price Breakdown</DialogTitle>
+                        <DialogTitle className="text-xl font-bold">Price Breakdown</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-3 pt-4">
                         <div className="flex justify-between">
