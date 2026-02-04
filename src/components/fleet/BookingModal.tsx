@@ -150,7 +150,7 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
 
   // Set default insurance to the cheapest/first one if not set
   useEffect(() => {
-    if (car.insuranceOptions?.length > 0 && !selectedInsuranceId) {
+    if (car.insuranceOptions && car.insuranceOptions.length > 0 && !selectedInsuranceId) {
        // Sort by price to find "Basic"
        const sorted = [...car.insuranceOptions].sort((a, b) => a.pricePerDay - b.pricePerDay)
        setSelectedInsuranceId(sorted[0].planId)
