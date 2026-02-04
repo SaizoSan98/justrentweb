@@ -46,7 +46,7 @@ export default async function LandingPage() {
   const t = (key: string, section: string = "hero") => (dictionary as any)?.[section]?.[key] || key
 
   return (
-    <div className="flex flex-col min-h-screen bg-zinc-950 text-white font-sans selection:bg-red-500/30">
+    <div className="flex flex-col min-h-screen bg-white text-zinc-900 font-sans selection:bg-red-500/30">
       {/* Navbar */}
       <Header transparent={true} user={session?.user} dictionary={dictionary} lang={lang} />
 
@@ -55,25 +55,22 @@ export default async function LandingPage() {
 
       {/* Booking Engine - Floating */}
       <div className="container mx-auto px-6 relative z-30 -mt-24 lg:-mt-32 mb-24">
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-2xl">
+        <div className="bg-white/80 backdrop-blur-xl border border-white/20 p-6 rounded-3xl shadow-2xl">
           <BookingEngine dictionary={dictionary} />
         </div>
       </div>
 
       {/* Why Us Section - Seamless Transition */}
       <section id="about" className="py-24 relative overflow-hidden">
-        {/* Background Elements */}
-        <div className="absolute top-0 left-0 w-full h-full bg-zinc-950">
-           <div className="absolute top-0 left-1/4 w-96 h-96 bg-red-600/10 rounded-full blur-[128px]" />
-           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[128px]" />
-        </div>
+        {/* Background Elements - Fade from Hero */}
+        <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-transparent to-white pointer-events-none" />
 
         <div className="container mx-auto px-6 relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight">
+            <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight text-zinc-900">
               WHY <span className="text-red-600">US?</span>
             </h2>
-            <p className="text-zinc-400 text-lg max-w-2xl mx-auto leading-relaxed">
+            <p className="text-zinc-500 text-lg max-w-2xl mx-auto leading-relaxed">
               We redefine the car rental experience with premium service, transparent pricing, and a fleet that speaks for itself.
             </p>
           </div>
@@ -81,27 +78,27 @@ export default async function LandingPage() {
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                icon: <Shield className="w-8 h-8 text-red-500" />,
+                icon: <Shield className="w-8 h-8 text-red-600" />,
                 title: "Premium Insurance",
                 desc: "Full coverage for your peace of mind. Drive without worries."
               },
               {
-                icon: <Clock className="w-8 h-8 text-red-500" />,
+                icon: <Clock className="w-8 h-8 text-red-600" />,
                 title: "24/7 Concierge",
                 desc: "We are here for you, anytime, anywhere. Roadside assistance included."
               },
               {
-                icon: <Star className="w-8 h-8 text-red-500" />,
+                icon: <Star className="w-8 h-8 text-red-600" />,
                 title: "Top Condition",
                 desc: "Our fleet is meticulously maintained and detailed before every rental."
               }
             ].map((item, i) => (
-              <div key={i} className="group p-8 rounded-2xl bg-zinc-900/50 border border-zinc-800 hover:bg-zinc-900 hover:border-red-900/50 transition-all duration-500 hover:-translate-y-2">
-                <div className="mb-6 bg-zinc-950 w-16 h-16 rounded-xl flex items-center justify-center border border-zinc-800 group-hover:border-red-900/50 transition-colors">
+              <div key={i} className="group p-8 rounded-2xl bg-white border border-zinc-100 hover:border-red-100 hover:shadow-xl transition-all duration-500 hover:-translate-y-2">
+                <div className="mb-6 bg-red-50 w-16 h-16 rounded-xl flex items-center justify-center border border-red-100 group-hover:bg-red-100 transition-colors">
                   {item.icon}
                 </div>
-                <h3 className="text-xl font-bold mb-3">{item.title}</h3>
-                <p className="text-zinc-500 leading-relaxed group-hover:text-zinc-400 transition-colors">
+                <h3 className="text-xl font-bold mb-3 text-zinc-900">{item.title}</h3>
+                <p className="text-zinc-500 leading-relaxed">
                   {item.desc}
                 </p>
               </div>
@@ -111,15 +108,15 @@ export default async function LandingPage() {
       </section>
 
       {/* Popular Cars Section */}
-      <section id="fleet" className="py-24 bg-zinc-950 relative">
+      <section id="fleet" className="py-24 bg-zinc-50 relative">
         <div className="container mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
             <div>
-              <h2 className="text-4xl md:text-5xl font-black mb-4 tracking-tight">POPULAR <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-red-800">CARS</span></h2>
-              <p className="text-zinc-400 text-lg">Choose from our most requested models.</p>
+              <h2 className="text-4xl md:text-5xl font-black mb-4 tracking-tight text-zinc-900">POPULAR <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-800">CARS</span></h2>
+              <p className="text-zinc-500 text-lg">Choose from our most requested models.</p>
             </div>
             <Link href="/fleet">
-              <Button variant="outline" className="border-zinc-800 text-white hover:bg-white hover:text-black transition-all rounded-full px-8">
+              <Button variant="outline" className="border-zinc-200 text-zinc-900 hover:bg-zinc-900 hover:text-white transition-all rounded-full px-8">
                 VIEW ALL CARS <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
@@ -127,33 +124,35 @@ export default async function LandingPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {serializedFeaturedCars.map((car: any) => (
-              <FleetCard key={car.id} car={car} redirectToFleet={true} dictionary={dictionary} variant="dark" />
+              <FleetCard key={car.id} car={car} redirectToFleet={true} dictionary={dictionary} variant="light" />
             ))}
           </div>
           
           <div className="mt-16 text-center md:hidden">
             <Link href="/fleet">
-              <Button variant="outline" className="w-full border-zinc-800 text-white">VIEW ALL CARS</Button>
+              <Button variant="outline" className="w-full border-zinc-200 text-zinc-900">VIEW ALL CARS</Button>
             </Link>
           </div>
         </div>
       </section>
 
       {/* Modern CTA Section */}
-      <section id="contact" className="py-32 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 to-red-950/20" />
+      <section id="contact" className="py-32 relative overflow-hidden bg-zinc-900 text-white">
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1494976388531-d1058494cdd8?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-zinc-900 via-zinc-900/80 to-transparent" />
+        
         <div className="container mx-auto px-6 relative z-10 text-center">
           <h2 className="text-5xl md:text-7xl font-black mb-8 tracking-tighter">
             READY TO <span className="text-red-600">DRIVE?</span>
           </h2>
-          <p className="text-zinc-400 text-xl mb-12 max-w-2xl mx-auto font-light">
+          <p className="text-zinc-300 text-xl mb-12 max-w-2xl mx-auto font-light">
             Book your car in minutes or contact our premium support team for special requirements.
           </p>
           <div className="flex flex-col md:flex-row justify-center gap-6">
             <Button size="lg" className="bg-red-600 hover:bg-red-700 text-white rounded-full px-10 py-8 text-lg font-bold shadow-lg shadow-red-900/20 hover:shadow-red-900/40 transition-all">
               {t('call_us')}
             </Button>
-            <Button size="lg" variant="outline" className="border-zinc-700 text-white bg-transparent hover:bg-white hover:text-black rounded-full px-10 py-8 text-lg font-bold">
+            <Button size="lg" variant="outline" className="border-white/20 text-white bg-white/5 hover:bg-white hover:text-black rounded-full px-10 py-8 text-lg font-bold backdrop-blur-sm">
               {t('send_email')}
             </Button>
           </div>
