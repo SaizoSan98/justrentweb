@@ -43,17 +43,15 @@ export default async function LandingPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30" />
         
-        <div className="container mx-auto px-6 relative z-10 h-full flex flex-col justify-end pb-48 items-center text-center">
+        <div className="container mx-auto px-6 relative z-10 h-full flex flex-col pt-32 items-center text-center">
+            {/* Search Widget - Top Positioned */}
+            <div className="w-full mb-12 md:mb-24">
+               <BookingEngine dictionary={dictionary} />
+            </div>
+
            <h1 className="text-4xl md:text-6xl font-bold text-white mb-8 max-w-4xl leading-tight uppercase tracking-wide">
              Rent a Car BUDAPEST
            </h1>
-        </div>
-
-        {/* Search Widget - Overlapping */}
-        <div className="absolute -bottom-24 md:-bottom-16 left-0 right-0 z-20 px-4 md:px-6">
-           <div className="container mx-auto">
-              <BookingEngine dictionary={dictionary} />
-           </div>
         </div>
       </div>
 
