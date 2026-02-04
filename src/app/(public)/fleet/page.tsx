@@ -194,7 +194,7 @@ export default async function FleetPage({
       <main className="flex-1 pt-24 pb-20">
          <div className="container mx-auto px-4 md:px-6">
             {/* Top Search & Filter Bar */}
-            <div className="mb-12">
+            <div className="mb-20">
                  <BookingEngine 
                     initialStartDate={startDate} 
                     initialEndDate={endDate}

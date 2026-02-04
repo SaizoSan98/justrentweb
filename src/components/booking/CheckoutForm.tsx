@@ -20,6 +20,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 const ICON_MAP: Record<string, any> = {
   Map: MapIcon,
@@ -209,19 +216,9 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
         <Card className="border-0 shadow-sm ring-1 ring-zinc-200">
           <CardHeader className="border-b border-zinc-100 bg-white flex flex-row items-center justify-between py-4">
             <CardTitle className="text-xl font-bold flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-red-600" />
+              <CalendarIcon className="w-5 h-5 text-red-600" />
               Booking Details
             </CardTitle>
-            <Button 
-              type="button" 
-              variant="ghost" 
-              size="sm" 
-              className="text-red-600 hover:text-red-700 hover:bg-red-50"
-              onClick={() => setIsEditingDetails(!isEditingDetails)}
-            >
-              <Edit2 className="w-4 h-4 mr-2" />
-              {isEditingDetails ? 'Done' : 'Edit'}
-            </Button>
           </CardHeader>
           <CardContent className="p-6">
             <div className="grid md:grid-cols-2 gap-6">
@@ -235,18 +232,41 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                   <div className="space-y-1">
                     <Label className="text-xs text-zinc-500">Date & Time</Label>
                     <div className="flex gap-2">
-                      <Input 
-                        type="date" 
-                        value={format(startDate, 'yyyy-MM-dd')}
-                        onChange={(e) => setStartDate(new Date(e.target.value))}
-                        disabled={!isEditingDetails}
-                        className="font-medium"
-                      />
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button variant="outline" className="w-full justify-start text-left font-normal">
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {startDate ? format(startDate, "PPP") : <span>Pick a date</span>}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-4 flex gap-4" align="start">
+                                <Calendar
+                                    mode="single"
+                                    selected={startDate}
+                                    onSelect={(date) => date && setStartDate(date)}
+                                    disabled={(date) => date < new Date()}
+                                />
+                                <div className="h-[300px] w-px bg-zinc-100" />
+                                <div className="h-[300px] overflow-y-auto w-24 space-y-1 pr-2">
+                                    {TIME_OPTIONS.map(time => (
+                                        <button
+                                            key={time}
+                                            onClick={() => setStartTime(time)}
+                                            className={cn(
+                                                "w-full text-xs font-bold py-2 rounded-md hover:bg-zinc-100 transition-colors",
+                                                startTime === time ? "bg-black text-white hover:bg-black" : "text-zinc-600"
+                                            )}
+                                        >
+                                            {time}
+                                        </button>
+                                    ))}
+                                </div>
+                            </PopoverContent>
+                        </Popover>
                       <Input 
                         type="time" 
                         value={startTime}
                         onChange={(e) => setStartTime(e.target.value)}
-                        disabled={!isEditingDetails}
                         className="w-24 font-medium"
                       />
                     </div>
@@ -256,7 +276,6 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                     <Input 
                       value={pickupLocation}
                       onChange={(e) => setPickupLocation(e.target.value)}
-                      disabled={!isEditingDetails}
                       className="font-medium"
                     />
                   </div>
@@ -273,19 +292,41 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                   <div className="space-y-1">
                     <Label className="text-xs text-zinc-500">Date & Time</Label>
                     <div className="flex gap-2">
-                      <Input 
-                        type="date" 
-                        value={endDate ? format(endDate, 'yyyy-MM-dd') : ''}
-                        onChange={(e) => setEndDate(e.target.value ? new Date(e.target.value) : undefined)}
-                        disabled={!isEditingDetails}
-                        className={cn("font-medium", !endDate && "border-red-500")}
-                        required
-                      />
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !endDate && "border-red-500")}>
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {endDate ? format(endDate, "PPP") : <span>Pick a date</span>}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-4 flex gap-4" align="start">
+                                <Calendar
+                                    mode="single"
+                                    selected={endDate}
+                                    onSelect={(date) => date && setEndDate(date)}
+                                    disabled={(date) => date < startDate}
+                                />
+                                <div className="h-[300px] w-px bg-zinc-100" />
+                                <div className="h-[300px] overflow-y-auto w-24 space-y-1 pr-2">
+                                    {TIME_OPTIONS.map(time => (
+                                        <button
+                                            key={time}
+                                            onClick={() => setEndTime(time)}
+                                            className={cn(
+                                                "w-full text-xs font-bold py-2 rounded-md hover:bg-zinc-100 transition-colors",
+                                                endTime === time ? "bg-black text-white hover:bg-black" : "text-zinc-600"
+                                            )}
+                                        >
+                                            {time}
+                                        </button>
+                                    ))}
+                                </div>
+                            </PopoverContent>
+                        </Popover>
                       <Input 
                         type="time" 
                         value={endTime}
                         onChange={(e) => setEndTime(e.target.value)}
-                        disabled={!isEditingDetails}
                         className="w-24 font-medium"
                       />
                     </div>
@@ -295,7 +336,6 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                     <Input 
                       value={dropoffLocation}
                       onChange={(e) => setDropoffLocation(e.target.value)}
-                      disabled={!isEditingDetails}
                       className="font-medium"
                     />
                   </div>
@@ -572,6 +612,10 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                 <div>
                   <div className="font-black uppercase text-lg leading-tight">{car.make} {car.model}</div>
                   <div className="text-zinc-400 text-sm">{car.category}</div>
+                  <div className="flex items-center gap-2 mt-2">
+                     <CreditCard className="w-4 h-4 text-zinc-500" />
+                     <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider">MINIMUM DRIVER AGE: 21 YEARS</span>
+                  </div>
                 </div>
               </div>
               
@@ -663,47 +707,73 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
             </div>
 
             <div className="p-6 bg-zinc-950/50 space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-zinc-400">Car Rental ({days} days)</span>
-                <span>€{basePrice.toLocaleString()}</span>
-              </div>
               
-              {fullInsurance && (
-                <div className="flex justify-between text-green-400">
-                  <span>Full Insurance</span>
-                  <span>+€{insurancePrice.toLocaleString()}</span>
-                </div>
-              )}
+              <Dialog>
+                <DialogTrigger asChild>
+                    <button type="button" className="w-full flex justify-between items-center group">
+                        <span className="text-zinc-400 font-medium group-hover:text-white transition-colors">Total Price</span>
+                        <div className="flex items-center gap-2">
+                             <span className="text-3xl font-black text-red-500">€{totalPrice.toLocaleString()}</span>
+                             <div className="bg-zinc-800 text-zinc-400 text-[10px] px-2 py-1 rounded uppercase font-bold group-hover:bg-zinc-700 transition-colors">Details</div>
+                        </div>
+                    </button>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Price Breakdown</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-3 pt-4">
+                        <div className="flex justify-between">
+                            <span className="text-zinc-500">Car Rental ({days} days)</span>
+                            <span className="font-bold">€{basePrice.toLocaleString()}</span>
+                        </div>
+                        
+                        {insurancePrice > 0 && (
+                            <div className="flex justify-between text-green-600">
+                                <span>Insurance</span>
+                                <span>+€{insurancePrice.toLocaleString()}</span>
+                            </div>
+                        )}
 
-              {selectedExtras.map(id => {
-                const extra = extras.find(e => e.id === id)
-                if (!extra) return null
-                const price = extra.priceType === 'PER_DAY' ? extra.price * days : extra.price
-                return (
-                  <div key={id} className="flex justify-between text-zinc-300">
-                    <span>{extra.name}</span>
-                    <span>+€{price.toLocaleString()}</span>
-                  </div>
-                )
-              })}
+                        {mileagePrice > 0 && (
+                            <div className="flex justify-between text-zinc-500">
+                                <span>Unlimited Mileage</span>
+                                <span>+€{mileagePrice.toLocaleString()}</span>
+                            </div>
+                        )}
 
-              {pickupFee > 0 && (
-                <div className="flex justify-between text-zinc-300">
-                   <span>After Hours Pickup</span>
-                   <span>+€{pickupFee.toLocaleString()}</span>
-                </div>
-              )}
-              {returnFee > 0 && (
-                <div className="flex justify-between text-zinc-300">
-                   <span>After Hours Return</span>
-                   <span>+€{returnFee.toLocaleString()}</span>
-                </div>
-              )}
+                        {selectedExtras.map(id => {
+                            const extra = extras.find(e => e.id === id)
+                            if (!extra) return null
+                            const price = extra.priceType === 'PER_DAY' ? extra.price * days : extra.price
+                            return (
+                                <div key={id} className="flex justify-between text-zinc-500">
+                                    <span>{extra.name}</span>
+                                    <span>+€{price.toLocaleString()}</span>
+                                </div>
+                            )
+                        })}
 
-              <div className="pt-4 border-t border-zinc-800 flex justify-between items-end">
-                <span className="text-zinc-400 font-medium">Total</span>
-                <span className="text-3xl font-black text-red-500">€{totalPrice.toLocaleString()}</span>
-              </div>
+                        {pickupFee > 0 && (
+                            <div className="flex justify-between text-zinc-500">
+                                <span>After Hours Pickup</span>
+                                <span>+€{pickupFee.toLocaleString()}</span>
+                            </div>
+                        )}
+                        {returnFee > 0 && (
+                            <div className="flex justify-between text-zinc-500">
+                                <span>After Hours Return</span>
+                                <span>+€{returnFee.toLocaleString()}</span>
+                            </div>
+                        )}
+
+                        <div className="pt-4 border-t border-zinc-100 flex justify-between items-end mt-4">
+                            <span className="text-zinc-900 font-bold">Total</span>
+                            <span className="text-2xl font-black text-red-600">€{totalPrice.toLocaleString()}</span>
+                        </div>
+                    </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </Card>
 
