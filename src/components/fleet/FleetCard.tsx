@@ -1,20 +1,13 @@
 
 "use client"
 
-import { useState, useActionState } from "react"
+import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Users, Briefcase, Gauge, Info, Check, Shield, Zap, CreditCard, MapPin, Calendar, ArrowRight, ChevronLeft, AlertCircle, Settings } from "lucide-react"
+import { Users, Briefcase, Gauge, Info, Check, Shield, Zap, CreditCard, MapPin, Calendar, ArrowRight, ChevronLeft, AlertCircle, Settings, Fuel, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 
 type PricingTier = {
@@ -73,8 +66,6 @@ type Extra = {
   icon: string | null
 }
 
-import { BookingModal } from "./BookingModal"
-
 export function FleetCard({ 
   car, 
   searchParams,
@@ -93,11 +84,10 @@ export function FleetCard({
   dictionary?: any,
   variant?: 'light' | 'dark'
 }) {
-  const t = (key: string, section: string = "fleet") => dictionary?.[section]?.[key] || key
-  const tCommon = (key: string) => dictionary?.common?.[key?.toLowerCase()] || key
-  
-  const isDark = variant === 'dark'
-  
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [selectedInsuranceId, setSelectedInsuranceId] = useState<string>("")
+  const [mileageOption, setMileageOption] = useState<'LIMITED' | 'UNLIMITED'>('LIMITED')
+
   const startDate = searchParams?.startDate ? new Date(searchParams.startDate) : new Date()
   const endDate = searchParams?.endDate ? new Date(searchParams.endDate) : undefined
   
@@ -123,35 +113,30 @@ export function FleetCard({
 
   // Insurance Logic
   const insuranceOptions = car.insuranceOptions?.sort((a, b) => (a.plan?.order || 0) - (b.plan?.order || 0)) || []
-  const [selectedPlanId, setSelectedPlanId] = useState<string>(insuranceOptions[0]?.planId || "")
   
-  const selectedOption = insuranceOptions.find(o => o.planId === selectedPlanId)
-  const insuranceCost = selectedOption ? selectedOption.pricePerDay * diffDays : 0
-  const finalTotal = totalPrice + insuranceCost
-  const finalDeposit = selectedOption ? selectedOption.deposit : (car.deposit || 0)
+  // Initialize default insurance
+  if (!selectedInsuranceId && insuranceOptions.length > 0) {
+      setSelectedInsuranceId(insuranceOptions[0].planId)
+  }
 
-  // Booking Modal State
-  const [isBookingOpen, setIsBookingOpen] = useState(false)
+  const selectedOption = insuranceOptions.find(o => o.planId === selectedInsuranceId)
+  const insuranceCost = selectedOption ? selectedOption.pricePerDay * diffDays : 0
+  const mileageCost = mileageOption === 'UNLIMITED' ? ((car.unlimitedMileagePrice || 0) * diffDays) : 0
   
-  const handleBooking = () => {
-      setIsBookingOpen(true)
+  const finalTotal = totalPrice + insuranceCost + mileageCost
+
+  const handleToggle = () => {
+      setIsExpanded(!isExpanded)
   }
 
   return (
-    <>
-    <BookingModal 
-      isOpen={isBookingOpen} 
-      onClose={() => setIsBookingOpen(false)} 
-      car={car}
-      searchParams={{
-        startDate: searchParams?.startDate,
-        endDate: searchParams?.endDate
-      }}
-      extras={extras}
-    />
-
-    <div className="group relative bg-white border border-zinc-100 hover:border-zinc-200 rounded-[2rem] overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full flex flex-col">
-      <div className="p-4 flex flex-col h-full">
+    <div className={cn(
+        "group relative bg-white border border-zinc-100 rounded-[2rem] overflow-hidden transition-all duration-300",
+        isExpanded ? "shadow-2xl ring-1 ring-zinc-200" : "hover:border-zinc-200 hover:shadow-xl hover:-translate-y-1"
+    )}>
+      
+      {/* --- COLLAPSED STATE (DEFAULT CARD) --- */}
+      <div className={cn("p-4 flex flex-col h-full", isExpanded && "hidden")}>
         {/* Header */}
         <div className="flex justify-between items-start mb-2">
             <div className="space-y-1">
@@ -171,7 +156,7 @@ export function FleetCard({
         </div>
 
         {/* Image */}
-        <div className="relative aspect-[16/9] w-full flex items-center justify-center my-2 bg-zinc-50 rounded-xl overflow-hidden">
+        <div className="relative aspect-[16/9] w-full flex items-center justify-center my-2 bg-zinc-50 rounded-xl overflow-hidden cursor-pointer" onClick={handleToggle}>
             <Image
               src={car.imageUrl || "/placeholder-car.png"}
               alt={`${car.make} ${car.model}`}
@@ -207,7 +192,7 @@ export function FleetCard({
                 Total: {totalPrice.toLocaleString()} €
              </div>
              <Button 
-                onClick={handleBooking}
+                onClick={handleToggle}
                 size="sm"
                 className="bg-black text-white hover:bg-zinc-800 font-bold rounded-lg px-6 h-9 text-xs uppercase tracking-wider"
             >
@@ -215,7 +200,170 @@ export function FleetCard({
             </Button>
         </div>
       </div>
+
+      {/* --- EXPANDED STATE (SPLIT VIEW) --- */}
+      {isExpanded && (
+        <div className="flex flex-col md:flex-row h-auto min-h-[500px]">
+           {/* LEFT SIDE: DARK (Image + Specs) */}
+           <div className="w-full md:w-[55%] bg-[#0a0a0a] text-white p-8 relative flex flex-col justify-between">
+              
+              {/* Header */}
+              <div className="space-y-1 relative z-10">
+                 <h2 className="text-3xl font-black uppercase tracking-tight">{car.make} {car.model}</h2>
+                 <p className="text-zinc-400 text-sm font-bold uppercase tracking-widest">or similar class</p>
+                 <p className="text-white/60 text-sm mt-1">{car.categories?.[0]?.name} {car.transmission} {car.fuelType}</p>
+              </div>
+
+              {/* Hero Image */}
+              <div className="relative w-full aspect-[16/9] my-6 z-10">
+                 <Image
+                    src={car.imageUrl || "/placeholder-car.png"}
+                    alt={`${car.make} ${car.model}`}
+                    fill
+                    className="object-contain"
+                 />
+              </div>
+
+              {/* Specs Grid */}
+              <div className="grid grid-cols-4 gap-4 relative z-10">
+                  <div className="flex items-center gap-2 text-zinc-300">
+                     <Users className="w-4 h-4" /> <span className="text-sm font-bold">{car.seats} Seats</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-zinc-300">
+                     <Briefcase className="w-4 h-4" /> <span className="text-sm font-bold">{car.suitcases} Bags</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-zinc-300">
+                     <Gauge className="w-4 h-4" /> <span className="text-sm font-bold">{car.transmission === 'AUTOMATIC' ? 'Auto' : 'Manual'}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-zinc-300">
+                     <Fuel className="w-4 h-4" /> <span className="text-sm font-bold">{car.fuelType}</span>
+                  </div>
+              </div>
+              
+              {/* Age Restriction Note */}
+              <div className="flex items-center gap-2 mt-6 text-zinc-500 text-xs font-bold uppercase tracking-wider">
+                  <CreditCard className="w-3 h-3" />
+                  <span>Minimum driver age: 21 years</span>
+              </div>
+
+              {/* Background Gradient */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80 pointer-events-none" />
+           </div>
+
+           {/* RIGHT SIDE: WHITE (Options + Total) */}
+           <div className="w-full md:w-[45%] bg-white p-6 flex flex-col relative">
+              
+              {/* Close Button */}
+              <button 
+                 onClick={handleToggle}
+                 className="absolute top-4 right-4 p-2 text-zinc-400 hover:text-black hover:bg-zinc-100 rounded-full transition-colors"
+              >
+                 <X className="w-5 h-5" />
+              </button>
+
+              <h3 className="font-bold text-zinc-900 mb-6 text-lg">Booking Options</h3>
+
+              <div className="space-y-6 flex-1">
+                 {/* Insurance Options */}
+                 <div className="space-y-3">
+                    <Label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Insurance Plan</Label>
+                    <div className="space-y-2">
+                       {insuranceOptions.map((ins) => (
+                          <div 
+                             key={ins.planId}
+                             onClick={() => setSelectedInsuranceId(ins.planId)}
+                             className={cn(
+                               "flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition-all",
+                               selectedInsuranceId === ins.planId ? "border-black bg-zinc-50" : "border-zinc-100 hover:border-zinc-200"
+                             )}
+                           >
+                              <div className="flex items-center gap-3">
+                                 <div className={cn("w-4 h-4 rounded-full border-2 flex items-center justify-center", selectedInsuranceId === ins.planId ? "border-black" : "border-zinc-300")}>
+                                    {selectedInsuranceId === ins.planId && <div className="w-2 h-2 rounded-full bg-black" />}
+                                 </div>
+                                 <div>
+                                    <div className="font-bold text-sm text-zinc-900">{ins.plan.name}</div>
+                                    <div className="text-[10px] text-zinc-500 leading-tight max-w-[180px]">{ins.plan.description || "Basic coverage"}</div>
+                                 </div>
+                              </div>
+                              <span className="font-bold text-sm">
+                                {ins.pricePerDay === 0 ? "Included" : `+${Math.round(ins.pricePerDay * diffDays).toLocaleString()} €`}
+                              </span>
+                           </div>
+                       ))}
+                    </div>
+                 </div>
+
+                 {/* Mileage Options */}
+                 <div className="space-y-3">
+                    <Label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Mileage</Label>
+                    <div className="space-y-2">
+                         <div 
+                           onClick={() => setMileageOption('LIMITED')}
+                           className={cn(
+                             "flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition-all",
+                             mileageOption === 'LIMITED' ? "border-black bg-zinc-50" : "border-zinc-100 hover:border-zinc-200"
+                           )}
+                         >
+                            <div className="flex items-center gap-3">
+                               <div className={cn("w-4 h-4 rounded-full border-2 flex items-center justify-center", mileageOption === 'LIMITED' ? "border-black" : "border-zinc-300")}>
+                                  {mileageOption === 'LIMITED' && <div className="w-2 h-2 rounded-full bg-black" />}
+                               </div>
+                               <div>
+                                  <div className="font-bold text-sm text-zinc-900">{car.dailyMileageLimit || 300} km / day</div>
+                               </div>
+                            </div>
+                            <span className="font-bold text-sm">Included</span>
+                         </div>
+
+                         <div 
+                           onClick={() => setMileageOption('UNLIMITED')}
+                           className={cn(
+                             "flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition-all",
+                             mileageOption === 'UNLIMITED' ? "border-black bg-zinc-50" : "border-zinc-100 hover:border-zinc-200"
+                           )}
+                         >
+                            <div className="flex items-center gap-3">
+                               <div className={cn("w-4 h-4 rounded-full border-2 flex items-center justify-center", mileageOption === 'UNLIMITED' ? "border-black" : "border-zinc-300")}>
+                                  {mileageOption === 'UNLIMITED' && <div className="w-2 h-2 rounded-full bg-black" />}
+                               </div>
+                               <div>
+                                  <div className="font-bold text-sm text-zinc-900">Unlimited km</div>
+                               </div>
+                            </div>
+                            <span className="font-bold text-sm">+{Math.round((car.unlimitedMileagePrice || 0) * diffDays).toLocaleString()} €</span>
+                         </div>
+                    </div>
+                 </div>
+              </div>
+
+              {/* Bottom Total & CTA */}
+              <div className="mt-8 pt-6 border-t border-zinc-100">
+                  <div className="flex justify-between items-end mb-4">
+                      <div>
+                          <span className="block text-2xl font-black text-zinc-900 tracking-tighter leading-none">
+                              {Math.round(finalTotal / diffDays).toLocaleString()} €
+                              <span className="text-sm text-zinc-400 font-bold ml-1">/ day</span>
+                          </span>
+                          <span className="text-xs text-zinc-400 font-medium">
+                              Total: {finalTotal.toLocaleString()} €
+                          </span>
+                      </div>
+                      <Link href={`/checkout?carId=${car.id}&insurance=${selectedInsuranceId}&mileage=${mileageOption}&startDate=${startDate.toISOString()}&endDate=${endDate?.toISOString()}`} className="w-1/2">
+                        <Button className="w-full bg-[#ff5f00] hover:bg-[#ff5f00]/90 text-white font-bold h-12 rounded-xl uppercase tracking-wider shadow-lg shadow-orange-500/20">
+                            Next Step
+                        </Button>
+                      </Link>
+                  </div>
+                  <button className="text-[10px] font-bold text-zinc-400 underline uppercase tracking-wider hover:text-zinc-600">
+                      Price Breakdown
+                  </button>
+              </div>
+
+           </div>
+        </div>
+      )}
+
     </div>
-    </>
   )
 }
