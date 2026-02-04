@@ -50,7 +50,6 @@ export function BookingEngine({
   const [departure, setDeparture] = React.useState("Budapest Liszt Ferenc Airport (BUD)")
   const [returnLocation, setReturnLocation] = React.useState("Budapest Liszt Ferenc Airport (BUD)")
   const [isRoundTrip, setIsRoundTrip] = React.useState(false)
-  const [withDriver, setWithDriver] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
 
   const handleSearch = () => {
@@ -64,9 +63,115 @@ export function BookingEngine({
     const params = new URLSearchParams()
     if (dateRange?.from) params.set("startDate", dateRange.from.toISOString())
     if (dateRange?.to) params.set("endDate", dateRange.to.toISOString())
-    if (withDriver) params.set("withDriver", "true")
     
     router.push(`/fleet?${params.toString()}`)
+  }
+
+  if (compact) {
+    return (
+      <div className={cn("w-full bg-white rounded-2xl shadow-sm border border-zinc-100 p-4", className)}>
+        <div className="flex flex-col lg:flex-row items-center gap-4">
+             {/* Departure */}
+            <div className="flex-1 w-full min-w-[200px]">
+               <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1 block">Departure</label>
+               <div className="relative">
+                  <input 
+                    type="text" 
+                    value={departure}
+                    className="w-full text-sm font-bold text-zinc-900 bg-transparent outline-none truncate"
+                    readOnly
+                  />
+               </div>
+            </div>
+
+            <div className="w-px h-8 bg-zinc-100 hidden lg:block" />
+
+            {/* Return */}
+            <div className="flex-1 w-full min-w-[200px]">
+               <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1 block">Return Location</label>
+               <div className="relative">
+                  <input 
+                    type="text" 
+                    value={returnLocation}
+                    className="w-full text-sm font-bold text-zinc-900 bg-transparent outline-none truncate"
+                    readOnly
+                  />
+               </div>
+            </div>
+
+            <div className="w-px h-8 bg-zinc-100 hidden lg:block" />
+
+            {/* Pick Up */}
+            <div className="flex-1 w-full min-w-[200px]">
+               <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1 block">Pick Up Date & Time</label>
+               <div className="flex items-center gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="flex items-center text-sm font-bold text-zinc-900 hover:text-zinc-700 outline-none truncate">
+                         <CalendarIcon className="w-3 h-3 mr-2 text-zinc-400" />
+                         {dateRange?.from ? format(dateRange.from, "d MMM yyyy") : "Select"}
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={dateRange?.from}
+                        onSelect={(date) => setDateRange(prev => ({ from: date, to: prev?.to }))}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <select 
+                    value={startTime} 
+                    onChange={(e) => setStartTime(e.target.value)}
+                    className="text-sm font-medium text-zinc-500 outline-none bg-transparent cursor-pointer"
+                  >
+                     <option>10:30 AM</option>
+                     <option>11:00 AM</option>
+                  </select>
+               </div>
+            </div>
+
+            <div className="w-px h-8 bg-zinc-100 hidden lg:block" />
+
+            {/* Return */}
+            <div className="flex-1 w-full min-w-[200px]">
+               <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1 block">Return Date & Time</label>
+               <div className="flex items-center gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="flex items-center text-sm font-bold text-zinc-900 hover:text-zinc-700 outline-none truncate">
+                         <CalendarIcon className="w-3 h-3 mr-2 text-zinc-400" />
+                         {dateRange?.to ? format(dateRange.to, "d MMM yyyy") : "Select"}
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={dateRange?.to}
+                        onSelect={(date) => setDateRange(prev => ({ from: prev?.from, to: date }))}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <select 
+                    value={endTime} 
+                    onChange={(e) => setEndTime(e.target.value)}
+                    className="text-sm font-medium text-zinc-500 outline-none bg-transparent cursor-pointer"
+                  >
+                     <option>04:30 PM</option>
+                     <option>05:00 PM</option>
+                  </select>
+               </div>
+            </div>
+
+            <Button 
+                onClick={handleSearch}
+                className="bg-black hover:bg-zinc-800 text-white rounded-xl px-6 h-10 font-bold shrink-0"
+            >
+                Search <ArrowRightLeft className="w-3 h-3 ml-2" />
+            </Button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -181,31 +286,7 @@ export function BookingEngine({
          </div>
 
          {/* Bottom Row: Filter & Button */}
-         <div className="flex flex-col md:flex-row justify-between items-center gap-6 pt-4 border-t border-zinc-100">
-            <div className="flex items-center gap-4 w-full md:w-auto">
-               <span className="text-sm font-bold text-zinc-900">Filter:</span>
-               <div className="flex bg-zinc-100 p-1 rounded-full">
-                  <button 
-                    onClick={() => setWithDriver(false)}
-                    className={cn(
-                        "px-4 py-1.5 rounded-full text-xs font-bold transition-all",
-                        !withDriver ? "bg-black text-white shadow-md" : "text-zinc-500 hover:text-zinc-900"
-                    )}
-                  >
-                    Without Driver
-                  </button>
-                  <button 
-                    onClick={() => setWithDriver(true)}
-                    className={cn(
-                        "px-4 py-1.5 rounded-full text-xs font-bold transition-all",
-                        withDriver ? "bg-black text-white shadow-md" : "text-zinc-500 hover:text-zinc-900"
-                    )}
-                  >
-                    With Driver
-                  </button>
-               </div>
-            </div>
-
+         <div className="flex flex-col md:flex-row justify-end items-center gap-6 pt-4 border-t border-zinc-100">
             <Button 
                 onClick={handleSearch}
                 className="bg-black hover:bg-zinc-800 text-white rounded-xl px-8 h-12 font-bold w-full md:w-auto"

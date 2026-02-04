@@ -73,6 +73,8 @@ type Extra = {
   icon: string | null
 }
 
+import { BookingModal } from "./BookingModal"
+
 export function FleetCard({ 
   car, 
   searchParams,
@@ -137,90 +139,16 @@ export function FleetCard({
 
   return (
     <>
-    <Dialog open={isBookingOpen} onOpenChange={setIsBookingOpen}>
-        <DialogContent className="max-w-3xl bg-white border-zinc-100 text-zinc-900">
-            <DialogHeader>
-                <DialogTitle className="text-2xl font-bold text-zinc-900">Customize Your Rental</DialogTitle>
-            </DialogHeader>
-            
-            <div className="grid md:grid-cols-3 gap-6 py-4">
-                <div className="md:col-span-2 space-y-6">
-                    <div>
-                        <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-zinc-900">
-                            <Shield className="w-5 h-5 text-red-600" />
-                            Select Insurance Plan
-                        </h3>
-                        <div className="grid gap-4">
-                            {insuranceOptions.length > 0 ? insuranceOptions.map((option) => (
-                                <div 
-                                    key={option.planId}
-                                    onClick={() => setSelectedPlanId(option.planId)}
-                                    className={cn(
-                                        "cursor-pointer border rounded-xl p-4 transition-all relative overflow-hidden",
-                                        selectedPlanId === option.planId 
-                                            ? "bg-red-50 border-red-600 ring-1 ring-red-600" 
-                                            : "bg-white border-zinc-200 hover:border-zinc-300"
-                                    )}
-                                >
-                                    <div className="flex justify-between items-start mb-2">
-                                        <h4 className="font-bold text-zinc-900">{option.plan.name}</h4>
-                                        <span className="font-mono text-sm font-bold text-zinc-700">
-                                            {option.pricePerDay > 0 ? `+${option.pricePerDay}€/day` : "Included"}
-                                        </span>
-                                    </div>
-                                    <p className="text-sm text-zinc-500 mb-3">{option.plan.description}</p>
-                                    <div className="flex items-center gap-2 text-xs font-bold text-zinc-500">
-                                        <CreditCard className="w-3 h-3" />
-                                        <span>Deposit: {option.deposit}€</span>
-                                    </div>
-                                </div>
-                            )) : (
-                                <div className="p-4 bg-zinc-50 rounded-xl border border-zinc-200 text-zinc-500 text-sm">
-                                    Standard insurance included. Deposit: {car.deposit}€
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-
-                <div className="md:col-span-1">
-                    <div className="bg-zinc-50 rounded-xl p-6 border border-zinc-100 sticky top-4">
-                        <h3 className="font-bold text-lg mb-4 text-zinc-900">Summary</h3>
-                        
-                        <div className="space-y-4 text-sm">
-                            <div className="flex justify-between text-zinc-500">
-                                <span>Car Rental ({diffDays} days)</span>
-                                <span>{totalPrice.toLocaleString()}€</span>
-                            </div>
-                            {insuranceCost > 0 && (
-                                <div className="flex justify-between text-zinc-500">
-                                    <span>Insurance ({selectedOption?.plan.name})</span>
-                                    <span>{insuranceCost.toLocaleString()}€</span>
-                                </div>
-                            )}
-                            
-                            <div className="pt-4 border-t border-zinc-200 flex justify-between items-end">
-                                <span className="font-bold text-zinc-900">Total</span>
-                                <span className="text-2xl font-black text-zinc-900">{finalTotal.toLocaleString()}€</span>
-                            </div>
-                            
-                            <div className="bg-white rounded-lg p-3 text-xs text-zinc-500 mt-4 border border-zinc-200">
-                                <div className="flex justify-between mb-1">
-                                    <span>Refundable Deposit:</span>
-                                    <span className="text-zinc-900 font-bold">{finalDeposit}€</span>
-                                </div>
-                                <p>Blocked on card at pickup.</p>
-                            </div>
-
-                            <Button className="w-full mt-4 bg-red-600 hover:bg-red-700 text-white font-bold h-12">
-                                Continue to Extras
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </DialogContent>
-    </Dialog>
+    <BookingModal 
+      isOpen={isBookingOpen} 
+      onClose={() => setIsBookingOpen(false)} 
+      car={car}
+      searchParams={{
+        startDate: searchParams?.startDate,
+        endDate: searchParams?.endDate
+      }}
+      extras={extras}
+    />
 
     <div className="group relative bg-white border border-zinc-100 hover:border-zinc-200 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
       <div className="p-6">

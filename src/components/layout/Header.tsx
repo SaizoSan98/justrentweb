@@ -48,7 +48,7 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
   const handleSearch = (e?: React.FormEvent) => {
     e?.preventDefault()
     if (searchQuery.trim()) {
-        router.push(`/fleet?category=${encodeURIComponent(searchQuery.trim())}`)
+        router.push(`/fleet?make=${encodeURIComponent(searchQuery.trim())}`)
     }
   }
 
@@ -117,7 +117,7 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
             <form onSubmit={handleSearch} className="flex-1 flex items-center w-full">
                 <input 
                   type="text" 
-                  placeholder="Search Car..." 
+                  placeholder="Search Car" 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className={cn(

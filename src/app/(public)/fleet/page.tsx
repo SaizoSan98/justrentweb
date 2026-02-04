@@ -8,6 +8,7 @@ import { FleetTopBar } from "@/components/fleet/FleetTopBar";
 import { getSession } from "@/lib/auth";
 
 import { FleetFilters } from "@/components/fleet/FleetFilters";
+import { ActiveFilters } from "@/components/fleet/ActiveFilters";
 
 import { getTranslations } from "@/lib/translation"
 import { cookies } from "next/headers"
@@ -42,6 +43,7 @@ export default async function FleetPage({
   const seatCounts = typeof params.seats === 'object' ? params.seats : (seats ? [seats] : undefined);
 
   const guaranteedModel = params.guaranteedModel === 'true';
+  const make = typeof params.make === 'string' ? params.make : undefined;
 
   // Date parsing and calculation
   const startDateStr = typeof params.startDate === 'string' ? params.startDate : undefined;
@@ -99,6 +101,13 @@ export default async function FleetPage({
 
   if (guaranteedModel) {
     fullWhereClause.orSimilar = false;
+  }
+
+  if (make) {
+    fullWhereClause.make = {
+      contains: make,
+      mode: 'insensitive'
+    };
   }
 
   const [cars, allAvailableCars, extrasData] = await Promise.all([
@@ -186,7 +195,7 @@ export default async function FleetPage({
          <div className="container mx-auto px-4 md:px-6">
             {/* Top Search & Filter Bar */}
             <div className="mb-12">
-                <div className="bg-zinc-50 rounded-3xl p-6 md:p-8 shadow-sm border border-zinc-100 mb-8">
+                <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-zinc-100 mb-8">
                      <h2 className="text-xl font-bold mb-4">Modify Search</h2>
                      <BookingEngine 
                         initialStartDate={startDate} 
@@ -246,6 +255,11 @@ export default async function FleetPage({
                             </div>
                         </details>
                     </div>
+                </div>
+
+                {/* Active Filters Display */}
+                <div className="mt-4">
+                    <ActiveFilters />
                 </div>
             </div>
 
