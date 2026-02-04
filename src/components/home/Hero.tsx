@@ -25,8 +25,8 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-zinc-950/50 z-10" />
         <Image
-          src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=2898&auto=format&fit=crop"
-          alt="Premium Car Background"
+          src="https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?q=80&w=2940&auto=format&fit=crop"
+          alt="Car Rental Budapest"
           fill
           className="object-cover"
           priority
@@ -42,18 +42,14 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
         >
           <div className="mb-6 flex items-center justify-center gap-3">
              <div className="h-[1px] w-12 bg-red-600"></div>
-             <span className="text-red-500 font-bold tracking-widest uppercase text-sm">Premium Car Rental</span>
+             <span className="text-red-500 font-bold tracking-widest uppercase text-sm">BOOK NOW</span>
              <div className="h-[1px] w-12 bg-red-600"></div>
           </div>
           
           <h1 className="text-5xl md:text-7xl lg:text-9xl font-black text-white tracking-tighter leading-[0.9] mb-8">
-            DRIVE THE <br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-zinc-400">EXTRAORDINARY</span>
+            RENT A CAR <br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-zinc-400">BUDAPEST</span>
           </h1>
-          
-          <p className="text-lg md:text-2xl text-zinc-300 max-w-2xl mx-auto leading-relaxed font-light">
-            {t.subtitle}
-          </p>
         </motion.div>
       </div>
     </section>
