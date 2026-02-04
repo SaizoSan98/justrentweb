@@ -67,9 +67,9 @@ export function Footer() {
         </div>
         
         <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-white/10 gap-6">
-          <p className="text-zinc-500 text-sm">© 2024 JustRent Budapest. All rights reserved.</p>
+          <p className="text-zinc-500 text-sm">© 2026 JustRent Budapest. All rights reserved.</p>
           <div className="flex gap-8 text-sm text-zinc-500">
-             <span>Made with ❤️ in Budapest</span>
+             <span>Created by K.D Budapest</span>
           </div>
         </div>
       </div>

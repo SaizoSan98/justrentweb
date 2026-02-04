@@ -29,8 +29,8 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-screen bg-zinc-50">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-zinc-200 hidden md:flex flex-col fixed h-full z-50">
+      {/* Sidebar - Sticky & Scrollable */}
+      <aside className="w-64 bg-white border-r border-zinc-200 hidden md:flex flex-col fixed top-0 left-0 bottom-0 z-50 overflow-y-auto">
         <div className="p-6 border-b border-zinc-100">
           <Link href="/" className="block">
             <div className="mb-2">
@@ -44,7 +44,7 @@ export default async function DashboardLayout({
           </div>
         </div>
         
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+        <nav className="flex-1 p-4 space-y-2">
           <Link href="/dashboard">
             <Button variant="ghost" className="w-full justify-start text-zinc-600 hover:text-red-600 hover:bg-red-50">
               <LayoutDashboard className="mr-3 h-5 w-5" />
@@ -76,7 +76,7 @@ export default async function DashboardLayout({
           </div>
         </nav>
 
-        <div className="p-4 border-t border-zinc-100">
+        <div className="p-4 border-t border-zinc-100 mt-auto">
           <form action={logoutAction}>
             <Button variant="ghost" className="w-full justify-start text-zinc-500 hover:text-red-600 hover:bg-red-50">
               <LogOut className="mr-3 h-5 w-5" />
@@ -86,22 +86,24 @@ export default async function DashboardLayout({
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 md:ml-64 p-4 md:p-8">
-        {/* Mobile Header */}
-        <div className="md:hidden flex justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-zinc-200">
-           <Link href="/" className="text-xl font-black tracking-tight">
-            JUST <span className="text-red-600">RENT</span>
-          </Link>
-           <form action={logoutAction}>
-            <Button variant="ghost" size="sm">
-              <LogOut className="w-5 h-5" />
-            </Button>
-          </form>
-        </div>
+      {/* Main Content - Independent Scroll */}
+      <div className="flex-1 md:ml-64 min-h-screen flex flex-col">
+        <main className="flex-1 p-4 md:p-8 overflow-y-auto">
+          {/* Mobile Header */}
+          <div className="md:hidden flex justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-zinc-200">
+             <Link href="/" className="text-xl font-black tracking-tight">
+              JUST <span className="text-red-600">RENT</span>
+            </Link>
+             <form action={logoutAction}>
+              <Button variant="ghost" size="sm">
+                <LogOut className="w-5 h-5" />
+              </Button>
+            </form>
+          </div>
 
-        {children}
-      </main>
+          {children}
+        </main>
+      </div>
     </div>
   )
 }

@@ -12,6 +12,16 @@ import { AuthModal } from "@/components/auth/AuthModal"
 import { logoutAction } from "@/app/admin/actions"
 import { cn } from "@/lib/utils"
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Settings, LayoutDashboard } from "lucide-react"
+
 interface HeaderProps {
   transparent?: boolean
   user?: any
@@ -91,11 +101,43 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
           {/* Auth Trigger */}
           {user ? (
             <div className="flex items-center gap-2">
-              <Link href={user.role === 'ADMIN' ? "/admin" : "/dashboard"}>
-                <Button variant="ghost" className="rounded-full w-10 h-10 p-0 bg-zinc-900 text-white hover:bg-zinc-800 hover:scale-105 transition-all">
-                   <span className="text-xs font-bold">{getInitials(user.name)}</span>
-                </Button>
-              </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="rounded-full w-10 h-10 p-0 bg-zinc-900 text-white hover:bg-zinc-800 hover:scale-105 transition-all cursor-pointer">
+                     <span className="text-xs font-bold">{getInitials(user.name)}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 mt-2 rounded-2xl p-2 bg-white/90 backdrop-blur-xl border border-white/20 shadow-2xl">
+                  <DropdownMenuLabel>
+                    <div className="flex flex-col">
+                      <span className="font-bold">{user.name}</span>
+                      <span className="text-xs text-zinc-500 font-normal">{user.email}</span>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-zinc-100" />
+                  <Link href={user.role === 'ADMIN' ? "/admin" : "/dashboard"}>
+                    <DropdownMenuItem className="cursor-pointer rounded-xl focus:bg-zinc-100 p-3">
+                      <LayoutDashboard className="w-4 h-4 mr-2" />
+                      <span>Dashboard</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link href="/dashboard/profile">
+                    <DropdownMenuItem className="cursor-pointer rounded-xl focus:bg-zinc-100 p-3">
+                      <Settings className="w-4 h-4 mr-2" />
+                      <span>Settings</span>
+                    </DropdownMenuItem>
+                  </Link>
+                  <DropdownMenuSeparator className="bg-zinc-100" />
+                  <form action={logoutAction} className="w-full">
+                    <button type="submit" className="w-full">
+                      <DropdownMenuItem className="cursor-pointer rounded-xl focus:bg-red-50 text-red-600 focus:text-red-700 p-3">
+                        <LogOut className="w-4 h-4 mr-2" />
+                        <span>Log out</span>
+                      </DropdownMenuItem>
+                    </button>
+                  </form>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           ) : (
             <AuthModal 

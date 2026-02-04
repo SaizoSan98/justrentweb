@@ -41,9 +41,13 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
           className="absolute top-32 left-10 md:left-20 hidden lg:flex items-center gap-3 bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/20"
         >
           <div className="flex -space-x-3">
-             {[1,2,3].map(i => (
-               <div key={i} className="w-10 h-10 rounded-full bg-zinc-200 border-2 border-white flex items-center justify-center text-xs font-bold text-zinc-600">
-                 U{i}
+             {[
+               "https://i.pravatar.cc/150?u=a042581f4e29026024d",
+               "https://i.pravatar.cc/150?u=a042581f4e29026704d",
+               "https://i.pravatar.cc/150?u=a04258114e29026302d"
+             ].map((src, i) => (
+               <div key={i} className="w-10 h-10 rounded-full border-2 border-white overflow-hidden">
+                 <Image src={src} alt="User" width={40} height={40} className="w-full h-full object-cover" />
                </div>
              ))}
           </div>
@@ -75,15 +79,15 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
             transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
             className="max-w-5xl mx-auto"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-8">
-               <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-               <span className="text-white/90 text-xs font-bold tracking-widest uppercase">Available Now in Budapest</span>
-            </div>
-            
-            <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-white tracking-tighter leading-[0.9] mb-8 drop-shadow-2xl">
-              RENT A CAR <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-zinc-400">PREMIUM</span>
-            </h1>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-8 hidden">
+             <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+             <span className="text-white/90 text-xs font-bold tracking-widest uppercase">Available Now in Budapest</span>
+          </div>
+          
+          <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-white tracking-tighter leading-[0.9] mb-8 drop-shadow-2xl">
+            RENT A CAR <br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-zinc-400">BUDAPEST</span>
+          </h1>
             
             <p className="text-lg md:text-2xl text-white/80 max-w-2xl mx-auto leading-relaxed font-medium drop-shadow-lg">
               Unlock the city with our elite fleet. Seamless digital booking, delivered to your door.
