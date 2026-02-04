@@ -8,6 +8,7 @@ import { getSession } from "@/lib/auth"
 import { Hero } from "@/components/home/Hero"
 import { cookies } from "next/headers"
 import { dictionaries } from "@/lib/dictionary"
+import NextImage from "next/image"
 
 export const dynamic = 'force-dynamic'
 
@@ -147,8 +148,14 @@ export default async function LandingPage() {
       <footer className="bg-zinc-950 py-12 border-t border-zinc-900 text-sm text-zinc-500">
         <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
-             <span className="text-zinc-100 font-bold uppercase tracking-wider">Just<span className="text-red-600">Rent</span></span>
-             <span>© 2024</span>
+             <NextImage 
+               src="/jrlogo.PNG" 
+               alt="JustRent Logo" 
+               width={120} 
+               height={40} 
+               className="h-8 w-auto object-contain brightness-0 invert" 
+             />
+             <span className="ml-2">© 2024</span>
           </div>
           <div className="flex gap-8">
             <a href="#" className="hover:text-white transition-colors">{t('privacy')}</a>

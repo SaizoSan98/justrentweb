@@ -1,5 +1,6 @@
 
 import Link from "next/link"
+import Image from "next/image"
 import { 
   LayoutDashboard, 
   Calendar, 
@@ -30,8 +31,14 @@ export default async function DashboardLayout({
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-zinc-200 hidden md:flex flex-col fixed h-full z-50">
         <div className="p-6 border-b border-zinc-100">
-          <Link href="/" className="text-2xl font-black tracking-tight block">
-            JUST <span className="text-red-600">RENT</span>
+          <Link href="/" className="block">
+            <Image 
+              src="/jrlogo.PNG" 
+              alt="JustRent Logo" 
+              width={150} 
+              height={50} 
+              className="h-10 w-auto object-contain mb-2"
+            />
             <span className="text-xs font-normal text-zinc-400 block tracking-widest mt-1">CLIENT PORTAL</span>
           </Link>
           <div className="mt-4 pt-4 border-t border-zinc-100 text-xs">

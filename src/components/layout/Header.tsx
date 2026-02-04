@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Menu, X, User, LogOut, Globe } from "lucide-react"
 import { LanguageSwitcher } from "./LanguageSwitcher"
 import { Button } from "@/components/ui/button"
@@ -41,8 +42,15 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
     }`}>
       <div className="container mx-auto px-6 h-20 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="text-2xl font-black tracking-tighter text-zinc-900 uppercase">
-          Just<span className="text-red-600">Rent</span>
+        <Link href="/" className="flex items-center">
+          <Image 
+            src="/jrlogo.PNG" 
+            alt="JustRent Logo" 
+            width={150} 
+            height={50} 
+            className="h-10 w-auto object-contain"
+            priority
+          />
         </Link>
 
         {/* Desktop Nav */}
@@ -101,8 +109,14 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-white p-0 flex flex-col">
               <div className="p-6 border-b border-zinc-100 flex items-center justify-between">
-                <Link href="/" className="text-xl font-black tracking-tighter text-zinc-900 uppercase" onClick={() => setIsMobileMenuOpen(false)}>
-                  Just<span className="text-red-600">Rent</span>
+                <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Image 
+                    src="/jrlogo.PNG" 
+                    alt="JustRent Logo" 
+                    width={120} 
+                    height={40} 
+                    className="h-8 w-auto object-contain"
+                  />
                 </Link>
                 {/* Close button is automatically added by SheetContent, but we can customize if needed */}
               </div>

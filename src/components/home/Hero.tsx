@@ -1,6 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
+import Image from "next/image"
 import { Dictionary } from "@/lib/dictionary"
 
 export function Hero({ dictionary }: { dictionary?: Dictionary }) {
@@ -29,14 +30,21 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
       <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
       
       <div className="relative container mx-auto px-6 flex flex-col items-center text-center z-10 pt-20 pb-32">
-        <motion.h1 
+        <motion.div 
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
-          className="text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-6 drop-shadow-lg"
+          className="mb-6 drop-shadow-lg"
         >
-          JUST <span className="text-red-600">RENT</span>
-        </motion.h1>
+           <Image 
+            src="/jrlogo.PNG" 
+            alt="JustRent Logo" 
+            width={400} 
+            height={150} 
+            className="h-24 md:h-32 w-auto object-contain brightness-0 invert"
+            priority
+          />
+        </motion.div>
         
         <motion.p 
           initial={{ y: 30, opacity: 0 }}

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { X, Mail, Lock, User, ArrowRight, Github, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { loginAction, registerAction } from "@/app/login/actions"
@@ -38,9 +39,15 @@ export function AuthModal({ trigger }: AuthModalProps) {
         {/* Header Section */}
         <div className="bg-zinc-900 p-6 text-center relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-red-600/20 to-transparent opacity-50" />
-          <h2 className="text-2xl font-black text-white relative z-10 tracking-tight">
-            Welcome to <span className="text-red-500">JustRent</span>
-          </h2>
+          <div className="relative z-10 flex justify-center mb-2">
+            <Image 
+              src="/jrlogo.PNG" 
+              alt="JustRent Logo" 
+              width={160} 
+              height={50} 
+              className="h-10 w-auto object-contain brightness-0 invert" 
+            />
+          </div>
           <p className="text-zinc-400 text-sm mt-2 relative z-10">
             Access your premium fleet journey
           </p>

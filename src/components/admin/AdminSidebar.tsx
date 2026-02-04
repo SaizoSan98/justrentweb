@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { 
   LayoutDashboard, 
@@ -32,6 +33,15 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
   return (
     <aside className="w-64 bg-zinc-900 text-white flex flex-col fixed top-20 bottom-0 z-40">
       <div className="p-6 border-b border-zinc-800">
+        <div className="mb-4">
+          <Image 
+            src="/jrlogo.PNG" 
+            alt="JustRent Logo" 
+            width={140} 
+            height={45} 
+            className="h-8 w-auto object-contain brightness-0 invert" 
+          />
+        </div>
         <div className="text-xs font-black text-zinc-400 block tracking-widest uppercase mb-4">
           Admin Panel
         </div>
