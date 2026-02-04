@@ -29,7 +29,7 @@ type CarType = {
   make: string
   model: string
   year: number
-  category: string
+  categories: { name: string, slug: string }[]
   imageUrl: string | null
   images: string[]
   pricePerDay: number
@@ -230,7 +230,7 @@ export function FleetCard({
                 <h3 className="text-2xl font-bold text-white mb-1">{car.make} {car.model}</h3>
                 <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider border border-zinc-700 px-2 py-0.5 rounded-sm">
-                        Or Similar {car.category}
+                        Or Similar {car.categories?.map(c => c.name).join(', ')}
                     </span>
                     <span className="text-xs font-bold text-white bg-zinc-800 px-2 py-0.5 rounded-sm">
                         ADVICE OF THE DAY

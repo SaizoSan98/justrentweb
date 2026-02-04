@@ -78,7 +78,8 @@ export async function createCar(formData: FormData) {
   const year = parseInt(formData.get('year') as string)
   const licensePlate = formData.get('licensePlate') as string
   const mileage = parseInt(formData.get('mileage') as string)
-  const category = formData.get('category') as string
+  const categoriesRaw = formData.get('categories') as string
+  const categoryNames = categoriesRaw ? JSON.parse(categoriesRaw) : []
   const pricePerDay = parseFloat(formData.get('pricePerDay') as string)
   const deposit = parseFloat(formData.get('deposit') as string)
   const fullInsurancePrice = parseFloat(formData.get('fullInsurancePrice') as string)
@@ -135,7 +136,9 @@ export async function createCar(formData: FormData) {
         year,
         licensePlate,
         mileage,
-        category,
+        categories: {
+          connect: categoryNames.map((name: string) => ({ name }))
+        },
         pricePerDay,
         deposit,
         fullInsurancePrice,
@@ -201,7 +204,8 @@ export async function updateCar(formData: FormData) {
   const year = parseInt(formData.get('year') as string)
   const licensePlate = formData.get('licensePlate') as string
   const mileage = parseInt(formData.get('mileage') as string)
-  const category = formData.get('category') as string
+  const categoriesRaw = formData.get('categories') as string
+  const categoryNames = categoriesRaw ? JSON.parse(categoriesRaw) : []
   const pricePerDay = parseFloat(formData.get('pricePerDay') as string)
   const deposit = parseFloat(formData.get('deposit') as string)
   const fullInsurancePrice = parseFloat(formData.get('fullInsurancePrice') as string)
@@ -257,7 +261,9 @@ export async function updateCar(formData: FormData) {
         year,
         licensePlate,
         mileage,
-        category,
+        categories: {
+          set: categoryNames.map((name: string) => ({ name }))
+        },
         pricePerDay,
         deposit,
         fullInsurancePrice,

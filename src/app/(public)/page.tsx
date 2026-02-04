@@ -27,7 +27,7 @@ export default async function LandingPage() {
     } as any,
     take: 6,
     orderBy: { createdAt: 'desc' },
-    include: { pricingTiers: true }
+    include: { pricingTiers: true, categories: true }
   })
 
   const serializedFeaturedCars = featuredCars.map((car: any) => ({

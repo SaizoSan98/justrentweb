@@ -17,7 +17,8 @@ export default async function EditCarPage({ params }: PageProps) {
     where: { id },
     include: { 
         pricingTiers: true,
-        insuranceOptions: true
+        insuranceOptions: true,
+        categories: true
     }
   })
 

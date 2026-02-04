@@ -65,7 +65,7 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
         "pointer-events-auto transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
         "flex items-center justify-between px-2 py-2 rounded-full",
         "bg-white/90 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.12)]",
-        isScrolled ? "w-[90%] md:w-[70%] lg:w-[50%]" : "w-[95%] md:w-[85%] lg:w-[1200px]"
+        isScrolled ? "w-[95%] md:w-[85%] lg:w-[800px]" : "w-[95%] md:w-[85%] lg:w-[1200px]"
       )}>
         <div className="flex items-center gap-1 pl-4">
           {/* Logo */}

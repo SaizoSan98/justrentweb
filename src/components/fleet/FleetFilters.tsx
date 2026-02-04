@@ -39,7 +39,7 @@ export function FleetFilters({
     seats: number[]
   }
   availableCars?: {
-    category: string
+    categories: { name: string }[]
     transmission: string
     fuelType: string
     seats: number

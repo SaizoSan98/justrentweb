@@ -19,7 +19,7 @@ async function main() {
       year: 2024,
       licensePlate: 'AA-001-AA',
       mileage: 5000,
-      category: 'SUV',
+      categories: ['SUV', 'Luxury'],
       pricePerDay: 120,
       status: CarStatus.AVAILABLE,
       imageUrl: 'https://images.unsplash.com/photo-1555215696-99ac45e43d34?auto=format&fit=crop&q=80',
@@ -31,7 +31,7 @@ async function main() {
       year: 2023,
       licensePlate: 'AA-002-BB',
       mileage: 12000,
-      category: 'Sedan',
+      categories: ['Sedan', 'Luxury'],
       pricePerDay: 145,
       status: CarStatus.AVAILABLE,
       imageUrl: 'https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&q=80',
@@ -43,7 +43,7 @@ async function main() {
       year: 2024,
       licensePlate: 'AA-003-CC',
       mileage: 3500,
-      category: 'Coupe',
+      categories: ['Coupe', 'Sport'],
       pricePerDay: 130,
       status: CarStatus.RENTED,
       imageUrl: 'https://images.unsplash.com/photo-1606152421802-db97b9c7a11b?auto=format&fit=crop&q=80',
@@ -55,7 +55,7 @@ async function main() {
       year: 2023,
       licensePlate: 'AA-004-DD',
       mileage: 8000,
-      category: 'Electric',
+      categories: ['Electric', 'Sedan'],
       pricePerDay: 110,
       status: CarStatus.AVAILABLE,
       imageUrl: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&q=80',
@@ -67,7 +67,7 @@ async function main() {
       year: 2022,
       licensePlate: 'AA-005-EE',
       mileage: 15000,
-      category: 'Sports',
+      categories: ['Sports', 'Coupe'],
       pricePerDay: 350,
       status: CarStatus.MAINTENANCE,
       imageUrl: 'https://images.unsplash.com/photo-1503376763036-066120622c74?auto=format&fit=crop&q=80',
@@ -76,8 +76,17 @@ async function main() {
   ]
 
   for (const car of cars) {
+    const { categories, ...carData } = car
     const createdCar = await prisma.car.create({
-      data: car,
+      data: {
+        ...carData,
+        categories: {
+          connectOrCreate: categories.map((cat) => ({
+            where: { slug: cat.toLowerCase() },
+            create: { name: cat, slug: cat.toLowerCase() },
+          })),
+        },
+      },
     })
     console.log(`Created car with id: ${createdCar.id}`)
 

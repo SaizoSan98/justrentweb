@@ -40,7 +40,9 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
   
   // Dependent fields state
   const [selectedMake, setSelectedMake] = useState<string>(car?.make || "")
-  const [selectedCategory, setSelectedCategory] = useState<string>(car?.category || "")
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    car?.categories?.map((c: any) => c.name) || []
+  )
   const [selectedModel, setSelectedModel] = useState<string>(car?.model || "")
   const [selectedSeats, setSelectedSeats] = useState<string>(car?.seats?.toString() || "")
   const [selectedDoors, setSelectedDoors] = useState<string>(car?.doors?.toString() || "")
@@ -188,7 +190,7 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
       const data = new FormData()
       
       // General
-      data.append('category', selectedCategory)
+      data.append('categories', JSON.stringify(selectedCategories))
       data.append('make', selectedMake)
       data.append('model', selectedModel)
       data.append('description', description)
@@ -274,19 +276,26 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
           <Card>
             <CardContent className="p-6 space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="category">Category</Label>
-                  <input type="hidden" name="category" value={selectedCategory} />
-                  <Select value={selectedCategory} onValueChange={setSelectedCategory} required>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map(cat => (
-                        <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div className="space-y-2 md:col-span-2">
+                  <Label>Categories</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 border p-4 rounded-md bg-zinc-50">
+                    {categories.map(cat => (
+                      <div key={cat.id} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={`cat-${cat.id}`}
+                          checked={selectedCategories.includes(cat.name)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setSelectedCategories([...selectedCategories, cat.name])
+                            } else {
+                              setSelectedCategories(selectedCategories.filter(c => c !== cat.name))
+                            }
+                          }}
+                        />
+                        <Label htmlFor={`cat-${cat.id}`} className="font-normal cursor-pointer">{cat.name}</Label>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -486,7 +495,7 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
               </div>
               
               <div className="grid gap-6">
-                {insurancePlans.map((plan: any) => (
+                {insurancePlans.filter(p => !p.name.toLowerCase().includes('basic')).map((plan: any) => (
                   <div key={plan.id} className="grid md:grid-cols-3 gap-4 p-4 border rounded-lg bg-zinc-50/50">
                     <div className="flex flex-col justify-center">
                       <h4 className="font-bold">{plan.name}</h4>

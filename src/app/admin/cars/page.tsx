@@ -9,7 +9,8 @@ export const dynamic = 'force-dynamic'
 
 export default async function CarsPage() {
   const cars = await prisma.car.findMany({
-    orderBy: { createdAt: 'desc' }
+    orderBy: { createdAt: 'desc' },
+    include: { categories: true }
   })
 
   return (
@@ -53,7 +54,7 @@ export default async function CarsPage() {
                   </td>
                   <td className="px-6 py-4">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-100 text-zinc-800 border border-zinc-200">
-                      {car.category}
+                      {car.categories.map((c: any) => c.name).join(', ')}
                     </span>
                   </td>
                   <td className="px-6 py-4 font-mono text-zinc-600">{car.licensePlate}</td>

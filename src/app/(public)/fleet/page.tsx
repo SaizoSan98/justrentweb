@@ -75,7 +75,11 @@ export default async function FleetPage({
   const fullWhereClause = { ...baseWhereClause };
 
   if (categories && categories.length > 0) {
-    fullWhereClause.category = { in: categories };
+    fullWhereClause.categories = {
+      some: {
+        name: { in: categories }
+      }
+    };
   }
 
   if (transmissions && transmissions.length > 0) {
@@ -95,10 +99,11 @@ export default async function FleetPage({
     fullWhereClause.orSimilar = false;
   }
 
-  const [cars, allAvailableCars, categoriesData, transmissionsData, fuelTypesData, seatsData, extrasData] = await Promise.all([
+  const [cars, allAvailableCars, extrasData] = await Promise.all([
     prisma.car.findMany({
       where: fullWhereClause,
       include: {
+        categories: true,
         pricingTiers: true,
         insuranceOptions: {
             include: { plan: true }
@@ -112,37 +117,23 @@ export default async function FleetPage({
       where: baseWhereClause,
       select: {
         id: true,
-        category: true,
+        categories: { select: { name: true } },
         transmission: true,
         fuelType: true,
         seats: true,
         orSimilar: true,
       }
     }),
-    prisma.category.findMany({ 
-      select: { name: true }, 
-      orderBy: { name: 'asc' } 
-    }),
-    prisma.car.findMany({ 
-      select: { transmission: true }, 
-      distinct: ['transmission'],
-      where: { status: 'AVAILABLE' }
-    }),
-    prisma.car.findMany({ 
-      select: { fuelType: true }, 
-      distinct: ['fuelType'],
-      where: { status: 'AVAILABLE' }
-    }),
-    prisma.car.findMany({ 
-      select: { seats: true }, 
-      distinct: ['seats'], 
-      orderBy: { seats: 'asc' },
-      where: { status: 'AVAILABLE' }
-    }),
     prisma.extra.findMany({
       orderBy: { price: 'asc' }
     })
   ]);
+
+  // Derive filter options from available cars
+  const availableCategories = Array.from(new Set(allAvailableCars.flatMap(car => car.categories.map(c => c.name)))).sort();
+  const availableTransmissions = Array.from(new Set(allAvailableCars.map(car => car.transmission))).sort();
+  const availableFuelTypes = Array.from(new Set(allAvailableCars.map(car => car.fuelType))).sort();
+  const availableSeats = Array.from(new Set(allAvailableCars.map(car => car.seats))).sort((a, b) => a - b);
 
   const extras = extrasData.map(extra => ({
     ...extra,
@@ -206,10 +197,10 @@ export default async function FleetPage({
                         total: allAvailableCars.length
                     }}
                     options={{
-                        categories: categoriesData.map(c => c.name),
-                        transmissions: transmissionsData.map(t => t.transmission),
-                        fuelTypes: fuelTypesData.map(f => f.fuelType),
-                        seats: seatsData.map(s => s.seats)
+                        categories: availableCategories,
+                        transmissions: availableTransmissions,
+                        fuelTypes: availableFuelTypes,
+                        seats: availableSeats
                     }}
                     availableCars={availableCarsSerialized}
                     dictionary={dictionary}

@@ -65,7 +65,7 @@ model Car {
   mileage            Int            // Current mileage
   
   // Technical Details
-  category           String         // e.g. SUV, Sedan, Luxury
+  categories         Category[]
   seats              Int            @default(5)
   doors              Int            @default(5)
   suitcases          Int            @default(2)
@@ -111,6 +111,7 @@ model Category {
   slug        String   @unique
   description String?
   imageUrl    String?
+  cars        Car[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
