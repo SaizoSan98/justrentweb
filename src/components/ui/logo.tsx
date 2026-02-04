@@ -11,8 +11,8 @@ export function Logo({ className, variant = "dark" }: LogoProps) {
     <div className={cn("flex items-center gap-2", className)}>
       {/* White/Black Rectangle with JUST */}
       <div className={cn(
-        "px-2 py-1 rounded-sm font-black tracking-tighter text-lg leading-none select-none",
-        variant === "dark" ? "bg-zinc-900 text-white" : "bg-white text-zinc-900"
+        "px-2 py-1 rounded-sm font-black tracking-tighter text-lg leading-none select-none flex items-center justify-center",
+        variant === "dark" ? "bg-zinc-900 text-white" : "bg-white text-black"
       )}>
         JUST
       </div>

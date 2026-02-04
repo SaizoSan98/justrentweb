@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Logo } from "@/components/ui/logo"
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { AuthModal } from "@/components/auth/AuthModal"
 import { logoutAction } from "@/app/admin/actions"
+import { cn } from "@/lib/utils"
 
 interface HeaderProps {
   transparent?: boolean
@@ -20,6 +21,15 @@ interface HeaderProps {
 
 export function Header({ transparent = false, user, dictionary = {}, lang = "en" }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50)
+    }
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
   
   // Helper to safely get dictionary value
   const t = (key: string, section: string = "nav") => {
@@ -35,38 +45,51 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
       .slice(0, 2) || "U";
   }
 
+  const isTransparent = transparent && !isScrolled
+  const textColor = isTransparent ? "text-white" : "text-zinc-900"
+  const navHoverColor = isTransparent ? "hover:text-red-400" : "hover:text-red-600"
+
   return (
-    <header className={`fixed top-0 w-full z-50 border-b transition-all duration-300 ${
-      transparent 
-        ? "bg-white/95 backdrop-blur-md border-zinc-200" 
-        : "bg-white border-zinc-200 shadow-sm"
-    }`}>
-      <div className="container mx-auto px-6 h-20 flex items-center justify-between">
+    <header className={cn(
+      "fixed top-0 w-full z-50 transition-all duration-300 border-b",
+      isTransparent 
+        ? "bg-transparent border-transparent py-4" 
+        : "bg-white/95 backdrop-blur-md border-zinc-200 py-2 shadow-sm"
+    )}>
+      <div className="container mx-auto px-6 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center group">
-          <Logo className="scale-125 origin-left transition-transform group-hover:scale-110" variant="dark" />
+          <Logo 
+            className="scale-125 origin-left transition-transform group-hover:scale-110" 
+            variant={isTransparent ? "light" : "dark"} 
+          />
         </Link>
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex gap-8 text-sm font-bold tracking-wide uppercase">
-          <Link href="/" className="text-zinc-600 hover:text-red-600 transition-colors">{t('home')}</Link>
-          <Link href="/fleet" className="text-zinc-600 hover:text-red-600 transition-colors">{t('fleet')}</Link>
-          <Link href="#contact" className="text-zinc-600 hover:text-red-600 transition-colors">{t('contact')}</Link>
+          <Link href="/" className={cn("transition-colors", textColor, navHoverColor)}>{t('home')}</Link>
+          <Link href="/fleet" className={cn("transition-colors", textColor, navHoverColor)}>{t('fleet')}</Link>
+          <Link href="#contact" className={cn("transition-colors", textColor, navHoverColor)}>{t('contact')}</Link>
         </nav>
 
         {/* Right Actions */}
         <div className="flex items-center gap-6">
           {/* Language Selector */}
-          <LanguageSwitcher currentLang={lang} />
+          <div className={isTransparent ? "text-white" : "text-zinc-900"}>
+            <LanguageSwitcher currentLang={lang} />
+          </div>
 
-          <div className="w-px h-6 bg-zinc-200 hidden md:block" />
+          <div className={cn("w-px h-6 hidden md:block", isTransparent ? "bg-white/20" : "bg-zinc-200")} />
 
           {/* Auth Trigger */}
           {user ? (
             <div className="flex items-center gap-4">
               <Link href={user.role === 'ADMIN' ? "/admin" : "/dashboard"}>
-                <Button variant="ghost" className="hidden md:flex items-center gap-2 text-zinc-900 hover:text-red-600 hover:bg-transparent p-0 h-auto transition-colors group font-normal">
-                  <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center group-hover:bg-red-50 group-hover:rotate-12 transition-all duration-300 shadow-sm group-hover:shadow-md text-xs font-bold">
+                <Button variant="ghost" className={cn("hidden md:flex items-center gap-2 hover:bg-transparent p-0 h-auto transition-colors group font-normal", textColor, navHoverColor)}>
+                  <div className={cn(
+                    "w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 shadow-sm group-hover:shadow-md text-xs font-bold",
+                    isTransparent ? "bg-white/10 text-white group-hover:bg-white/20" : "bg-zinc-100 text-zinc-900 group-hover:bg-red-50"
+                  )}>
                     {getInitials(user.name)}
                   </div>
                   <span className="text-sm font-bold uppercase group-hover:underline decoration-2 underline-offset-4">
@@ -75,7 +98,7 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
                 </Button>
               </Link>
               <form action={logoutAction}>
-                <Button variant="ghost" size="sm" className="text-zinc-500 hover:text-red-600">
+                <Button variant="ghost" size="sm" className={cn("hover:text-red-600", isTransparent ? "text-zinc-300" : "text-zinc-500")}>
                   <LogOut className="w-4 h-4 mr-2" />
                   {t('signout')}
                 </Button>
@@ -84,8 +107,11 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
           ) : (
             <AuthModal 
               trigger={
-                <Button variant="ghost" className="hidden md:flex items-center gap-2 text-zinc-900 hover:text-red-600 hover:bg-transparent p-0 h-auto transition-colors group font-normal">
-                  <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center group-hover:bg-red-50 group-hover:rotate-12 transition-all duration-300 shadow-sm group-hover:shadow-md">
+                <Button variant="ghost" className={cn("hidden md:flex items-center gap-2 hover:bg-transparent p-0 h-auto transition-colors group font-normal", textColor, navHoverColor)}>
+                  <div className={cn(
+                    "w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 shadow-sm group-hover:shadow-md",
+                    isTransparent ? "bg-white/10 text-white group-hover:bg-white/20" : "bg-zinc-100 text-zinc-900 group-hover:bg-red-50"
+                  )}>
                     <User className="w-4 h-4" />
                   </div>
                   <span className="text-sm font-bold uppercase group-hover:underline decoration-2 underline-offset-4">{t('login')} | {t('register')}</span>
@@ -97,7 +123,7 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
           {/* Mobile Menu Toggle */}
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
+              <Button variant="ghost" size="icon" className={cn("md:hidden", textColor)}>
                 <Menu className="w-6 h-6" />
               </Button>
             </SheetTrigger>
