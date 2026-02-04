@@ -9,8 +9,8 @@ import { getSession } from "@/lib/auth"
 import { Hero } from "@/components/home/Hero"
 import { cookies } from "next/headers"
 import { dictionaries } from "@/lib/dictionary"
-import { Logo } from "@/components/ui/logo"
-import { Shield, Clock, Star, ArrowRight, Phone, Mail, MapPin, CheckCircle2 } from "lucide-react"
+import { ArrowRight, Shield, Globe, Zap, Heart } from "lucide-react"
+import Image from "next/image"
 
 export const dynamic = 'force-dynamic'
 
@@ -25,7 +25,7 @@ export default async function LandingPage() {
       status: 'AVAILABLE',
       isFeatured: true
     } as any,
-    take: 6,
+    take: 4, // Screenshot shows 4 cars grid
     orderBy: { createdAt: 'desc' },
     include: { pricingTiers: true, categories: true }
   })
@@ -44,133 +44,183 @@ export default async function LandingPage() {
   const t = (key: string, section: string = "hero") => (dictionary as any)?.[section]?.[key] || key
 
   return (
-    <div className="flex flex-col min-h-screen bg-zinc-50 font-sans selection:bg-black selection:text-white">
-      {/* Navbar - Now floating inside/above the hero via CSS */}
+    <div className="flex flex-col min-h-screen bg-white font-sans selection:bg-blue-100 selection:text-blue-900">
       <Header transparent={true} user={session?.user} dictionary={dictionary} lang={lang} />
 
-      {/* Hero Section - The Card */}
-      <Hero dictionary={dictionary} />
+      {/* Hero Section - Full Width Image */}
+      <div className="relative w-full h-[600px] md:h-[700px] bg-zinc-900">
+        <Image 
+          src="/budapest.jpg" 
+          alt="Hero" 
+          fill 
+          className="object-cover opacity-80"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30" />
+        
+        <div className="container mx-auto px-6 relative z-10 h-full flex flex-col justify-end pb-32">
+           <h1 className="text-4xl md:text-6xl font-bold text-white mb-8 max-w-2xl leading-tight">
+             Rent a Car for Every Journey
+           </h1>
+        </div>
 
-      {/* Floating Booking Engine - Bridging Hero & Content */}
-      <div className="container mx-auto px-6 relative z-30 -mt-24 mb-32">
-        <div className="bg-white/70 backdrop-blur-xl border border-white/40 p-1 rounded-[2.5rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.1)]">
-          <div className="bg-white rounded-[2rem] p-6 border border-zinc-100/50">
-             <BookingEngine dictionary={dictionary} />
-          </div>
+        {/* Search Widget - Overlapping */}
+        <div className="absolute -bottom-24 md:-bottom-16 left-0 right-0 z-20 px-4 md:px-6">
+           <div className="container mx-auto">
+              <BookingEngine dictionary={dictionary} />
+           </div>
         </div>
       </div>
 
-      {/* Why Us - Floating Card */}
-      <div className="px-4 pb-4 md:px-6 md:pb-6">
-        <section className="py-32 bg-white rounded-[2.5rem] shadow-xl">
-          <div className="container mx-auto px-6">
-            <div className="text-center mb-20">
-              <span className="text-red-600 font-bold tracking-widest uppercase text-sm mb-4 block">Our Values</span>
-              <h2 className="text-5xl md:text-6xl font-black text-zinc-900 tracking-tighter mb-6">WHY CHOOSE US?</h2>
-              <p className="text-xl text-zinc-500 max-w-3xl mx-auto leading-relaxed">
-                We don't just rent cars. We provide a seamless mobility experience tailored to your needs, with transparent terms and premium service.
-              </p>
-            </div>
+      {/* Spacer for Search Widget */}
+      <div className="h-32 md:h-24 bg-white" />
 
-            <div className="grid md:grid-cols-2 gap-8 lg:gap-12 max-w-6xl mx-auto">
-              {/* Left Column: Stacked Cards */}
-              <div className="flex flex-col gap-8 justify-center">
-                <div className="group relative p-8 rounded-[2rem] bg-white border border-zinc-100 hover:border-zinc-200 hover:shadow-xl transition-all duration-500 overflow-hidden text-left">
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-zinc-900 max-w-[80%] leading-none">
-                      INSTANT <br/> CAR SEARCH
-                    </h3>
-                    <ArrowRight className="w-6 h-6 text-zinc-300 group-hover:text-zinc-900 -rotate-45 transition-colors" />
-                  </div>
-                  <p className="text-zinc-500 text-sm font-medium uppercase tracking-wide max-w-xs">
-                    Find your perfect ride with just a few clicks
-                  </p>
-                </div>
-
-                <div className="group relative p-8 rounded-[2rem] bg-black text-white border border-zinc-900 hover:shadow-2xl transition-all duration-500 overflow-hidden text-left">
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-white max-w-[80%] leading-none">
-                      VERIFIED <br/> PRO LISTINGS
-                    </h3>
-                    <ArrowRight className="w-6 h-6 text-zinc-600 group-hover:text-white -rotate-45 transition-colors" />
-                  </div>
-                  <p className="text-zinc-400 text-sm font-medium uppercase tracking-wide max-w-xs">
-                    100% verified and updated vehicle details
-                  </p>
-                </div>
-
-                <div className="group relative p-8 rounded-[2rem] bg-white border border-zinc-100 hover:border-zinc-200 hover:shadow-xl transition-all duration-500 overflow-hidden text-left">
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-zinc-900 max-w-[80%] leading-none">
-                      SMART <br/> RENTAL INSIGHTS
-                    </h3>
-                    <ArrowRight className="w-6 h-6 text-zinc-300 group-hover:text-zinc-900 -rotate-45 transition-colors" />
-                  </div>
-                  <p className="text-zinc-500 text-sm font-medium uppercase tracking-wide max-w-xs">
-                    Personalized recommendations for your journey
-                  </p>
-                </div>
-                
-                <div className="group relative p-8 rounded-[2rem] bg-white border border-zinc-100 hover:border-zinc-200 hover:shadow-xl transition-all duration-500 overflow-hidden text-left">
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-zinc-900 max-w-[80%] leading-none">
-                      REAL TIME <br/> FLEET UPDATES
-                    </h3>
-                    <ArrowRight className="w-6 h-6 text-zinc-300 group-hover:text-zinc-900 -rotate-45 transition-colors" />
-                  </div>
-                  <p className="text-zinc-500 text-sm font-medium uppercase tracking-wide max-w-xs">
-                    Get instant alerts on new arrivals and price drops
-                  </p>
-                </div>
-              </div>
-
-              {/* Right Column: Large Image Card */}
-              <div className="relative rounded-[2.5rem] overflow-hidden min-h-[500px] group shadow-2xl">
-                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <div className="absolute bottom-0 left-0 p-10 text-white">
-                   <h3 className="text-4xl font-black uppercase tracking-tighter mb-4">Premium <br/> Experience</h3>
-                   <p className="text-white/80 max-w-sm">Discover a new level of luxury with our exclusive fleet of high-end vehicles.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      {/* Popular Cars - New Component */}
-      <FeaturedCars cars={serializedFeaturedCars} />
-
-      {/* CTA - Floating Card */}
-      <div className="px-4 pb-4 md:px-6 md:pb-6">
-        <section className="py-40 bg-black text-white relative overflow-hidden rounded-[2.5rem] shadow-2xl">
-          <div className="absolute inset-0 bg-[url('/budapest.jpg')] bg-cover bg-fixed opacity-20 grayscale" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent" />
+      {/* Top Picks Section */}
+      <section className="py-16 md:py-24 bg-white">
+        <div className="container mx-auto px-6">
+          <FeaturedCars cars={serializedFeaturedCars} />
           
-          <div className="container mx-auto px-6 relative z-10 text-center">
-            <h2 className="text-[12vw] leading-none font-black tracking-tighter opacity-10 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full pointer-events-none">
-              JUSTRENT
-            </h2>
-            
-            <h2 className="text-5xl md:text-7xl font-bold mb-8 tracking-tight relative">
-              Ready to start your journey?
-            </h2>
-            <p className="text-xl text-zinc-400 mb-12 max-w-2xl mx-auto">
-              Experience Budapest with the ultimate freedom. Premium service, 24/7 support, and unforgettable memories await.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button size="lg" className="bg-white text-black hover:bg-zinc-200 rounded-full h-14 px-8 text-lg font-bold" asChild>
-                <Link href="/fleet">Book Your Car Now</Link>
-              </Button>
-              <Button size="lg" variant="outline" className="bg-transparent border-white/20 text-white hover:bg-white/10 rounded-full h-14 px-8 text-lg" asChild>
-                <Link href="/contact">Contact Support</Link>
-              </Button>
-            </div>
+          <div className="mt-12 text-center">
+             <Button variant="outline" size="lg" className="rounded-full px-8 border-zinc-200 text-zinc-900 hover:bg-zinc-50" asChild>
+                <Link href="/fleet">See All <ArrowRight className="w-4 h-4 ml-2" /></Link>
+             </Button>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
 
-      {/* Footer moved to layout */}
+      {/* Popular Locations / Categories */}
+      <section className="py-12 bg-zinc-50/50">
+         <div className="container mx-auto px-6">
+            <h2 className="text-2xl font-bold text-zinc-900 mb-2">Discover popular car rental in worldwide</h2>
+            <p className="text-zinc-500 mb-8">Explore a diverse and extensive range of rental cars.</p>
+            
+            <div className="flex flex-wrap gap-3">
+               {["Car Rental in Budapest", "Car Rental in Debrecen", "Car Rental in Vienna", "Car Rental in Prague", "Car Rental in Munich", "Car Rental in Zagreb", "Car Rental in Bratislava", "Car Rental in Warsaw"].map((loc) => (
+                  <Button key={loc} variant="outline" className="rounded-full bg-white border-zinc-200 text-zinc-600 hover:border-zinc-400 hover:text-zinc-900">
+                     {loc}
+                  </Button>
+               ))}
+            </div>
+         </div>
+      </section>
+
+      {/* Promo Section */}
+      <section className="py-20 bg-white">
+         <div className="container mx-auto px-6">
+            <div className="flex justify-between items-end mb-8">
+               <h2 className="text-2xl font-bold text-zinc-900">Enjoy extra miles with our best deal</h2>
+               <Link href="/fleet" className="text-sm font-bold text-zinc-500 hover:text-zinc-900 flex items-center">
+                  See All <ArrowRight className="w-4 h-4 ml-2" />
+               </Link>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-8">
+               {/* Promo Card 1 */}
+               <div className="relative h-[300px] rounded-3xl overflow-hidden group">
+                  <Image src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=2070&auto=format&fit=crop" alt="Promo" fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent" />
+                  <div className="absolute inset-0 p-8 flex flex-col justify-center text-white max-w-md">
+                     <span className="text-yellow-400 font-bold mb-2">Valid until Dec 31</span>
+                     <h3 className="text-3xl font-bold mb-4">Experience the Holidays with Our Festive Promotions</h3>
+                     <div className="text-5xl font-black mb-6">40% <span className="text-lg font-medium align-top">OFF</span></div>
+                     <p className="text-white/60 text-xs">*with Terms and Condition</p>
+                  </div>
+               </div>
+
+               {/* Promo Card 2 */}
+               <div className="relative h-[300px] rounded-3xl overflow-hidden group">
+                  <Image src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=2070&auto=format&fit=crop" alt="Promo" fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent" />
+                  <div className="absolute inset-0 p-8 flex flex-col justify-center text-white max-w-md">
+                     <span className="text-yellow-400 font-bold mb-2">Valid only on Weekdays</span>
+                     <h3 className="text-3xl font-bold mb-4">Unlock Online-Only Discounts for a Seamless Booking Experience</h3>
+                     <div className="text-5xl font-black mb-6">65% <span className="text-lg font-medium align-top">OFF</span></div>
+                     <p className="text-white/60 text-xs">*with Terms and Condition</p>
+                  </div>
+               </div>
+            </div>
+
+            {/* Logos */}
+            <div className="mt-16 flex flex-wrap justify-center gap-12 opacity-30 grayscale">
+               {/* Simple text placeholders for logos as per design */}
+               <span className="text-2xl font-black">HELLOSIGN</span>
+               <span className="text-2xl font-black">DOORDASH</span>
+               <span className="text-2xl font-black">coinbase</span>
+               <span className="text-2xl font-black">Airtable</span>
+               <span className="text-2xl font-black">pendo</span>
+               <span className="text-2xl font-black">treehouse</span>
+            </div>
+         </div>
+      </section>
+
+      {/* Bottom Features */}
+      <section className="py-4 bg-white pb-20">
+         <div className="container mx-auto px-6">
+            <div className="grid md:grid-cols-2 gap-6">
+               <div className="relative h-[400px] rounded-3xl overflow-hidden bg-zinc-900 text-white p-10 flex flex-col justify-end">
+                   <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?q=80&w=2021&auto=format&fit=crop')] bg-cover bg-center opacity-40" />
+                   <div className="relative z-10">
+                      <Globe className="w-10 h-10 mb-6 text-white" />
+                      <h3 className="text-3xl font-bold mb-4">Explore more to get your comfort zone</h3>
+                      <p className="text-zinc-300 mb-8">Book your perfect stay with us.</p>
+                      <Button className="bg-white text-black hover:bg-zinc-200 rounded-full px-8 font-bold">Booking Now <ArrowRight className="w-4 h-4 ml-2" /></Button>
+                   </div>
+               </div>
+               
+               <div className="relative h-[400px] rounded-3xl overflow-hidden bg-zinc-900 text-white p-10 flex flex-col justify-end">
+                   <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1503376763036-066120622c74?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-60" />
+                   <div className="relative z-10 text-center">
+                      <h3 className="text-3xl font-bold mb-2">Beyond accommodation, creating</h3>
+                      <p className="text-xl">memories of a lifetime</p>
+                   </div>
+               </div>
+            </div>
+         </div>
+      </section>
+
+      {/* Footer is handled by layout, but we can add the specific footer style here if needed or modify the global footer */}
+      <footer className="bg-black text-white py-20">
+         <div className="container mx-auto px-6">
+            <div className="grid md:grid-cols-4 gap-12">
+               <div className="col-span-1">
+                  <h3 className="text-2xl font-bold mb-6">Horizone</h3>
+                  <p className="text-zinc-400 text-sm leading-relaxed">
+                     Our mission is to equip modern explorers with cutting-edge, functional, and stylish bags that elevate every adventure.
+                  </p>
+               </div>
+               <div>
+                  <h4 className="font-bold mb-6">About</h4>
+                  <ul className="space-y-4 text-sm text-zinc-400">
+                     <li>About Us</li>
+                     <li>Blog</li>
+                     <li>Career</li>
+                  </ul>
+               </div>
+               <div>
+                  <h4 className="font-bold mb-6">Support</h4>
+                  <ul className="space-y-4 text-sm text-zinc-400">
+                     <li>Contact Us</li>
+                     <li>Return</li>
+                     <li>FAQ</li>
+                  </ul>
+               </div>
+               <div>
+                  <h4 className="font-bold mb-6">Get Updates</h4>
+                  <div className="flex gap-2 bg-zinc-900 p-2 rounded-full">
+                     <input type="email" placeholder="Enter your email" className="bg-transparent border-0 focus:ring-0 text-sm text-white px-4 w-full" />
+                     <Button className="rounded-full bg-white text-black hover:bg-zinc-200">Subscribe</Button>
+                  </div>
+               </div>
+            </div>
+            <div className="border-t border-zinc-800 mt-16 pt-8 flex justify-between text-xs text-zinc-500">
+               <p>©2024 Horizone. All rights reserved.</p>
+               <div className="flex gap-6">
+                  <span>Privacy Policy</span>
+                  <span>Terms of Service</span>
+               </div>
+            </div>
+         </div>
+      </footer>
     </div>
   );
 }
