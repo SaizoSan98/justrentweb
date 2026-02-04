@@ -41,9 +41,12 @@ export default async function LandingPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30" />
         
-        <div className="container mx-auto px-6 relative z-10 h-full flex flex-col justify-end pb-48">
-           <h1 className="text-4xl md:text-6xl font-bold text-white mb-8 max-w-2xl leading-tight">
-             Rent a Car for Every Journey
+        <div className="container mx-auto px-6 relative z-10 h-full flex flex-col justify-end pb-48 items-center text-center">
+           <div className="mb-6 relative w-64 h-24">
+              <Image src="/jrlogo.PNG" alt="JustRent Logo" fill className="object-contain brightness-0 invert" />
+           </div>
+           <h1 className="text-4xl md:text-6xl font-bold text-white mb-8 max-w-4xl leading-tight uppercase tracking-wide">
+             Rent a Car BUDAPEST
            </h1>
         </div>
 

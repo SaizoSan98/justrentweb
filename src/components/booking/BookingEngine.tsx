@@ -47,8 +47,8 @@ export function BookingEngine({
   
   const [startTime, setStartTime] = React.useState("10:30 AM")
   const [endTime, setEndTime] = React.useState("04:30 PM")
-  const [departure, setDeparture] = React.useState("")
-  const [returnLocation, setReturnLocation] = React.useState("")
+  const [departure, setDeparture] = React.useState("Budapest Liszt Ferenc Airport (BUD)")
+  const [returnLocation, setReturnLocation] = React.useState("Budapest Liszt Ferenc Airport (BUD)")
   const [isRoundTrip, setIsRoundTrip] = React.useState(false)
   const [withDriver, setWithDriver] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
@@ -87,9 +87,10 @@ export function BookingEngine({
                   <input 
                     type="text" 
                     placeholder="City, airport or station" 
-                    className="w-full pl-6 pr-4 py-2 text-sm text-zinc-600 placeholder:text-zinc-300 outline-none font-medium"
+                    className="w-full pl-6 pr-4 py-2 text-sm text-zinc-600 placeholder:text-zinc-300 outline-none font-medium bg-transparent cursor-not-allowed opacity-70"
                     value={departure}
-                    onChange={(e) => setDeparture(e.target.value)}
+                    readOnly
+                    disabled
                   />
                   <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 text-zinc-300 w-4 h-4 pointer-events-none" />
                </div>
@@ -107,9 +108,10 @@ export function BookingEngine({
                   <input 
                     type="text" 
                     placeholder="City, airport or station" 
-                    className="w-full pl-6 pr-4 py-2 text-sm text-zinc-600 placeholder:text-zinc-300 outline-none font-medium"
+                    className="w-full pl-6 pr-4 py-2 text-sm text-zinc-600 placeholder:text-zinc-300 outline-none font-medium bg-transparent cursor-not-allowed opacity-70"
                     value={returnLocation}
-                    onChange={(e) => setReturnLocation(e.target.value)}
+                    readOnly
+                    disabled
                   />
                   <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 text-zinc-300 w-4 h-4 pointer-events-none" />
                </div>
