@@ -20,10 +20,10 @@ export default async function AdminDashboard() {
     <div className="space-y-8 p-6">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-4xl font-black text-white tracking-tight mb-2">Overview</h1>
-          <p className="text-zinc-400">Welcome back to the command center.</p>
+          <h1 className="text-4xl font-black text-zinc-900 tracking-tight mb-2">Overview</h1>
+          <p className="text-zinc-500">Welcome back to the command center.</p>
         </div>
-        <div className="px-4 py-2 bg-zinc-900 rounded-full border border-zinc-800 text-zinc-400 text-sm flex items-center gap-2">
+        <div className="px-4 py-2 bg-white rounded-full border border-zinc-200 text-zinc-500 text-sm flex items-center gap-2 shadow-sm">
           <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
           System Operational
         </div>
@@ -31,16 +31,16 @@ export default async function AdminDashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Link href="/admin/cars" className="block group">
-          <Card className="h-full border-zinc-800 bg-zinc-900/50 backdrop-blur-sm hover:bg-zinc-900 hover:border-red-900/50 transition-all duration-300 rounded-2xl overflow-hidden group-hover:-translate-y-1 relative">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-red-600/5 rounded-full blur-3xl -mr-16 -mt-16 transition-all group-hover:bg-red-600/10"></div>
+          <Card className="h-full border-zinc-100 bg-white shadow-sm hover:shadow-md hover:border-red-100 transition-all duration-300 rounded-2xl overflow-hidden group-hover:-translate-y-1 relative">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-red-50 rounded-full blur-3xl -mr-16 -mt-16 transition-all group-hover:bg-red-100"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-sm font-bold text-zinc-400 group-hover:text-red-500 transition-colors">Total Fleet</CardTitle>
-              <Car className="h-5 w-5 text-zinc-600 group-hover:text-red-500 transition-colors" />
+              <CardTitle className="text-sm font-bold text-zinc-500 group-hover:text-red-600 transition-colors">Total Fleet</CardTitle>
+              <Car className="h-5 w-5 text-zinc-400 group-hover:text-red-600 transition-colors" />
             </CardHeader>
             <CardContent className="relative z-10">
-              <div className="text-4xl font-black text-white mb-1 group-hover:scale-105 transition-transform origin-left">{carsCount}</div>
+              <div className="text-4xl font-black text-zinc-900 mb-1 group-hover:scale-105 transition-transform origin-left">{carsCount}</div>
               <div className="flex items-center gap-2 text-xs text-zinc-500">
-                <span className="text-green-500 flex items-center font-bold">
+                <span className="text-green-600 flex items-center font-bold">
                   <TrendingUp className="w-3 h-3 mr-1" />
                   +2
                 </span>
@@ -51,16 +51,16 @@ export default async function AdminDashboard() {
         </Link>
         
         <Link href="/admin/bookings" className="block group">
-          <Card className="h-full border-zinc-800 bg-zinc-900/50 backdrop-blur-sm hover:bg-zinc-900 hover:border-red-900/50 transition-all duration-300 rounded-2xl overflow-hidden group-hover:-translate-y-1 relative">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 rounded-full blur-3xl -mr-16 -mt-16 transition-all group-hover:bg-blue-600/10"></div>
+          <Card className="h-full border-zinc-100 bg-white shadow-sm hover:shadow-md hover:border-blue-100 transition-all duration-300 rounded-2xl overflow-hidden group-hover:-translate-y-1 relative">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full blur-3xl -mr-16 -mt-16 transition-all group-hover:bg-blue-100"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-sm font-bold text-zinc-400 group-hover:text-blue-500 transition-colors">Active Bookings</CardTitle>
-              <Calendar className="h-5 w-5 text-zinc-600 group-hover:text-blue-500 transition-colors" />
+              <CardTitle className="text-sm font-bold text-zinc-500 group-hover:text-blue-600 transition-colors">Active Bookings</CardTitle>
+              <Calendar className="h-5 w-5 text-zinc-400 group-hover:text-blue-600 transition-colors" />
             </CardHeader>
             <CardContent className="relative z-10">
-              <div className="text-4xl font-black text-white mb-1 group-hover:scale-105 transition-transform origin-left">{bookingsCount}</div>
+              <div className="text-4xl font-black text-zinc-900 mb-1 group-hover:scale-105 transition-transform origin-left">{bookingsCount}</div>
               <div className="flex items-center gap-2 text-xs text-zinc-500">
-                <span className="text-blue-500 flex items-center font-bold">
+                <span className="text-blue-600 flex items-center font-bold">
                   <Activity className="w-3 h-3 mr-1" />
                   Active
                 </span>
@@ -71,15 +71,15 @@ export default async function AdminDashboard() {
         </Link>
 
         <div className="block group">
-          <Card className="h-full border-zinc-800 bg-zinc-900/50 backdrop-blur-sm rounded-2xl overflow-hidden relative opacity-75">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-green-600/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
+          <Card className="h-full border-zinc-100 bg-white shadow-sm rounded-2xl overflow-hidden relative opacity-75">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-green-50 rounded-full blur-3xl -mr-16 -mt-16"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-sm font-bold text-zinc-400">Total Revenue</CardTitle>
-              <DollarSign className="h-5 w-5 text-zinc-600" />
+              <CardTitle className="text-sm font-bold text-zinc-500">Total Revenue</CardTitle>
+              <DollarSign className="h-5 w-5 text-zinc-400" />
             </CardHeader>
             <CardContent className="relative z-10">
-              <div className="text-4xl font-black text-zinc-700 mb-1">$0</div>
-              <div className="flex items-center gap-2 text-xs text-zinc-600">
+              <div className="text-4xl font-black text-zinc-300 mb-1">$0</div>
+              <div className="flex items-center gap-2 text-xs text-zinc-400">
                 <span>Coming soon</span>
               </div>
             </CardContent>
@@ -87,16 +87,16 @@ export default async function AdminDashboard() {
         </div>
 
         <Link href="/admin/users" className="block group">
-          <Card className="h-full border-zinc-800 bg-zinc-900/50 backdrop-blur-sm hover:bg-zinc-900 hover:border-purple-900/50 transition-all duration-300 rounded-2xl overflow-hidden group-hover:-translate-y-1 relative">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-purple-600/5 rounded-full blur-3xl -mr-16 -mt-16 transition-all group-hover:bg-purple-600/10"></div>
+          <Card className="h-full border-zinc-100 bg-white shadow-sm hover:shadow-md hover:border-purple-100 transition-all duration-300 rounded-2xl overflow-hidden group-hover:-translate-y-1 relative">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-purple-50 rounded-full blur-3xl -mr-16 -mt-16 transition-all group-hover:bg-purple-100"></div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-              <CardTitle className="text-sm font-bold text-zinc-400 group-hover:text-purple-500 transition-colors">Users</CardTitle>
-              <Users className="h-5 w-5 text-zinc-600 group-hover:text-purple-500 transition-colors" />
+              <CardTitle className="text-sm font-bold text-zinc-500 group-hover:text-purple-600 transition-colors">Users</CardTitle>
+              <Users className="h-5 w-5 text-zinc-400 group-hover:text-purple-600 transition-colors" />
             </CardHeader>
             <CardContent className="relative z-10">
-              <div className="text-4xl font-black text-white mb-1 group-hover:scale-105 transition-transform origin-left">{usersCount}</div>
+              <div className="text-4xl font-black text-zinc-900 mb-1 group-hover:scale-105 transition-transform origin-left">{usersCount}</div>
               <div className="flex items-center gap-2 text-xs text-zinc-500">
-                <span className="text-purple-500 flex items-center font-bold">
+                <span className="text-purple-600 flex items-center font-bold">
                   <ArrowUpRight className="w-3 h-3 mr-1" />
                   Growing
                 </span>
@@ -108,33 +108,33 @@ export default async function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-         <Card className="border-zinc-800 bg-zinc-900/30 backdrop-blur-sm rounded-3xl overflow-hidden">
+         <Card className="border-zinc-100 bg-white shadow-sm rounded-3xl overflow-hidden">
             <CardHeader>
-                <CardTitle className="text-white">Recent Activity</CardTitle>
+                <CardTitle className="text-zinc-900">Recent Activity</CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="h-[200px] flex items-center justify-center text-zinc-600 border-2 border-dashed border-zinc-800 rounded-xl">
+                <div className="h-[200px] flex items-center justify-center text-zinc-400 border-2 border-dashed border-zinc-100 rounded-xl bg-zinc-50/50">
                     No recent activity
                 </div>
             </CardContent>
          </Card>
          
-         <Card className="border-zinc-800 bg-zinc-900/30 backdrop-blur-sm rounded-3xl overflow-hidden">
+         <Card className="border-zinc-100 bg-white shadow-sm rounded-3xl overflow-hidden">
             <CardHeader>
-                <CardTitle className="text-white">System Status</CardTitle>
+                <CardTitle className="text-zinc-900">System Status</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div className="flex justify-between items-center pb-4 border-b border-zinc-800">
-                    <span className="text-zinc-400">Database</span>
-                    <span className="text-green-500 text-sm font-bold flex items-center"><div className="w-2 h-2 rounded-full bg-green-500 mr-2"></div>Connected</span>
+                <div className="flex justify-between items-center pb-4 border-b border-zinc-100">
+                    <span className="text-zinc-500">Database</span>
+                    <span className="text-green-600 text-sm font-bold flex items-center"><div className="w-2 h-2 rounded-full bg-green-500 mr-2"></div>Connected</span>
                 </div>
-                <div className="flex justify-between items-center pb-4 border-b border-zinc-800">
-                    <span className="text-zinc-400">API Latency</span>
-                    <span className="text-green-500 text-sm font-bold">24ms</span>
+                <div className="flex justify-between items-center pb-4 border-b border-zinc-100">
+                    <span className="text-zinc-500">API Latency</span>
+                    <span className="text-green-600 text-sm font-bold">24ms</span>
                 </div>
                 <div className="flex justify-between items-center">
-                    <span className="text-zinc-400">Storage</span>
-                    <span className="text-zinc-500 text-sm font-bold">45% Used</span>
+                    <span className="text-zinc-500">Storage</span>
+                    <span className="text-zinc-900 text-sm font-bold">45% Used</span>
                 </div>
             </CardContent>
          </Card>

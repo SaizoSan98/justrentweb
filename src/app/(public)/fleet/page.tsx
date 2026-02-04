@@ -171,7 +171,7 @@ export default async function FleetPage({
   }));
 
   return (
-    <div className="flex flex-col min-h-screen bg-black text-white font-sans selection:bg-red-600 selection:text-white">
+    <div className="flex flex-col min-h-screen bg-zinc-50 text-zinc-900 font-sans selection:bg-red-600 selection:text-white">
       <Header transparent={false} user={session?.user} dictionary={dictionary} lang={lang} />
       
       {/* Top Bar / Stepper */}
@@ -184,7 +184,7 @@ export default async function FleetPage({
           
           {/* Sidebar Filters */}
           <aside className="w-full lg:w-64 shrink-0">
-             <div className="bg-zinc-900 rounded-lg p-6 border border-zinc-800 sticky top-32">
+             <div className="bg-white rounded-2xl p-6 border border-zinc-100 shadow-sm sticky top-32">
                 <FleetFilters 
                     currentFilters={{
                         category: categories as string[],
@@ -238,12 +238,12 @@ export default async function FleetPage({
              </div>
              
              {serializedCars.length === 0 && (
-                <div className="text-center py-20 bg-zinc-900 rounded-2xl border border-zinc-800">
-                    <h3 className="text-2xl font-bold text-white mb-2">No cars available</h3>
+                <div className="text-center py-20 bg-white rounded-2xl border border-zinc-100 shadow-sm">
+                    <h3 className="text-2xl font-bold text-zinc-900 mb-2">No cars available</h3>
                     <p className="text-zinc-500">Try adjusting your dates or filters to see more results.</p>
                     <Button 
                         asChild
-                        className="mt-6 bg-white text-black hover:bg-zinc-200"
+                        className="mt-6 bg-zinc-900 text-white hover:bg-zinc-800"
                     >
                         <Link href="/fleet">Clear Filters</Link>
                     </Button>

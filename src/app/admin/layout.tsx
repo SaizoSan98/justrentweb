@@ -11,12 +11,12 @@ export default async function AdminLayout({
   const user = session?.user
 
   return (
-    <div className="min-h-screen bg-black flex">
+    <div className="min-h-screen bg-zinc-50 flex">
       {/* Sidebar - Independent */}
       <AdminSidebar user={user} />
       
       {/* Main Content - Independent Scroll */}
-      <div className="flex-1 ml-64 min-h-screen flex flex-col bg-zinc-950">
+      <div className="flex-1 ml-64 min-h-screen flex flex-col bg-zinc-50">
         {/* Header - Not sticky here to avoid complexity with sidebar z-index, or maybe sticky inside content */}
         {/* Actually, user wants no footer here. And independent scroll. */}
         {/* Let's put header at top of main content area if we want it to scroll away or stay? */}

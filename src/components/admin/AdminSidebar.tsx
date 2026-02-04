@@ -33,17 +33,17 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
   const isStartsWith = (path: string) => pathname?.startsWith(path)
 
   return (
-    <aside className="w-64 bg-zinc-900 text-white flex flex-col fixed top-0 bottom-0 z-40 overflow-y-auto">
-      <div className="p-6 border-b border-zinc-800">
+    <aside className="w-64 bg-white border-r border-zinc-100 text-zinc-900 flex flex-col fixed top-0 bottom-0 z-40 overflow-y-auto">
+      <div className="p-6 border-b border-zinc-100">
         <div className="mb-4">
-          <Logo variant="light" className="scale-100 origin-left" />
+          <Logo variant="dark" className="scale-100 origin-left" />
         </div>
         <div className="text-xs font-black text-zinc-400 block tracking-widest uppercase mb-4">
           Admin Panel
         </div>
         <div className="text-xs">
           <span className="text-zinc-500 block">Welcome,</span>
-          <span className="text-white font-bold block">{user?.name || 'Admin User'}</span>
+          <span className="text-zinc-900 font-bold block">{user?.name || 'Admin User'}</span>
           <span className="text-red-600 font-bold text-[10px] uppercase tracking-wider">{user?.role || 'ADMIN'}</span>
         </div>
       </div>
@@ -53,8 +53,8 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
           <Button 
             variant="ghost" 
             className={cn(
-              "w-full justify-start text-zinc-300 hover:text-white hover:bg-zinc-800",
-              isActive('/admin') && "bg-zinc-800 text-white border-l-2 border-red-600 rounded-l-none"
+              "w-full justify-start text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50",
+              isActive('/admin') && "bg-red-50 text-red-600 border-l-2 border-red-600 rounded-l-none"
             )}
           >
             <LayoutDashboard className="mr-3 h-5 w-5" />
@@ -63,15 +63,15 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
         </Link>
         
         <div className="pt-4 pb-2">
-          <p className="px-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">Fleet</p>
+          <p className="px-4 text-xs font-bold text-zinc-400 uppercase tracking-wider">Fleet</p>
         </div>
         
         <Link href="/admin/cars">
           <Button 
             variant="ghost" 
             className={cn(
-              "w-full justify-start text-zinc-300 hover:text-white hover:bg-zinc-800",
-              isActive('/admin/cars') && "bg-zinc-800 text-white border-l-2 border-red-600 rounded-l-none"
+              "w-full justify-start text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50",
+              isActive('/admin/cars') && "bg-red-50 text-red-600 border-l-2 border-red-600 rounded-l-none"
             )}
           >
             <Car className="mr-3 h-5 w-5" />
@@ -83,8 +83,8 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
           <Button 
             variant="ghost" 
             className={cn(
-              "w-full justify-start text-zinc-300 hover:text-white hover:bg-zinc-800",
-              isActive('/admin/categories') && "bg-zinc-800 text-white border-l-2 border-red-600 rounded-l-none"
+              "w-full justify-start text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50",
+              isActive('/admin/categories') && "bg-red-50 text-red-600 border-l-2 border-red-600 rounded-l-none"
             )}
           >
             <Tag className="mr-3 h-5 w-5" />
@@ -96,8 +96,8 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
           <Button 
             variant="ghost" 
             className={cn(
-              "w-full justify-start text-zinc-300 hover:text-white hover:bg-zinc-800",
-              isActive('/admin/insurances') && "bg-zinc-800 text-white border-l-2 border-red-600 rounded-l-none"
+              "w-full justify-start text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50",
+              isActive('/admin/insurances') && "bg-red-50 text-red-600 border-l-2 border-red-600 rounded-l-none"
             )}
           >
             <Shield className="mr-3 h-5 w-5" />
@@ -109,8 +109,8 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
           <Button 
             variant="ghost" 
             className={cn(
-              "w-full justify-start text-zinc-300 hover:text-white hover:bg-zinc-800",
-              isActive('/admin/cars/new') && "bg-zinc-800 text-white border-l-2 border-red-600 rounded-l-none"
+              "w-full justify-start text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50",
+              isActive('/admin/cars/new') && "bg-red-50 text-red-600 border-l-2 border-red-600 rounded-l-none"
             )}
           >
             <PlusCircle className="mr-3 h-5 w-5" />
@@ -119,15 +119,15 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
         </Link>
 
         <div className="pt-4 pb-2">
-          <p className="px-4 text-xs font-bold text-zinc-500 uppercase tracking-wider">Management</p>
+          <p className="px-4 text-xs font-bold text-zinc-400 uppercase tracking-wider">Management</p>
         </div>
 
         <Link href="/admin/bookings">
           <Button 
             variant="ghost" 
             className={cn(
-              "w-full justify-start text-zinc-300 hover:text-white hover:bg-zinc-800",
-              isActive('/admin/bookings') && "bg-zinc-800 text-white border-l-2 border-red-600 rounded-l-none"
+              "w-full justify-start text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50",
+              isActive('/admin/bookings') && "bg-red-50 text-red-600 border-l-2 border-red-600 rounded-l-none"
             )}
           >
             <Calendar className="mr-3 h-5 w-5" />
@@ -139,8 +139,8 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
           <Button 
             variant="ghost" 
             className={cn(
-              "w-full justify-start text-zinc-300 hover:text-white hover:bg-zinc-800",
-              isActive('/admin/featured') && "bg-zinc-800 text-white border-l-2 border-red-600 rounded-l-none"
+              "w-full justify-start text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50",
+              isActive('/admin/featured') && "bg-red-50 text-red-600 border-l-2 border-red-600 rounded-l-none"
             )}
           >
             <Star className="mr-3 h-5 w-5" />
@@ -152,8 +152,8 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
           <Button 
             variant="ghost" 
             className={cn(
-              "w-full justify-start text-zinc-300 hover:text-white hover:bg-zinc-800",
-              isActive('/admin/extras') && "bg-zinc-800 text-white border-l-2 border-red-600 rounded-l-none"
+              "w-full justify-start text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50",
+              isActive('/admin/extras') && "bg-red-50 text-red-600 border-l-2 border-red-600 rounded-l-none"
             )}
           >
             <Settings className="mr-3 h-5 w-5" />
@@ -165,8 +165,8 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
           <Button 
             variant="ghost" 
             className={cn(
-              "w-full justify-start text-zinc-300 hover:text-white hover:bg-zinc-800",
-              isActive('/admin/users') && "bg-zinc-800 text-white border-l-2 border-red-600 rounded-l-none"
+              "w-full justify-start text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50",
+              isActive('/admin/users') && "bg-red-50 text-red-600 border-l-2 border-red-600 rounded-l-none"
             )}
           >
             <Users className="mr-3 h-5 w-5" />
