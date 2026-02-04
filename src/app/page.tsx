@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { BookingEngine } from "@/components/booking/BookingEngine";
@@ -8,8 +9,9 @@ import { getSession } from "@/lib/auth"
 import { Hero } from "@/components/home/Hero"
 import { cookies } from "next/headers"
 import { dictionaries } from "@/lib/dictionary"
-import NextImage from "next/image"
 import { Logo } from "@/components/ui/logo"
+import * as motion from "framer-motion/client"
+import { Shield, Clock, Star, ArrowRight, Phone, Mail, MapPin } from "lucide-react"
 
 export const dynamic = 'force-dynamic'
 
@@ -44,118 +46,171 @@ export default async function LandingPage() {
   const t = (key: string, section: string = "hero") => (dictionary as any)?.[section]?.[key] || key
 
   return (
-    <div className="flex flex-col min-h-screen bg-white text-zinc-900 font-sans">
+    <div className="flex flex-col min-h-screen bg-zinc-950 text-white font-sans selection:bg-red-500/30">
       {/* Navbar */}
       <Header transparent={true} user={session?.user} dictionary={dictionary} lang={lang} />
 
       {/* Hero Section */}
       <Hero dictionary={dictionary} />
 
-      {/* Booking Engine */}
-      <div className="container mx-auto px-6">
-        <BookingEngine className="-mt-48" dictionary={dictionary} />
+      {/* Booking Engine - Floating */}
+      <div className="container mx-auto px-6 relative z-30 -mt-24 lg:-mt-32 mb-24">
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-2xl">
+          <BookingEngine dictionary={dictionary} />
+        </div>
       </div>
 
-      {/* About Section */}
-      <section id="about" className="pt-32 pb-24 bg-white">
-        <div className="container mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-zinc-900">{t('why_choose')}</h2>
-            <p className="text-zinc-600 text-lg leading-relaxed mb-8">
-              {t('why_choose_subtitle')}
+      {/* Why Us Section - Seamless Transition */}
+      <section id="about" className="py-24 relative overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute top-0 left-0 w-full h-full bg-zinc-950">
+           <div className="absolute top-0 left-1/4 w-96 h-96 bg-red-600/10 rounded-full blur-[128px]" />
+           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[128px]" />
+        </div>
+
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight">
+              WHY <span className="text-red-600">US?</span>
+            </h2>
+            <p className="text-zinc-400 text-lg max-w-2xl mx-auto leading-relaxed">
+              We redefine the car rental experience with premium service, transparent pricing, and a fleet that speaks for itself.
             </p>
-            <ul className="space-y-6">
-               <li className="flex items-start gap-4">
-                 <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0">
-                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                 </div>
-                 <div>
-                    <h3 className="font-bold text-zinc-900">{t('concierge')}</h3>
-                    <p className="text-zinc-500 text-sm mt-1">{t('concierge_desc')}</p>
-                 </div>
-               </li>
-               <li className="flex items-start gap-4">
-                 <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0">
-                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                 </div>
-                 <div>
-                    <h3 className="font-bold text-zinc-900">{t('insurance')}</h3>
-                    <p className="text-zinc-500 text-sm mt-1">{t('insurance_desc')}</p>
-                 </div>
-               </li>
-               <li className="flex items-start gap-4">
-                 <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 shrink-0">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                 </div>
-                 <div>
-                    <h3 className="font-bold text-zinc-900">{t('airport')}</h3>
-                    <p className="text-zinc-500 text-sm mt-1">{t('airport_desc')}</p>
-                 </div>
-               </li>
-            </ul>
           </div>
-          <div className="relative h-[500px] bg-zinc-100 rounded-2xl overflow-hidden shadow-2xl">
-             <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1560958089-b8a1929cea89?q=80&w=2071&auto=format&fit=crop')] bg-cover bg-center"></div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: <Shield className="w-8 h-8 text-red-500" />,
+                title: "Premium Insurance",
+                desc: "Full coverage for your peace of mind. Drive without worries."
+              },
+              {
+                icon: <Clock className="w-8 h-8 text-red-500" />,
+                title: "24/7 Concierge",
+                desc: "We are here for you, anytime, anywhere. Roadside assistance included."
+              },
+              {
+                icon: <Star className="w-8 h-8 text-red-500" />,
+                title: "Top Condition",
+                desc: "Our fleet is meticulously maintained and detailed before every rental."
+              }
+            ].map((item, i) => (
+              <div key={i} className="group p-8 rounded-2xl bg-zinc-900/50 border border-zinc-800 hover:bg-zinc-900 hover:border-red-900/50 transition-all duration-500 hover:-translate-y-2">
+                <div className="mb-6 bg-zinc-950 w-16 h-16 rounded-xl flex items-center justify-center border border-zinc-800 group-hover:border-red-900/50 transition-colors">
+                  {item.icon}
+                </div>
+                <h3 className="text-xl font-bold mb-3">{item.title}</h3>
+                <p className="text-zinc-500 leading-relaxed group-hover:text-zinc-400 transition-colors">
+                  {item.desc}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Featured Fleet Section */}
-      <section id="fleet" className="py-24 bg-zinc-50">
+      {/* Popular Cars Section */}
+      <section id="fleet" className="py-24 bg-zinc-950 relative">
         <div className="container mx-auto px-6">
-          <div className="flex justify-between items-end mb-12">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-4 text-zinc-900">{t('premium_fleet')}</h2>
-              <p className="text-zinc-600">{t('premium_fleet_subtitle')}</p>
+              <h2 className="text-4xl md:text-5xl font-black mb-4 tracking-tight">POPULAR <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-red-800">CARS</span></h2>
+              <p className="text-zinc-400 text-lg">Choose from our most requested models.</p>
             </div>
             <Link href="/fleet">
-              <Button variant="outline" className="hidden md:flex">{t('view_all')}</Button>
+              <Button variant="outline" className="border-zinc-800 text-white hover:bg-white hover:text-black transition-all rounded-full px-8">
+                VIEW ALL CARS <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
             </Link>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {serializedFeaturedCars.map((car: any) => (
-              <FleetCard key={car.id} car={car} redirectToFleet={true} dictionary={dictionary} />
+              <FleetCard key={car.id} car={car} redirectToFleet={true} dictionary={dictionary} variant="dark" />
             ))}
           </div>
           
-          <div className="mt-12 text-center md:hidden">
+          <div className="mt-16 text-center md:hidden">
             <Link href="/fleet">
-              <Button variant="outline" className="w-full">{t('view_all')}</Button>
+              <Button variant="outline" className="w-full border-zinc-800 text-white">VIEW ALL CARS</Button>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Contact Section */}
-      <section id="contact" className="py-24 bg-zinc-900 text-white">
-        <div className="container mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">{t('ready_title')}</h2>
-          <p className="text-zinc-400 text-lg mb-8 max-w-2xl mx-auto">
-            {t('ready_subtitle')}
+      {/* Modern CTA Section */}
+      <section id="contact" className="py-32 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-zinc-950 to-red-950/20" />
+        <div className="container mx-auto px-6 relative z-10 text-center">
+          <h2 className="text-5xl md:text-7xl font-black mb-8 tracking-tighter">
+            READY TO <span className="text-red-600">DRIVE?</span>
+          </h2>
+          <p className="text-zinc-400 text-xl mb-12 max-w-2xl mx-auto font-light">
+            Book your car in minutes or contact our premium support team for special requirements.
           </p>
           <div className="flex flex-col md:flex-row justify-center gap-6">
-            <Button size="lg" className="bg-red-600 hover:bg-red-700 text-white">
+            <Button size="lg" className="bg-red-600 hover:bg-red-700 text-white rounded-full px-10 py-8 text-lg font-bold shadow-lg shadow-red-900/20 hover:shadow-red-900/40 transition-all">
               {t('call_us')}
             </Button>
-            <Button size="lg" variant="outline" className="text-white border-zinc-700 bg-transparent hover:bg-zinc-800 hover:text-white">
+            <Button size="lg" variant="outline" className="border-zinc-700 text-white bg-transparent hover:bg-white hover:text-black rounded-full px-10 py-8 text-lg font-bold">
               {t('send_email')}
             </Button>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-zinc-950 py-12 border-t border-zinc-900 text-sm text-zinc-500">
-        <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2">
-             <Logo variant="light" className="scale-90" />
-             <span className="ml-2">© 2024</span>
+      {/* Extreme Modern Footer */}
+      <footer className="bg-black py-20 border-t border-zinc-900">
+        <div className="container mx-auto px-6">
+          <div className="grid md:grid-cols-4 gap-12 mb-16">
+            <div className="col-span-2">
+               <Logo variant="dark" className="scale-125 origin-left mb-8" />
+               <p className="text-zinc-500 max-w-sm leading-relaxed mb-8">
+                 JustRent provides a seamless car rental experience in Budapest. 
+                 Premium service, transparent pricing, and unforgettable journeys.
+               </p>
+               <div className="flex gap-4">
+                 {[1, 2, 3].map((i) => (
+                   <div key={i} className="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-zinc-400 hover:bg-red-600 hover:text-white transition-all cursor-pointer">
+                     <div className="w-4 h-4 bg-current rounded-full" />
+                   </div>
+                 ))}
+               </div>
+            </div>
+            
+            <div>
+              <h4 className="font-bold text-white mb-6 tracking-widest uppercase text-sm">Navigation</h4>
+              <ul className="space-y-4 text-zinc-500">
+                <li><Link href="/" className="hover:text-red-500 transition-colors">Home</Link></li>
+                <li><Link href="/fleet" className="hover:text-red-500 transition-colors">Fleet</Link></li>
+                <li><Link href="#contact" className="hover:text-red-500 transition-colors">Contact</Link></li>
+                <li><Link href="/login" className="hover:text-red-500 transition-colors">Client Portal</Link></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="font-bold text-white mb-6 tracking-widest uppercase text-sm">Contact</h4>
+              <ul className="space-y-4 text-zinc-500">
+                <li className="flex items-center gap-3">
+                  <MapPin className="w-4 h-4 text-red-500" /> Budapest, Hungary
+                </li>
+                <li className="flex items-center gap-3">
+                  <Phone className="w-4 h-4 text-red-500" /> +36 1 234 5678
+                </li>
+                <li className="flex items-center gap-3">
+                  <Mail className="w-4 h-4 text-red-500" /> hello@justrent.hu
+                </li>
+              </ul>
+            </div>
           </div>
-          <div className="flex gap-8">
-            <a href="#" className="hover:text-white transition-colors">{t('privacy')}</a>
-            <a href="#" className="hover:text-white transition-colors">{t('terms')}</a>
-            <a href="#" className="hover:text-white transition-colors">{t('cookies')}</a>
+          
+          <div className="pt-8 border-t border-zinc-900 flex flex-col md:flex-row justify-between items-center gap-6 text-zinc-600 text-sm">
+             <div>© 2024 JustRent. All rights reserved.</div>
+             <div className="flex gap-8">
+                <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>
+                <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>
+             </div>
           </div>
         </div>
       </footer>
