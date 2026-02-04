@@ -2,9 +2,7 @@
 
 import { motion } from "framer-motion"
 import Image from "next/image"
-import { Logo } from "@/components/ui/logo"
 import { Dictionary } from "@/lib/dictionary"
-import { BookingEngine } from "@/components/booking/BookingEngine"
 
 export function Hero({ dictionary }: { dictionary?: Dictionary }) {
   const t = dictionary?.hero || {
@@ -19,37 +17,44 @@ export function Hero({ dictionary }: { dictionary?: Dictionary }) {
   }
 
   return (
-    <section className="relative h-screen flex flex-col justify-center items-center overflow-hidden bg-zinc-950">
+    <section className="relative h-[90vh] min-h-[800px] flex flex-col justify-center items-center overflow-hidden">
       
-      {/* Background Video/Image */}
+      {/* Background Image with Parallax-like feel */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-transparent z-10" />
         <Image
-          src="/budapest1.jpg"
+          src="/budapest.jpg"
           alt="Car Rental Budapest"
           fill
           className="object-cover"
           priority
         />
+        {/* Gradient Overlay for Text Readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-transparent" />
+        
+        {/* Bottom Fade to White - Crucial for seamless transition */}
+        <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-white via-white/80 to-transparent" />
       </div>
 
-      <div className="container mx-auto px-6 relative z-20 text-center">
+      <div className="container mx-auto px-6 relative z-20 text-center pt-20">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="max-w-4xl mx-auto"
+          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          className="max-w-5xl mx-auto"
         >
-          <div className="mb-6 flex items-center justify-center gap-3">
-             <div className="h-[1px] w-12 bg-red-600"></div>
-             <span className="text-red-500 font-bold tracking-widest uppercase text-sm">BOOK NOW</span>
-             <div className="h-[1px] w-12 bg-red-600"></div>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-8">
+             <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+             <span className="text-white/90 text-xs font-bold tracking-widest uppercase">Premium Car Rental Service</span>
           </div>
           
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white tracking-tighter leading-[0.9] mb-8">
+          <h1 className="text-6xl md:text-8xl lg:text-9xl font-black text-white tracking-tighter leading-[0.9] mb-8 drop-shadow-2xl">
             RENT A CAR <br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-zinc-400">BUDAPEST</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/60">BUDAPEST</span>
           </h1>
+          
+          <p className="text-lg md:text-2xl text-white/80 max-w-2xl mx-auto leading-relaxed font-medium drop-shadow-lg">
+            Discover the city with freedom. No hidden fees, just pure driving pleasure.
+          </p>
         </motion.div>
       </div>
     </section>

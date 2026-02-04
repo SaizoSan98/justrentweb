@@ -10,8 +10,7 @@ import { Hero } from "@/components/home/Hero"
 import { cookies } from "next/headers"
 import { dictionaries } from "@/lib/dictionary"
 import { Logo } from "@/components/ui/logo"
-import * as motion from "framer-motion/client"
-import { Shield, Clock, Star, ArrowRight, Phone, Mail, MapPin } from "lucide-react"
+import { Shield, Clock, Star, ArrowRight, Phone, Mail, MapPin, CheckCircle2 } from "lucide-react"
 
 export const dynamic = 'force-dynamic'
 
@@ -31,7 +30,6 @@ export default async function LandingPage() {
     include: { pricingTiers: true }
   })
 
-  // Serialize complex objects for client component
   const serializedFeaturedCars = featuredCars.map((car: any) => ({
     ...car,
     pricePerDay: Number(car.pricePerDay),
@@ -46,78 +44,71 @@ export default async function LandingPage() {
   const t = (key: string, section: string = "hero") => (dictionary as any)?.[section]?.[key] || key
 
   return (
-    <div className="flex flex-col min-h-screen bg-white text-zinc-900 font-sans selection:bg-red-500/30">
+    <div className="flex flex-col min-h-screen bg-white font-sans selection:bg-black selection:text-white">
       {/* Navbar */}
       <Header transparent={true} user={session?.user} dictionary={dictionary} lang={lang} />
 
       {/* Hero Section */}
       <Hero dictionary={dictionary} />
 
-      {/* Booking Engine - Floating */}
-      <div className="container mx-auto px-6 relative z-30 -mt-24 lg:-mt-32 mb-24">
-        <div className="bg-white/80 backdrop-blur-xl border border-white/20 p-6 rounded-3xl shadow-2xl">
-          <BookingEngine dictionary={dictionary} />
+      {/* Floating Booking Engine - Bridging Hero & Content */}
+      <div className="container mx-auto px-6 relative z-30 -mt-32 mb-32">
+        <div className="bg-white/70 backdrop-blur-xl border border-white/40 p-1 rounded-[2.5rem] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.1)]">
+          <div className="bg-white rounded-[2rem] p-6 border border-zinc-100/50">
+             <BookingEngine dictionary={dictionary} />
+          </div>
         </div>
       </div>
 
-      {/* Why Us Section - Seamless Transition */}
-      <section id="about" className="py-24 relative overflow-hidden bg-white">
-        {/* Background Elements - Fade from Hero */}
-        <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-transparent to-white pointer-events-none" />
-
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black mb-6 tracking-tight text-zinc-900">
-              WHY <span className="text-red-600">US?</span>
-            </h2>
-            <p className="text-zinc-500 text-lg max-w-2xl mx-auto leading-relaxed">
-              We redefine the car rental experience with premium service, transparent pricing, and a fleet that speaks for itself.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: <Shield className="w-8 h-8 text-red-600" />,
-                title: "Premium Insurance",
-                desc: "Full coverage for your peace of mind. Drive without worries."
-              },
-              {
-                icon: <Clock className="w-8 h-8 text-red-600" />,
-                title: "24/7 Concierge",
-                desc: "We are here for you, anytime, anywhere. Roadside assistance included."
-              },
-              {
-                icon: <Star className="w-8 h-8 text-red-600" />,
-                title: "Top Condition",
-                desc: "Our fleet is meticulously maintained and detailed before every rental."
-              }
-            ].map((item, i) => (
-              <div key={i} className="group p-8 rounded-2xl bg-zinc-50 border border-zinc-100 hover:border-red-100 hover:shadow-xl transition-all duration-500 hover:-translate-y-2">
-                <div className="mb-6 bg-white w-16 h-16 rounded-xl flex items-center justify-center border border-zinc-100 group-hover:border-red-100 group-hover:bg-red-50 transition-colors shadow-sm">
-                  {item.icon}
-                </div>
-                <h3 className="text-xl font-bold mb-3 text-zinc-900">{item.title}</h3>
-                <p className="text-zinc-500 leading-relaxed">
-                  {item.desc}
-                </p>
+      {/* Why Us - Clean Minimalist Grid */}
+      <section className="pb-32 container mx-auto px-6">
+        <div className="grid md:grid-cols-3 gap-12 lg:gap-20">
+          {[
+            {
+              title: "Transparent Pricing",
+              desc: "No hidden fees. What you see is what you pay. Full insurance included options available.",
+              icon: <Shield className="w-6 h-6" />
+            },
+            {
+              title: "Instant Booking",
+              desc: "Book your car in less than 2 minutes. Digital contract signing and quick pickup.",
+              icon: <Clock className="w-6 h-6" />
+            },
+            {
+              title: "Premium Fleet",
+              desc: "From compact city cars to luxury sedans. All vehicles are under 2 years old.",
+              icon: <Star className="w-6 h-6" />
+            }
+          ].map((item, i) => (
+            <div key={i} className="group">
+              <div className="w-12 h-12 rounded-2xl bg-zinc-50 flex items-center justify-center mb-6 group-hover:bg-black group-hover:text-white transition-colors duration-500">
+                {item.icon}
               </div>
-            ))}
-          </div>
+              <h3 className="text-2xl font-bold mb-4 text-zinc-900 tracking-tight">{item.title}</h3>
+              <p className="text-zinc-500 leading-relaxed text-lg">
+                {item.desc}
+              </p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Popular Cars Section */}
-      <section id="fleet" className="py-24 bg-zinc-50 relative">
+      {/* Fleet Section - Wide & Immersive */}
+      <section className="py-32 bg-zinc-50/50 border-t border-zinc-100">
         <div className="container mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-            <div>
-              <h2 className="text-4xl md:text-5xl font-black mb-4 tracking-tight text-zinc-900">POPULAR <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-800">CARS</span></h2>
-              <p className="text-zinc-500 text-lg">Choose from our most requested models.</p>
+          <div className="flex flex-col md:flex-row justify-between items-end mb-20">
+            <div className="max-w-xl">
+              <span className="text-red-600 font-bold tracking-widest uppercase text-sm mb-4 block">Our Collection</span>
+              <h2 className="text-5xl md:text-6xl font-black text-zinc-900 tracking-tighter leading-[0.9]">
+                DRIVE <br/> THE BEST.
+              </h2>
             </div>
-            <Link href="/fleet">
-              <Button variant="outline" className="border-zinc-200 text-zinc-900 hover:bg-zinc-900 hover:text-white transition-all rounded-full px-8">
-                VIEW ALL CARS <ArrowRight className="w-4 h-4 ml-2" />
+            <Link href="/fleet" className="hidden md:block">
+              <Button variant="ghost" className="text-lg hover:bg-transparent hover:text-red-600 p-0 flex items-center gap-4 group">
+                View Full Fleet 
+                <div className="w-12 h-12 rounded-full border border-zinc-200 flex items-center justify-center group-hover:border-red-600 group-hover:bg-red-600 group-hover:text-white transition-all">
+                  <ArrowRight className="w-5 h-5" />
+                </div>
               </Button>
             </Link>
           </div>
@@ -127,86 +118,83 @@ export default async function LandingPage() {
               <FleetCard key={car.id} car={car} redirectToFleet={true} dictionary={dictionary} variant="light" />
             ))}
           </div>
-          
+
           <div className="mt-16 text-center md:hidden">
             <Link href="/fleet">
-              <Button variant="outline" className="w-full border-zinc-200 text-zinc-900">VIEW ALL CARS</Button>
+              <Button size="lg" className="w-full bg-black text-white rounded-full">View Full Fleet</Button>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Modern CTA Section */}
-      <section id="contact" className="py-32 relative overflow-hidden bg-white text-zinc-900">
+      {/* CTA - Big Typography */}
+      <section className="py-40 bg-black text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/budapest.jpg')] bg-cover bg-fixed opacity-20 grayscale" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent" />
+        
         <div className="container mx-auto px-6 relative z-10 text-center">
-          <h2 className="text-5xl md:text-7xl font-black mb-8 tracking-tighter">
-            READY TO <span className="text-red-600">DRIVE?</span>
+          <h2 className="text-[12vw] leading-none font-black tracking-tighter opacity-10 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full pointer-events-none">
+            JUSTRENT
           </h2>
-          <p className="text-zinc-500 text-xl mb-12 max-w-2xl mx-auto font-light">
-            Book your car in minutes or contact our premium support team for special requirements.
+          
+          <h2 className="text-5xl md:text-7xl font-bold mb-8 tracking-tight relative">
+            Ready to start your journey?
+          </h2>
+          <p className="text-xl text-zinc-400 mb-12 max-w-2xl mx-auto">
+            Experience Budapest with the ultimate freedom. Premium service, 24/7 support, and unforgettable memories await.
           </p>
-          <div className="flex flex-col md:flex-row justify-center gap-6">
-            <Button size="lg" className="bg-red-600 hover:bg-red-700 text-white rounded-full px-10 py-8 text-lg font-bold shadow-lg shadow-red-600/20 hover:shadow-red-600/40 transition-all">
-              {t('call_us')}
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Button size="lg" className="bg-white text-black hover:bg-zinc-200 rounded-full h-14 px-8 text-lg font-bold">
+              Book Your Car Now
             </Button>
-            <Button size="lg" variant="outline" className="border-zinc-200 text-zinc-900 bg-white hover:bg-zinc-50 hover:text-black rounded-full px-10 py-8 text-lg font-bold">
-              {t('send_email')}
+            <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10 rounded-full h-14 px-8 text-lg">
+              Contact Support
             </Button>
           </div>
         </div>
       </section>
 
-      {/* Extreme Modern Footer */}
-      <footer className="bg-zinc-50 py-20 border-t border-zinc-200">
+      {/* Minimalist Footer */}
+      <footer className="bg-white pt-24 pb-12 border-t border-zinc-100">
         <div className="container mx-auto px-6">
-          <div className="grid md:grid-cols-4 gap-12 mb-16">
-            <div className="col-span-2">
-               <Logo variant="light" className="scale-125 origin-left mb-8" />
-               <p className="text-zinc-500 max-w-sm leading-relaxed mb-8">
-                 JustRent provides a seamless car rental experience in Budapest. 
-                 Premium service, transparent pricing, and unforgettable journeys.
-               </p>
-               <div className="flex gap-4">
-                 {[1, 2, 3].map((i) => (
-                   <div key={i} className="w-10 h-10 rounded-full bg-white border border-zinc-200 flex items-center justify-center text-zinc-400 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all cursor-pointer shadow-sm">
-                     <div className="w-4 h-4 bg-current rounded-full" />
-                   </div>
-                 ))}
-               </div>
+          <div className="flex flex-col md:flex-row justify-between items-start gap-12 mb-24">
+            <div className="max-w-sm">
+              <Logo variant="light" className="scale-125 origin-left mb-8" />
+              <p className="text-zinc-500 text-lg leading-relaxed">
+                Redefining car rental in Budapest. Simple, transparent, and premium.
+              </p>
             </div>
             
-            <div>
-              <h4 className="font-bold text-zinc-900 mb-6 tracking-widest uppercase text-sm">Navigation</h4>
-              <ul className="space-y-4 text-zinc-500">
-                <li><Link href="/" className="hover:text-red-600 transition-colors">Home</Link></li>
-                <li><Link href="/fleet" className="hover:text-red-600 transition-colors">Fleet</Link></li>
-                <li><Link href="#contact" className="hover:text-red-600 transition-colors">Contact</Link></li>
-                <li><Link href="/login" className="hover:text-red-600 transition-colors">Client Portal</Link></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-bold text-zinc-900 mb-6 tracking-widest uppercase text-sm">Contact</h4>
-              <ul className="space-y-4 text-zinc-500">
-                <li className="flex items-center gap-3">
-                  <MapPin className="w-4 h-4 text-red-600" /> Budapest, Hungary
-                </li>
-                <li className="flex items-center gap-3">
-                  <Phone className="w-4 h-4 text-red-600" /> +36 1 234 5678
-                </li>
-                <li className="flex items-center gap-3">
-                  <Mail className="w-4 h-4 text-red-600" /> hello@justrent.hu
-                </li>
-              </ul>
+            <div className="grid grid-cols-2 gap-12 md:gap-24">
+              <div>
+                <h4 className="font-bold text-black mb-6">Explore</h4>
+                <ul className="space-y-4 text-zinc-500">
+                  <li><Link href="/fleet" className="hover:text-black transition-colors">Our Fleet</Link></li>
+                  <li><Link href="/about" className="hover:text-black transition-colors">About Us</Link></li>
+                  <li><Link href="/locations" className="hover:text-black transition-colors">Locations</Link></li>
+                  <li><Link href="/blog" className="hover:text-black transition-colors">Journal</Link></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-bold text-black mb-6">Support</h4>
+                <ul className="space-y-4 text-zinc-500">
+                  <li><Link href="/help" className="hover:text-black transition-colors">Help Center</Link></li>
+                  <li><Link href="/terms" className="hover:text-black transition-colors">Terms & Conditions</Link></li>
+                  <li><Link href="/privacy" className="hover:text-black transition-colors">Privacy Policy</Link></li>
+                  <li><Link href="/contact" className="hover:text-black transition-colors">Contact Us</Link></li>
+                </ul>
+              </div>
             </div>
           </div>
           
-          <div className="pt-8 border-t border-zinc-200 flex flex-col md:flex-row justify-between items-center gap-6 text-zinc-500 text-sm">
-             <div>© 2024 JustRent. All rights reserved.</div>
-             <div className="flex gap-8">
-                <Link href="#" className="hover:text-zinc-900 transition-colors">Privacy Policy</Link>
-                <Link href="#" className="hover:text-zinc-900 transition-colors">Terms of Service</Link>
-             </div>
+          <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-zinc-100 gap-6">
+            <p className="text-zinc-400 text-sm">© 2024 JustRent Budapest. All rights reserved.</p>
+            <div className="flex gap-6">
+               {/* Social Icons Placeholder */}
+               <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center text-black hover:bg-black hover:text-white transition-all cursor-pointer">
+                 <ArrowRight className="w-4 h-4 -rotate-45" />
+               </div>
+            </div>
           </div>
         </div>
       </footer>
