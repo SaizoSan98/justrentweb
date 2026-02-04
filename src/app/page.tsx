@@ -72,38 +72,67 @@ export default async function LandingPage() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
-              {[
-                {
-                  title: "Transparent Pricing",
-                  desc: "No hidden fees, no surprises. Our pricing model is straightforward: what you see is what you pay. We offer comprehensive insurance packages so you can drive with zero worries.",
-                  icon: <Shield className="w-8 h-8 text-white" />,
-                  color: "bg-blue-600"
-                },
-                {
-                  title: "Instant Digital Booking",
-                  desc: "Forget paperwork. Our fully digital booking process takes less than 2 minutes. Sign contracts on your phone, pick up your car, and go. Efficiency at its finest.",
-                  icon: <Clock className="w-8 h-8 text-white" />,
-                  color: "bg-red-600"
-                },
-                {
-                  title: "Premium Fleet Guarantee",
-                  desc: "We strictly maintain a fleet of vehicles under 2 years old. From compact city cruisers to executive sedans, every car is detailed and inspected before you turn the key.",
-                  icon: <Star className="w-8 h-8 text-white" />,
-                  color: "bg-black"
-                }
-              ].map((item, i) => (
-                <div key={i} className="group relative p-8 rounded-[2rem] bg-zinc-50 hover:bg-zinc-100 border border-zinc-100 hover:border-zinc-200 transition-all duration-500 overflow-hidden">
-                  <div className={`w-16 h-16 rounded-2xl ${item.color} flex items-center justify-center mb-8 shadow-lg group-hover:scale-110 transition-transform duration-500`}>
-                    {item.icon}
+            <div className="grid md:grid-cols-2 gap-8 lg:gap-12 max-w-6xl mx-auto">
+              {/* Left Column: Stacked Cards */}
+              <div className="flex flex-col gap-8 justify-center">
+                <div className="group relative p-8 rounded-[2rem] bg-white border border-zinc-100 hover:border-zinc-200 hover:shadow-xl transition-all duration-500 overflow-hidden text-left">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-zinc-900 max-w-[80%] leading-none">
+                      INSTANT <br/> CAR SEARCH
+                    </h3>
+                    <ArrowRight className="w-6 h-6 text-zinc-300 group-hover:text-zinc-900 -rotate-45 transition-colors" />
                   </div>
-                  <h3 className="text-2xl font-bold mb-4 text-zinc-900 tracking-tight">{item.title}</h3>
-                  <p className="text-zinc-500 leading-relaxed text-lg mb-8">
-                    {item.desc}
+                  <p className="text-zinc-500 text-sm font-medium uppercase tracking-wide max-w-xs">
+                    Find your perfect ride with just a few clicks
                   </p>
-                  <div className="w-12 h-1 bg-zinc-200 group-hover:w-full group-hover:bg-current transition-all duration-500 rounded-full" />
                 </div>
-              ))}
+
+                <div className="group relative p-8 rounded-[2rem] bg-black text-white border border-zinc-900 hover:shadow-2xl transition-all duration-500 overflow-hidden text-left">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-white max-w-[80%] leading-none">
+                      VERIFIED <br/> PRO LISTINGS
+                    </h3>
+                    <ArrowRight className="w-6 h-6 text-zinc-600 group-hover:text-white -rotate-45 transition-colors" />
+                  </div>
+                  <p className="text-zinc-400 text-sm font-medium uppercase tracking-wide max-w-xs">
+                    100% verified and updated vehicle details
+                  </p>
+                </div>
+
+                <div className="group relative p-8 rounded-[2rem] bg-white border border-zinc-100 hover:border-zinc-200 hover:shadow-xl transition-all duration-500 overflow-hidden text-left">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-zinc-900 max-w-[80%] leading-none">
+                      SMART <br/> RENTAL INSIGHTS
+                    </h3>
+                    <ArrowRight className="w-6 h-6 text-zinc-300 group-hover:text-zinc-900 -rotate-45 transition-colors" />
+                  </div>
+                  <p className="text-zinc-500 text-sm font-medium uppercase tracking-wide max-w-xs">
+                    Personalized recommendations for your journey
+                  </p>
+                </div>
+                
+                <div className="group relative p-8 rounded-[2rem] bg-white border border-zinc-100 hover:border-zinc-200 hover:shadow-xl transition-all duration-500 overflow-hidden text-left">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-zinc-900 max-w-[80%] leading-none">
+                      REAL TIME <br/> FLEET UPDATES
+                    </h3>
+                    <ArrowRight className="w-6 h-6 text-zinc-300 group-hover:text-zinc-900 -rotate-45 transition-colors" />
+                  </div>
+                  <p className="text-zinc-500 text-sm font-medium uppercase tracking-wide max-w-xs">
+                    Get instant alerts on new arrivals and price drops
+                  </p>
+                </div>
+              </div>
+
+              {/* Right Column: Large Image Card */}
+              <div className="relative rounded-[2.5rem] overflow-hidden min-h-[500px] group shadow-2xl">
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-0 left-0 p-10 text-white">
+                   <h3 className="text-4xl font-black uppercase tracking-tighter mb-4">Premium <br/> Experience</h3>
+                   <p className="text-white/80 max-w-sm">Discover a new level of luxury with our exclusive fleet of high-end vehicles.</p>
+                </div>
+              </div>
             </div>
           </div>
         </section>

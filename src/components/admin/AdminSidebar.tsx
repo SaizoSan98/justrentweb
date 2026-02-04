@@ -32,7 +32,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
   const isStartsWith = (path: string) => pathname?.startsWith(path)
 
   return (
-    <aside className="w-64 bg-zinc-900 text-white flex flex-col fixed top-20 bottom-0 z-40">
+    <aside className="w-64 bg-zinc-900 text-white flex flex-col fixed top-0 bottom-0 z-40 overflow-y-auto">
       <div className="p-6 border-b border-zinc-800">
         <div className="mb-4">
           <Logo variant="light" className="scale-100 origin-left" />
