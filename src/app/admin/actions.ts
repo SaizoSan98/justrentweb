@@ -24,9 +24,15 @@ async function uploadImage(file: File): Promise<string | null> {
         token: blobToken
       })
       return blob.url
-    } catch (error) {
-      console.error("Vercel Blob upload failed, falling back to local storage:", error)
-      // Fallback to local storage if blob fails
+    } catch (error: any) {
+      console.error("Vercel Blob upload failed:", error)
+      // If we are on Vercel, re-throw the error to inform the user
+      // instead of falling back to local storage which will also fail.
+      if (process.env.VERCEL) {
+        throw new Error(`Vercel Blob upload failed: ${error.message}. Check your BLOB_READ_WRITE_TOKEN.`)
+      }
+      // Fallback to local storage if NOT on Vercel (e.g. local dev without internet/token)
+      console.warn("Falling back to local storage due to Blob error.")
     }
   }
 
