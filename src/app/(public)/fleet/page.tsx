@@ -92,7 +92,7 @@ export default async function FleetPage({
   }
 
   if (guaranteedModel) {
-    fullWhereClause.guaranteedModel = true;
+    fullWhereClause.orSimilar = false;
   }
 
   const [cars, allAvailableCars, categoriesData, transmissionsData, fuelTypesData, seatsData, extrasData] = await Promise.all([
@@ -116,7 +116,6 @@ export default async function FleetPage({
         transmission: true,
         fuelType: true,
         seats: true,
-        guaranteedModel: true, 
         orSimilar: true,
       }
     }),
@@ -177,7 +176,7 @@ export default async function FleetPage({
 
   const availableCarsSerialized = allAvailableCars.map(car => ({
       ...car,
-      guaranteedModel: !!car.guaranteedModel
+      guaranteedModel: !car.orSimilar
   }));
 
   return (
