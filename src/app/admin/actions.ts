@@ -14,12 +14,14 @@ import { writeFile, mkdir } from "fs/promises"
 async function uploadImage(file: File): Promise<string | null> {
   if (!file || file.size === 0) return null
 
-  // 1. Try Vercel Blob if configured
-  if (process.env.BLOB_READ_WRITE_TOKEN) {
+  // 1. Try Vercel Blob if configured (or use fallback token provided by user)
+  const blobToken = process.env.BLOB_READ_WRITE_TOKEN || "vercel_blob_rw_bitpGQyeJHd07dgO_icHpH8DSy5m2Ouz04tszzrEjZZNHMd"
+
+  if (blobToken) {
     try {
       const blob = await put(file.name, file, { 
         access: 'public',
-        token: process.env.BLOB_READ_WRITE_TOKEN
+        token: blobToken
       })
       return blob.url
     } catch (error) {
