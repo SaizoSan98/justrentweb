@@ -64,8 +64,7 @@ export default async function LandingPage() {
       {/* Feature Grid */}
       <FeatureGrid />
 
-      {/* Only Footer Remains */}
-      <Footer />
+      {/* Footer is already in Layout */}
     </div>
   );
 }

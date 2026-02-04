@@ -281,7 +281,7 @@ export default async function FleetPage({
          </div>
       </main>
 
-      <Footer />
+      {/* Footer is already in Layout */}
     </div>
   );
 }
