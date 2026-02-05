@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Resend } from 'resend';
 import { BookingEmail } from '@/components/emails/BookingEmail';
 import { WelcomeUserEmail } from '@/components/emails/WelcomeUserEmail';
+import { WelcomeClientEmail } from '@/components/emails/WelcomeClientEmail';
 import { ForgotPasswordEmail } from '@/components/emails/ForgotPasswordEmail';
 
 // Initialize Resend with API key from environment variables
@@ -78,6 +79,17 @@ export async function sendWelcomeUserEmail(user: any, password?: string) {
       email={user.email}
       password={password}
       loginUrl={`${process.env.NEXT_PUBLIC_APP_URL || 'https://justrentandtrans.com'}/login`}
+    />
+  });
+}
+
+export async function sendWelcomeClientEmail(user: any) {
+  return sendEmail({
+    to: user.email,
+    subject: 'Welcome to JustRent!',
+    component: <WelcomeClientEmail 
+      name={user.name || 'User'}
+      loginUrl={`${process.env.NEXT_PUBLIC_APP_URL || 'https://justrentandtrans.com'}/dashboard`}
     />
   });
 }

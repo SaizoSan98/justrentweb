@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma"
 import { login } from "@/lib/auth"
 import { redirect } from "next/navigation"
+import { sendWelcomeClientEmail } from "@/lib/email"
 
 export async function loginAction(formData: FormData) {
   const email = formData.get("email") as string
@@ -80,6 +81,9 @@ export async function registerAction(formData: FormData) {
       name: newUser.name,
       role: newUser.role
     })
+    
+    // 4. Send Welcome Email
+    await sendWelcomeClientEmail(newUser)
     
   } catch (err) {
     console.error("Registration failed:", err)

@@ -190,26 +190,6 @@ export function AuthModal({ trigger }: AuthModalProps) {
               <RegisterButton />
             </form>
           )}
-
-          {/* Divider */}
-          <div className="relative my-8">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-zinc-100" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-zinc-400 font-medium">Or continue with</span>
-            </div>
-          </div>
-
-          {/* Social Auth */}
-          <div className="grid grid-cols-2 gap-3">
-            <Button variant="outline" type="button" className="h-10 border-zinc-200 hover:bg-zinc-50 hover:text-zinc-900 text-zinc-600 font-medium text-xs">
-              <Github className="w-4 h-4 mr-2" /> Google
-            </Button>
-            <Button variant="outline" type="button" className="h-10 border-zinc-200 hover:bg-zinc-50 hover:text-zinc-900 text-zinc-600 font-medium text-xs">
-              <Github className="w-4 h-4 mr-2" /> Apple
-            </Button>
-          </div>
         </div>
       </DialogContent>
     </Dialog>

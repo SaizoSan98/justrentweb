@@ -17,7 +17,7 @@ export async function createUser(formData: FormData) {
   const email = formData.get("email") as string
   const phone = formData.get("phone") as string
   const password = formData.get("password") as string
-  const role = formData.get("role") as string || 'USER'
+  const role = 'PARTNER'
 
   if (!email || !password || !name) {
     return { error: 'Missing required fields' }

@@ -25,6 +25,10 @@ export default async function DashboardPage() {
 
   const upcomingBookings = bookings.filter(b => new Date(b.startDate) > new Date())
 
+  // Calculate stats for Partners
+  const totalSpent = bookings.reduce((sum, b) => sum + Number(b.totalPrice), 0)
+  const isPartner = session.user.role === 'PARTNER' || session.user.role === 'SUPERADMIN' // Superadmin sees all features usually
+
   return (
     <div className="space-y-8">
       <div>
@@ -32,35 +36,65 @@ export default async function DashboardPage() {
         <p className="text-zinc-500">Welcome to your personal dashboard.</p>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6">
-        <Card className="bg-white text-zinc-900 border-zinc-200 shadow-sm hover:shadow-md transition-all duration-300">
-          <CardContent className="p-6">
-            <div className="flex justify-between items-start mb-4">
-              <div className="p-2 bg-red-50 rounded-lg">
-                <Calendar className="w-6 h-6 text-red-600" />
+      {isPartner ? (
+        <div className="grid md:grid-cols-3 gap-6">
+          <Card className="bg-white text-zinc-900 border-zinc-200 shadow-sm hover:shadow-md transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex justify-between items-start mb-4">
+                <div className="p-2 bg-red-50 rounded-lg">
+                  <Calendar className="w-6 h-6 text-red-600" />
+                </div>
               </div>
-            </div>
-            <div className="space-y-1">
-              <span className="text-4xl font-bold">{upcomingBookings.length}</span>
-              <p className="text-zinc-500 text-sm">Upcoming Bookings</p>
-            </div>
-          </CardContent>
-        </Card>
+              <div className="space-y-1">
+                <span className="text-4xl font-bold">{upcomingBookings.length}</span>
+                <p className="text-zinc-500 text-sm">Upcoming Bookings</p>
+              </div>
+            </CardContent>
+          </Card>
 
-        <Card className="bg-white text-zinc-900 border-zinc-200 shadow-sm hover:shadow-md transition-all duration-300">
-          <CardContent className="p-6">
-             <div className="flex justify-between items-start mb-4">
-              <div className="p-2 bg-zinc-50 rounded-lg">
-                <Car className="w-6 h-6 text-zinc-600" />
+          <Card className="bg-white text-zinc-900 border-zinc-200 shadow-sm hover:shadow-md transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex justify-between items-start mb-4">
+                <div className="p-2 bg-zinc-50 rounded-lg">
+                  <Car className="w-6 h-6 text-zinc-600" />
+                </div>
               </div>
-            </div>
-             <div className="space-y-1">
-              <span className="text-4xl font-bold">{bookings.length}</span>
-              <p className="text-zinc-500 text-sm">Total Trips</p>
-            </div>
+              <div className="space-y-1">
+                <span className="text-4xl font-bold">{bookings.length}</span>
+                <p className="text-zinc-500 text-sm">Total Trips</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white text-zinc-900 border-zinc-200 shadow-sm hover:shadow-md transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex justify-between items-start mb-4">
+                <div className="p-2 bg-green-50 rounded-lg">
+                  <span className="text-2xl font-bold text-green-600">€</span>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <span className="text-4xl font-bold">{totalSpent.toFixed(0)}</span>
+                <p className="text-zinc-500 text-sm">Total Spent</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      ) : (
+        <Card className="bg-gradient-to-r from-zinc-900 to-zinc-800 text-white border-0">
+          <CardContent className="p-8">
+             <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div>
+                   <h2 className="text-2xl font-bold mb-2">Ready for your next trip?</h2>
+                   <p className="text-zinc-300">Browse our premium fleet and book your perfect car today.</p>
+                </div>
+                <Button asChild className="bg-white text-black hover:bg-zinc-200">
+                   <Link href="/fleet">Browse Fleet</Link>
+                </Button>
+             </div>
           </CardContent>
         </Card>
-      </div>
+      )}
 
       <div>
         <div className="flex items-center justify-between mb-6">

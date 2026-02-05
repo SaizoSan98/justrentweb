@@ -56,19 +56,6 @@ export function CreateUserForm() {
         </p>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="role">Role</Label>
-        <Select name="role" defaultValue="USER">
-          <SelectTrigger>
-            <SelectValue placeholder="Select role" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="USER">User</SelectItem>
-            <SelectItem value="ADMIN">Admin</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
       <div className="flex justify-end gap-4">
         <Button type="button" variant="outline" onClick={() => router.back()}>
           Cancel
