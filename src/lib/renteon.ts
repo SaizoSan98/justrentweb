@@ -130,11 +130,17 @@ export async function getRenteonToken(): Promise<string> {
     params.append('grant_type', 'password');
     params.append('username', process.env.RENTEON_USERNAME || '');
     params.append('password', process.env.RENTEON_PASSWORD || '');
-    // Client ID/Secret might be needed depending on grant type, but password grant usually just needs user/pass 
-    // or Basic Auth header with ClientID:Secret.
-    // Based on standard OAuth2 for Renteon (usually):
+    // Some OAuth2 implementations require client_id in body even with Basic Auth
+    if (process.env.RENTEON_CLIENT_ID) {
+        params.append('client_id', process.env.RENTEON_CLIENT_ID);
+    }
     
     // Construct Basic Auth Header
+    // NOTE: If Renteon uses 'client_credentials' flow instead of 'password', we should change grant_type.
+    // But typically user-based access uses 'password'.
+    // Another possibility: The endpoint might not support Basic Auth header and expects client_id/secret in body.
+    // Let's try adding them to body as fallback/standard practice for some providers.
+    
     const credentials = Buffer.from(`${process.env.RENTEON_CLIENT_ID}:${process.env.RENTEON_CLIENT_SECRET}`).toString('base64');
 
     const response = await fetch(RENTEON_TOKEN_URL, {
