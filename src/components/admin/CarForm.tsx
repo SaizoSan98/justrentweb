@@ -508,11 +508,18 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
               </div>
               
               <div className="grid gap-6">
-                {insurancePlans.filter(p => p.name !== 'Basic').map((plan: any) => (
+                {insurancePlans.length === 0 && (
+                    <div className="text-center p-8 bg-zinc-50 rounded-lg border border-dashed border-zinc-200">
+                        <p className="text-zinc-500">No insurance plans found.</p>
+                        <p className="text-xs text-zinc-400 mt-1">Run "Sync Renteon" to import plans.</p>
+                    </div>
+                )}
+                {insurancePlans.map((plan: any) => (
                   <div key={plan.id} className="grid md:grid-cols-3 gap-4 p-4 border rounded-lg bg-zinc-50/50">
                     <div className="flex flex-col justify-center">
                       <h4 className="font-bold">{plan.name}</h4>
                       {plan.isDefault && <span className="text-xs text-zinc-500">Default Plan</span>}
+                      {plan.description && <p className="text-xs text-zinc-400 mt-1">{plan.description}</p>}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor={`ins-price-${plan.id}`}>Daily Price Add-on (€)</Label>

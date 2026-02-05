@@ -225,27 +225,58 @@ export async function syncCarsFromRenteon() {
             const batch = categories.slice(i, i + batchSize);
             await Promise.all(batch.map(async (cat: any) => {
                 try {
-                    const payload = {
+                    let price = 0;
+                    
+                    // Strategy 1: Standard Payload (Pricelist 351, Commissioner)
+                    const payload1 = {
                         CarCategoryId: cat.Id,
-                        OfficeOutId: 54, // Airport
+                        OfficeOutId: 54,
                         OfficeInId: 54,
                         DateOut: tomorrow.toISOString(),
                         DateIn: dayAfter.toISOString(),
                         PricelistId: 351,
                         BookAsCommissioner: true
                     };
-                    const res = await fetch(`${RENTEON_API_URL}/bookings/calculate`, {
-                        method: 'POST',
-                        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (data.Total && data.Total > 0) {
-                            priceMap.set(cat.Id, data.Total);
+                    
+                    try {
+                        const res1 = await fetch(`${RENTEON_API_URL}/bookings/calculate`, {
+                            method: 'POST',
+                            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload1)
+                        });
+                        
+                        if (res1.ok) {
+                            const data = await res1.json();
+                            if (data.Total && data.Total > 0) {
+                                price = data.Total;
+                                console.log(`Price found (Strategy 1) for Cat ${cat.Id}: ${price}`);
+                            }
                         }
+                    } catch (e) { console.warn("Strategy 1 failed", e); }
+
+                    // Strategy 2: Without Commissioner (if Strategy 1 failed)
+                    if (price <= 0) {
+                         const payload2 = { ...payload1, BookAsCommissioner: false };
+                         try {
+                            const res2 = await fetch(`${RENTEON_API_URL}/bookings/calculate`, {
+                                method: 'POST',
+                                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload2)
+                            });
+                            if (res2.ok) {
+                                const data = await res2.json();
+                                if (data.Total && data.Total > 0) {
+                                    price = data.Total;
+                                    console.log(`Price found (Strategy 2) for Cat ${cat.Id}: ${price}`);
+                                }
+                            }
+                        } catch (e) { console.warn("Strategy 2 failed", e); }
+                    }
+
+                    if (price > 0) {
+                        priceMap.set(cat.Id, price);
                     } else {
-                        // console.warn(`Price check failed for cat ${cat.Id}: ${res.status}`);
+                        console.warn(`All pricing strategies failed for Cat ${cat.Id}`);
                     }
                 } catch (e) {
                     console.error(`Error fetching price for cat ${cat.Id}`, e);
@@ -587,6 +618,7 @@ export async function syncExtrasFromRenteon() {
         
         for (const ep of insEndpoints) {
              try {
+                console.log(`Attempting to fetch insurances from ${ep}...`);
                 const res = await fetch(`${RENTEON_API_URL}${ep}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -597,7 +629,7 @@ export async function syncExtrasFromRenteon() {
                         if (ep === '/services') {
                             const ins = data.filter((s: any) => {
                                 const name = (s.Name || s.Title || "").toLowerCase();
-                                return name.includes('insurance') || name.includes('cdw') || name.includes('protection');
+                                return name.includes('insurance') || name.includes('cdw') || name.includes('protection') || name.includes('sct') || name.includes('fdw');
                             });
                             if (ins.length > 0) {
                                 insurances = ins;
@@ -609,7 +641,11 @@ export async function syncExtrasFromRenteon() {
                             console.log(`Found ${insurances.length} items at ${ep}`);
                             break;
                         }
+                    } else {
+                        console.log(`${ep} returned empty array or invalid data.`);
                     }
+                } else {
+                    console.warn(`Failed to fetch ${ep}: ${res.status}`);
                 }
             } catch (e) { console.warn(`Failed ${ep}`, e); }
         }
@@ -618,10 +654,11 @@ export async function syncExtrasFromRenteon() {
         if (equipment.length === 0 && insurances.length === 0) {
              console.log("Specific endpoints failed, trying generic fetchRenteonServices...");
              const services = await fetchRenteonServices();
+             console.log(`Generic fetch returned ${services.length} services.`);
              // Split services into equipment and insurances
              for (const s of services) {
                 const name = (s.Name || s.Title || "").toLowerCase();
-                if (name.includes('insurance') || name.includes('cdw') || name.includes('protection') || name.includes('excess')) {
+                if (name.includes('insurance') || name.includes('cdw') || name.includes('protection') || name.includes('excess') || name.includes('sct') || name.includes('fdw')) {
                     insurances.push(s);
                 } else {
                     equipment.push(s);

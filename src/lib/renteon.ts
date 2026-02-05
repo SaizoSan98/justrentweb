@@ -209,39 +209,44 @@ export async function fetchRenteonServices(): Promise<any[]> {
   const token = await getRenteonToken();
   if (!token) return [];
 
+  // Aggregated fetch from multiple potential endpoints
+  const endpoints = ['/services', '/extras', '/additionalEquipment', '/equipment', '/insurances', '/insuranceTypes'];
+  let allServices: any[] = [];
+  const seenIds = new Set();
+
   try {
-    // API endpoint based on documentation assumption: GET /api/extras or /api/services
-    // Let's try /api/extras first as it's common. If not, /api/services.
-    // Based on previous code in booking sync, it uses "Services" field.
-    // Documentation usually lists "AdditionalServices" or "Extras".
-    // Let's try to fetch a dummy booking or calculation to see available services, 
-    // OR try the direct endpoint.
-    
-    // Attempt 1: Direct endpoint (guessing /api/services based on "Services" field in booking)
-    const response = await fetch(`${RENTEON_API_URL}/services`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
+    for (const ep of endpoints) {
+        try {
+            const response = await fetch(`${RENTEON_API_URL}${ep}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
 
-    if (response.ok) {
-      return await response.json();
+            if (response.ok) {
+                const data = await response.json();
+                if (Array.isArray(data)) {
+                    // console.log(`Fetched ${data.length} items from ${ep}`);
+                    data.forEach((item: any) => {
+                        const id = item.Id || item.id || item.Code; // Unique ID check
+                        if (id && !seenIds.has(id)) {
+                            seenIds.add(id);
+                            allServices.push(item);
+                        } else if (!id) {
+                             // If no ID, push anyway (rare)
+                            allServices.push(item);
+                        }
+                    });
+                }
+            }
+        } catch (innerError) {
+            console.warn(`Failed to fetch from ${ep}:`, innerError);
+        }
     }
     
-    // Attempt 2: /api/extras
-    const response2 = await fetch(`${RENTEON_API_URL}/extras`, {
-        method: 'GET',
-        headers: { 'Authorization': `Bearer ${token}` }
-    });
-    
-    if (response2.ok) {
-        return await response2.json();
-    }
-
-    console.warn(`Failed to fetch services/extras: ${response.status} / ${response2.status}`);
-    return [];
+    return allServices;
 
   } catch (error) {
     console.error('Renteon Services Fetch Exception:', error);
