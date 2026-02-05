@@ -531,12 +531,21 @@ export async function syncCarsFromRenteon() {
     }
     
     // Trigger Extras Sync too
-    await syncExtrasFromRenteon();
+    try {
+        await syncExtrasFromRenteon();
+    } catch (extraErr) {
+        console.error("Extras sync failed during main sync:", extraErr);
+    }
 
     revalidatePath("/admin/cars")
     return { 
         success: true, 
-        message: `Synced ${categories.length} categories. Created ${createdCount} cars, updated ${updatedCount} cars. Pricing source: ${priceMap.size > 0 ? 'Renteon Pricelist 351' : 'Default'}` 
+        message: `Synced ${categories.length} categories. Created ${createdCount} cars, updated ${updatedCount} cars. Pricing source: ${priceMap.size > 0 ? 'Renteon Pricelist 351' : 'Default'}`,
+        stats: {
+            created: createdCount,
+            updated: updatedCount,
+            total: createdCount + updatedCount
+        }
     }
 
   } catch (error: any) {
