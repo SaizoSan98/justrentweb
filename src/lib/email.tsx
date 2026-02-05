@@ -7,7 +7,8 @@ import { VerificationEmail } from '@/components/emails/VerificationEmail';
 import { ForgotPasswordEmail } from '@/components/emails/ForgotPasswordEmail';
 
 // Initialize Resend with API key from environment variables
-const resend = new Resend(process.env.RESEND_API_KEY);
+// We wrap this in a getter or check to ensure it doesn't crash if env is missing during build
+const resend = new Resend(process.env.RESEND_API_KEY || 're_123456789'); // Fallback to dummy key during build/dev if missing
 
 const FROM_EMAIL = process.env.EMAIL_FROM || 'JustRent <onboarding@resend.dev>';
 
