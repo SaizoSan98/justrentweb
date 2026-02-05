@@ -289,7 +289,7 @@ export function UsersTable({ users }: { users: any[] }) {
 
               <div className="flex justify-end gap-2 pt-4">
                 <Button type="button" variant="outline" onClick={() => setBanningUser(null)}>Cancel</Button>
-                <Button type="destructive" type="submit">Ban User</Button>
+                <Button variant="destructive" type="submit">Ban User</Button>
               </div>
             </form>
           )}
