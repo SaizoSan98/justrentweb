@@ -7,15 +7,18 @@ import { VerificationEmail } from '@/components/emails/VerificationEmail';
 import { ForgotPasswordEmail } from '@/components/emails/ForgotPasswordEmail';
 
 // Initialize Resend with API key from environment variables
-// We wrap this in a getter or check to ensure it doesn't crash if env is missing during build
-const resend = new Resend(process.env.RESEND_API_KEY || 're_123456789'); // Fallback to dummy key during build/dev if missing
+// Use process.env.RESEND_API_KEY if available, otherwise it might fail in runtime if not handled
+const resendApiKey = process.env.RESEND_API_KEY;
+
+// Only initialize if key exists, otherwise we handle it in sendEmail
+const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 const FROM_EMAIL = process.env.EMAIL_FROM || 'JustRent <onboarding@resend.dev>';
 
 // Helper to send email safely
 async function sendEmail({ to, subject, component }: { to: string, subject: string, component: React.ReactElement }) {
-  if (!process.env.RESEND_API_KEY) {
-    console.warn("RESEND_API_KEY missing. Email skipped:", subject);
+  if (!resend) {
+    console.warn("Resend client not initialized (missing API key). Email skipped:", subject);
     return { success: false, error: "Missing API Key" };
   }
 
