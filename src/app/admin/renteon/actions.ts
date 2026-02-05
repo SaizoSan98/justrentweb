@@ -309,17 +309,23 @@ export async function syncCarsFromRenteon() {
                 });
                 if (searchRes.ok) {
                     const bookings = await searchRes.json();
+                    let fallbackCount = 0;
                     bookings.forEach((b: any) => {
+                        // Ensure we use Total and valid dates
                         if (b.Total && b.DateOut && b.DateIn && b.CarCategoryId && !priceMap.has(b.CarCategoryId)) {
                             const start = new Date(b.DateOut);
                             const end = new Date(b.DateIn);
                             const days = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
-                            const dailyRate = b.Total / days;
+                            let dailyRate = b.Total / days;
+                            
+                            // Sanity check for daily rate (e.g., avoid 0 or extremely high values)
                             if (dailyRate > 10 && dailyRate < 1000) {
                                  priceMap.set(b.CarCategoryId, dailyRate);
+                                 fallbackCount++;
                             }
                         }
                     });
+                    console.log(`Smart Pricing found ${fallbackCount} additional prices from historical bookings.`);
                 }
             }
         } catch (e) { console.warn("Smart Pricing fallback failed", e); }
