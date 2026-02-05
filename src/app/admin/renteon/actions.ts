@@ -91,41 +91,71 @@ export async function syncCarsFromRenteon() {
             make: cat.CarMakeName || cat.CarModel?.split(' ')[0] || 'Unknown',
             model: cat.CarModel?.split(' ').slice(1).join(' ') || cat.CarModel || 'Unknown',
             year: 2024, // Default to current year as API might not return it for category
-            // color removed as it is not in the schema
             licensePlate: `RT-${cat.SIPP}-${cat.Id}`, // Virtual license plate
-            vin: `RT-VIN-${cat.Id}`,
-            fuelType: cat.FuelTypes?.[0]?.Name || 'Petrol',
-            transmission: cat.CarTransmissionType?.Name || 'Manual',
+            // vin is NOT in schema based on prisma/schema.prisma Read result
+            // fuelType and transmission are ENUMS in schema, need to map them correctly
+            // Schema Enums: FuelType { PETROL, DIESEL, ELECTRIC, HYBRID }, Transmission { MANUAL, AUTOMATIC }
+            // We need a helper to map strings to these Enums safely
             seats: cat.PassengerCapacity || 5,
             pricePerDay: 50, // Default, will need real pricing later
             imageUrl: cat.CarModelImageURL || null,
-            isAvailable: true,
-            renteonId: cat.Id.toString(),
-            mileage: 0 // Default mileage for new cars synced from Renteon
+            // isAvailable is NOT in schema directly as boolean, it uses 'status' Enum (AVAILABLE, RENTED, MAINTENANCE)
+            status: 'AVAILABLE', 
+            // renteonId is NOT in schema based on prisma/schema.prisma Read result
+            // We should use a different field or just rely on licensePlate for now
+            mileage: 0
         }
+
+        // Helper for Enums (simplified for this block)
+        const mapFuelType = (ft: string) => {
+            const lower = ft?.toLowerCase() || ''
+            if (lower.includes('diesel')) return 'DIESEL'
+            if (lower.includes('hybrid')) return 'HYBRID'
+            if (lower.includes('electric') || lower.includes('electro')) return 'ELECTRIC'
+            return 'PETROL'
+        }
+
+        const mapTransmission = (tr: string) => {
+            const lower = tr?.toLowerCase() || ''
+            if (lower.includes('auto') || lower.includes('dsg')) return 'AUTOMATIC'
+            return 'MANUAL'
+        }
+
+        const finalCarData = {
+            ...carData,
+            fuelType: mapFuelType(cat.FuelTypes?.[0]?.Name),
+            transmission: mapTransmission(cat.CarTransmissionType?.Name)
+        }
+        
+        // Remove fields that are not in schema
+        // @ts-ignore
+        delete finalCarData.vin
+        // @ts-ignore
+        delete finalCarData.isAvailable
+        // @ts-ignore
+        delete finalCarData.renteonId
 
         // Check if exists by our virtual license plate
         const existing = await prisma.car.findUnique({
-            where: { licensePlate: carData.licensePlate }
+            where: { licensePlate: finalCarData.licensePlate }
         })
 
         if (existing) {
             await prisma.car.update({
                 where: { id: existing.id },
                 data: {
-                    make: carData.make,
-                    model: carData.model,
-                    imageUrl: carData.imageUrl,
-                    transmission: carData.transmission,
-                    fuelType: carData.fuelType,
-                    seats: carData.seats
-                    // We don't update price/availability blindly to avoid overwriting manual changes
+                    make: finalCarData.make,
+                    model: finalCarData.model,
+                    imageUrl: finalCarData.imageUrl,
+                    transmission: finalCarData.transmission as any,
+                    fuelType: finalCarData.fuelType as any,
+                    seats: finalCarData.seats
                 }
             })
             updatedCount++
         } else {
             await prisma.car.create({
-                data: carData
+                data: finalCarData as any
             })
             createdCount++
         }
