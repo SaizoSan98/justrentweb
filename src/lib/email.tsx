@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Resend } from 'resend';
-import { renderToStaticMarkup } from 'react-dom/server';
 import { BookingEmail } from '@/components/emails/BookingEmail';
 import { WelcomeUserEmail } from '@/components/emails/WelcomeUserEmail';
 import { ForgotPasswordEmail } from '@/components/emails/ForgotPasswordEmail';
@@ -18,12 +17,11 @@ async function sendEmail({ to, subject, component }: { to: string, subject: stri
   }
 
   try {
-    const html = renderToStaticMarkup(component);
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
       to,
       subject,
-      html
+      react: component
     });
 
     if (error) {
