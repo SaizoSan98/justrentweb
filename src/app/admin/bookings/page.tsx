@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma"
 import { format } from "date-fns"
 import { BookingFilters } from "@/components/admin/BookingFilters"
 import { BookingActions } from "@/components/admin/BookingActions"
+import { BookingDetailsModal } from "@/components/admin/BookingDetailsModal"
 
 export default async function BookingsPage({
   searchParams,
@@ -105,7 +106,10 @@ export default async function BookingsPage({
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <BookingActions bookingId={booking.id} status={booking.status} />
+                    <div className="flex gap-2">
+                        <BookingActions bookingId={booking.id} status={booking.status} />
+                        <BookingDetailsModal booking={booking} />
+                    </div>
                   </td>
                 </tr>
               ))}

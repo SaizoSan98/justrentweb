@@ -5,11 +5,27 @@ import { revalidatePath } from "next/cache"
 import { BookingStatus } from "@prisma/client"
 import { getSession } from "@/lib/auth"
 import { cancelBookingInRenteon } from "@/lib/renteon"
-import { 
-  sendBookingConfirmationEmail, 
-  sendBookingCancellationEmail, 
-  sendBookingCompletedEmail 
-} from "@/lib/email"
+import { sendBookingConfirmationEmail, sendBookingCancellationEmail, sendBookingCompletedEmail } from "@/lib/email"
+
+export async function deleteBooking(bookingId: string) {
+  const session = await getSession()
+  
+  if (!session || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
+    return { error: "Unauthorized" }
+  }
+
+  try {
+    await prisma.booking.delete({
+      where: { id: bookingId }
+    })
+
+    revalidatePath("/admin/bookings")
+    return { success: true }
+  } catch (error) {
+    console.error("Failed to delete booking:", error)
+    return { error: "Failed to delete booking" }
+  }
+}
 
 export async function updateBookingStatus(bookingId: string, status: BookingStatus) {
   const session = await getSession()
