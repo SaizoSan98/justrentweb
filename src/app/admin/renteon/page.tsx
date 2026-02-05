@@ -118,13 +118,17 @@ export default function RenteonTestPage() {
                             {syncResult.success ? "Sync Completed" : "Sync Failed"}
                         </h3>
                     </div>
-                    {syncResult.success && (
+                    {syncResult.success && syncResult.stats ? (
                         <div className="text-sm text-green-800 space-y-1">
                             <p>Created: <strong>{syncResult.stats.created}</strong></p>
                             <p>Updated: <strong>{syncResult.stats.updated}</strong></p>
                             <p>Total Processed: <strong>{syncResult.stats.total}</strong></p>
                         </div>
-                    )}
+                    ) : syncResult.success ? (
+                        <div className="text-sm text-green-800">
+                            {syncResult.message}
+                        </div>
+                    ) : null}
                     {!syncResult.success && (
                         <div className="text-sm text-red-800">
                             {syncResult.error}
