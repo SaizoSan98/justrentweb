@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { getSession } from "@/lib/auth"
 import { sendBookingConfirmationEmail } from "@/lib/email"
+import { syncBookingToRenteon } from "@/lib/renteon"
 
 export async function createBooking(prevState: any, formData: FormData) {
   try {
@@ -75,6 +76,10 @@ export async function createBooking(prevState: any, formData: FormData) {
     // 3. Send Confirmation Email (Async, don't block response)
     // We await it here to ensure it works, but in high load you might offload it.
     await sendBookingConfirmationEmail(booking)
+
+    // 4. Sync to Renteon (Fire and forget, or log errors)
+    // We don't await this to fail the request, but we log the output
+    syncBookingToRenteon(booking).catch(err => console.error("Background Renteon Sync Failed:", err))
 
     return { success: true, bookingId: booking.id }
     
