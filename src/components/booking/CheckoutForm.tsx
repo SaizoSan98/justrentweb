@@ -718,7 +718,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                         </div>
                     </button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px] bg-white text-zinc-900 border-zinc-200">
+                <DialogContent className="w-[90%] sm:max-w-[425px] bg-white text-zinc-900 border-zinc-200 rounded-2xl">
                     <DialogHeader>
                         <DialogTitle className="text-xl font-bold">Price Breakdown</DialogTitle>
                     </DialogHeader>

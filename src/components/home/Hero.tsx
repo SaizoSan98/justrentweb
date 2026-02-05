@@ -20,7 +20,7 @@ export function Hero({ dictionary, carCount }: { dictionary?: Dictionary; carCou
 
   return (
     <div className="md:pb-6 bg-zinc-50 relative">
-      <section className="relative h-[900px] flex flex-col justify-start pt-28 md:pt-48 items-center overflow-hidden rounded-b-3xl md:rounded-b-[2.5rem] shadow-2xl">
+      <section className="relative h-[80vh] md:h-[900px] flex flex-col justify-start pt-28 md:pt-48 items-center overflow-hidden rounded-b-[2.5rem] md:rounded-b-[3rem] shadow-2xl">
         
         {/* Background Image with Parallax-like feel */}
         <div className="absolute inset-0 z-0">
@@ -28,11 +28,11 @@ export function Hero({ dictionary, carCount }: { dictionary?: Dictionary; carCou
             src="/rs6.avif"
             alt="Car Rental Budapest"
             fill
-            className="object-cover"
+            className="object-cover object-center"
             priority
           />
           {/* Gradient Overlay for Text Readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/60" />
         </div>
 
         {/* Tech Pins / Bubbles */}
@@ -132,14 +132,14 @@ export function Hero({ dictionary, carCount }: { dictionary?: Dictionary; carCou
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-            className="max-w-5xl mx-auto"
+            className="max-w-5xl mx-auto px-4"
           >
-            <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-black text-white tracking-tighter leading-[0.9] mb-6 md:mb-8 drop-shadow-2xl text-center">
+            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black text-white tracking-tighter leading-[0.85] mb-6 md:mb-8 drop-shadow-2xl text-center">
                 RENT A CAR <br/>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-zinc-400">BUDAPEST</span>
             </h1>
             
-            <p className="text-base sm:text-lg md:text-2xl text-white/80 max-w-2xl mx-auto leading-relaxed font-medium drop-shadow-lg text-center mb-12 md:mb-0">
+            <p className="text-base sm:text-xl md:text-2xl text-white/90 max-w-xl mx-auto leading-relaxed font-medium drop-shadow-lg text-center mb-12 md:mb-0">
               Unlock the city with our elite fleet. Seamless digital booking, delivered to your door.
             </p>
           </motion.div>

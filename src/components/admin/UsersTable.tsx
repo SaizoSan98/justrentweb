@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from "react"
@@ -12,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { ShieldAlert, ShieldCheck, Ban, CheckCircle, Pencil, UserX } from "lucide-react"
+import { ShieldAlert, ShieldCheck, Ban, CheckCircle, Pencil, UserX, Mail, Phone, Calendar } from "lucide-react"
 import { toggleUserRole, banUser, unbanUser, updateUserByAdmin } from "@/app/admin/actions"
 
 export function UsersTable({ users }: { users: any[] }) {
@@ -26,7 +27,9 @@ export function UsersTable({ users }: { users: any[] }) {
           <h3 className="font-bold text-zinc-900">All Users</h3>
           <span className="text-xs font-bold bg-zinc-200 px-2 py-1 rounded text-zinc-600">{users.length} Users</span>
         </div>
-        <div className="overflow-x-auto">
+        
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm text-left">
             <thead className="bg-white text-zinc-500 uppercase tracking-wider font-bold text-xs border-b border-zinc-100">
               <tr>
@@ -126,11 +129,99 @@ export function UsersTable({ users }: { users: any[] }) {
             </tbody>
           </table>
         </div>
+
+        {/* Mobile Card View */}
+        <div className="md:hidden divide-y divide-zinc-100">
+          {users.map((user) => (
+            <div key={user.id} className={`p-4 ${user.isBanned ? "bg-red-50" : "bg-white"}`}>
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <div className="font-bold text-zinc-900">{user.name || 'N/A'}</div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                        user.role === 'SUPERADMIN' ? 'bg-purple-100 text-purple-700' :
+                        user.role === 'ADMIN' ? 'bg-zinc-900 text-white' :
+                        'bg-zinc-100 text-zinc-600'
+                      }`}>
+                        {user.role}
+                    </span>
+                    {user.isBanned ? (
+                      <span className="inline-flex items-center text-[10px] font-bold text-red-600">
+                        <Ban className="w-3 h-3 mr-1" /> Banned
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center text-[10px] font-bold text-green-600">
+                        <CheckCircle className="w-3 h-3 mr-1" /> Active
+                      </span>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="flex gap-1">
+                   <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setEditingUser(user)}
+                      className="h-8 w-8 p-0"
+                    >
+                      <Pencil className="w-3 h-3" />
+                    </Button>
+                </div>
+              </div>
+
+              <div className="space-y-2 text-sm text-zinc-600 mb-4">
+                <div className="flex items-center gap-2">
+                  <Mail className="w-3 h-3 text-zinc-400" />
+                  {user.email}
+                </div>
+                {user.phone && (
+                  <div className="flex items-center gap-2">
+                    <Phone className="w-3 h-3 text-zinc-400" />
+                    {user.phone}
+                  </div>
+                )}
+                <div className="flex items-center gap-2 text-xs text-zinc-400">
+                  <Calendar className="w-3 h-3" />
+                  Joined {format(new Date(user.createdAt), 'MMM d, yyyy')}
+                </div>
+              </div>
+
+              {/* Mobile Actions */}
+              {user.role !== 'SUPERADMIN' && (
+                <div className="flex gap-2 pt-3 border-t border-zinc-100/50">
+                   <form action={async () => await toggleUserRole(user.id, user.role)} className="flex-1">
+                      <Button variant="outline" size="sm" className="w-full text-xs h-8">
+                        {user.role === 'ADMIN' ? 'Revoke Admin' : 'Make Admin'}
+                      </Button>
+                   </form>
+                   
+                   {user.isBanned ? (
+                      <form action={async () => await unbanUser(user.id)} className="flex-1">
+                        <Button variant="outline" size="sm" className="w-full text-xs h-8 text-green-600 border-green-200 hover:bg-green-50">
+                          Unban
+                        </Button>
+                      </form>
+                   ) : (
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => setBanningUser(user)}
+                        className="flex-1 text-xs h-8 text-red-600 border-red-200 hover:bg-red-50"
+                      >
+                        Ban
+                      </Button>
+                   )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
       </div>
 
       {/* Edit User Dialog */}
       <Dialog open={!!editingUser} onOpenChange={(open) => !open && setEditingUser(null)}>
-        <DialogContent>
+        <DialogContent className="w-[90%] max-w-[420px] rounded-xl">
           <DialogHeader>
             <DialogTitle>Edit User: {editingUser?.name}</DialogTitle>
           </DialogHeader>
@@ -177,7 +268,7 @@ export function UsersTable({ users }: { users: any[] }) {
 
       {/* Ban User Dialog */}
       <Dialog open={!!banningUser} onOpenChange={(open) => !open && setBanningUser(null)}>
-        <DialogContent>
+        <DialogContent className="w-[90%] max-w-[420px] rounded-xl">
           <DialogHeader>
             <DialogTitle>Ban User: {banningUser?.name}</DialogTitle>
           </DialogHeader>
@@ -198,7 +289,7 @@ export function UsersTable({ users }: { users: any[] }) {
 
               <div className="flex justify-end gap-2 pt-4">
                 <Button type="button" variant="outline" onClick={() => setBanningUser(null)}>Cancel</Button>
-                <Button type="submit" variant="destructive">Ban User</Button>
+                <Button type="destructive" type="submit">Ban User</Button>
               </div>
             </form>
           )}

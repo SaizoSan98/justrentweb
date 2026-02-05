@@ -28,7 +28,7 @@ export default async function UsersPage() {
         <h1 className="text-3xl font-black text-zinc-900 tracking-tight">Users & Permissions</h1>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-1">
           <AdminProfileForm user={currentUser} />
         </div>

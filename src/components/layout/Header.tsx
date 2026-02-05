@@ -201,7 +201,7 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
                   trigger={
                     <Button className={cn(
                         "rounded-lg px-4 sm:px-6 font-bold shadow-sm hover:shadow-md hover:scale-105 transition-all text-xs sm:text-sm h-9 sm:h-10",
-                        isScrolled ? "bg-zinc-900 text-white hover:bg-zinc-800" : "bg-white text-zinc-900 hover:bg-white/90"
+                        (isScrolled || !transparent) ? "bg-zinc-900 text-white hover:bg-zinc-800" : "bg-white text-zinc-900 hover:bg-white/90"
                     )}>
                       Sign Up
                     </Button>
@@ -215,7 +215,7 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className={cn(
                     "md:hidden rounded-full w-10 h-10",
-                    isScrolled ? "text-zinc-900 hover:bg-zinc-100" : "text-white hover:bg-white/20"
+                    (isScrolled || !transparent) ? "text-zinc-900 hover:bg-zinc-100" : "text-white hover:bg-white/20"
                 )}>
                   <Menu className="w-5 h-5" />
                 </Button>

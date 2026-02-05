@@ -36,14 +36,14 @@ export function AuthModal({ trigger }: AuthModalProps) {
       <DialogTrigger asChild>
         {trigger || <Button>Log in</Button>}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[420px] max-h-[90vh] p-0 overflow-y-auto bg-white border-0 shadow-2xl rounded-2xl gap-0">
+      <DialogContent className="w-[85%] max-w-[360px] sm:max-w-[420px] max-h-[90vh] p-0 overflow-y-auto bg-white border-0 shadow-2xl rounded-2xl gap-0">
         {/* Header Section */}
-        <div className="bg-zinc-900 p-6 text-center relative overflow-hidden">
+        <div className="bg-zinc-900 p-5 md:p-6 text-center relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-red-600/20 to-transparent opacity-50" />
           <div className="relative z-10 flex justify-center mb-2">
-            <Logo variant="light" className="scale-125" />
+            <Logo variant="light" className="scale-110 md:scale-125" />
           </div>
-          <p className="text-zinc-400 text-sm mt-2 relative z-10">
+          <p className="text-zinc-400 text-xs md:text-sm mt-2 relative z-10">
             Access your premium fleet journey
           </p>
         </div>
@@ -81,7 +81,7 @@ export function AuthModal({ trigger }: AuthModalProps) {
         </div>
 
         {/* Form Content */}
-        <div className="p-6 md:p-8">
+        <div className="p-5 md:p-8">
           {activeTab === "login" ? (
             <form action={loginAction} className="space-y-4">
               <div className="space-y-2">

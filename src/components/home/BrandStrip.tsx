@@ -9,7 +9,7 @@ export function BrandStrip() {
     { name: "BMW", slug: "bmw" },
     { name: "Audi", slug: "audi" },
     { name: "Seat", slug: "seat" },
-    { name: "Mercedes", slug: "mercedes" },
+    { name: "Mercedes", slug: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Mercedes-Benz_logo.svg/1024px-Mercedes-Benz_logo.svg.png" },
     { name: "Mini", slug: "mini" },
     { name: "KIA", slug: "kia" },
     { name: "Hyundai", slug: "hyundai" },
