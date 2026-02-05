@@ -613,8 +613,8 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                   <div className="font-black uppercase text-lg leading-tight">{car.make} {car.model}</div>
                   <div className="text-zinc-400 text-sm">{car.category}</div>
                   <div className="flex items-center gap-2 mt-2">
-                     <CreditCard className="w-4 h-4 text-zinc-500" />
-                     <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider">MINIMUM DRIVER AGE: 21 YEARS</span>
+                     <CreditCard className="w-4 h-4 text-zinc-400" />
+                     <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">MINIMUM DRIVER AGE: 21 YEARS</span>
                   </div>
                 </div>
               </div>

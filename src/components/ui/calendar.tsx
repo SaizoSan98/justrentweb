@@ -113,7 +113,7 @@ function Calendar({
   }
 
   return (
-    <div className={cn("p-4 bg-white rounded-xl shadow-sm border border-zinc-200 w-fit mx-auto", className)}>
+    <div className={cn("p-3 sm:p-4 bg-white rounded-xl shadow-sm border border-zinc-200 w-full max-w-[320px] sm:max-w-fit mx-auto", className)}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <button 
@@ -123,7 +123,7 @@ function Calendar({
         >
           <ChevronLeft className="h-5 w-5 text-zinc-600" />
         </button>
-        <div className="font-bold text-lg text-zinc-900 capitalize">
+        <div className="font-bold text-base sm:text-lg text-zinc-900 capitalize">
           {format(currentMonth, "MMMM yyyy")}
         </div>
         <button 
@@ -138,7 +138,7 @@ function Calendar({
       {/* Grid */}
       <div className="grid grid-cols-7 gap-1 text-center mb-2">
         {weekDays.map((d) => (
-          <div key={d} className="text-sm font-bold text-zinc-400 w-10 py-1">
+          <div key={d} className="text-[10px] sm:text-sm font-bold text-zinc-400 py-1">
             {d}
           </div>
         ))}
@@ -183,7 +183,7 @@ function Calendar({
               onClick={() => !isDisabled && handleDayClick(day)}
               disabled={isDisabled}
               className={cn(
-                "w-10 h-10 flex items-center justify-center text-sm transition-all hover:bg-zinc-100",
+                "w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-xs sm:text-sm transition-all hover:bg-zinc-100 mx-auto",
                 bgClass,
                 textClass,
                 roundedClass,

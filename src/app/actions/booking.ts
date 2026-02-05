@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { getSession } from "@/lib/auth"
+import { sendBookingConfirmationEmail } from "@/lib/email"
 
 export async function createBooking(prevState: any, formData: FormData) {
   try {
@@ -65,8 +66,15 @@ export async function createBooking(prevState: any, formData: FormData) {
         extras: {
           connect: selectedExtras.map(id => ({ id }))
         }
+      },
+      include: {
+        car: true
       }
     })
+
+    // 3. Send Confirmation Email (Async, don't block response)
+    // We await it here to ensure it works, but in high load you might offload it.
+    await sendBookingConfirmationEmail(booking)
 
     return { success: true, bookingId: booking.id }
     

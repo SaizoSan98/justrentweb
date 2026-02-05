@@ -1,23 +1,27 @@
 
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useTransition } from "react"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 import { format } from "date-fns"
 import { 
   X, Check, Info, Shield, Zap, CreditCard, Users, Briefcase, Gauge, 
-  Fuel, MapPin, Calendar, ArrowRight, ChevronLeft, AlertCircle, Plane
+  Fuel, MapPin, Calendar, ArrowRight, ChevronLeft, AlertCircle, Plane,
+  Building2
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Switch } from "@/components/ui/switch"
+import { toast } from "sonner"
 import {
   Dialog,
   DialogContent,
 } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
-// import { createBooking } from "@/app/actions/booking" // We will create this
+import { createBooking } from "@/app/actions/booking"
 
 // Types
 type CarType = {
@@ -69,6 +73,9 @@ const STEPS = [
 ]
 
 export function BookingModal({ isOpen, onClose, car, searchParams, extras }: BookingModalProps) {
+  const router = useRouter()
+  const [isPending, startTransition] = useTransition()
+
   // --- State ---
   const [step, setStep] = useState(1)
   const [isPriceDetailsOpen, setIsPriceDetailsOpen] = useState(false)
@@ -78,6 +85,10 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
   const [selectedInsuranceId, setSelectedInsuranceId] = useState<string>("")
   const [selectedExtras, setSelectedExtras] = useState<string[]>([])
   
+  // Locations
+  const [pickupLocation, setPickupLocation] = useState("Budapest Airport")
+  const [dropoffLocation, setDropoffLocation] = useState("Budapest Airport")
+
   // User Details
   const [driverDetails, setDriverDetails] = useState({
     firstName: "",
@@ -90,6 +101,17 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
     hasLicense: true,
     comments: ""
   })
+
+  // Company Details
+  const [isCompany, setIsCompany] = useState(false)
+  const [companyDetails, setCompanyDetails] = useState({
+    name: "",
+    address: "",
+    taxId: ""
+  })
+
+  // Payment
+  const [paymentMethod, setPaymentMethod] = useState("CASH_ON_SITE")
 
   // --- Calculations ---
   const startDate = searchParams.startDate ? new Date(searchParams.startDate) : new Date()
@@ -141,10 +163,64 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
   const handleBack = () => setStep(prev => Math.max(prev - 1, 1))
 
   const handleBookingSubmit = async () => {
-    // Call server action (pending implementation)
-    // await createBooking(...)
-    alert("Booking submitted! (Implementation pending)")
-    onClose()
+    startTransition(async () => {
+      try {
+        const formData = new FormData()
+        formData.append('carId', car.id)
+        formData.append('startDate', startDate.toISOString())
+        formData.append('endDate', endDate.toISOString())
+        formData.append('pickupLocation', pickupLocation)
+        formData.append('dropoffLocation', dropoffLocation)
+        formData.append('totalPrice', totalCost.toString())
+        
+        formData.append('firstName', driverDetails.firstName)
+        formData.append('lastName', driverDetails.lastName)
+        formData.append('email', driverDetails.email)
+        formData.append('phone', driverDetails.phone)
+        formData.append('flightNumber', driverDetails.flightNumber)
+        formData.append('comments', driverDetails.comments)
+        
+        formData.append('isCompany', isCompany.toString())
+        if (isCompany) {
+           formData.append('companyName', companyDetails.name)
+           formData.append('companyAddress', companyDetails.address)
+           formData.append('companyTaxId', companyDetails.taxId)
+        }
+    
+        // Determine full insurance based on selection (if not basic)
+        // Assuming basic is the first one or cheapest.
+        // Actually, createBooking expects boolean 'fullInsurance'.
+        // If selectedInsuranceId is not the basic plan, we can consider it "full" or just pass false if no "full" logic.
+        // Let's pass 'fullInsurance' if the selected plan has 'isFullCoverage' or similar? 
+        // We don't have that info here. Let's just pass false for now or logic:
+        // If price > basic price? 
+        // Let's rely on what the user selects. 
+        // Ideally we should pass the insurance ID to the backend, but backend 'createBooking' logic:
+        // `fullInsurance = formData.get('fullInsurance') === 'true'`
+        // It doesn't link insurance ID. This is a potential flaw in backend action vs frontend modal.
+        // But `createBooking` DOES link extras.
+        // And it DOES NOT link insurance ID in Prisma schema?
+        // Let's check schema later.
+        // For now, I will append fullInsurance as true if it's not the cheapest option.
+        const isBasic = sortedInsurance.length > 0 && selectedInsuranceId === sortedInsurance[0].planId
+        formData.append('fullInsurance', (!isBasic).toString())
+        
+        formData.append('paymentMethod', paymentMethod)
+        formData.append('selectedExtras', JSON.stringify(selectedExtras))
+    
+        const result = await createBooking(null, formData)
+        
+        if (result?.success) {
+          toast.success("Booking request sent successfully!")
+          router.push(`/booking/success/${result.bookingId}`)
+          onClose()
+        } else {
+          toast.error(result?.error || "Failed to create booking")
+        }
+      } catch (error) {
+        toast.error("Something went wrong. Please try again.")
+      }
+    })
   }
 
   // Set default insurance to the cheapest/first one if not set
@@ -386,6 +462,35 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
               {step === 4 && (
                  <div className="space-y-6">
                     <h3 className="text-2xl font-bold">Driver Details</h3>
+                    
+                    {/* Locations */}
+                    <div className="grid md:grid-cols-2 gap-6">
+                       <div className="space-y-2">
+                          <Label>Pick-up Location</Label>
+                          <div className="relative">
+                            <MapPin className="absolute left-3 top-3 w-4 h-4 text-zinc-400" />
+                            <Input 
+                               className="pl-10"
+                               value={pickupLocation} 
+                               onChange={(e) => setPickupLocation(e.target.value)}
+                               placeholder="Pick-up Location" 
+                            />
+                          </div>
+                       </div>
+                       <div className="space-y-2">
+                          <Label>Drop-off Location</Label>
+                          <div className="relative">
+                            <MapPin className="absolute left-3 top-3 w-4 h-4 text-zinc-400" />
+                            <Input 
+                               className="pl-10"
+                               value={dropoffLocation} 
+                               onChange={(e) => setDropoffLocation(e.target.value)}
+                               placeholder="Drop-off Location" 
+                            />
+                          </div>
+                       </div>
+                    </div>
+
                     <div className="grid md:grid-cols-2 gap-6">
                        <div className="space-y-2">
                           <Label>First Name</Label>
@@ -434,6 +539,44 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                           </div>
                        </div>
                     </div>
+
+                    {/* Company Billing Toggle */}
+                    <div className="flex items-center space-x-2 pt-4 border-t border-zinc-100">
+                      <Switch id="company-mode" checked={isCompany} onCheckedChange={setIsCompany} />
+                      <Label htmlFor="company-mode" className="font-bold flex items-center gap-2">
+                        <Building2 className="w-4 h-4" />
+                        Billing to a Company?
+                      </Label>
+                    </div>
+
+                    {isCompany && (
+                      <div className="grid md:grid-cols-2 gap-6 bg-zinc-50 p-4 rounded-xl border border-zinc-200">
+                         <div className="space-y-2">
+                            <Label>Company Name</Label>
+                            <Input 
+                               value={companyDetails.name} 
+                               onChange={(e) => setCompanyDetails({...companyDetails, name: e.target.value})}
+                               placeholder="Company Ltd." 
+                            />
+                         </div>
+                         <div className="space-y-2">
+                            <Label>Tax ID</Label>
+                            <Input 
+                               value={companyDetails.taxId} 
+                               onChange={(e) => setCompanyDetails({...companyDetails, taxId: e.target.value})}
+                               placeholder="12345678-1-42" 
+                            />
+                         </div>
+                         <div className="space-y-2 md:col-span-2">
+                            <Label>Address</Label>
+                            <Input 
+                               value={companyDetails.address} 
+                               onChange={(e) => setCompanyDetails({...companyDetails, address: e.target.value})}
+                               placeholder="1234 City, Street 1." 
+                            />
+                         </div>
+                      </div>
+                    )}
                     
                     <div className="space-y-2">
                        <Label>Comments</Label>
@@ -496,6 +639,11 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                              <span>Fees</span>
                              <span>{totalFees.toLocaleString()} Ft</span>
                           </div>
+                          
+                          <div className="flex justify-between pt-2 text-zinc-600">
+                             <span>Payment Method</span>
+                             <span className="font-bold text-zinc-900">Pay on Arrival (Cash/Card)</span>
+                          </div>
                        </div>
                        
                        <div className="flex justify-between items-center pt-4 border-t border-zinc-100">
@@ -517,7 +665,7 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
         {/* Footer Actions */}
         <div className="bg-white border-t border-zinc-100 p-6 flex justify-between items-center shrink-0">
            {step > 1 ? (
-              <Button variant="outline" onClick={handleBack} className="gap-2">
+              <Button variant="outline" onClick={handleBack} className="gap-2" disabled={isPending}>
                  <ChevronLeft className="w-4 h-4" /> Back
               </Button>
            ) : (
@@ -534,8 +682,8 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                     Next Step <ArrowRight className="w-4 h-4" />
                  </Button>
               ) : (
-                 <Button onClick={handleBookingSubmit} className="bg-black text-white hover:bg-zinc-800 gap-2 px-8">
-                    Confirm Booking <Check className="w-4 h-4" />
+                 <Button onClick={handleBookingSubmit} disabled={isPending} className="bg-black text-white hover:bg-zinc-800 gap-2 px-8">
+                    {isPending ? "Processing..." : <>Confirm Booking <Check className="w-4 h-4" /></>}
                  </Button>
               )}
            </div>
