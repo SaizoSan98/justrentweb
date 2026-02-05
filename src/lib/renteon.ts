@@ -119,61 +119,48 @@ function mapCarToCategoryId(car: any): number {
 }
 
 // Authentication
-async function getRenteonToken(): Promise<string | null> {
-  // Return cached token if valid (buffer of 5 minutes)
-  if (cachedToken && tokenExpiry && Date.now() < tokenExpiry) {
+export async function getRenteonToken(): Promise<string> {
+  // Return cached token if valid
+  if (cachedToken && Date.now() < tokenExpiry) {
     return cachedToken;
   }
 
-  const clientId = process.env.RENTEON_CLIENT_ID;
-  const clientSecret = process.env.RENTEON_CLIENT_SECRET;
-  const username = process.env.RENTEON_USERNAME;
-  const password = process.env.RENTEON_PASSWORD;
-
-  if (!clientId || !clientSecret || !username || !password) {
-    console.error('Missing Renteon credentials in environment variables');
-    return null;
-  }
-
-  // Signature Generation
-  const salt = crypto.randomBytes(16).toString('hex'); // Random salt
-  // Pattern: {username}{salt}{secret}{password}{salt}{secret}{client_id}
-  const compositeKey = `${username}${salt}${clientSecret}${password}${salt}${clientSecret}${clientId}`;
-  
-  const hash = crypto.createHash('sha512').update(compositeKey).digest('base64');
-  
-  const params = new URLSearchParams();
-  params.append('grant_type', 'password');
-  params.append('username', username);
-  params.append('password', password);
-  params.append('client_id', clientId);
-  params.append('signature', hash);
-  params.append('salt', salt);
-
   try {
+    const params = new URLSearchParams();
+    params.append('grant_type', 'password');
+    params.append('username', process.env.RENTEON_USERNAME || '');
+    params.append('password', process.env.RENTEON_PASSWORD || '');
+    // Client ID/Secret might be needed depending on grant type, but password grant usually just needs user/pass 
+    // or Basic Auth header with ClientID:Secret.
+    // Based on standard OAuth2 for Renteon (usually):
+    
+    // Construct Basic Auth Header
+    const credentials = Buffer.from(`${process.env.RENTEON_CLIENT_ID}:${process.env.RENTEON_CLIENT_SECRET}`).toString('base64');
+
     const response = await fetch(RENTEON_TOKEN_URL, {
       method: 'POST',
-      body: params,
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': `Basic ${credentials}`
+      },
+      body: params
     });
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Renteon Token Error:', response.status, errorText);
-      return null;
+      throw new Error(`Failed to get token: ${response.status}`);
     }
 
     const data = await response.json();
     cachedToken = data.access_token;
-    // expires_in is in seconds. Set expiry to now + expires_in * 1000 - 5 minutes buffer
-    tokenExpiry = Date.now() + (data.expires_in * 1000) - 300000;
+    // Set expiry (safety margin 60s)
+    tokenExpiry = Date.now() + (data.expires_in * 1000) - 60000;
     
-    return cachedToken;
+    return cachedToken as string;
   } catch (error) {
-    console.error('Renteon Token Fetch Failed:', error);
-    return null;
+    console.error('Renteon Auth Exception:', error);
+    throw error;
   }
 }
 
