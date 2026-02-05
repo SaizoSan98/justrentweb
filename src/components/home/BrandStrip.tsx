@@ -5,11 +5,11 @@ import Image from "next/image"
 
 export function BrandStrip() {
   const brands = [
-    { name: "Mercedes", slug: "https://upload.wikimedia.org/wikipedia/commons/b/b8/Mercedes-Logo.svg" },
-    { name: "Range Rover", slug: "landrover" },
+    { name: "Mercedes", slug: "/mercedes.png" },
+    { name: "Range Rover", slug: "/rangerover.png" },
     { name: "Volvo", slug: "volvo" },
     { name: "Ford", slug: "ford" },
-    { name: "Omoda", slug: "https://upload.wikimedia.org/wikipedia/commons/b/b8/Omoda_wordmark.svg" },
+    { name: "Omoda", slug: "/omoda.png" },
     { name: "Audi", slug: "audi" },
     { name: "BMW", slug: "bmw" },
     { name: "Volkswagen", slug: "volkswagen" },
@@ -35,7 +35,7 @@ export function BrandStrip() {
             <div key={`${brand.name}-${i}`} className="flex items-center gap-3 opacity-50 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300 shrink-0">
                <div className="w-8 h-8 relative">
                  <Image 
-                    src={brand.slug.startsWith('http') ? brand.slug : `https://cdn.simpleicons.org/${brand.slug}/000000`} 
+                    src={brand.slug.startsWith('http') || brand.slug.startsWith('/') ? brand.slug : `https://cdn.simpleicons.org/${brand.slug}/000000`} 
                     alt={brand.name}
                     fill
                     className="object-contain"

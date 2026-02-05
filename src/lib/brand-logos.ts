@@ -3,8 +3,6 @@ export const BRAND_LOGOS: Record<string, string> = {
   // Simple Icons slugs (default behavior in BrandStrip)
   "audi": "audi",
   "bmw": "bmw",
-  "mercedes-benz": "mercedes",
-  "mercedes": "mercedes",
   "volkswagen": "volkswagen",
   "vw": "volkswagen",
   "toyota": "toyota",
@@ -27,8 +25,6 @@ export const BRAND_LOGOS: Record<string, string> = {
   "suzuki": "suzuki",
   "tesla": "tesla",
   "porsche": "porsche",
-  "land rover": "landrover",
-  "range rover": "landrover", // Fallback to Land Rover as they are the same company/brand family
   "jaguar": "jaguar",
   "lexus": "lexus",
   "mini": "mini",
@@ -36,9 +32,11 @@ export const BRAND_LOGOS: Record<string, string> = {
   "dacia": "dacia",
   
   // Custom URLs for brands not in Simple Icons or where specific version is preferred
-  "omoda": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Omoda_wordmark.svg",
-  "mercedes": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Mercedes-Logo.svg",
-  "mercedes-benz": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Mercedes-Logo.svg",
+  "omoda": "/omoda.png",
+  "mercedes": "/mercedes.png",
+  "mercedes-benz": "/mercedes.png",
+  "land rover": "/rangerover.png",
+  "range rover": "/rangerover.png",
 }
 
 export function getBrandLogo(make: string): string {
@@ -47,13 +45,14 @@ export function getBrandLogo(make: string): string {
   // Check direct match
   if (BRAND_LOGOS[normalizedMake]) {
     const logo = BRAND_LOGOS[normalizedMake]
-    if (logo.startsWith("http")) return logo
+    if (logo.startsWith("http") || logo.startsWith("/")) return logo
     return `https://cdn.simpleicons.org/${logo}/000000`
   }
 
   // Check for partial matches or specific overrides
-  if (normalizedMake.includes("mercedes")) return "https://upload.wikimedia.org/wikipedia/commons/b/b8/Mercedes-Logo.svg"
-  if (normalizedMake.includes("land rover") || normalizedMake.includes("range rover")) return `https://cdn.simpleicons.org/landrover/000000`
+  if (normalizedMake.includes("mercedes")) return "/mercedes.png"
+  if (normalizedMake.includes("land rover") || normalizedMake.includes("range rover")) return "/rangerover.png"
+  if (normalizedMake.includes("omoda")) return "/omoda.png"
   if (normalizedMake.includes("vw") || normalizedMake.includes("volkswagen")) return `https://cdn.simpleicons.org/volkswagen/000000`
   
   // Default fallback (maybe a generic car icon or empty)
