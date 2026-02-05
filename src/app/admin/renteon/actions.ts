@@ -175,10 +175,59 @@ export async function syncCarsFromRenteon() {
         return { error: "No car categories found in Renteon" }
     }
 
-    let createdCount = 0
-    let updatedCount = 0
+    // 0. Build Price Map from Recent Bookings (Smart Pricing)
+    const priceMap = new Map<number, number>(); // CategoryId -> PricePerDay
+    try {
+        const today = new Date();
+        const past = new Date();
+        past.setDate(today.getDate() - 90); // Look back 90 days
+        const future = new Date();
+        future.setDate(today.getDate() + 365);
 
-    // Process each category
+        const searchPayload = {
+            DateFrom: past.toISOString(),
+            DateTo: future.toISOString()
+        };
+        
+        const token = await getRenteonToken();
+        if (token) {
+            const searchRes = await fetch('https://justrentandtrans.s11.renteon.com/en/api/bookings/search', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(searchPayload)
+            });
+            
+            if (searchRes.ok) {
+                const bookings = await searchRes.json();
+                bookings.forEach((b: any) => {
+                    if (b.Total && b.DateOut && b.DateIn && b.CarCategoryId) {
+                        const start = new Date(b.DateOut);
+                        const end = new Date(b.DateIn);
+                        const days = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
+                        const dailyRate = b.Total / days;
+                        
+                        // Simple average or keep latest? Let's keep latest (most relevant)
+                        // Or if we have multiple, maybe average? 
+                        // Let's stick to "latest found" which in search results usually means most recent.
+                        // Actually search results order is not guaranteed.
+                        // Let's use a running average? No, keep it simple: store it if not exists or update.
+                        // We'll trust the data.
+                        if (dailyRate > 10 && dailyRate < 1000) { // Sanity check
+                             priceMap.set(b.CarCategoryId, dailyRate);
+                        }
+                    }
+                });
+                console.log(`Smart Pricing: Found prices for ${priceMap.size} categories.`);
+            }
+        }
+    } catch (e) {
+         console.warn("Smart Pricing failed, falling back to defaults", e);
+     }
+
+     let createdCount = 0
+     let updatedCount = 0
+
+     // Process each category
     for (const cat of categories) {
         let categoryId: string | null = null;
         if (cat.CarCategoryGroup) {
@@ -240,7 +289,7 @@ export async function syncCarsFromRenteon() {
                     year: model.Year || new Date().getFullYear(),
                     licensePlate: `RT-${cat.SIPP}-${model.Id}`, // Virtual LP
                     seats: cat.PassengerCapacity || 5,
-                    pricePerDay: 50, // Placeholder
+                    pricePerDay: priceMap.get(cat.Id) || 50, // Use Smart Price or default
                     imageUrl: model.ImageURL || cat.CarModelImageURL || null,
                     status: 'AVAILABLE',
                     renteonId: model.Id.toString(),
@@ -371,7 +420,7 @@ export async function syncCarsFromRenteon() {
                 year: new Date().getFullYear(),
                 licensePlate: `RT-${cat.SIPP}-${cat.Id}`,
                 seats: cat.PassengerCapacity || 5,
-                pricePerDay: 50,
+                pricePerDay: priceMap.get(cat.Id) || 50,
                 imageUrl: cat.CarModelImageURL || null,
                 status: 'AVAILABLE',
                 renteonId: cat.Id.toString(),
