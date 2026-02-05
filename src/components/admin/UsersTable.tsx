@@ -148,14 +148,15 @@ export function UsersTable({ users }: { users: any[] }) {
                             size="icon"
                             type="button"
                             onClick={(e) => {
+                                console.log('Delete button clicked for:', user.name);
                                 e.preventDefault();
                                 e.stopPropagation();
                                 setDeletingUser(user);
                             }}
-                            className="h-8 w-8 text-zinc-400 hover:text-red-700 hover:bg-red-50 z-10 relative"
+                            className="h-8 w-8 text-zinc-400 hover:text-red-700 hover:bg-red-50 z-10 relative cursor-pointer"
                             title="Delete User Permanently"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-4 h-4 pointer-events-none" />
                           </Button>
                         </>
                       )}
