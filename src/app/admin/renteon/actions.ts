@@ -228,56 +228,61 @@ export async function syncCarsFromRenteon() {
                     let price = 0;
                     
                     // Strategy 1: Standard Payload (Pricelist 351, Commissioner)
-                    const payload1 = {
-                        CarCategoryId: cat.Id,
-                        OfficeOutId: 54,
-                        OfficeInId: 54,
-                        DateOut: tomorrow.toISOString(),
-                        DateIn: dayAfter.toISOString(),
-                        PricelistId: 351,
-                        BookAsCommissioner: true
-                    };
-                    
-                    try {
-                        const res1 = await fetch(`${RENTEON_API_URL}/bookings/calculate`, {
-                            method: 'POST',
-                            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload1)
-                        });
-                        
-                        if (res1.ok) {
-                            const data = await res1.json();
-                            if (data.Total && data.Total > 0) {
-                                price = data.Total;
-                                console.log(`Price found (Strategy 1) for Cat ${cat.Id}: ${price}`);
-                            }
-                        }
-                    } catch (e) { console.warn("Strategy 1 failed", e); }
+                     const payload1 = {
+                         CarCategoryId: cat.Id,
+                         OfficeOutId: 54,
+                         OfficeInId: 54,
+                         DateOut: tomorrow.toISOString(),
+                         DateIn: dayAfter.toISOString(),
+                         PricelistId: 351,
+                         BookAsCommissioner: true,
+                         Currency: "EUR"
+                     };
+                     
+                     try {
+                         const res1 = await fetch(`${RENTEON_API_URL}/bookings/calculate`, {
+                             method: 'POST',
+                             headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                             body: JSON.stringify(payload1)
+                         });
+                         
+                         if (res1.ok) {
+                             const data = await res1.json();
+                             if (data.Total && data.Total > 0) {
+                                 price = data.Total;
+                                 console.log(`Price found (Strategy 1) for Cat ${cat.Id}: ${price}`);
+                             }
+                         } else {
+                             // Log why it failed (e.g. 422 No available cars)
+                             const txt = await res1.text();
+                             console.log(`Strategy 1 failed for Cat ${cat.Id}: ${res1.status} - ${txt}`);
+                         }
+                     } catch (e) { console.warn("Strategy 1 exception", e); }
 
                     // Strategy 2: Without Commissioner (if Strategy 1 failed)
-                    if (price <= 0) {
-                         const payload2 = { ...payload1, BookAsCommissioner: false };
-                         try {
-                            const res2 = await fetch(`${RENTEON_API_URL}/bookings/calculate`, {
-                                method: 'POST',
-                                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                                body: JSON.stringify(payload2)
-                            });
-                            if (res2.ok) {
-                                const data = await res2.json();
-                                if (data.Total && data.Total > 0) {
-                                    price = data.Total;
-                                    console.log(`Price found (Strategy 2) for Cat ${cat.Id}: ${price}`);
-                                }
-                            }
-                        } catch (e) { console.warn("Strategy 2 failed", e); }
-                    }
+                     if (price <= 0) {
+                          const payload2 = { ...payload1, BookAsCommissioner: false };
+                          try {
+                             const res2 = await fetch(`${RENTEON_API_URL}/bookings/calculate`, {
+                                 method: 'POST',
+                                 headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                                 body: JSON.stringify(payload2)
+                             });
+                             if (res2.ok) {
+                                 const data = await res2.json();
+                                 if (data.Total && data.Total > 0) {
+                                     price = data.Total;
+                                     console.log(`Price found (Strategy 2) for Cat ${cat.Id}: ${price}`);
+                                 }
+                             }
+                         } catch (e) { console.warn("Strategy 2 failed", e); }
+                     }
 
-                    if (price > 0) {
-                        priceMap.set(cat.Id, price);
-                    } else {
-                        console.warn(`All pricing strategies failed for Cat ${cat.Id}`);
-                    }
+                     if (price > 0) {
+                         priceMap.set(cat.Id, price);
+                     } else {
+                         console.warn(`All pricing strategies failed for Cat ${cat.Id}`);
+                     }
                 } catch (e) {
                     console.error(`Error fetching price for cat ${cat.Id}`, e);
                 }
@@ -286,9 +291,9 @@ export async function syncCarsFromRenteon() {
         console.log(`Real Pricing: Found prices for ${priceMap.size} categories.`);
     }
 
-    // 0b. Fallback to Smart Pricing if Real Pricing missed some
-    if (priceMap.size < categories.length * 0.5) { // If we have less than 50% coverage
-        console.log("Real Pricing coverage low, attempting Smart Pricing fallback...");
+    // 0b. Always run Smart Pricing Fallback for missing items
+    if (priceMap.size < categories.length) { 
+        console.log(`Real Pricing coverage partial (${priceMap.size}/${categories.length}), attempting Smart Pricing fallback for gaps...`);
         // ... (Keep existing Smart Pricing logic as fallback)
         try {
             const today = new Date();
