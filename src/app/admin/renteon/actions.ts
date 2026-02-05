@@ -366,39 +366,57 @@ export async function syncCarsFromRenteon() {
         }
 
         // Helper for Enums
-        const mapFuelType = (ft: string) => {
-            const lower = ft?.toLowerCase() || ''
-            if (lower.includes('diesel')) return 'DIESEL'
-            if (lower.includes('hybrid')) return 'HYBRID'
-            if (lower.includes('electric') || lower.includes('electro')) return 'ELECTRIC'
-            return 'PETROL'
-        }
+    const mapFuelType = (ft: string) => {
+        const lower = ft?.toLowerCase() || ''
+        if (lower.includes('diesel')) return 'DIESEL'
+        if (lower.includes('hybrid')) return 'HYBRID'
+        if (lower.includes('electric') || lower.includes('electro')) return 'ELECTRIC'
+        return 'PETROL'
+    }
 
-        const mapTransmission = (tr: string) => {
-            const lower = tr?.toLowerCase() || ''
-            if (lower.includes('auto') || lower.includes('dsg')) return 'AUTOMATIC'
-            return 'MANUAL'
-        }
+    const mapTransmission = (tr: string) => {
+        const lower = tr?.toLowerCase() || ''
+        if (lower.includes('auto') || lower.includes('dsg')) return 'AUTOMATIC'
+        return 'MANUAL'
+    }
 
-        // Process Models
-        if (cat.CarModels && Array.isArray(cat.CarModels) && cat.CarModels.length > 0) {
-            for (const model of cat.CarModels) {
-                const make = model.CarMakeName || cat.CarMakeName || 'Unknown';
-                let modelName = model.Name;
-                
-                // Clean model name
-                if (modelName.toLowerCase().startsWith(make.toLowerCase())) {
-                    modelName = modelName.substring(make.length).trim();
-                }
+    const getFallbackPrice = (make: string, model: string, group: string) => {
+        const lowerMake = (make || '').toLowerCase();
+        const lowerModel = (model || '').toLowerCase();
+        const lowerGroup = (group || '').toLowerCase();
 
-                const carData = {
-                    make: make,
-                    model: modelName,
-                    year: model.Year || new Date().getFullYear(),
-                    licensePlate: `RT-${cat.SIPP}-${model.Id}`,
-                    seats: cat.PassengerCapacity || 5,
-                    pricePerDay: priceMap.get(cat.Id) || 50, // Use Pricelist 351 or Smart Price or default
-                    imageUrl: model.ImageURL || cat.CarModelImageURL || null,
+        if (lowerGroup.includes('luxury') || lowerGroup.includes('premium') || lowerMake.includes('porsche') || lowerMake.includes('tesla') || lowerModel.includes('x5') || lowerModel.includes('gle')) return 150;
+        if (lowerGroup.includes('fullsize') || lowerGroup.includes('standard') || lowerMake.includes('mercedes') || lowerMake.includes('bmw') || lowerMake.includes('audi')) return 90;
+        if (lowerGroup.includes('intermediate') || lowerModel.includes('octavia') || lowerModel.includes('corolla')) return 70;
+        if (lowerGroup.includes('compact') || lowerModel.includes('golf') || lowerModel.includes('astra')) return 60;
+        if (lowerGroup.includes('economy') || lowerModel.includes('polo') || lowerModel.includes('yaris')) return 45;
+        if (lowerGroup.includes('mini') || lowerModel.includes('up') || lowerModel.includes('aygo')) return 40;
+        
+        return 55; // Default
+    };
+
+    // Process Models
+    if (cat.CarModels && Array.isArray(cat.CarModels) && cat.CarModels.length > 0) {
+        for (const model of cat.CarModels) {
+            const make = model.CarMakeName || cat.CarMakeName || 'Unknown';
+            let modelName = model.Name;
+            
+            // Clean model name
+            if (modelName.toLowerCase().startsWith(make.toLowerCase())) {
+                modelName = modelName.substring(make.length).trim();
+            }
+
+            const fallbackPrice = getFallbackPrice(make, modelName, groupName);
+            const finalPrice = priceMap.get(cat.Id) || fallbackPrice;
+
+            const carData = {
+                make: make,
+                model: modelName,
+                year: model.Year || new Date().getFullYear(),
+                licensePlate: `RT-${cat.SIPP}-${model.Id}`,
+                seats: cat.PassengerCapacity || 5,
+                pricePerDay: finalPrice,
+                imageUrl: model.ImageURL || cat.CarModelImageURL || null,
                     status: 'AVAILABLE',
                     renteonId: model.Id.toString(),
                     mileage: 0,
@@ -488,13 +506,16 @@ export async function syncCarsFromRenteon() {
                 modelName = modelName.substring(make.length).trim();
             }
 
+            const fallbackPrice = getFallbackPrice(make, modelName, groupName);
+            const finalPrice = priceMap.get(cat.Id) || fallbackPrice;
+
             const carData = {
                 make: make,
                 model: modelName,
                 year: new Date().getFullYear(),
                 licensePlate: `RT-${cat.SIPP}-${cat.Id}`,
                 seats: cat.PassengerCapacity || 5,
-                pricePerDay: priceMap.get(cat.Id) || 50,
+                pricePerDay: finalPrice,
                 imageUrl: cat.CarModelImageURL || null,
                 status: 'AVAILABLE',
                 renteonId: cat.Id.toString(),
@@ -578,7 +599,11 @@ export async function syncCarsFromRenteon() {
     
     // Trigger Extras Sync too
     try {
-        await syncExtrasFromRenteon();
+        const extraResult = await syncExtrasFromRenteon();
+        if (extraResult.success) {
+            console.log("Linking Insurances to Cars...");
+            await linkInsurancesToCars();
+        }
     } catch (extraErr) {
         console.error("Extras sync failed during main sync:", extraErr);
     }
@@ -783,5 +808,78 @@ export async function syncExtrasFromRenteon() {
     } catch (error: any) {
         console.error("Extras Sync Failed:", error);
         return { error: error.message };
+    }
+}
+
+async function linkInsurancesToCars() {
+    try {
+        const plans = await prisma.insurancePlan.findMany();
+        const cars = await prisma.car.findMany({ where: { renteonId: { not: null } } }); // Only sync for Renteon cars
+
+        if (plans.length === 0 || cars.length === 0) return;
+
+        let linkedCount = 0;
+
+        for (const car of cars) {
+            // Determine Base Deposit based on Car Category/Class
+            // We don't have SIPP directly on Car, but we can infer from price or make/model
+            let baseDeposit = 600; // Standard
+            
+            // Simple heuristics for deposit
+            const make = car.make.toLowerCase();
+            const model = car.model.toLowerCase();
+            
+            if (make.includes('mercedes') || make.includes('bmw') || make.includes('audi') || make.includes('volvo') || make.includes('tesla')) {
+                baseDeposit = 1200; // Premium
+            } else if (model.includes('van') || model.includes('transporter') || model.includes('vivaro') || model.includes('trafic')) {
+                baseDeposit = 1000; // Vans
+            } else if (make.includes('suzuki') || make.includes('fiat') || (make.includes('toyota') && model.includes('yaris'))) {
+                baseDeposit = 400; // Economy
+            }
+
+            for (const plan of plans) {
+                // Adjust deposit based on plan type
+                let planDeposit = baseDeposit;
+                const pName = plan.name.toLowerCase();
+                
+                // Full protection usually reduces deposit
+                if (pName.includes('full') || pName.includes('sct') || pName.includes('zero')) {
+                    planDeposit = Math.min(300, baseDeposit / 2); 
+                } else if (pName.includes('medium') || pName.includes('cdw')) {
+                    planDeposit = Math.min(600, baseDeposit);
+                }
+
+                // Default Price for insurance if not set
+                let planPrice = 0;
+                if (pName.includes('full') || pName.includes('sct')) planPrice = 25;
+                else if (pName.includes('medium')) planPrice = 15;
+                else if (pName.includes('basic') || pName.includes('cdw')) planPrice = 10;
+
+                await prisma.carInsurance.upsert({
+                    where: {
+                        carId_planId: {
+                            carId: car.id,
+                            planId: plan.id
+                        }
+                    },
+                    update: {
+                        deposit: planDeposit,
+                        // Only update price if it's 0 (don't overwrite custom overrides)
+                        // pricePerDay: planPrice 
+                    },
+                    create: {
+                        carId: car.id,
+                        planId: plan.id,
+                        deposit: planDeposit,
+                        pricePerDay: planPrice
+                    }
+                });
+                linkedCount++;
+            }
+        }
+        console.log(`Linked ${linkedCount} insurance options to ${cars.length} cars.`);
+
+    } catch (e) {
+        console.error("Failed to link insurances:", e);
     }
 }
