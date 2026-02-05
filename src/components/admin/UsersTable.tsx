@@ -27,12 +27,18 @@ export function UsersTable({ users }: { users: any[] }) {
   const handleDeleteUser = async () => {
     if (!deletingUser) return
     
-    const result = await deleteUser(deletingUser.id)
-    if (result.error) {
-        toast.error(result.error)
-    } else {
-        toast.success("User deleted successfully")
-        setDeletingUser(null)
+    // Optimistic UI update or loading state could be added here
+    try {
+        const result = await deleteUser(deletingUser.id)
+        if (result.error) {
+            toast.error(result.error)
+        } else {
+            toast.success("User deleted successfully")
+            setDeletingUser(null)
+            router.refresh() // Ensure list is refreshed
+        }
+    } catch (err) {
+        toast.error("An unexpected error occurred")
     }
   }
 
