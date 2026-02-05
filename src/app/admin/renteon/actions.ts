@@ -410,12 +410,26 @@ export async function syncCarsFromRenteon() {
                     }
                 } catch (err: any) {
                     if (err.code === 'P2002') {
-                        // Handle duplicate cleanup (simplified)
-                         const conflict = await prisma.car.findUnique({ where: { licensePlate: carData.licensePlate } });
-                         if (conflict && conflict.renteonId !== carData.renteonId) {
-                             await prisma.car.delete({ where: { id: conflict.id } });
-                             // Retry create/update would be needed here, but let's skip for next run
-                         }
+                        // Handle race condition or lingering duplicates
+                        console.warn(`Duplicate conflict for ${carData.renteonId}, retrying update...`);
+                        const conflict = await prisma.car.findFirst({
+                            where: { 
+                                OR: [
+                                    { renteonId: carData.renteonId },
+                                    { licensePlate: carData.licensePlate }
+                                ]
+                             } as any
+                        });
+                        
+                        if (conflict) {
+                             await prisma.car.update({
+                                where: { id: conflict.id },
+                                data: {
+                                    renteonId: carData.renteonId, // Ensure ID is set
+                                    pricePerDay: carData.pricePerDay
+                                } as any
+                            });
+                        }
                     }
                     console.error(`Failed to sync car ${carData.renteonId}`, err.message);
                 }
