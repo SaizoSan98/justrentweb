@@ -5,7 +5,7 @@ import Image from "next/image"
 
 export function BrandStrip() {
   const brands = [
-    { name: "Mercedes", slug: "mercedes" },
+    { name: "Mercedes", slug: "https://upload.wikimedia.org/wikipedia/commons/b/b8/Mercedes-Logo.svg" },
     { name: "Range Rover", slug: "landrover" },
     { name: "Volvo", slug: "volvo" },
     { name: "Ford", slug: "ford" },

@@ -37,6 +37,8 @@ export const BRAND_LOGOS: Record<string, string> = {
   
   // Custom URLs for brands not in Simple Icons or where specific version is preferred
   "omoda": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Omoda_wordmark.svg",
+  "mercedes": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Mercedes-Logo.svg",
+  "mercedes-benz": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Mercedes-Logo.svg",
 }
 
 export function getBrandLogo(make: string): string {
@@ -50,7 +52,7 @@ export function getBrandLogo(make: string): string {
   }
 
   // Check for partial matches or specific overrides
-  if (normalizedMake.includes("mercedes")) return `https://cdn.simpleicons.org/mercedes/000000`
+  if (normalizedMake.includes("mercedes")) return "https://upload.wikimedia.org/wikipedia/commons/b/b8/Mercedes-Logo.svg"
   if (normalizedMake.includes("land rover") || normalizedMake.includes("range rover")) return `https://cdn.simpleicons.org/landrover/000000`
   if (normalizedMake.includes("vw") || normalizedMake.includes("volkswagen")) return `https://cdn.simpleicons.org/volkswagen/000000`
   

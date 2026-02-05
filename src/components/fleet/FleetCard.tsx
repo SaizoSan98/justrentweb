@@ -140,7 +140,9 @@ export function FleetCard({
         {/* Header */}
         <div className="flex justify-between items-start mb-2">
             <div className="space-y-1">
-                <h3 className="text-xl font-black text-zinc-900 tracking-tight leading-none">{car.make} <span className="text-zinc-500 font-bold">{car.model}</span></h3>
+                <h3 className="text-xl font-black text-zinc-900 tracking-tight leading-none min-h-[3rem] flex flex-col justify-center">
+                    <span>{car.make} <span className="text-zinc-500 font-bold">{car.model}</span></span>
+                </h3>
                 <div className="flex flex-wrap items-center gap-2">
                     <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
                         OR SIMILAR
