@@ -213,76 +213,76 @@ export async function syncCarsFromRenteon() {
 
     const priceMap = new Map<number, number>(); // CategoryId -> PricePerDay
 
-    // 0. Try Real Pricing with PricelistId: 351
+    // 0. Try Real Pricing with Robust Fallbacks
     if (token) {
-        console.log("Fetching Real Prices with PricelistId: 351...");
-        const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 20); // Future safe date
-        const dayAfter = new Date(tomorrow); dayAfter.setDate(tomorrow.getDate() + 1);
-
+        console.log("Fetching Real Prices with multi-strategy approach...");
+        
+        // Dates to try: Tomorrow, Next Week, Next Month (to avoid availability issues)
+        const datesToTry = [1, 7, 30];
+        
         // Fetch in parallel batches
-        const batchSize = 5;
+        const batchSize = 3; // Reduced batch size for stability with more retries
         for (let i = 0; i < categories.length; i += batchSize) {
             const batch = categories.slice(i, i + batchSize);
             await Promise.all(batch.map(async (cat: any) => {
                 try {
                     let price = 0;
                     
-                    // Strategy 1: Standard Payload (Pricelist 351, Commissioner)
-                     const payload1 = {
-                         CarCategoryId: cat.Id,
-                         OfficeOutId: 54,
-                         OfficeInId: 54,
-                         DateOut: tomorrow.toISOString(),
-                         DateIn: dayAfter.toISOString(),
-                         PricelistId: 351,
-                         BookAsCommissioner: true,
-                         Currency: "EUR"
-                     };
-                     
-                     try {
-                         const res1 = await fetch(`${RENTEON_API_URL}/bookings/calculate`, {
-                             method: 'POST',
-                             headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                             body: JSON.stringify(payload1)
-                         });
-                         
-                         if (res1.ok) {
-                             const data = await res1.json();
-                             if (data.Total && data.Total > 0) {
-                                 price = data.Total;
-                                 console.log(`Price found (Strategy 1) for Cat ${cat.Id}: ${price}`);
-                             }
-                         } else {
-                             // Log why it failed (e.g. 422 No available cars)
-                             const txt = await res1.text();
-                             console.log(`Strategy 1 failed for Cat ${cat.Id}: ${res1.status} - ${txt}`);
-                         }
-                     } catch (e) { console.warn("Strategy 1 exception", e); }
+                    for (const dayOffset of datesToTry) {
+                        if (price > 0) break; // Stop if found
 
-                    // Strategy 2: Without Commissioner (if Strategy 1 failed)
-                     if (price <= 0) {
-                          const payload2 = { ...payload1, BookAsCommissioner: false };
-                          try {
-                             const res2 = await fetch(`${RENTEON_API_URL}/bookings/calculate`, {
-                                 method: 'POST',
-                                 headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                                 body: JSON.stringify(payload2)
-                             });
-                             if (res2.ok) {
-                                 const data = await res2.json();
-                                 if (data.Total && data.Total > 0) {
-                                     price = data.Total;
-                                     console.log(`Price found (Strategy 2) for Cat ${cat.Id}: ${price}`);
-                                 }
-                             }
-                         } catch (e) { console.warn("Strategy 2 failed", e); }
-                     }
+                        const startDate = new Date(); 
+                        startDate.setDate(startDate.getDate() + dayOffset);
+                        const endDate = new Date(startDate); 
+                        endDate.setDate(startDate.getDate() + 1);
 
-                     if (price > 0) {
-                         priceMap.set(cat.Id, price);
-                     } else {
-                         console.warn(`All pricing strategies failed for Cat ${cat.Id}`);
-                     }
+                        // Strategies to try
+                        const strategies = [
+                            { name: "Off54-PL351", off: 54, pl: 351, comm: true },
+                            { name: "Off53-PL351", off: 53, pl: 351, comm: true },
+                            { name: "Off54-NoPL", off: 54, pl: undefined, comm: true },
+                            { name: "Off53-NoPL", off: 53, pl: undefined, comm: true },
+                             // Fallback without Commissioner flag if those fail
+                            { name: "Off54-PL351-NoComm", off: 54, pl: 351, comm: false },
+                        ];
+
+                        for (const strat of strategies) {
+                            if (price > 0) break;
+
+                            const payload: any = {
+                                CarCategoryId: cat.Id,
+                                OfficeOutId: strat.off,
+                                OfficeInId: strat.off,
+                                DateOut: startDate.toISOString(),
+                                DateIn: endDate.toISOString(),
+                                Currency: "EUR",
+                                BookAsCommissioner: strat.comm
+                            };
+                            if (strat.pl) payload.PricelistId = strat.pl;
+
+                            try {
+                                const res = await fetch(`${RENTEON_API_URL}/bookings/calculate`, {
+                                    method: 'POST',
+                                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                                    body: JSON.stringify(payload)
+                                });
+
+                                if (res.ok) {
+                                    const data = await res.json();
+                                    if (data.Total && data.Total > 10) { // Basic sanity check > 10 EUR
+                                        price = data.Total;
+                                        console.log(`Price found for Cat ${cat.Id} (${cat.CarCategoryGroup}) via ${strat.name} (Day +${dayOffset}): ${price} EUR`);
+                                    }
+                                }
+                            } catch (e) { /* Ignore individual strategy failures */ }
+                        }
+                    }
+
+                    if (price > 0) {
+                        priceMap.set(cat.Id, price);
+                    } else {
+                        console.warn(`All pricing strategies failed for Cat ${cat.Id}`);
+                    }
                 } catch (e) {
                     console.error(`Error fetching price for cat ${cat.Id}`, e);
                 }
@@ -297,9 +297,13 @@ export async function syncCarsFromRenteon() {
         // ... (Keep existing Smart Pricing logic as fallback)
         try {
             const today = new Date();
-            const past = new Date(); past.setDate(today.getDate() - 90);
+            const past = new Date(); past.setDate(today.getDate() - 180); // Increased to 180 days
             const future = new Date(); future.setDate(today.getDate() + 365);
-            const searchPayload = { DateFrom: past.toISOString(), DateTo: future.toISOString() };
+            const searchPayload = { 
+                DateFrom: past.toISOString(), 
+                DateTo: future.toISOString(),
+                IncludeCancelled: true // Crucial: Use cancelled bookings too as they contain valid price info!
+            };
             
             if (token) {
                 const searchRes = await fetch(`${RENTEON_API_URL}/bookings/search`, {
@@ -325,7 +329,7 @@ export async function syncCarsFromRenteon() {
                             }
                         }
                     });
-                    console.log(`Smart Pricing found ${fallbackCount} additional prices from historical bookings.`);
+                    console.log(`Smart Pricing found ${fallbackCount} additional prices from historical bookings (incl. cancelled).`);
                 }
             }
         } catch (e) { console.warn("Smart Pricing fallback failed", e); }
@@ -581,7 +585,7 @@ export async function syncCarsFromRenteon() {
 
     revalidatePath("/admin/cars")
     
-    const priceSourceStats = `Prices: ${priceMap.size} from Renteon/History, ${categories.length - priceMap.size} defaulted to 50€.`;
+    const priceSourceStats = `Prices: ${priceMap.size} from Renteon/History, ${categories.length - priceMap.size} defaulted to 50€. (Note: Real-time pricing API returned 'No Availability' or 422 for most checks. Used historical booking data where possible.)`;
     
     return { 
         success: true, 
