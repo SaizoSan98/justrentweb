@@ -14,7 +14,14 @@ Ezt a **Vercel** "Storage" fülén kapod meg, ha hozzáadsz egy új Blob tárol�
 *   **Érték:** `vercel_blob_rw_................`
     *   *Hol találod:* Vercel Projekt -> Storage -> Create Database -> Vercel Blob -> "Connect" gomb után megjelenik a token.
 
-## 3. (Opcionális/Később) Autentikáció (NextAuth)
+## 3. Renteon API Integráció
+Az autóbérlő rendszerrel való szinkronizációhoz.
+*   `RENTEON_CLIENT_ID`: A kapott ID (pl. 553)
+*   `RENTEON_USERNAME`: A felhasználónév (pl. justrent.agg.api)
+*   `RENTEON_PASSWORD`: A jelszó
+*   `RENTEON_CLIENT_SECRET`: A titkos kulcs (Client Secret) - **Ez még hiányzik!**
+
+## 4. (Opcionális/Később) Autentikáció (NextAuth)
 Ha majd bekapcsoljuk a bejelentkezést, ezek kellenek majd:
 *   `AUTH_SECRET`: Egy hosszú véletlenszerű string (generálható terminálban: `openssl rand -base64 32`).
 *   `AUTH_URL`: A domained címe (pl. `https://justrentweb.vercel.app` vagy lokálisan `http://localhost:3000`).
@@ -28,3 +35,4 @@ Ha majd bekapcsoljuk a bejelentkezést, ezek kellenek majd:
 4.  Menj a **Vercel** projektedhez -> Settings -> Environment Variables.
 5.  Add hozzá: `DATABASE_URL` = (a kód, amit másoltál).
 6.  Menj a Vercel "Storage" fülre, hozz létre egy Blob-ot, és a kapott tokent is add hozzá env varként.
+7.  Add hozzá a Renteon változókat is!
