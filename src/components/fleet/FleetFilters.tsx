@@ -1,57 +1,37 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 const CATEGORIES = ["SUV", "Sedan", "Luxury", "Convertible", "Van"]
 const TRANSMISSIONS = ["AUTOMATIC", "MANUAL"]
 const FUEL_TYPES = ["PETROL", "DIESEL", "ELECTRIC", "HYBRID"]
-const SEATS = [2, 4, 5, 7, 8, 9]
+
+interface FleetFiltersProps {
+  filters: {
+    categories: string[]
+    transmissions: string[]
+    fuelTypes: string[]
+    seats: number[]
+    guaranteedModel: boolean
+    make: string
+  }
+  onChange: (key: any, value: any) => void
+  options?: any
+  dictionary?: any
+}
 
 export function FleetFilters({ 
-  currentFilters, 
-  counts,
+  filters, 
+  onChange, 
   options,
-  availableCars,
   dictionary = {}
-}: { 
-  currentFilters?: any
-  counts?: any
-  options?: any
-  availableCars?: any
-  dictionary?: any
-}) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-
+}: FleetFiltersProps) {
+  
   const categoriesList = options?.categories || CATEGORIES
   const transmissionsList = options?.transmissions || TRANSMISSIONS
   const fuelTypesList = options?.fuelTypes || FUEL_TYPES
   
-  // State from URL
-  const selectedCategories = searchParams.getAll("category")
-  const selectedTransmissions = searchParams.getAll("transmission")
-  const selectedFuelTypes = searchParams.getAll("fuelType")
-
-  // Update URL helper
-  const updateFilters = (newFilters: any) => {
-    const params = new URLSearchParams(searchParams.toString())
-    
-    const updateArrayParam = (key: string, values: string[] | undefined) => {
-      params.delete(key)
-      values?.forEach(v => params.append(key, v))
-    }
-
-    if ('category' in newFilters) updateArrayParam('category', newFilters.category)
-    if ('transmission' in newFilters) updateArrayParam('transmission', newFilters.transmission)
-    if ('fuelType' in newFilters) updateArrayParam('fuelType', newFilters.fuelType)
-    if ('seats' in newFilters) updateArrayParam('seats', newFilters.seats)
-
-    router.push(`/fleet?${params.toString()}`, { scroll: false })
-  }
-
   return (
     <div className="space-y-8 text-zinc-900 bg-white">
       
@@ -62,16 +42,16 @@ export function FleetFilters({
         </div>
         <div className="flex flex-wrap gap-2">
           {categoriesList.map((category: string) => {
-            const isSelected = selectedCategories.includes(category)
+            const isSelected = filters.categories.includes(category)
             return (
               <Button
                 key={category}
                 variant="outline"
                 onClick={() => {
                   const newCategories = isSelected
-                    ? selectedCategories.filter((c) => c !== category)
-                    : [...selectedCategories, category]
-                  updateFilters({ category: newCategories })
+                    ? filters.categories.filter((c) => c !== category)
+                    : [...filters.categories, category]
+                  onChange('categories', newCategories)
                 }}
                 className={cn(
                   "rounded-full h-9 px-4 text-xs font-bold transition-all border",
@@ -96,16 +76,16 @@ export function FleetFilters({
         </div>
         <div className="flex flex-wrap gap-2">
           {transmissionsList.map((transmission: string) => {
-             const isSelected = selectedTransmissions.includes(transmission)
+             const isSelected = filters.transmissions.includes(transmission)
              return (
                 <Button
                     key={transmission}
                     variant="outline"
                     onClick={() => {
                         const newTransmissions = isSelected
-                            ? selectedTransmissions.filter((t) => t !== transmission)
-                            : [...selectedTransmissions, transmission]
-                        updateFilters({ transmission: newTransmissions })
+                            ? filters.transmissions.filter((t) => t !== transmission)
+                            : [...filters.transmissions, transmission]
+                        onChange('transmissions', newTransmissions)
                     }}
                     className={cn(
                         "rounded-full h-9 px-4 text-xs font-bold transition-all border",
@@ -130,16 +110,16 @@ export function FleetFilters({
         </div>
         <div className="flex flex-wrap gap-2">
           {fuelTypesList.map((fuel: string) => {
-             const isSelected = selectedFuelTypes.includes(fuel)
+             const isSelected = filters.fuelTypes.includes(fuel)
              return (
                 <Button
                     key={fuel}
                     variant="outline"
                     onClick={() => {
                         const newFuelTypes = isSelected
-                            ? selectedFuelTypes.filter((f) => f !== fuel)
-                            : [...selectedFuelTypes, fuel]
-                        updateFilters({ fuelType: newFuelTypes })
+                            ? filters.fuelTypes.filter((f) => f !== fuel)
+                            : [...filters.fuelTypes, fuel]
+                        onChange('fuelTypes', newFuelTypes)
                     }}
                     className={cn(
                         "rounded-full h-9 px-4 text-xs font-bold transition-all border",

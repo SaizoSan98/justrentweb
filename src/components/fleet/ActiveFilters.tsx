@@ -1,48 +1,62 @@
-
 "use client"
 
-import { useRouter, useSearchParams } from "next/navigation"
 import { X } from "lucide-react"
-import { cn } from "@/lib/utils"
 
-export function ActiveFilters() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
+interface ActiveFiltersProps {
+  filters: {
+    categories: string[]
+    transmissions: string[]
+    fuelTypes: string[]
+    seats: number[]
+    guaranteedModel: boolean
+    make: string
+  }
+  onChange: (key: any, value: any) => void
+}
 
-  const filters = []
+export function ActiveFilters({ filters, onChange }: ActiveFiltersProps) {
+  const activeFilters = []
 
   // Collect all active filters
-  searchParams.getAll("category").forEach(v => filters.push({ key: "category", value: v, label: v }))
-  searchParams.getAll("transmission").forEach(v => filters.push({ key: "transmission", value: v, label: v }))
-  searchParams.getAll("fuelType").forEach(v => filters.push({ key: "fuelType", value: v, label: v }))
-  searchParams.getAll("seats").forEach(v => filters.push({ key: "seats", value: v, label: `${v} Seats` }))
-  if (searchParams.get("guaranteedModel") === "true") {
-      filters.push({ key: "guaranteedModel", value: "true", label: "Guaranteed Model" })
+  filters.categories.forEach(v => activeFilters.push({ key: "categories", value: v, label: v }))
+  filters.transmissions.forEach(v => activeFilters.push({ key: "transmissions", value: v, label: v }))
+  filters.fuelTypes.forEach(v => activeFilters.push({ key: "fuelTypes", value: v, label: v }))
+  filters.seats.forEach(v => activeFilters.push({ key: "seats", value: v, label: `${v} Seats` }))
+  if (filters.guaranteedModel) {
+      activeFilters.push({ key: "guaranteedModel", value: true, label: "Guaranteed Model" })
+  }
+  if (filters.make) {
+      activeFilters.push({ key: "make", value: filters.make, label: `Search: ${filters.make}` })
   }
 
-  if (filters.length === 0) return null
+  if (activeFilters.length === 0) return null
 
-  const removeFilter = (key: string, value: string) => {
-    const params = new URLSearchParams(searchParams.toString())
-    
+  const removeFilter = (key: string, value: any) => {
     if (key === "guaranteedModel") {
-        params.delete(key)
+        onChange("guaranteedModel", false)
+    } else if (key === "make") {
+        onChange("make", "")
     } else {
-        const values = params.getAll(key).filter(v => v !== value)
-        params.delete(key)
-        values.forEach(v => params.append(key, v))
+        // Array types
+        // @ts-ignore
+        const currentList = filters[key] as any[]
+        const newList = currentList.filter(v => v !== value)
+        onChange(key, newList)
     }
-    
-    router.push(`/fleet?${params.toString()}`, { scroll: false })
   }
 
   const clearAll = () => {
-      router.push('/fleet', { scroll: false })
+      onChange("categories", [])
+      onChange("transmissions", [])
+      onChange("fuelTypes", [])
+      onChange("seats", [])
+      onChange("guaranteedModel", false)
+      onChange("make", "")
   }
 
   return (
     <div className="flex flex-wrap items-center gap-2 mb-6">
-      {filters.map((filter, idx) => (
+      {activeFilters.map((filter, idx) => (
         <div 
           key={`${filter.key}-${filter.value}-${idx}`}
           className="flex items-center gap-2 px-3 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 rounded-full text-xs font-bold transition-colors"
@@ -57,7 +71,7 @@ export function ActiveFilters() {
         </div>
       ))}
       
-      {filters.length > 0 && (
+      {activeFilters.length > 0 && (
           <button 
             onClick={clearAll}
             className="text-xs font-bold text-red-600 hover:text-red-700 ml-2"
