@@ -54,6 +54,114 @@ export async function testRenteonConnection() {
   }
 }
 
+export async function syncAvailability() {
+  const session = await getSession()
+  if (!session || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
+    return { error: "Unauthorized" }
+  }
+
+  const token = await getRenteonToken();
+  if (!token) return { error: "Failed to get token" };
+
+  try {
+      // Fetch bookings for the next 12 months to cover all future availability
+      const today = new Date();
+      const nextYear = new Date();
+      nextYear.setDate(today.getDate() + 365);
+
+      const payload = {
+          DateFrom: today.toISOString(),
+          DateTo: nextYear.toISOString()
+      };
+
+      const response = await fetch('https://justrentandtrans.s11.renteon.com/en/api/bookings/search', {
+          method: 'POST',
+          headers: { 
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+          throw new Error(`Renteon Search Failed: ${response.status} ${await response.text()}`);
+      }
+
+      const bookings = await response.json();
+      const activeBookings = bookings.filter((b: any) => !b.IsCancelled);
+      
+      console.log(`Found ${activeBookings.length} active future bookings.`);
+
+      // DEBUG: Log first booking to understand structure
+      if (activeBookings.length > 0) {
+          console.log("Sample Booking Structure:", JSON.stringify(activeBookings[0], null, 2));
+      }
+
+      const now = new Date();
+      let updatedCount = 0;
+
+      // 1. Reset all cars to AVAILABLE first? 
+      // Risk: If we fail to find bookings, we might show rented cars as available.
+      // Better: Fetch all cars, map status based on bookings.
+      
+      // Get all local cars with renteonId
+      const localCars = await prisma.car.findMany({
+          where: { renteonId: { not: null } }
+      });
+
+      // Map of Renteon CarID -> Status
+      const carStatusMap = new Map<string, 'AVAILABLE' | 'RENTED'>();
+
+      // Initialize all as AVAILABLE
+      localCars.forEach(c => {
+          if (c.renteonId) carStatusMap.set(c.renteonId, 'AVAILABLE');
+      });
+
+      // Process bookings to find RENTED ones
+      for (const b of activeBookings) {
+          // Check if booking is currently active
+          const start = new Date(b.DateOut);
+          const end = new Date(b.DateIn);
+          
+          // Add 2 hours buffer for "cleanup" or late return? No, stick to strict dates for now.
+          const isOngoing = start <= now && end >= now;
+
+          if (isOngoing) {
+              // Try to find CarId
+              // Booking structure might have CarId directly or inside Car object
+              const carId = b.CarId || b.Car?.Id;
+              
+              if (carId) {
+                  carStatusMap.set(carId.toString(), 'RENTED');
+              }
+          }
+      }
+
+      // Update DB
+      for (const [renteonId, status] of carStatusMap.entries()) {
+          // Only update if status changed?
+          // For simplicity/robustness, just update. Prisma is fast enough for small fleet.
+          await prisma.car.updateMany({
+              where: { renteonId: renteonId },
+              data: { status: status }
+          });
+          updatedCount++;
+      }
+
+      revalidatePath("/admin/cars");
+      
+      return { 
+          success: true, 
+          message: `Availability check ran. Processed ${activeBookings.length} bookings. Updated status for ${updatedCount} cars.`,
+          bookingsCount: activeBookings.length
+      }
+
+  } catch (error: any) {
+      console.error("Availability Sync Error:", error);
+      return { error: error.message };
+  }
+}
+
 export async function syncCarsFromRenteon() {
   const session = await getSession()
   if (!session || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
@@ -70,10 +178,8 @@ export async function syncCarsFromRenteon() {
     let createdCount = 0
     let updatedCount = 0
 
-
     // Process each category
     for (const cat of categories) {
-        // First, sync/create the Category (Group)
         let categoryId: string | null = null;
         if (cat.CarCategoryGroup) {
             // "Crossover", "Compact", etc.
@@ -149,11 +255,12 @@ export async function syncCarsFromRenteon() {
                 }
 
                 // Upsert Car
+                // Check if exists by renteonId first
                 const existing = await prisma.car.findUnique({
-                    where: { renteonId: carData.renteonId } as any // Using renteonId as unique key ideally, but schema has unique licensePlate too
+                    where: { renteonId: carData.renteonId } as any
                 })
 
-                // If we found by renteonId, we update. If not, check licensePlate
+                // Then check by licensePlate (our virtual one or real one if synced differently before)
                 let existingId = existing?.id;
                 if (!existingId) {
                     const existingByLp = await prisma.car.findUnique({
@@ -161,9 +268,14 @@ export async function syncCarsFromRenteon() {
                     });
                     existingId = existingByLp?.id;
                 }
-
+                
+                // CRITICAL: Check if we have duplicates in DB for this car (e.g. one by renteonId, one by LP)
+                // If we found both and they are different IDs, we should probably merge or delete one?
+                // For now, let's prefer the one with renteonId if available, or just update the one we found.
+                
                 try {
                     if (existingId) {
+                         // Update
                         await prisma.car.update({
                             where: { id: existingId },
                             data: {
@@ -175,12 +287,14 @@ export async function syncCarsFromRenteon() {
                                 fuelType: carData.fuelType as any,
                                 seats: carData.seats,
                                 doors: carData.doors,
-                                renteonId: carData.renteonId,
+                                renteonId: carData.renteonId, // Ensure renteonId is set
+                                licensePlate: carData.licensePlate, // Ensure LP is consistent
                                 categories: carData.categories
                             } as any
                         })
                         updatedCount++
                     } else {
+                        // Create
                         await prisma.car.create({
                             data: {
                             ...carData,
@@ -194,15 +308,23 @@ export async function syncCarsFromRenteon() {
                 } catch (err: any) {
                     // Handle Unique Constraint Violation (P2002)
                     if (err.code === 'P2002') {
-                        console.warn(`Unique constraint failed for Car ${carData.renteonId}. Retrying update...`);
-                        // Force find by renteonId again
-                        const forceFound = await prisma.car.findUnique({
-                            where: { renteonId: carData.renteonId } as any
-                        });
+                        console.warn(`Unique constraint failed for Car ${carData.renteonId}. Cleaning up duplicates...`);
                         
-                        if (forceFound) {
+                        // It means we tried to update/create but a record with same unique field (renteonId OR licensePlate) exists
+                        // and it wasn't the one we targeted (or we targeted none).
+                        
+                        // Strategy: Find ALL records that conflict (by renteonId OR licensePlate)
+                        // and keep the "best" one, delete others.
+                        
+                        const conflictByRenteonId = await prisma.car.findUnique({ where: { renteonId: carData.renteonId } as any });
+                        const conflictByLp = await prisma.car.findUnique({ where: { licensePlate: carData.licensePlate } });
+                        
+                        const winner = conflictByRenteonId || conflictByLp;
+                        
+                        if (winner) {
+                             // Update the winner
                              await prisma.car.update({
-                                where: { id: forceFound.id },
+                                where: { id: winner.id },
                                 data: {
                                     make: carData.make,
                                     model: carData.model,
@@ -212,12 +334,22 @@ export async function syncCarsFromRenteon() {
                                     fuelType: carData.fuelType as any,
                                     seats: carData.seats,
                                     doors: carData.doors,
+                                    renteonId: carData.renteonId,
+                                    licensePlate: carData.licensePlate,
                                     categories: carData.categories
                                 } as any
                             })
                             updatedCount++
-                        } else {
-                             console.error(`Failed to recover from unique constraint error for ${carData.renteonId}`, err);
+                            
+                            // If there was another conflicting record (e.g. one had renteonId, other had LP), delete the loser
+                            if (conflictByRenteonId && conflictByLp && conflictByRenteonId.id !== conflictByLp.id) {
+                                console.log(`Deleting duplicate car ${conflictByLp.id} in favor of ${conflictByRenteonId.id}`);
+                                // Delete related first just in case
+                                await prisma.pricingTier.deleteMany({ where: { carId: conflictByLp.id } });
+                                await prisma.carInsurance.deleteMany({ where: { carId: conflictByLp.id } });
+                                await prisma.availability.deleteMany({ where: { carId: conflictByLp.id } });
+                                await prisma.car.delete({ where: { id: conflictByLp.id } });
+                            }
                         }
                     } else {
                         console.error(`Failed to sync car ${carData.renteonId}`, err);
@@ -301,6 +433,7 @@ export async function syncCarsFromRenteon() {
     }
 
     revalidatePath("/admin/cars")
+    revalidatePath("/cars")
     return { 
         success: true, 
         message: `Sync successful! Created: ${createdCount}, Updated: ${updatedCount}`,

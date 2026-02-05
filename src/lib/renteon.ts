@@ -289,10 +289,31 @@ export async function syncBookingToRenteon(booking: any) {
       DateOut: dateOut,
       DateIn: dateIn,
       Currency: "EUR", 
+      PricelistId: 351, // Found via deep probe
+      BookAsCommissioner: true // Required for Agency/Partner API users
     };
 
     // 1. Availability Check (Optional but recommended to get PricelistId if needed)
     // We'll skip explicitly using the result for now unless errors occur.
+    // Actually, we can use /calculate to validate price first
+    const calcResponse = await fetch(`${RENTEON_API_URL}/bookings/calculate`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(createPayload)
+    });
+
+    if (!calcResponse.ok) {
+        const err = await calcResponse.text();
+        console.warn('Renteon Price Calc Warning (continuing anyway):', err);
+        // Continue to create booking as create might handle it differently or give better error
+    } else {
+        const calcData = await calcResponse.json();
+        // If we got a price, we could update our local record, but for now just use it to validate
+        console.log('Renteon Price Validated:', calcData.Total);
+    }
     
     // 2. Create Booking (In-Memory)
     const createResponse = await fetch(`${RENTEON_API_URL}/bookings/create`, {

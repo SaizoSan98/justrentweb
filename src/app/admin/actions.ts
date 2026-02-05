@@ -95,13 +95,29 @@ export async function logoutAction() {
 
 export async function deleteCar(id: string) {
   try {
-    await prisma.car.delete({
-      where: { id }
-    })
+    // Transaction delete to handle foreign keys if cascade is not set in DB
+    // Or just try delete and catch specific error to explain
+    
+    // Deleting related records manually to be safe (if Prisma schema doesn't cascade)
+    // Based on error: `PricingTier_carId_fkey (index)`
+    await prisma.$transaction([
+        prisma.pricingTier.deleteMany({ where: { carId: id } }),
+        prisma.carInsurance.deleteMany({ where: { carId: id } }),
+        prisma.availability.deleteMany({ where: { carId: id } }),
+        // Note: Bookings might need to be kept or handled differently (e.g. set carId to null?)
+        // Usually we don't delete cars with bookings, but if requested...
+        // Let's check if there are active bookings?
+        // For now, let's assume we can delete associated data.
+        prisma.car.delete({ where: { id } })
+    ])
+
     revalidatePath('/admin/cars')
     return { success: true }
   } catch (error: any) {
     console.error("Failed to delete car:", error)
+    if (error.code === 'P2003') {
+        return { error: "Cannot delete car because it has related records (e.g. bookings)." }
+    }
     return { error: error.message || "Failed to delete car" }
   }
 }
