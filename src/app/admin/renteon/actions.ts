@@ -446,34 +446,72 @@ export async function syncCarsFromRenteon() {
                 } : undefined
             }
 
-            const existing = await prisma.car.findUnique({ where: { licensePlate: carData.licensePlate } });
+            // Try to find by renteonId first (Primary Key in Renteon)
+            let existing = await prisma.car.findUnique({ 
+                where: { renteonId: carData.renteonId } as any 
+            });
+
+            // If not found by renteonId, try by License Plate (Fallback/Legacy)
+            if (!existing) {
+                existing = await prisma.car.findUnique({ 
+                    where: { licensePlate: carData.licensePlate } 
+                });
+            }
             
-            if (existing) {
-                await prisma.car.update({
-                    where: { id: existing.id },
-                    data: {
-                        make: carData.make,
-                        model: carData.model,
-                        imageUrl: carData.imageUrl,
-                        transmission: carData.transmission as any,
-                        fuelType: carData.fuelType as any,
-                        seats: carData.seats,
-                        categories: carData.categories,
-                        renteonId: carData.renteonId,
-                        pricePerDay: carData.pricePerDay
-                    } as any
-                })
-                updatedCount++
-            } else {
-                 await prisma.car.create({
-                    data: {
-                        ...carData,
-                        status: 'AVAILABLE',
-                        transmission: carData.transmission as any,
-                        fuelType: carData.fuelType as any,
-                    } as any
-                })
-                createdCount++
+            try {
+                if (existing) {
+                    await prisma.car.update({
+                        where: { id: existing.id },
+                        data: {
+                            make: carData.make,
+                            model: carData.model,
+                            imageUrl: carData.imageUrl,
+                            transmission: carData.transmission as any,
+                            fuelType: carData.fuelType as any,
+                            seats: carData.seats,
+                            categories: carData.categories,
+                            renteonId: carData.renteonId,
+                            pricePerDay: carData.pricePerDay
+                        } as any
+                    })
+                    updatedCount++
+                } else {
+                     await prisma.car.create({
+                        data: {
+                            ...carData,
+                            status: 'AVAILABLE',
+                            transmission: carData.transmission as any,
+                            fuelType: carData.fuelType as any,
+                        } as any
+                    })
+                    createdCount++
+                }
+            } catch (err: any) {
+                 if (err.code === 'P2002') {
+                    // Handle race condition or lingering duplicates
+                    console.warn(`Duplicate conflict for ${carData.renteonId}, retrying update...`);
+                    // If create failed due to unique constraint, it means it exists now (or we missed it).
+                    // Try to find and update one last time.
+                    const conflict = await prisma.car.findFirst({
+                        where: { 
+                            OR: [
+                                { renteonId: carData.renteonId },
+                                { licensePlate: carData.licensePlate }
+                            ]
+                         } as any
+                    });
+                    
+                    if (conflict) {
+                         await prisma.car.update({
+                            where: { id: conflict.id },
+                            data: {
+                                renteonId: carData.renteonId, // Ensure ID is set
+                                pricePerDay: carData.pricePerDay
+                            } as any
+                        });
+                    }
+                }
+                console.error(`Failed to sync fallback car ${carData.renteonId}`, err.message);
             }
         }
     }
