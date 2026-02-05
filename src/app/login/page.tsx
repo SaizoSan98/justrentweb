@@ -95,6 +95,8 @@ function AuthForm({ searchParams }: { searchParams?: { error?: string, tab?: str
   )
 }
 
+export const dynamic = 'force-dynamic'
+
 export default async function LoginPage(props: {
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
