@@ -13,7 +13,8 @@ import {
   Settings,
   Users,
   Shield,
-  ArrowLeft
+  ArrowLeft,
+  Database
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -69,6 +70,23 @@ export function AdminSidebarContent({ user, className, onLinkClick }: AdminSideb
           </Button>
         </Link>
         
+        <div className="pt-4 pb-2">
+          <p className="px-4 text-xs font-bold text-zinc-400 uppercase tracking-wider">Integrations</p>
+        </div>
+
+        <Link href="/admin/renteon" onClick={onLinkClick}>
+          <Button 
+            variant="ghost" 
+            className={cn(
+              "w-full justify-start text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50",
+              isActive('/admin/renteon') && "bg-red-50 text-red-600 border-l-2 border-red-600 rounded-l-none"
+            )}
+          >
+            <Database className="mr-3 h-5 w-5" />
+            Renteon API
+          </Button>
+        </Link>
+
         <div className="pt-4 pb-2">
           <p className="px-4 text-xs font-bold text-zinc-400 uppercase tracking-wider">Fleet</p>
         </div>
