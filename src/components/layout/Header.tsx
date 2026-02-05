@@ -138,7 +138,10 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
           <div className="flex items-center gap-4">
             {/* Language Selector */}
             <div className="hidden sm:block">
-              <LanguageSwitcher currentLang={lang} />
+              <LanguageSwitcher 
+                currentLang={lang} 
+                variant={(isScrolled || !transparent) ? 'dark' : 'light'}
+              />
             </div>
 
             {/* Auth Trigger */}

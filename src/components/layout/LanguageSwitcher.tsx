@@ -10,8 +10,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
-export function LanguageSwitcher({ currentLang }: { currentLang: string }) {
+export function LanguageSwitcher({ currentLang, variant = 'dark' }: { currentLang: string, variant?: 'light' | 'dark' }) {
   const router = useRouter()
 
   const handleLanguageChange = async (lang: string) => {
@@ -25,8 +26,14 @@ export function LanguageSwitcher({ currentLang }: { currentLang: string }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="hidden md:flex items-center gap-2 text-zinc-600 hover:text-zinc-900 cursor-pointer transition-colors group p-0 hover:bg-transparent">
-          <Globe className="w-5 h-5 group-hover:text-red-600 transition-colors" />
+        <Button 
+          variant="ghost" 
+          className={cn(
+            "hidden md:flex items-center gap-2 cursor-pointer transition-colors group p-0 hover:bg-transparent",
+            variant === 'light' ? "text-white/80 hover:text-white" : "text-zinc-600 hover:text-zinc-900"
+          )}
+        >
+          <Globe className={cn("w-5 h-5 transition-colors", variant === 'light' ? "group-hover:text-white" : "group-hover:text-red-600")} />
           <span className="text-sm font-bold">
             {currentLang === 'he' ? 'עברית | EUR' : 'ENG | EUR'}
           </span>
