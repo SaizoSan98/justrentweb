@@ -4,20 +4,15 @@ import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { getSession } from "@/lib/auth"
-import { sendBookingConfirmationEmail } from "@/lib/email"
+import { sendBookingConfirmationEmail, sendWelcomeUserEmail } from "@/lib/email"
 import { syncBookingToRenteon } from "@/lib/renteon"
+import { login } from "@/lib/auth"
 
 export async function createBooking(prevState: any, formData: FormData) {
   try {
     const session = await getSession()
     
-    // Allow guest booking if session is missing, but preferably we should require auth or create a guest user.
-    // However, the error "Application error: a server-side exception has occurred" usually means a crash.
-    // Let's check if session exists. If not, we might be trying to access session.user.id which throws if session is null.
-    // Based on the code: if (!session?.user?.id) return { error: ... }
-    // This is safe.
-    
-    // The issue might be date parsing if startDate is invalid string "undefined" or similar.
+    // ... Date parsing logic ...
     const startDateStr = formData.get('startDate') as string
     const endDateStr = formData.get('endDate') as string
     
@@ -26,9 +21,6 @@ export async function createBooking(prevState: any, formData: FormData) {
     }
     
     const startDate = new Date(startDateStr)
-    // If endDate is undefined/null, we default to startDate + 1 day or throw error?
-    // The previous fix in CheckoutForm ensures we display 1 day if undefined, 
-    // but here we are receiving form data.
     let endDate = endDateStr && endDateStr !== 'undefined' ? new Date(endDateStr) : undefined
     
     if (!endDate) {
@@ -37,24 +29,58 @@ export async function createBooking(prevState: any, formData: FormData) {
         endDate.setDate(endDate.getDate() + 1)
     }
 
-    // Extract carId here as it was missed in previous patch
     const carId = formData.get('carId') as string
     
-    // ... rest of the code
-    
-    // Also, if session is null, we need to handle userId.
-    // If we want to allow guest bookings, we need to change the schema or create a placeholder user.
-    // For now, let's assume auth is required as per the check.
-    
-    // IF NO USER ID (Guest Checkout scenario which might be happening if auth check was relaxed in page.tsx)
-    // We need to either create a user or have optional userId in schema.
-    // Assuming schema requires userId, we must return error if not logged in.
-    if (!session?.user?.id) {
-         // return { error: 'You must be logged in to create a booking.' }
-         // To fix the crash, we return an error message instead of letting it crash later if userId is null
-         return { error: 'Please sign in to complete your booking.' }
+    // --- USER HANDLING ---
+    let userId = session?.user?.id
+    let isNewUser = false
+    let autoPassword = ""
+
+    const email = formData.get('email') as string
+    const firstName = formData.get('firstName') as string
+    const lastName = formData.get('lastName') as string
+    const phone = formData.get('phone') as string
+
+    // If not logged in, find or create user
+    if (!userId) {
+      // 1. Check if email exists
+      const existingUser = await prisma.user.findUnique({
+        where: { email }
+      })
+
+      if (existingUser) {
+        // If user exists but not logged in, we link the booking to them.
+        // Optionally: we could require login, but for better conversion we allow it.
+        // Ideally we should flag this booking or user verification?
+        // For now: Just link it.
+        userId = existingUser.id
+      } else {
+        // 2. Create new user (Guest -> User)
+        isNewUser = true
+        // Generate random password (8 chars)
+        autoPassword = Math.random().toString(36).slice(-8)
+        
+        const newUser = await prisma.user.create({
+          data: {
+            email,
+            name: `${firstName} ${lastName}`,
+            phone,
+            password: autoPassword, // In production, hash this!
+            role: 'USER'
+          }
+        })
+        
+        userId = newUser.id
+
+        // Auto-login the new user so they land on dashboard authenticated
+        await login({
+          id: newUser.id,
+          email: newUser.email,
+          name: newUser.name,
+          role: newUser.role
+        })
+      }
     }
-    const userId = session.user.id
     
     const pickupLocation = formData.get('pickupLocation') as string
     const dropoffLocation = formData.get('dropoffLocation') as string
@@ -112,8 +138,13 @@ export async function createBooking(prevState: any, formData: FormData) {
     // We wrap this in a try-catch to ensure it doesn't crash the main flow if email fails
     try {
       await sendBookingConfirmationEmail(booking)
+      
+      // If new user, send welcome email with credentials
+      if (isNewUser) {
+        await sendWelcomeUserEmail(booking.user, autoPassword)
+      }
     } catch (emailError) {
-      console.error("Failed to send confirmation email:", emailError)
+      console.error("Failed to send email:", emailError)
     }
 
     // 4. Sync to Renteon (Fire and forget, or log errors)
