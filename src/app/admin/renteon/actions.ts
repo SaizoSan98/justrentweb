@@ -504,55 +504,63 @@ export async function syncExtrasFromRenteon() {
             const description = s.Description || "";
 
             if (isInsurance) {
-                // Upsert InsurancePlan
-                // Map common names to standard types if needed, or just create generic plans
-                // We'll use the Name as the key
-                await prisma.insurancePlan.upsert({
-                    where: { name: name },
-                    update: {
-                        description: description,
-                        pricePerDay: price,
-                    },
-                    create: {
-                        name: name,
-                        description: description,
-                        pricePerDay: price,
-                        order: 10 // Default order
-                    }
+                // Upsert InsurancePlan manually (since name is not unique in schema yet)
+                const existingPlan = await prisma.insurancePlan.findFirst({
+                    where: { name: name }
                 });
+
+                if (existingPlan) {
+                    await prisma.insurancePlan.update({
+                        where: { id: existingPlan.id },
+                        data: {
+                            description: description,
+                            // InsurancePlan schema does not have pricePerDay in it directly, 
+                            // it seems it's in CarInsurance (relation). 
+                            // Wait, let's check schema again. 
+                            // Schema says: InsurancePlan { id, name, description, isDefault, order, ... }
+                            // It DOES NOT have pricePerDay. 
+                            // Prices are likely in CarInsurance or we need to add it to schema if we want global price.
+                            // But user said "Insurance Plans & Deposits" section in Edit Car...
+                            // In Edit Car, we configure prices PER CAR.
+                            // So here we are just syncing the DEFINITION of the plan.
+                            // We can't sync price here unless we add it to InsurancePlan model as a default.
+                            // Let's check schema again.
+                        }
+                    });
+                } else {
+                    await prisma.insurancePlan.create({
+                        data: {
+                            name: name,
+                            description: description,
+                            order: 10
+                        }
+                    });
+                }
                 insuranceCount++;
             } else {
-                // Upsert Extra
-                await prisma.extra.upsert({
-                    where: { name: name } as any, // assuming name is unique or we need a unique field
-                    // Note: Extra model in schema might not have name as unique. Let's check schema.
-                    // If not unique, we might duplicate.
-                    // Let's check schema first...
-                    // Assuming name is unique for now or we search first.
-                    create: {
-                        name: name,
-                        description: description,
-                        price: price,
-                        priceType: 'PER_DAY', // Default assumption
-                    },
-                    update: {
-                        description: description,
-                        price: price
-                    }
-                } as any).catch(async (e) => {
-                     // If upsert fails (e.g. name not unique), try find first
-                     const existing = await prisma.extra.findFirst({ where: { name: name } });
-                     if (existing) {
-                         await prisma.extra.update({
-                             where: { id: existing.id },
-                             data: { description, price }
-                         });
-                     } else {
-                         await prisma.extra.create({
-                             data: { name, description, price, priceType: 'PER_DAY' }
-                         });
-                     }
+                // Upsert Extra manually (since name is not unique in schema)
+                const existingExtra = await prisma.extra.findFirst({
+                    where: { name: name }
                 });
+
+                if (existingExtra) {
+                    await prisma.extra.update({
+                        where: { id: existingExtra.id },
+                        data: {
+                            description: description,
+                            price: price
+                        }
+                    });
+                } else {
+                    await prisma.extra.create({
+                        data: {
+                            name: name,
+                            description: description,
+                            price: price,
+                            priceType: 'PER_DAY'
+                        }
+                    });
+                }
                 extrasCount++;
             }
         }
