@@ -81,13 +81,24 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
   })
 
   const calculateDays = () => {
+    // If endDate is missing, default to 1 day
     if (!endDate) return 1
-    // Combine date and time
-    const start = new Date(`${format(startDate, 'yyyy-MM-dd')}T${startTime}`)
-    const end = new Date(`${format(endDate, 'yyyy-MM-dd')}T${endTime}`)
     
-    const diff = differenceInDays(end, start)
-    return Math.max(1, diff) // Minimum 1 day
+    // Combine date and time safely
+    try {
+        const startStr = `${format(startDate, 'yyyy-MM-dd')}T${startTime}`
+        const endStr = `${format(endDate, 'yyyy-MM-dd')}T${endTime}`
+        const start = new Date(startStr)
+        const end = new Date(endStr)
+        
+        // If invalid dates
+        if (isNaN(start.getTime()) || isNaN(end.getTime())) return 1
+
+        const diff = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
+        return Math.max(1, diff)
+    } catch (e) {
+        return 1
+    }
   }
 
   const days = calculateDays()
