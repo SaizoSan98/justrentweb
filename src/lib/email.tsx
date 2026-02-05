@@ -3,6 +3,7 @@ import { Resend } from 'resend';
 import { BookingEmail } from '@/components/emails/BookingEmail';
 import { WelcomeUserEmail } from '@/components/emails/WelcomeUserEmail';
 import { WelcomeClientEmail } from '@/components/emails/WelcomeClientEmail';
+import { VerificationEmail } from '@/components/emails/VerificationEmail';
 import { ForgotPasswordEmail } from '@/components/emails/ForgotPasswordEmail';
 
 // Initialize Resend with API key from environment variables
@@ -91,6 +92,14 @@ export async function sendWelcomeClientEmail(user: any) {
       name={user.name || 'User'}
       loginUrl={`${process.env.NEXT_PUBLIC_APP_URL || 'https://justrentandtrans.com'}/dashboard`}
     />
+  });
+}
+
+export async function sendVerificationEmail(email: string, code: string) {
+  return sendEmail({
+    to: email,
+    subject: 'Verify your email - JustRent',
+    component: <VerificationEmail code={code} />
   });
 }
 

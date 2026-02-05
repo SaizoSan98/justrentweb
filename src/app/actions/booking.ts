@@ -29,6 +29,7 @@ export async function createBooking(prevState: any, formData: FormData) {
         endDate.setDate(endDate.getDate() + 1)
     }
 
+    // Extract carId here as it was missed in previous patch
     const carId = formData.get('carId') as string
     
     // --- USER HANDLING ---
@@ -130,7 +131,8 @@ export async function createBooking(prevState: any, formData: FormData) {
         }
       },
       include: {
-        car: true
+        car: true,
+        user: true // Include user to get data for email
       }
     })
 
