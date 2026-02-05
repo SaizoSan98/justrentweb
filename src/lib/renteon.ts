@@ -178,6 +178,33 @@ export async function getRenteonToken(): Promise<string> {
   }
 }
 
+export async function fetchCarCategories(): Promise<any[]> {
+  const token = await getRenteonToken();
+  if (!token) return [];
+
+  try {
+    // API endpoint based on documentation: GET /api/carCategories
+    const response = await fetch(`${RENTEON_API_URL}/carCategories`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      console.error('Failed to fetch car categories:', await response.text());
+      return [];
+    }
+
+    const data = await response.json();
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error('Renteon Car Category Fetch Exception:', error);
+    return [];
+  }
+}
+
 // Search Booking
 async function findBookingInRenteon(booking: any): Promise<string | null> {
   const token = await getRenteonToken();
