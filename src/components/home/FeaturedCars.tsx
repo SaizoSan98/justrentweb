@@ -6,6 +6,7 @@ import Image from "next/image"
 import { ArrowRight, Gauge, Fuel, Users, Star, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { getBrandLogo } from "@/lib/brand-logos"
 
 interface Car {
   id: string
@@ -88,6 +89,17 @@ export function FeaturedCars({ cars }: FeaturedCarsProps) {
                     
                     {/* Background Pattern */}
                     <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-110 duration-700" />
+                    
+                    {/* Brand Logo Watermark */}
+                    <div className="absolute top-8 right-8 w-12 h-12 z-10 opacity-30 grayscale group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500">
+                        <Image 
+                            src={getBrandLogo(car.make)}
+                            alt={car.make}
+                            fill
+                            className="object-contain"
+                            unoptimized
+                        />
+                    </div>
                     
                     {/* Badge */}
                     <div className="relative z-10 mb-8">
