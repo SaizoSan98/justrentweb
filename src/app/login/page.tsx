@@ -95,14 +95,12 @@ function AuthForm({ searchParams }: { searchParams?: { error?: string, tab?: str
   )
 }
 
-export default async function LoginPage({
-  searchParams,
-}: {
+export default async function LoginPage(props: {
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-  const params = await searchParams
-  const error = typeof params?.error === 'string' ? params.error : undefined
-  const tab = typeof params?.tab === 'string' ? params.tab : undefined
+  const searchParams = await props.searchParams
+  const error = typeof searchParams?.error === 'string' ? searchParams.error : undefined
+  const tab = typeof searchParams?.tab === 'string' ? searchParams.tab : undefined
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-zinc-100 p-4">
