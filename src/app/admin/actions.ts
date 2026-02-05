@@ -99,8 +99,10 @@ export async function deleteCar(id: string) {
       where: { id }
     })
     revalidatePath('/admin/cars')
-  } catch (error) {
+    return { success: true }
+  } catch (error: any) {
     console.error("Failed to delete car:", error)
+    return { error: error.message || "Failed to delete car" }
   }
 }
 

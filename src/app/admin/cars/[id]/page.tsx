@@ -13,14 +13,41 @@ interface PageProps {
 export default async function EditCarPage({ params }: PageProps) {
   const { id } = await params
   
-  const car = await prisma.car.findUnique({
-    where: { id },
-    include: { 
-        pricingTiers: true,
-        insuranceOptions: true,
-        categories: true
-    }
-  })
+  let car: any = null;
+  
+  try {
+    car = await prisma.car.findUnique({
+      where: { id },
+      include: { 
+          pricingTiers: true,
+          insuranceOptions: true,
+          categories: true
+      }
+    })
+  } catch (error) {
+    console.error("Error fetching car by ID:", error)
+  }
+
+  // Fallback: Try to find by Renteon ID if standard lookup failed
+  // This helps if someone navigates using Renteon ID or if ID format is unusual
+  if (!car && /^\d+$/.test(id)) {
+      try {
+        car = await prisma.car.findUnique({
+            where: { renteonId: id } as any,
+            include: { 
+                pricingTiers: true,
+                insuranceOptions: true,
+                categories: true
+            }
+        })
+      } catch (error) {
+        console.error("Error fetching car by Renteon ID:", error)
+      }
+  }
+
+  if (!car) {
+    notFound()
+  }
 
   const categories = await prisma.category.findMany({
     orderBy: { name: 'asc' }
@@ -30,10 +57,12 @@ export default async function EditCarPage({ params }: PageProps) {
     orderBy: { order: 'asc' }
   })
 
-  const translations = await getTranslations([id], 'Car', 'he')
-
-  if (!car) {
-    notFound()
+  let translations: any[] = []
+  try {
+    translations = await getTranslations([car.id], 'Car', 'he')
+  } catch (error) {
+    console.error("Error fetching translations:", error)
+    // Continue without translations
   }
 
   // Convert decimals to numbers for the form
