@@ -441,6 +441,52 @@ export async function updateExtra(formData: FormData) {
   }
 }
 
+import { getSession } from "@/lib/auth"
+
+export async function deleteUser(userId: string) {
+  const session = await getSession()
+  if (!session || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
+    return { error: "Unauthorized" }
+  }
+
+  // Prevent self-deletion
+  if (session.user.id === userId) {
+    return { error: "You cannot delete your own account." }
+  }
+
+  try {
+    // Check if user is Superadmin
+    const targetUser = await prisma.user.findUnique({ where: { id: userId } })
+    if (targetUser?.role === 'SUPERADMIN') {
+        return { error: "Cannot delete a Superadmin." }
+    }
+
+    // Delete user (cascade will handle bookings if configured, but let's be explicit if needed)
+    // Prisma schema usually handles cascade delete on relations if defined.
+    // Assuming Bookings have onDelete: Cascade or we need to delete them first.
+    // Let's delete the user directly, assuming Prisma handles cascade.
+    // If not, we might need to delete bookings manually.
+    // Checking schema: Booking relation to User does NOT have onDelete: Cascade in the provided snippet earlier.
+    // So we must delete related data first.
+    
+    // 1. Delete Bookings
+    await prisma.booking.deleteMany({
+        where: { userId }
+    })
+    
+    // 2. Delete User
+    await prisma.user.delete({
+      where: { id: userId }
+    })
+
+    revalidatePath("/admin/users")
+    return { success: true }
+  } catch (error) {
+    console.error("Failed to delete user:", error)
+    return { error: "Failed to delete user" }
+  }
+}
+
 export async function toggleUserRole(userId: string, currentRole: string) {
   // Logic: USER -> ADMIN -> USER. 
   // SUPERADMIN cannot be changed via this simple toggle (needs special handling if we want to downgrade superadmin)

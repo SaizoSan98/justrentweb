@@ -13,12 +13,28 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { ShieldAlert, ShieldCheck, Ban, CheckCircle, Pencil, UserX, Mail, Phone, Calendar } from "lucide-react"
-import { toggleUserRole, banUser, unbanUser, updateUserByAdmin } from "@/app/admin/actions"
+import { ShieldAlert, ShieldCheck, Ban, CheckCircle, Pencil, UserX, Mail, Phone, Calendar, Trash2 } from "lucide-react"
+import { toggleUserRole, banUser, unbanUser, updateUserByAdmin, deleteUser } from "@/app/admin/actions"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 export function UsersTable({ users }: { users: any[] }) {
   const [editingUser, setEditingUser] = useState<any>(null)
   const [banningUser, setBanningUser] = useState<any>(null)
+  const [deletingUser, setDeletingUser] = useState<any>(null)
+  const router = useRouter()
+
+  const handleDeleteUser = async () => {
+    if (!deletingUser) return
+    
+    const result = await deleteUser(deletingUser.id)
+    if (result.error) {
+        toast.error(result.error)
+    } else {
+        toast.success("User deleted successfully")
+        setDeletingUser(null)
+    }
+  }
 
   return (
     <>
@@ -120,6 +136,16 @@ export function UsersTable({ users }: { users: any[] }) {
                               <UserX className="w-4 h-4" />
                             </Button>
                           )}
+
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => setDeletingUser(user)}
+                            className="h-8 w-8 text-zinc-400 hover:text-red-700 hover:bg-red-50"
+                            title="Delete User Permanently"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
                         </>
                       )}
                     </div>
