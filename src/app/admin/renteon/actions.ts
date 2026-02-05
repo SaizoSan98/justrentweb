@@ -297,7 +297,7 @@ export async function syncCarsFromRenteon() {
         // ... (Keep existing Smart Pricing logic as fallback)
         try {
             const today = new Date();
-            const past = new Date(); past.setDate(today.getDate() - 180); // Increased to 180 days
+            const past = new Date(); past.setDate(today.getDate() - 730); // Increased to 730 days (2 years)
             const future = new Date(); future.setDate(today.getDate() + 365);
             const searchPayload = { 
                 DateFrom: past.toISOString(), 
@@ -585,10 +585,9 @@ export async function syncCarsFromRenteon() {
 
     revalidatePath("/admin/cars")
     
-    const priceSourceStats = `Prices: ${priceMap.size} from Renteon/History, ${categories.length - priceMap.size} defaulted to 50€. (Note: Real-time pricing API returned 'No Availability' or 422 for most checks. Used historical booking data where possible.)`;
-    
-    return { 
-        success: true, 
+    const priceSourceStats = `Prices: ${priceMap.size} from Renteon/History (2-year lookback), ${categories.length - priceMap.size} defaulted to 50€. (Note: Real-time pricing API returned 'No Availability' or 422 for most checks. Used extended historical booking data where possible.)`;
+        return { 
+            success: true, 
         message: `Synced ${categories.length} categories. Created ${createdCount}, updated ${updatedCount} cars. ${priceSourceStats}`,
         stats: {
             created: createdCount,
