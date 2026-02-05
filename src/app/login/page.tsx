@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Image from "next/image"
+import Link from "next/link"
 import { Logo } from "@/components/ui/logo"
 import { loginAction, registerAction } from "./actions"
 import { LoginButton } from "@/components/auth/LoginButton"
@@ -63,7 +64,7 @@ function AuthForm({ searchParams }: { searchParams?: { error?: string, tab?: str
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <Label htmlFor="password">Password</Label>
-                  <a href="#" className="text-xs text-red-600 hover:underline">Forgot password?</a>
+                  <Link href="/forgot-password" className="text-xs text-red-600 hover:underline">Forgot password?</Link>
                 </div>
                 <Input id="password" name="password" type="password" required className="bg-zinc-50" />
               </div>

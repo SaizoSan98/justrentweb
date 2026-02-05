@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Image from "next/image"
+import Link from "next/link"
 import { Logo } from "@/components/ui/logo"
 import { X, Mail, Lock, User, ArrowRight, Github, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -101,7 +102,7 @@ export function AuthModal({ trigger }: AuthModalProps) {
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <label className="text-xs font-bold text-zinc-500 uppercase">Password</label>
-                  <a href="#" className="text-xs font-medium text-red-600 hover:underline">Forgot?</a>
+                  <Link href="/forgot-password" className="text-xs font-medium text-red-600 hover:underline">Forgot?</Link>
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />

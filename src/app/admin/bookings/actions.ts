@@ -5,6 +5,11 @@ import { revalidatePath } from "next/cache"
 import { BookingStatus } from "@prisma/client"
 import { getSession } from "@/lib/auth"
 import { cancelBookingInRenteon } from "@/lib/renteon"
+import { 
+  sendBookingConfirmationEmail, 
+  sendBookingCancellationEmail, 
+  sendBookingCompletedEmail 
+} from "@/lib/email"
 
 export async function updateBookingStatus(bookingId: string, status: BookingStatus) {
   const session = await getSession()
@@ -25,6 +30,15 @@ export async function updateBookingStatus(bookingId: string, status: BookingStat
       where: { id: bookingId },
       data: { status }
     })
+
+    // Send Email Notification based on status
+    if (status === 'CONFIRMED') {
+      await sendBookingConfirmationEmail(booking)
+    } else if (status === 'CANCELLED') {
+      await sendBookingCancellationEmail(booking)
+    } else if (status === 'COMPLETED') {
+      await sendBookingCompletedEmail(booking)
+    }
 
     // Sync with Renteon if Cancelled
     if (status === 'CANCELLED') {
