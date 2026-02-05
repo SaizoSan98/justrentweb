@@ -91,7 +91,7 @@ export async function syncCarsFromRenteon() {
             make: cat.CarMakeName || cat.CarModel?.split(' ')[0] || 'Unknown',
             model: cat.CarModel?.split(' ').slice(1).join(' ') || cat.CarModel || 'Unknown',
             year: 2024, // Default to current year as API might not return it for category
-            color: 'White', // Default
+            // color removed as it is not in the schema
             licensePlate: `RT-${cat.SIPP}-${cat.Id}`, // Virtual license plate
             vin: `RT-VIN-${cat.Id}`,
             fuelType: cat.FuelTypes?.[0]?.Name || 'Petrol',
