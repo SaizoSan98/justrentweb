@@ -101,6 +101,8 @@ model Extra {
   price       Decimal
   priceType   String    @default("PER_DAY")
   icon        String?
+  renteonId   String?   @unique
+  code        String?
   bookings    Booking[] @relation("BookingToExtra")
 }
 
@@ -110,6 +112,8 @@ model InsurancePlan {
   description   String?
   isDefault     Boolean        @default(false)
   order         Int            @default(0)
+  renteonId     String?        @unique
+  code          String?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   bookings      Booking[]

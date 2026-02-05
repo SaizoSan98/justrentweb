@@ -19,25 +19,43 @@ export async function testRenteonConnection() {
     if (!token) throw new Error("Failed to obtain access token")
 
     // 2. Test Data Fetch (e.g. Offices)
-    const response = await fetch(`${RENTEON_API_URL}/offices`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    })
-
-    if (!response.ok) {
-        const text = await response.text()
-        throw new Error(`API Error: ${response.status} - ${text}`)
+    // Probe for Extras/Insurances
+    const endpoints = [
+        '/offices',
+        '/additionalEquipment', 
+        '/equipment',
+        '/insurances',
+        '/insuranceTypes',
+        '/services'
+    ];
+    
+    const results: any = {};
+    
+    for (const ep of endpoints) {
+        try {
+            const res = await fetch(`${RENTEON_API_URL}${ep}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const json = await res.json();
+                results[ep] = Array.isArray(json) ? `Found ${json.length} items` : 'Found object';
+                // Store sample if found
+                if (Array.isArray(json) && json.length > 0) {
+                    results[`${ep}_sample`] = json[0];
+                }
+            } else {
+                results[ep] = `Status: ${res.status}`;
+            }
+        } catch (e: any) {
+            results[ep] = `Error: ${e.message}`;
+        }
     }
 
-    const data = await response.json()
-    
     return { 
         success: true, 
         message: "Connection Successful!", 
         tokenPreview: `${token.substring(0, 10)}...`,
-        data: data
+        data: results
     }
 
   } catch (error: any) {
@@ -478,91 +496,170 @@ export async function syncCarsFromRenteon() {
 export async function syncExtrasFromRenteon() {
     try {
         console.log("Starting Extras/Services Sync...");
-        const services = await fetchRenteonServices();
+        const token = await getRenteonToken();
+        if (!token) return { error: "No token" };
+
+        // 1. Fetch Equipment (Extras)
+        // Try multiple endpoints to find the right one
+        let equipment: any[] = [];
+        const equipEndpoints = ['/additionalEquipment', '/equipment'];
         
-        if (!services || services.length === 0) {
-            console.warn("No services found in Renteon.");
-            return { error: "No services found" };
+        for (const ep of equipEndpoints) {
+            try {
+                const res = await fetch(`${RENTEON_API_URL}${ep}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data) && data.length > 0) {
+                        equipment = data;
+                        console.log(`Found ${equipment.length} items at ${ep}`);
+                        break;
+                    }
+                }
+            } catch (e) { console.warn(`Failed ${ep}`, e); }
         }
 
-        console.log(`Found ${services.length} services.`);
+        // 2. Fetch Insurances
+        let insurances: any[] = [];
+        const insEndpoints = ['/insurances', '/insuranceTypes', '/services']; // 'services' often contains insurances too
+        
+        for (const ep of insEndpoints) {
+             try {
+                const res = await fetch(`${RENTEON_API_URL}${ep}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data) && data.length > 0) {
+                        // If it's the 'services' endpoint, filter for insurances
+                        if (ep === '/services') {
+                            const ins = data.filter((s: any) => {
+                                const name = (s.Name || s.Title || "").toLowerCase();
+                                return name.includes('insurance') || name.includes('cdw') || name.includes('protection');
+                            });
+                            if (ins.length > 0) {
+                                insurances = ins;
+                                console.log(`Found ${insurances.length} insurances in /services`);
+                                break;
+                            }
+                        } else {
+                            insurances = data;
+                            console.log(`Found ${insurances.length} items at ${ep}`);
+                            break;
+                        }
+                    }
+                }
+            } catch (e) { console.warn(`Failed ${ep}`, e); }
+        }
+        
+        // If specific endpoints failed, fall back to generic service fetch
+        if (equipment.length === 0 && insurances.length === 0) {
+             console.log("Specific endpoints failed, trying generic fetchRenteonServices...");
+             const services = await fetchRenteonServices();
+             // Split services into equipment and insurances
+             for (const s of services) {
+                const name = (s.Name || s.Title || "").toLowerCase();
+                if (name.includes('insurance') || name.includes('cdw') || name.includes('protection') || name.includes('excess')) {
+                    insurances.push(s);
+                } else {
+                    equipment.push(s);
+                }
+             }
+        }
+
+        console.log(`Syncing ${insurances.length} insurances and ${equipment.length} extras...`);
 
         let extrasCount = 0;
         let insuranceCount = 0;
 
-        for (const s of services) {
+        // Sync Insurances
+        for (const s of insurances) {
+            const name = s.Name || s.Title;
+            if (!name) continue;
+            
+            const renteonId = s.Id ? s.Id.toString() : null;
+            const code = s.Code || null;
+            const description = s.Description || "";
+            // Price might be missing in definition list, usually 0 or varies by car class
+            const price = s.Price || s.Total || 0; 
+
+            // Upsert InsurancePlan
+            // Priority: Match by renteonId -> Match by Name -> Create
+            let existing = null;
+            if (renteonId) {
+                existing = await prisma.insurancePlan.findUnique({ where: { renteonId } });
+            }
+            if (!existing) {
+                existing = await prisma.insurancePlan.findFirst({ where: { name: name } });
+            }
+
+            if (existing) {
+                await prisma.insurancePlan.update({
+                    where: { id: existing.id },
+                    data: {
+                        name: name, // Update name in case it changed
+                        description: description,
+                        renteonId: renteonId,
+                        code: code
+                    }
+                });
+            } else {
+                await prisma.insurancePlan.create({
+                    data: {
+                        name: name,
+                        description: description,
+                        renteonId: renteonId,
+                        code: code,
+                        order: 10
+                    }
+                });
+            }
+            insuranceCount++;
+        }
+
+        // Sync Extras (Equipment)
+        for (const s of equipment) {
             const name = s.Name || s.Title;
             if (!name) continue;
 
-            // Detect Type: Insurance or Extra?
-            const lowerName = name.toLowerCase();
-            const isInsurance = lowerName.includes('insurance') || lowerName.includes('cdw') || lowerName.includes('protection') || lowerName.includes('coverage') || lowerName.includes('excess');
-
-            const price = s.Price || s.Total || 0; // Depends on API structure
-            
-            // Clean description
+            const renteonId = s.Id ? s.Id.toString() : null;
+            const code = s.Code || null;
             const description = s.Description || "";
+            const price = s.Price || s.Total || 0;
 
-            if (isInsurance) {
-                // Upsert InsurancePlan manually (since name is not unique in schema yet)
-                const existingPlan = await prisma.insurancePlan.findFirst({
-                    where: { name: name }
-                });
-
-                if (existingPlan) {
-                    await prisma.insurancePlan.update({
-                        where: { id: existingPlan.id },
-                        data: {
-                            description: description,
-                            // InsurancePlan schema does not have pricePerDay in it directly, 
-                            // it seems it's in CarInsurance (relation). 
-                            // Wait, let's check schema again. 
-                            // Schema says: InsurancePlan { id, name, description, isDefault, order, ... }
-                            // It DOES NOT have pricePerDay. 
-                            // Prices are likely in CarInsurance or we need to add it to schema if we want global price.
-                            // But user said "Insurance Plans & Deposits" section in Edit Car...
-                            // In Edit Car, we configure prices PER CAR.
-                            // So here we are just syncing the DEFINITION of the plan.
-                            // We can't sync price here unless we add it to InsurancePlan model as a default.
-                            // Let's check schema again.
-                        }
-                    });
-                } else {
-                    await prisma.insurancePlan.create({
-                        data: {
-                            name: name,
-                            description: description,
-                            order: 10
-                        }
-                    });
-                }
-                insuranceCount++;
-            } else {
-                // Upsert Extra manually (since name is not unique in schema)
-                const existingExtra = await prisma.extra.findFirst({
-                    where: { name: name }
-                });
-
-                if (existingExtra) {
-                    await prisma.extra.update({
-                        where: { id: existingExtra.id },
-                        data: {
-                            description: description,
-                            price: price
-                        }
-                    });
-                } else {
-                    await prisma.extra.create({
-                        data: {
-                            name: name,
-                            description: description,
-                            price: price,
-                            priceType: 'PER_DAY'
-                        }
-                    });
-                }
-                extrasCount++;
+            let existing = null;
+            if (renteonId) {
+                existing = await prisma.extra.findUnique({ where: { renteonId } });
             }
+            if (!existing) {
+                existing = await prisma.extra.findFirst({ where: { name: name } });
+            }
+
+            if (existing) {
+                await prisma.extra.update({
+                    where: { id: existing.id },
+                    data: {
+                        name: name,
+                        description: description,
+                        price: price,
+                        renteonId: renteonId,
+                        code: code
+                    }
+                });
+            } else {
+                await prisma.extra.create({
+                    data: {
+                        name: name,
+                        description: description,
+                        price: price,
+                        renteonId: renteonId,
+                        code: code,
+                        priceType: 'PER_DAY'
+                    }
+                });
+            }
+            extrasCount++;
         }
 
         console.log(`Synced ${insuranceCount} insurance plans and ${extrasCount} extras.`);
