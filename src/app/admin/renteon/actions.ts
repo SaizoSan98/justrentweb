@@ -380,6 +380,9 @@ export async function syncCarsFromRenteon() {
         return 'MANUAL'
     }
 
+    // TODO: REMOVE THIS ENTIRE FALLBACK LOGIC ONCE RENTEON API RETURNS VALID PRICES
+    // User Requirement: Pure Renteon integration without hardcoded guesses.
+    // Currently used because API returns 422/No Availability.
     const getFallbackPrice = (make: string, model: string, group: string) => {
         const lowerMake = (make || '').toLowerCase();
         const lowerModel = (model || '').toLowerCase();
@@ -812,6 +815,8 @@ export async function syncExtrasFromRenteon() {
 }
 
 async function linkInsurancesToCars() {
+    // TODO: REMOVE/REFACTOR WHEN RENTEON PROVIDES CAR-SPECIFIC INSURANCE DATA
+    // Currently creates default links because API doesn't return per-car insurance prices/deposits.
     try {
         const plans = await prisma.insurancePlan.findMany();
         const cars = await prisma.car.findMany({ where: { renteonId: { not: null } } }); // Only sync for Renteon cars
