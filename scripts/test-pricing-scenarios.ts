@@ -47,29 +47,69 @@ async function testPricing() {
     const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 20);
     const dayAfter = new Date(tomorrow); dayAfter.setDate(tomorrow.getDate() + 1);
     
-    // Test Availability Search
-    console.log("\n--- Testing General Availability Search ---");
+    // Test Availability Search (Smart Pricing Data Source)
+    console.log("\n--- Testing Smart Pricing Data Source (Booking History) ---");
+    const today = new Date();
+    const past = new Date(); past.setDate(today.getDate() - 90); // Last 3 months
+    const future = new Date(); future.setDate(today.getDate() + 180); // Next 6 months
+    
     const searchPayload = {
-        DateFrom: tomorrow.toISOString(),
-        DateTo: dayAfter.toISOString(),
-        OfficeOutId: 54,
-        OfficeInId: 54
+        DateFrom: past.toISOString(),
+        DateTo: future.toISOString()
+        // Removed Office filter to get ALL bookings
     };
     
     try {
+        console.log(`Searching bookings from ${past.toISOString()} to ${future.toISOString()}...`);
         const res = await fetch(`${RENTEON_API_URL}/bookings/search`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
             body: JSON.stringify(searchPayload)
         });
         if (res.ok) {
-            const data = await res.json();
-            console.log(`Availability Search found ${Array.isArray(data) ? data.length : 0} bookings.`);
-            if (Array.isArray(data) && data.length > 0) {
-                console.log("Sample Booking:", JSON.stringify(data[0], null, 2));
+            const bookings = await res.json();
+            console.log(`Found ${Array.isArray(bookings) ? bookings.length : 0} bookings.`);
+            
+            if (Array.isArray(bookings)) {
+                // Analyze Pricing Data
+                const categoryStats = new Map();
+                
+                bookings.forEach((b: any) => {
+                    if (b.CarCategoryId && b.Total && b.DateOut && b.DateIn) {
+                        const start = new Date(b.DateOut);
+                        const end = new Date(b.DateIn);
+                        const days = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
+                        const dailyRate = b.Total / days;
+                        
+                        if (!categoryStats.has(b.CarCategoryId)) {
+                            categoryStats.set(b.CarCategoryId, { count: 0, sum: 0, min: 9999, max: 0 });
+                        }
+                        const stats = categoryStats.get(b.CarCategoryId);
+                        stats.count++;
+                        stats.sum += dailyRate;
+                        stats.min = Math.min(stats.min, dailyRate);
+                        stats.max = Math.max(stats.max, dailyRate);
+                    }
+                });
+
+                console.log("\nDerived Daily Rates from History:");
+                categoryStats.forEach((stats, catId) => {
+                    const avg = (stats.sum / stats.count).toFixed(2);
+                    // Find category name
+                    const catName = categories.find(c => c.Id === catId)?.CarCategoryGroup || 'Unknown';
+                    console.log(`Cat ID ${catId} (${catName}): Avg ${avg} EUR (Samples: ${stats.count}, Range: ${stats.min.toFixed(0)}-${stats.max.toFixed(0)})`);
+                });
+                
+                // Check coverage
+                const coveredIds = Array.from(categoryStats.keys());
+                const missingIds = categories.map(c => c.Id).filter(id => !coveredIds.includes(id));
+                console.log(`\nCoverage: ${coveredIds.length}/${categories.length} categories.`);
+                if (missingIds.length > 0) {
+                    console.log(`Missing Data for Cat IDs: ${missingIds.join(', ')}`);
+                }
             }
         } else {
-            console.log(`Availability Search Failed: ${res.status} - ${await res.text()}`);
+            console.log(`Booking Search Failed: ${res.status} - ${await res.text()}`);
         }
     } catch (e) { console.error("Search error", e); }
 

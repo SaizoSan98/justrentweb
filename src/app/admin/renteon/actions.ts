@@ -580,9 +580,12 @@ export async function syncCarsFromRenteon() {
     }
 
     revalidatePath("/admin/cars")
+    
+    const priceSourceStats = `Prices: ${priceMap.size} from Renteon/History, ${categories.length - priceMap.size} defaulted to 50€.`;
+    
     return { 
         success: true, 
-        message: `Synced ${categories.length} categories. Created ${createdCount} cars, updated ${updatedCount} cars. Pricing source: ${priceMap.size > 0 ? 'Renteon Pricelist 351' : 'Default'}`,
+        message: `Synced ${categories.length} categories. Created ${createdCount}, updated ${updatedCount} cars. ${priceSourceStats}`,
         stats: {
             created: createdCount,
             updated: updatedCount,
