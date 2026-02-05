@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Car, Calendar, DollarSign, Users, TrendingUp, ArrowUpRight, Activity } from "lucide-react"
 import Link from "next/link"
+import { SystemStatus } from "@/components/admin/SystemStatus"
 
 export const dynamic = 'force-dynamic'
 
@@ -23,10 +24,7 @@ export default async function AdminDashboard() {
           <h1 className="text-4xl font-black text-zinc-900 tracking-tight mb-2">Overview</h1>
           <p className="text-zinc-500">Welcome back to the command center.</p>
         </div>
-        <div className="px-4 py-2 bg-white rounded-full border border-zinc-200 text-zinc-500 text-sm flex items-center gap-2 shadow-sm">
-          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-          System Operational
-        </div>
+        <SystemStatus />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
