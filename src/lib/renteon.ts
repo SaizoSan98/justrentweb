@@ -126,28 +126,36 @@ export async function getRenteonToken(): Promise<string> {
   }
 
   try {
+    const clientId = process.env.RENTEON_CLIENT_ID || '';
+    const clientSecret = process.env.RENTEON_CLIENT_SECRET || '';
+    const username = process.env.RENTEON_USERNAME || '';
+    const password = process.env.RENTEON_PASSWORD || '';
+    
+    // Generate Salt (8-50 chars)
+    const salt = crypto.randomBytes(16).toString('hex');
+    
+    // Generate Signature
+    // Pattern: {username}{salt}{secret}{password}{salt}{secret}{client_id}
+    const compositeKey = `${username}${salt}${clientSecret}${password}${salt}${clientSecret}${clientId}`;
+    const signature = crypto.createHash('sha512').update(compositeKey, 'utf8').digest('base64');
+
     const params = new URLSearchParams();
     params.append('grant_type', 'password');
-    params.append('username', process.env.RENTEON_USERNAME || '');
-    params.append('password', process.env.RENTEON_PASSWORD || '');
-    // Some OAuth2 implementations require client_id in body even with Basic Auth
-    if (process.env.RENTEON_CLIENT_ID) {
-        params.append('client_id', process.env.RENTEON_CLIENT_ID);
-    }
+    params.append('username', username);
+    params.append('password', password);
+    params.append('client_id', clientId);
+    params.append('signature', signature);
+    params.append('salt', salt);
     
-    // Construct Basic Auth Header
-    // NOTE: If Renteon uses 'client_credentials' flow instead of 'password', we should change grant_type.
-    // But typically user-based access uses 'password'.
-    // Another possibility: The endpoint might not support Basic Auth header and expects client_id/secret in body.
-    // Let's try adding them to body as fallback/standard practice for some providers.
+    // Authorization Header is NOT needed according to documentation when using signature
+    // But some implementations might still expect Basic Auth or Bearer if specified otherwise.
+    // The doc says: "Params format: BODY: application/x-www-form-urlencoded"
+    // And does NOT mention Authorization header for token request, only parameters in body.
     
-    const credentials = Buffer.from(`${process.env.RENTEON_CLIENT_ID}:${process.env.RENTEON_CLIENT_SECRET}`).toString('base64');
-
     const response = await fetch(RENTEON_TOKEN_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${credentials}`
+        'Content-Type': 'application/x-www-form-urlencoded'
       },
       body: params
     });
