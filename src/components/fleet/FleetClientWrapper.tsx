@@ -157,24 +157,14 @@ export function FleetClientWrapper({ cars, dictionary, options }: FleetClientWra
 
         {filteredCars.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-            <AnimatePresence mode="popLayout">
               {filteredCars.map((car) => (
-                <motion.div
-                  key={car.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.2 }}
-                >
                   <FleetCard 
+                    key={car.id}
                     car={car} 
                     dictionary={dictionary}
                     searchParams={Object.fromEntries(searchParams.entries())}
                   />
-                </motion.div>
               ))}
-            </AnimatePresence>
           </div>
         ) : (
           <div className="text-center py-24 bg-zinc-50 rounded-3xl border border-zinc-100">
