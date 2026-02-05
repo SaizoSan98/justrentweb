@@ -21,7 +21,8 @@ export async function testRenteonConnection() {
     if (!token) throw new Error("Failed to obtain access token")
 
     // 2. Test Data Fetch (e.g. Offices)
-    const response = await fetch('https://justrentandtrans.s11.renteon.com/en/api/v1/offices', {
+    // Removed 'v1' from URL based on 404 error and documentation pattern: https://{host}/{culture}/api/{controller}/{action}
+    const response = await fetch('https://justrentandtrans.s11.renteon.com/en/api/offices', {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
