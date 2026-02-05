@@ -5,23 +5,26 @@ import Image from "next/image"
 
 export function BrandStrip() {
   const brands = [
-    { name: "Skoda", slug: "skoda" },
-    { name: "BMW", slug: "bmw" },
+    { name: "Mercedes", slug: "mercedes" },
+    { name: "Range Rover", slug: "landrover" },
+    { name: "Volvo", slug: "volvo" },
+    { name: "Ford", slug: "ford" },
+    { name: "Omoda", slug: "https://upload.wikimedia.org/wikipedia/commons/b/b8/Omoda_wordmark.svg" },
     { name: "Audi", slug: "audi" },
+    { name: "BMW", slug: "bmw" },
+    { name: "Volkswagen", slug: "volkswagen" },
+    { name: "Toyota", slug: "toyota" },
+    { name: "Skoda", slug: "skoda" },
     { name: "Seat", slug: "seat" },
-    { name: "Mercedes", slug: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Mercedes-Benz_logo.svg/1024px-Mercedes-Benz_logo.svg.png" },
     { name: "Mini", slug: "mini" },
     { name: "KIA", slug: "kia" },
     { name: "Hyundai", slug: "hyundai" },
     { name: "Peugeot", slug: "peugeot" },
     { name: "Renault", slug: "renault" },
     { name: "Citroën", slug: "citroen" },
-    { name: "Land Rover", slug: "landrover" }, 
     { name: "Nissan", slug: "nissan" },
     { name: "Mazda", slug: "mazda" },
-    { name: "Toyota", slug: "toyota" },
-    { name: "Volkswagen", slug: "volkswagen" },
-    { name: "CUPRA", slug: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Cupra_Logo.svg/1200px-Cupra_Logo.svg.png" } 
+    { name: "CUPRA", slug: "cupra" } 
   ]
 
   return (

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
+import { getBrandLogo } from "@/lib/brand-logos"
 
 type PricingTier = {
   minDays: number
@@ -156,6 +157,17 @@ export function FleetCard({
 
         {/* Image */}
         <div className="relative aspect-[16/9] w-full flex items-center justify-center my-2 bg-zinc-50 rounded-xl overflow-hidden cursor-pointer" onClick={handleToggle}>
+            {/* Brand Logo Overlay */}
+            <div className="absolute top-3 left-3 w-8 h-8 z-10 opacity-50 group-hover:opacity-100 transition-opacity grayscale group-hover:grayscale-0">
+               <Image 
+                  src={getBrandLogo(car.make)}
+                  alt={car.make}
+                  fill
+                  className="object-contain"
+                  unoptimized
+               />
+            </div>
+
             <Image
               src={car.imageUrl || "/placeholder-car.png"}
               alt={`${car.make} ${car.model}`}
@@ -206,6 +218,17 @@ export function FleetCard({
            {/* LEFT SIDE: DARK (Image + Specs) */}
            <div className="w-full md:w-[55%] bg-white md:bg-[#0a0a0a] text-zinc-900 md:text-white p-8 relative flex flex-col justify-between">
               
+              {/* Brand Logo Watermark */}
+              <div className="absolute top-8 right-8 w-12 h-12 opacity-50 md:opacity-20 z-10">
+                 <Image 
+                    src={getBrandLogo(car.make)}
+                    alt={car.make}
+                    fill
+                    className="object-contain md:invert"
+                    unoptimized
+                 />
+              </div>
+
               {/* Header */}
               <div className="space-y-1 relative z-10">
                  <h2 className="text-3xl font-black uppercase tracking-tight">{car.make} {car.model}</h2>

@@ -84,6 +84,19 @@ export function FleetClientWrapper({ cars, dictionary, options }: FleetClientWra
     updateUrl(newFilters)
   }
 
+  const handleClearAll = () => {
+    const newFilters = {
+        categories: [],
+        transmissions: [],
+        fuelTypes: [],
+        seats: [],
+        guaranteedModel: false,
+        make: ""
+    }
+    setFilters(newFilters)
+    updateUrl(newFilters)
+  }
+
   // Filter Logic
   const filteredCars = useMemo(() => {
     return cars.filter(car => {
@@ -133,6 +146,7 @@ export function FleetClientWrapper({ cars, dictionary, options }: FleetClientWra
         <ActiveFilters 
           filters={filters} 
           onChange={handleFilterChange} 
+          onClearAll={handleClearAll}
         />
 
         <div className="mb-6 flex justify-between items-center">
@@ -168,18 +182,7 @@ export function FleetClientWrapper({ cars, dictionary, options }: FleetClientWra
              <h3 className="text-xl font-bold text-zinc-900 mb-2">No vehicles found</h3>
              <p className="text-zinc-500">Try adjusting your filters to see more results.</p>
              <button 
-                onClick={() => {
-                    const reset = {
-                        categories: [],
-                        transmissions: [],
-                        fuelTypes: [],
-                        seats: [],
-                        guaranteedModel: false,
-                        make: ""
-                    }
-                    setFilters(reset)
-                    updateUrl(reset)
-                }}
+                onClick={handleClearAll}
                 className="mt-6 text-red-600 font-bold hover:underline"
              >
                 Clear all filters

@@ -31,6 +31,7 @@ export function FleetFilters({
   const categoriesList = options?.categories || CATEGORIES
   const transmissionsList = options?.transmissions || TRANSMISSIONS
   const fuelTypesList = options?.fuelTypes || FUEL_TYPES
+  const seatsList = options?.seats || [2, 4, 5, 7, 9]
   
   return (
     <div className="space-y-8 text-zinc-900 bg-white">
@@ -132,6 +133,63 @@ export function FleetFilters({
                 </Button>
              )
           })}
+        </div>
+      </div>
+
+      <div className="h-px bg-zinc-100 w-full" />
+
+      {/* Seats */}
+      <div className="space-y-4">
+         <div className="flex items-center justify-between">
+            <h4 className="font-bold text-sm uppercase tracking-wider text-zinc-900">Seats</h4>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {seatsList.map((seat: number) => {
+             const isSelected = filters.seats.includes(seat)
+             return (
+                <Button
+                    key={seat}
+                    variant="outline"
+                    onClick={() => {
+                        const newSeats = isSelected
+                            ? filters.seats.filter((s) => s !== seat)
+                            : [...filters.seats, seat]
+                        onChange('seats', newSeats)
+                    }}
+                    className={cn(
+                        "rounded-full h-9 px-4 text-xs font-bold transition-all border",
+                        isSelected 
+                            ? "bg-black text-white border-black hover:bg-zinc-800 hover:text-white" 
+                            : "bg-white text-zinc-600 border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-900"
+                    )}
+                >
+                    {seat} Seats
+                </Button>
+             )
+          })}
+        </div>
+      </div>
+
+      <div className="h-px bg-zinc-100 w-full" />
+
+      {/* Options */}
+      <div className="space-y-4">
+         <div className="flex items-center justify-between">
+            <h4 className="font-bold text-sm uppercase tracking-wider text-zinc-900">Options</h4>
+        </div>
+        <div className="flex flex-wrap gap-2">
+            <Button
+                variant="outline"
+                onClick={() => onChange('guaranteedModel', !filters.guaranteedModel)}
+                className={cn(
+                    "rounded-full h-9 px-4 text-xs font-bold transition-all border",
+                    filters.guaranteedModel 
+                        ? "bg-black text-white border-black hover:bg-zinc-800 hover:text-white" 
+                        : "bg-white text-zinc-600 border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-900"
+                )}
+            >
+                Guaranteed Model
+            </Button>
         </div>
       </div>
       

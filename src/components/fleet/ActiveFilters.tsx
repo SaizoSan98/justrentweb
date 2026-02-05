@@ -12,9 +12,10 @@ interface ActiveFiltersProps {
     make: string
   }
   onChange: (key: any, value: any) => void
+  onClearAll?: () => void
 }
 
-export function ActiveFilters({ filters, onChange }: ActiveFiltersProps) {
+export function ActiveFilters({ filters, onChange, onClearAll }: ActiveFiltersProps) {
   const activeFilters = []
 
   // Collect all active filters
@@ -46,6 +47,10 @@ export function ActiveFilters({ filters, onChange }: ActiveFiltersProps) {
   }
 
   const clearAll = () => {
+      if (onClearAll) {
+          onClearAll()
+          return
+      }
       onChange("categories", [])
       onChange("transmissions", [])
       onChange("fuelTypes", [])

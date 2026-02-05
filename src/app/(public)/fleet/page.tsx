@@ -118,7 +118,7 @@ export default async function FleetPage({
                  <BookingEngine 
                     initialStartDate={startDate} 
                     initialEndDate={endDate}
-                    className="shadow-xl"
+                    noShadow={true}
                  />
             </div>
 
