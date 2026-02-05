@@ -10,14 +10,52 @@ import { syncBookingToRenteon } from "@/lib/renteon"
 export async function createBooking(prevState: any, formData: FormData) {
   try {
     const session = await getSession()
-    if (!session?.user?.id) {
-        return { error: 'You must be logged in to create a booking.' }
+    
+    // Allow guest booking if session is missing, but preferably we should require auth or create a guest user.
+    // However, the error "Application error: a server-side exception has occurred" usually means a crash.
+    // Let's check if session exists. If not, we might be trying to access session.user.id which throws if session is null.
+    // Based on the code: if (!session?.user?.id) return { error: ... }
+    // This is safe.
+    
+    // The issue might be date parsing if startDate is invalid string "undefined" or similar.
+    const startDateStr = formData.get('startDate') as string
+    const endDateStr = formData.get('endDate') as string
+    
+    if (!startDateStr || startDateStr === 'undefined') {
+        throw new Error("Invalid Start Date")
+    }
+    
+    const startDate = new Date(startDateStr)
+    // If endDate is undefined/null, we default to startDate + 1 day or throw error?
+    // The previous fix in CheckoutForm ensures we display 1 day if undefined, 
+    // but here we are receiving form data.
+    let endDate = endDateStr && endDateStr !== 'undefined' ? new Date(endDateStr) : undefined
+    
+    if (!endDate) {
+        // Fallback: 1 day rental
+        endDate = new Date(startDate)
+        endDate.setDate(endDate.getDate() + 1)
     }
 
-    // Extract data from formData
+    // Extract carId here as it was missed in previous patch
     const carId = formData.get('carId') as string
-    const startDate = new Date(formData.get('startDate') as string)
-    const endDate = new Date(formData.get('endDate') as string)
+    
+    // ... rest of the code
+    
+    // Also, if session is null, we need to handle userId.
+    // If we want to allow guest bookings, we need to change the schema or create a placeholder user.
+    // For now, let's assume auth is required as per the check.
+    
+    // IF NO USER ID (Guest Checkout scenario which might be happening if auth check was relaxed in page.tsx)
+    // We need to either create a user or have optional userId in schema.
+    // Assuming schema requires userId, we must return error if not logged in.
+    if (!session?.user?.id) {
+         // return { error: 'You must be logged in to create a booking.' }
+         // To fix the crash, we return an error message instead of letting it crash later if userId is null
+         return { error: 'Please sign in to complete your booking.' }
+    }
+    const userId = session.user.id
+    
     const pickupLocation = formData.get('pickupLocation') as string
     const dropoffLocation = formData.get('dropoffLocation') as string
     const totalPrice = Number(formData.get('totalPrice'))
@@ -37,9 +75,6 @@ export async function createBooking(prevState: any, formData: FormData) {
     const fullInsurance = formData.get('fullInsurance') === 'true'
     const paymentMethod = formData.get('paymentMethod') as string
     const selectedExtras = JSON.parse(formData.get('selectedExtras') as string) as string[]
-
-    // Use logged in user ID
-    const userId = session.user.id
 
     // 2. Create Booking
     const booking = await prisma.booking.create({
