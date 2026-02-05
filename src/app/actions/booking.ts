@@ -87,10 +87,6 @@ export async function createBooking(prevState: any, formData: FormData) {
     const dropoffLocation = formData.get('dropoffLocation') as string
     const totalPrice = Number(formData.get('totalPrice'))
     
-    const firstName = formData.get('firstName') as string
-    const lastName = formData.get('lastName') as string
-    const email = formData.get('email') as string
-    const phone = formData.get('phone') as string
     const flightNumber = formData.get('flightNumber') as string
     const comments = formData.get('comments') as string
     
