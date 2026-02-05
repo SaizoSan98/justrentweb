@@ -100,8 +100,8 @@ export async function syncCarsFromRenteon() {
             pricePerDay: 50, // Default, will need real pricing later
             imageUrl: cat.CarModelImageURL || null,
             isAvailable: true,
-            renteonId: cat.Id.toString() // We should store this! But we need to check if schema has it.
-            // If schema doesn't have renteonId, we rely on licensePlate or add column later.
+            renteonId: cat.Id.toString(),
+            mileage: 0 // Default mileage for new cars synced from Renteon
         }
 
         // Check if exists by our virtual license plate
