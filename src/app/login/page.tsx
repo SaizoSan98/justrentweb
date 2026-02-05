@@ -11,6 +11,7 @@ import { LoginButton } from "@/components/auth/LoginButton"
 import { RegisterButton } from "@/components/auth/RegisterButton"
 import { Suspense } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ArrowLeft } from "lucide-react"
 
 // Separate component to handle search params in Suspense
 function AuthForm({ searchParams }: { searchParams?: { error?: string, tab?: string } }) {
@@ -18,7 +19,12 @@ function AuthForm({ searchParams }: { searchParams?: { error?: string, tab?: str
   const defaultTab = searchParams?.tab || "login"
 
   return (
-    <Card className="w-full max-w-md shadow-2xl border-zinc-200 overflow-hidden">
+    <div className="w-full max-w-md">
+      <Link href="/" className="inline-flex items-center text-sm text-zinc-500 hover:text-zinc-900 mb-6 transition-colors">
+        <ArrowLeft className="w-4 h-4 mr-2" />
+        Back to Home
+      </Link>
+      <Card className="w-full shadow-2xl border-zinc-200 overflow-hidden">
       <CardHeader className="space-y-2 pb-6 bg-zinc-50 border-b border-zinc-100">
         <div className="text-center mb-4 flex justify-center">
             <Logo variant="dark" className="scale-125" />
@@ -91,7 +97,8 @@ function AuthForm({ searchParams }: { searchParams?: { error?: string, tab?: str
           </TabsContent>
         </CardContent>
       </Tabs>
-    </Card>
+      </Card>
+    </div>
   )
 }
 
