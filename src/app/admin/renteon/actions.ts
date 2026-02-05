@@ -162,33 +162,66 @@ export async function syncCarsFromRenteon() {
                     existingId = existingByLp?.id;
                 }
 
-                if (existingId) {
-                    await prisma.car.update({
-                        where: { id: existingId },
-                        data: {
-                            make: carData.make,
-                            model: carData.model,
-                            year: carData.year,
-                            imageUrl: carData.imageUrl,
+                try {
+                    if (existingId) {
+                        await prisma.car.update({
+                            where: { id: existingId },
+                            data: {
+                                make: carData.make,
+                                model: carData.model,
+                                year: carData.year,
+                                imageUrl: carData.imageUrl,
+                                transmission: carData.transmission as any,
+                                fuelType: carData.fuelType as any,
+                                seats: carData.seats,
+                                doors: carData.doors,
+                                renteonId: carData.renteonId,
+                                categories: carData.categories
+                            } as any
+                        })
+                        updatedCount++
+                    } else {
+                        await prisma.car.create({
+                            data: {
+                            ...carData,
+                            status: 'AVAILABLE', // explicit enum
                             transmission: carData.transmission as any,
                             fuelType: carData.fuelType as any,
-                            seats: carData.seats,
-                            doors: carData.doors,
-                            renteonId: carData.renteonId,
-                            categories: carData.categories
-                        } as any
-                    })
-                    updatedCount++
-                } else {
-                    await prisma.car.create({
-                        data: {
-                           ...carData,
-                           status: 'AVAILABLE', // explicit enum
-                           transmission: carData.transmission as any,
-                           fuelType: carData.fuelType as any,
-                        } as any
-                    })
-                    createdCount++
+                            } as any
+                        })
+                        createdCount++
+                    }
+                } catch (err: any) {
+                    // Handle Unique Constraint Violation (P2002)
+                    if (err.code === 'P2002') {
+                        console.warn(`Unique constraint failed for Car ${carData.renteonId}. Retrying update...`);
+                        // Force find by renteonId again
+                        const forceFound = await prisma.car.findUnique({
+                            where: { renteonId: carData.renteonId } as any
+                        });
+                        
+                        if (forceFound) {
+                             await prisma.car.update({
+                                where: { id: forceFound.id },
+                                data: {
+                                    make: carData.make,
+                                    model: carData.model,
+                                    year: carData.year,
+                                    imageUrl: carData.imageUrl,
+                                    transmission: carData.transmission as any,
+                                    fuelType: carData.fuelType as any,
+                                    seats: carData.seats,
+                                    doors: carData.doors,
+                                    categories: carData.categories
+                                } as any
+                            })
+                            updatedCount++
+                        } else {
+                             console.error(`Failed to recover from unique constraint error for ${carData.renteonId}`, err);
+                        }
+                    } else {
+                        console.error(`Failed to sync car ${carData.renteonId}`, err);
+                    }
                 }
             }
         } else {
@@ -220,24 +253,49 @@ export async function syncCarsFromRenteon() {
 
             // ... Upsert logic (simplified for brevity, reused)
             const existing = await prisma.car.findUnique({ where: { licensePlate: carData.licensePlate } });
-            if (existing) {
-                await prisma.car.update({
-                    where: { id: existing.id },
-                    data: {
-                        make: carData.make,
-                        model: carData.model,
-                        imageUrl: carData.imageUrl,
-                        transmission: carData.transmission as any,
-                        fuelType: carData.fuelType as any,
-                        seats: carData.seats,
-                        categories: carData.categories,
-                        renteonId: carData.renteonId
-                    } as any
-                })
-                updatedCount++
-            } else {
-                await prisma.car.create({ data: carData as any })
-                createdCount++
+            
+            try {
+                if (existing) {
+                    await prisma.car.update({
+                        where: { id: existing.id },
+                        data: {
+                            make: carData.make,
+                            model: carData.model,
+                            imageUrl: carData.imageUrl,
+                            transmission: carData.transmission as any,
+                            fuelType: carData.fuelType as any,
+                            seats: carData.seats,
+                            categories: carData.categories,
+                            renteonId: carData.renteonId
+                        } as any
+                    })
+                    updatedCount++
+                } else {
+                    await prisma.car.create({ data: carData as any })
+                    createdCount++
+                }
+            } catch (err: any) {
+                if (err.code === 'P2002') {
+                    // Similar retry logic for fallback
+                     const forceFound = await prisma.car.findUnique({
+                        where: { renteonId: carData.renteonId } as any
+                    });
+                    if (forceFound) {
+                        await prisma.car.update({
+                            where: { id: forceFound.id },
+                            data: {
+                                // Update basic fields, keep existing details if possible?
+                                // Fallback logic is aggressive, but we must respect unique constraint
+                                make: carData.make,
+                                model: carData.model,
+                                renteonId: carData.renteonId
+                            } as any
+                        })
+                        updatedCount++
+                    }
+                } else {
+                    console.error("Fallback Sync Failed:", err)
+                }
             }
         }
     }
