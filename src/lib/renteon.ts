@@ -311,6 +311,14 @@ export async function syncBookingToRenteon(booking: any) {
     }
 
     // 5. Save Booking
+    // Check if services are valid before sending back
+    if (bookingModel.Services) {
+        bookingModel.Services = bookingModel.Services.map((s: any) => ({
+            ...s,
+            // Ensure numbers are numbers, etc. Renteon might be strict.
+        }));
+    }
+
     const saveResponse = await fetch(`${RENTEON_API_URL}/bookings/save`, {
       method: 'POST',
       headers: {

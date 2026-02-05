@@ -109,8 +109,12 @@ export async function createBooking(prevState: any, formData: FormData) {
     })
 
     // 3. Send Confirmation Email (Async, don't block response)
-    // We await it here to ensure it works, but in high load you might offload it.
-    await sendBookingConfirmationEmail(booking)
+    // We wrap this in a try-catch to ensure it doesn't crash the main flow if email fails
+    try {
+      await sendBookingConfirmationEmail(booking)
+    } catch (emailError) {
+      console.error("Failed to send confirmation email:", emailError)
+    }
 
     // 4. Sync to Renteon (Fire and forget, or log errors)
     // We don't await this to fail the request, but we log the output
@@ -120,6 +124,7 @@ export async function createBooking(prevState: any, formData: FormData) {
     
   } catch (error) {
     console.error('Booking creation failed:', error)
-    return { error: 'Failed to create booking. Please try again.' }
+    // Return a clean error message to the client instead of crashing
+    return { error: 'Something went wrong while creating your booking. Please try again.' }
   }
 }
