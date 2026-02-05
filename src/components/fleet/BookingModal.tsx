@@ -620,7 +620,7 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                           )}
                           {selectedInsurance && (
                              <div className="flex justify-between">
-                                <span>{selectedInsurance.plan.name}</span>
+                                <span>{selectedInsurance.plan?.name}</span>
                                 <span>{insuranceCost.toLocaleString()} Ft</span>
                              </div>
                           )}
