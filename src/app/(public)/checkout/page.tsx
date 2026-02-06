@@ -80,7 +80,7 @@ export default async function CheckoutPage({
   const days = Math.max(1, Math.ceil(durationMs / (1000 * 60 * 60 * 24)));
   
   const effectivePricePerDay = renteonPrice > 0 
-      ? renteonPrice / days 
+      ? Math.round(renteonPrice / days) 
       : Number(car.pricePerDay);
 
   const effectiveDeposit = renteonDeposit > 0 

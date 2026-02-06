@@ -122,7 +122,8 @@ export default async function FleetPage({
           
           if (renteonData) {
               // Override pricePerDay with Renteon's effective daily rate
-              newCar.pricePerDay = (renteonData.amount / days) as any;
+              // Round to nearest integer to avoid decimals like 109.993
+              newCar.pricePerDay = Math.round(renteonData.amount / days) as any;
               
               // Override Deposit
               if (renteonData.deposit > 0) {
