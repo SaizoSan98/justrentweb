@@ -27,12 +27,12 @@ function findMatchingImage(make: string, model: string): string | null {
     
     if (exactMatch) return `/carpictures/${exactMatch}`
 
-    // 2. Try Partial Match (Model contains Make or vice versa handling)
-    // Some files are just "Model.webp" if model is unique enough, or "Make Model suffix.webp"
+    // 2. Try Partial Match (Relaxed)
+    // Split make and model into parts and check if ALL parts of the filename are present in the car data OR vice versa
     const partialMatch = files.find(f => {
-        const lower = f.toLowerCase()
-        // Check if file name contains both make and model parts
-        // e.g. "VW GOLF.webp" matches make="Volkswagen" model="Golf" -> need to handle aliases
+        const fileName = f.toLowerCase().replace(/\.[^/.]+$/, ""); // Remove extension
+        
+        // Simple aliases
         const makeAliases: Record<string, string[]> = {
             'volkswagen': ['vw'],
             'vw': ['volkswagen'],
@@ -42,10 +42,21 @@ function findMatchingImage(make: string, model: string): string | null {
             'toyota': ['toyota']
         }
 
-        const makeChecks = [normalizedMake, ...(makeAliases[normalizedMake] || [])]
-        const hasMake = makeChecks.some(m => lower.includes(m))
+        const makeChecks = [normalizedMake, ...(makeAliases[normalizedMake] || [])];
+        const hasMake = makeChecks.some(m => fileName.includes(m));
         
-        return hasMake && lower.includes(normalizedModel)
+        // If make is found, check if model parts are found
+        if (hasMake) {
+             // Split model into words (e.g. "Yaris Cross" -> ["yaris", "cross"])
+             const modelParts = normalizedModel.split(' ').filter(p => p.length > 1);
+             // Check if fileName contains the main model part
+             return modelParts.some(part => fileName.includes(part));
+        }
+        
+        // Fallback: If filename starts with the model directly (e.g. "Golf.webp")
+        if (fileName.includes(normalizedModel)) return true;
+
+        return false;
     })
 
     if (partialMatch) return `/carpictures/${partialMatch}`
@@ -267,77 +278,48 @@ export async function syncCarsFromRenteon() {
     if (token) {
         console.log("Fetching Real Prices with multi-strategy approach...");
         
-        // Dates to try: Tomorrow, Next Week, Next Month (to avoid availability issues)
-        const datesToTry = [1, 7, 30];
-        
-        // Fetch in parallel batches
-        const batchSize = 3; // Reduced batch size for stability with more retries
+        // Use a future date (e.g., 30 days from now) to ensure availability
+        // This is a "sample" price to populate the DB, but REAL prices are fetched live on Checkout
+        const startDate = new Date(); 
+        startDate.setDate(startDate.getDate() + 30);
+        const endDate = new Date(startDate); 
+        endDate.setDate(startDate.getDate() + 3);
+
+        const batchSize = 5;
         for (let i = 0; i < categories.length; i += batchSize) {
             const batch = categories.slice(i, i + batchSize);
             await Promise.all(batch.map(async (cat: any) => {
                 try {
-                    let price = 0;
-                    
-                    for (const dayOffset of datesToTry) {
-                        if (price > 0) break; // Stop if found
+                    // Try simple calculation first
+                    const payload = {
+                        CarCategoryId: cat.Id,
+                        OfficeOutId: 54, // Vecsés
+                        OfficeInId: 54,
+                        DateOut: startDate.toISOString(),
+                        DateIn: endDate.toISOString(),
+                        Currency: "EUR",
+                        BookAsCommissioner: true,
+                        PricelistId: 306
+                    };
 
-                        const startDate = new Date(); 
-                        startDate.setDate(startDate.getDate() + dayOffset);
-                        const endDate = new Date(startDate); 
-                        endDate.setDate(startDate.getDate() + 1);
+                    const res = await fetch(`${RENTEON_API_URL}/bookings/calculate`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
 
-                        // Strategies to try
-                        const strategies = [
-                            { name: "WEB-PL306", off: 54, pl: 306, comm: true },
-                            { name: "Off54-PL351", off: 54, pl: 351, comm: true },
-                            { name: "Off53-PL351", off: 53, pl: 351, comm: true },
-                            { name: "Off54-NoPL", off: 54, pl: undefined, comm: true },
-                            { name: "Off53-NoPL", off: 53, pl: undefined, comm: true },
-                        ];
-
-                        for (const strat of strategies) {
-                            if (price > 0) break;
-
-                            const payload: any = {
-                                CarCategoryId: cat.Id,
-                                OfficeOutId: strat.off,
-                                OfficeInId: strat.off,
-                                DateOut: startDate.toISOString(),
-                                DateIn: endDate.toISOString(),
-                                Currency: "EUR",
-                                BookAsCommissioner: strat.comm
-                            };
-                            if (strat.pl) payload.PricelistId = strat.pl;
-
-                            try {
-                                const res = await fetch(`${RENTEON_API_URL}/bookings/calculate`, {
-                                    method: 'POST',
-                                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                                    body: JSON.stringify(payload)
-                                });
-
-                                if (res.ok) {
-                                    const data = await res.json();
-                                    if (data.Total && data.Total > 10) { // Basic sanity check > 10 EUR
-                                        price = data.Total;
-                                        console.log(`Price found for Cat ${cat.Id} (${cat.CarCategoryGroup}) via ${strat.name} (Day +${dayOffset}): ${price} EUR`);
-                                    }
-                                }
-                            } catch (e) { /* Ignore individual strategy failures */ }
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.Total && data.Total > 0) {
+                            const dailyPrice = data.Total / 3; // 3 days
+                            priceMap.set(cat.Id, Math.round(dailyPrice));
                         }
                     }
-
-                    if (price > 0) {
-                        priceMap.set(cat.Id, price);
-                    } else {
-                        console.warn(`All pricing strategies failed for Cat ${cat.Id}`);
-                    }
                 } catch (e) {
-                    console.error(`Error fetching price for cat ${cat.Id}`, e);
+                    console.error(`Price fetch failed for cat ${cat.Id}`);
                 }
             }));
         }
-        console.log(`Real Pricing: Found prices for ${priceMap.size} categories.`);
     }
 
     // 0b. Remove Smart Pricing Fallback - User requested RAW Renteon data only.
@@ -633,7 +615,7 @@ export async function syncCarsFromRenteon() {
 
     revalidatePath("/admin/cars")
     
-    const priceSourceStats = `Prices: ${priceMap.size} from Renteon/History (2-year lookback), ${categories.length - priceMap.size} defaulted to 50€. (Note: Real-time pricing API returned 'No Availability' or 422 for most checks. Used extended historical booking data where possible.)`;
+    const priceSourceStats = `Prices: ${priceMap.size} fetched from Renteon (Sample calculation), ${categories.length - priceMap.size} defaulted. (Note: Live prices are always fetched on Checkout)`;
         return { 
             success: true, 
         message: `Synced ${categories.length} categories. Created ${createdCount}, updated ${updatedCount} cars. ${priceSourceStats}`,
