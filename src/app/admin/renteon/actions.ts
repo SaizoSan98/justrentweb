@@ -4,8 +4,58 @@ import { getSession } from "@/lib/auth"
 import { getRenteonToken, fetchCarCategories, fetchRenteonServices } from "@/lib/renteon"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
+import fs from "fs"
+import path from "path"
 
 const RENTEON_API_URL = "https://justrentandtrans.s11.renteon.com/en/api"
+
+// Helper to find matching image in public/carpictures
+function findMatchingImage(make: string, model: string): string | null {
+  try {
+    const dir = path.join(process.cwd(), 'public', 'carpictures')
+    if (!fs.existsSync(dir)) return null
+    
+    const files = fs.readdirSync(dir)
+    const normalizedMake = make.toLowerCase().trim()
+    const normalizedModel = model.toLowerCase().trim()
+    
+    // 1. Try Exact Match "Make Model.ext"
+    const exactMatch = files.find(f => {
+        const lower = f.toLowerCase()
+        return lower.includes(normalizedMake) && lower.includes(normalizedModel)
+    })
+    
+    if (exactMatch) return `/carpictures/${exactMatch}`
+
+    // 2. Try Partial Match (Model contains Make or vice versa handling)
+    // Some files are just "Model.webp" if model is unique enough, or "Make Model suffix.webp"
+    const partialMatch = files.find(f => {
+        const lower = f.toLowerCase()
+        // Check if file name contains both make and model parts
+        // e.g. "VW GOLF.webp" matches make="Volkswagen" model="Golf" -> need to handle aliases
+        const makeAliases: Record<string, string[]> = {
+            'volkswagen': ['vw'],
+            'vw': ['volkswagen'],
+            'mercedes-benz': ['mercedes', 'merc'],
+            'mercedes': ['mercedes-benz', 'merc'],
+            'bmw': ['bmw'],
+            'toyota': ['toyota']
+        }
+
+        const makeChecks = [normalizedMake, ...(makeAliases[normalizedMake] || [])]
+        const hasMake = makeChecks.some(m => lower.includes(m))
+        
+        return hasMake && lower.includes(normalizedModel)
+    })
+
+    if (partialMatch) return `/carpictures/${partialMatch}`
+
+    return null
+  } catch (e) {
+    console.error("Image matching error:", e)
+    return null
+  }
+}
 
 export async function testRenteonConnection() {
   const session = await getSession()
@@ -476,6 +526,10 @@ export async function syncCarsFromRenteon() {
             const fallbackPrice = getFallbackPrice(make, modelName, groupName);
             const finalPrice = priceMap.get(cat.Id) || fallbackPrice;
 
+            // Try to find a matching local image
+            const localImage = findMatchingImage(make, modelName);
+            const finalImageUrl = localImage || cat.CarModelImageURL || null;
+
             const carData = {
                 make: make,
                 model: modelName,
@@ -483,7 +537,7 @@ export async function syncCarsFromRenteon() {
                 licensePlate: `RT-${cat.SIPP}-${cat.Id}`,
                 seats: cat.PassengerCapacity || 5,
                 pricePerDay: finalPrice,
-                imageUrl: cat.CarModelImageURL || null,
+                imageUrl: finalImageUrl,
                 status: 'AVAILABLE',
                 renteonId: cat.Id.toString(),
                 mileage: 0,
@@ -513,7 +567,9 @@ export async function syncCarsFromRenteon() {
                         data: {
                             make: carData.make,
                             model: carData.model,
-                            imageUrl: carData.imageUrl,
+                            // Only update image if we found a better local one or if current is null
+                            // If we found a local image, FORCE update it. 
+                            ...(localImage ? { imageUrl: localImage } : {}), 
                             transmission: carData.transmission as any,
                             fuelType: carData.fuelType as any,
                             seats: carData.seats,
