@@ -18,12 +18,16 @@ function findMatchingImage(make: string, model: string): string | null {
     const files = fs.readdirSync(dir)
     
     // Normalize: lowercase, remove accents, handle special chars
-    const normalize = (str: string, keepHyphens: boolean = false) => {
+    const normalize = (str: string, keepHyphens: boolean = false, isFilename: boolean = false) => {
         let s = str.toLowerCase().trim()
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
         .replace(/\(.*\)/g, '') // Remove (8s) etc
-        .replace(/\.[^/.]+$/, "") // Remove extension if passed
-        .trim();
+        
+        if (isFilename) {
+            s = s.replace(/\.[^/.]+$/, "") // Remove extension only if it's a filename
+        }
+
+        s = s.trim();
 
         if (!keepHyphens) {
             s = s.replace(/-/g, ' ').replace(/_/g, ' ');
@@ -93,8 +97,8 @@ function findMatchingImage(make: string, model: string): string | null {
     let bestScore = 0;
 
     for (const file of files) {
-        const normalizedFile = normalize(file);
-        const fileWithHyphens = normalize(file, true);
+        const normalizedFile = normalize(file, false, true);
+        const fileWithHyphens = normalize(file, true, true);
         let score = 0;
 
         // 1. CHECK FOR CONFLICTING MAKE
