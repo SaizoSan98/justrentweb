@@ -29,7 +29,12 @@ export default async function FleetPage({
   const startDateStr = typeof params.startDate === 'string' ? params.startDate : undefined;
   const endDateStr = typeof params.endDate === 'string' ? params.endDate : undefined;
   
-  const startDate = startDateStr ? new Date(startDateStr) : new Date();
+  // Calculate default start date (Next hour)
+  const defaultStartDate = new Date();
+  defaultStartDate.setHours(defaultStartDate.getHours() + 1);
+  defaultStartDate.setMinutes(0, 0, 0);
+
+  const startDate = startDateStr ? new Date(startDateStr) : defaultStartDate;
   const endDate = endDateStr ? new Date(endDateStr) : undefined;
   
   const queryEndDate = endDate || new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
