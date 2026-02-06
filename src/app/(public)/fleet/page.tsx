@@ -8,6 +8,8 @@ import { cookies } from "next/headers"
 import { dictionaries } from "@/lib/dictionary"
 import { Footer } from "@/components/layout/Footer";
 import { BookingEngine } from "@/components/booking/BookingEngine";
+import { checkRealTimeAvailability } from "@/app/actions/renteon-availability";
+import { mapCarToCategoryId } from "@/lib/renteon";
 
 export const dynamic = 'force-dynamic';
 
@@ -48,16 +50,15 @@ export default async function FleetPage({
     }
   };
 
-  // Fetch ALL available cars for the date range
-  // We do NOT filter by category/make/etc here anymore, to allow instant client-side filtering
-  const [allAvailableCars, extrasData] = await Promise.all([
+  // 1. Fetch Local Cars (Catalog)
+  const [localCars, extrasData] = await Promise.all([
     prisma.car.findMany({
       where: baseWhereClause,
       include: {
         categories: true,
         pricingTiers: true,
         insuranceOptions: {
-            include: { plan: true }
+          include: { plan: true }
         }
       },
       orderBy: {
@@ -68,6 +69,62 @@ export default async function FleetPage({
       orderBy: { price: 'asc' }
     })
   ]);
+
+  // 2. Renteon Availability Check (Real-time)
+  let renteonAvailableCategoryIds: Set<number> | null = null;
+  let renteonPrices = new Map<number, number>(); // Map CatId -> Total Amount
+  
+  // Only check Renteon if we have dates (which we usually do as defaults are set)
+  if (startDate && queryEndDate) {
+      const renteonResult = await checkRealTimeAvailability(startDate, queryEndDate);
+      
+      if (renteonResult.success && Array.isArray(renteonResult.data)) {
+          // Map Renteon results to Category IDs
+          // Renteon availability items typically contain CarCategoryId
+          renteonAvailableCategoryIds = new Set();
+          renteonResult.data.forEach((item: any) => {
+              const catId = item.CarCategoryId || item.CategoryId || item.Id;
+              if (catId) {
+                  renteonAvailableCategoryIds?.add(catId);
+                  // Store Price if available (Amount is usually Total for the period)
+                  if (item.Amount) {
+                      renteonPrices.set(catId, Number(item.Amount));
+                  }
+              }
+          });
+          console.log(`Renteon Real-Time: Found ${renteonAvailableCategoryIds.size} available categories.`);
+      } else {
+          console.warn("Renteon Availability Check Failed or Empty:", renteonResult.error);
+          // If check fails, we might want to fallback to local or show empty. 
+          // For now, if it errors, we treat it as "System unavailable" and fallback to local to avoid empty page on API error.
+          // BUT if it returns success=[] (empty), renteonAvailableCategoryIds will be empty Set, so we show 0 cars.
+      }
+  }
+
+  // 3. Filter Local Cars based on Renteon AND Update Prices
+  let allAvailableCars = localCars;
+  if (renteonAvailableCategoryIds !== null) {
+      // Calculate duration in days for price-per-day calculation
+      const durationMs = queryEndDate.getTime() - startDate.getTime();
+      const days = Math.max(1, Math.ceil(durationMs / (1000 * 60 * 60 * 24)));
+
+      allAvailableCars = localCars.filter(car => {
+          const catId = mapCarToCategoryId(car);
+          return renteonAvailableCategoryIds?.has(catId);
+      }).map(car => {
+          // Clone car to avoid mutating cached object
+          const newCar = { ...car };
+          const catId = mapCarToCategoryId(car);
+          const totalAmount = renteonPrices.get(catId);
+          
+          if (totalAmount !== undefined) {
+              // Override pricePerDay with Renteon's effective daily rate
+              // We use Decimal/Number conversion as prisma returns Decimals
+              newCar.pricePerDay = (totalAmount / days) as any;
+          }
+          return newCar;
+      });
+  }
 
   // Derive filter options from available cars
   const availableCategories = Array.from(new Set(allAvailableCars.flatMap(car => car.categories.map(c => c.name)))).sort();

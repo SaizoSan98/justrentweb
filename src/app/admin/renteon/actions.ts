@@ -238,12 +238,11 @@ export async function syncCarsFromRenteon() {
 
                         // Strategies to try
                         const strategies = [
+                            { name: "WEB-PL306", off: 54, pl: 306, comm: true },
                             { name: "Off54-PL351", off: 54, pl: 351, comm: true },
                             { name: "Off53-PL351", off: 53, pl: 351, comm: true },
                             { name: "Off54-NoPL", off: 54, pl: undefined, comm: true },
                             { name: "Off53-NoPL", off: 53, pl: undefined, comm: true },
-                             // Fallback without Commissioner flag if those fail
-                            { name: "Off54-PL351-NoComm", off: 54, pl: 351, comm: false },
                         ];
 
                         for (const strat of strategies) {
@@ -291,49 +290,14 @@ export async function syncCarsFromRenteon() {
         console.log(`Real Pricing: Found prices for ${priceMap.size} categories.`);
     }
 
-    // 0b. Always run Smart Pricing Fallback for missing items
+    // 0b. Remove Smart Pricing Fallback - User requested RAW Renteon data only.
+    /* 
     if (priceMap.size < categories.length) { 
         console.log(`Real Pricing coverage partial (${priceMap.size}/${categories.length}), attempting Smart Pricing fallback for gaps...`);
-        // ... (Keep existing Smart Pricing logic as fallback)
-        try {
-            const today = new Date();
-            const past = new Date(); past.setDate(today.getDate() - 730); // Increased to 730 days (2 years)
-            const future = new Date(); future.setDate(today.getDate() + 365);
-            const searchPayload = { 
-                DateFrom: past.toISOString(), 
-                DateTo: future.toISOString(),
-                IncludeCancelled: true // Crucial: Use cancelled bookings too as they contain valid price info!
-            };
-            
-            if (token) {
-                const searchRes = await fetch(`${RENTEON_API_URL}/bookings/search`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify(searchPayload)
-                });
-                if (searchRes.ok) {
-                    const bookings = await searchRes.json();
-                    let fallbackCount = 0;
-                    bookings.forEach((b: any) => {
-                        // Ensure we use Total and valid dates
-                        if (b.Total && b.DateOut && b.DateIn && b.CarCategoryId && !priceMap.has(b.CarCategoryId)) {
-                            const start = new Date(b.DateOut);
-                            const end = new Date(b.DateIn);
-                            const days = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
-                            let dailyRate = b.Total / days;
-                            
-                            // Sanity check for daily rate (e.g., avoid 0 or extremely high values)
-                            if (dailyRate > 10 && dailyRate < 1000) {
-                                 priceMap.set(b.CarCategoryId, dailyRate);
-                                 fallbackCount++;
-                            }
-                        }
-                    });
-                    console.log(`Smart Pricing found ${fallbackCount} additional prices from historical bookings (incl. cancelled).`);
-                }
-            }
-        } catch (e) { console.warn("Smart Pricing fallback failed", e); }
+        // ... Smart Pricing logic removed ...
     }
+    */
+    console.log("Skipping Smart Pricing fallback as requested. Using only raw Renteon prices.");
 
     let createdCount = 0
     let updatedCount = 0
@@ -695,14 +659,88 @@ export async function syncExtrasFromRenteon() {
             } catch (e) { console.warn(`Failed ${ep}`, e); }
         }
         
-        // If specific endpoints failed, fall back to generic service fetch
+        // If specific endpoints failed, fall back to generic service fetch OR dummy calculation
         if (equipment.length === 0 && insurances.length === 0) {
              console.log("Specific endpoints failed, trying generic fetchRenteonServices...");
              const services = await fetchRenteonServices();
-             console.log(`Generic fetch returned ${services.length} services.`);
+             
+             // FALLBACK: If standard endpoints failed, try to get services via Calculation
+             if (services.length === 0) {
+                console.log("Standard endpoints returned 0. Attempting to extract services via Dummy Calculation...");
+                try {
+                    // Find a car to calculate with
+                    // Future date: +1 month
+                    const dOut = new Date(); dOut.setDate(dOut.getDate() + 35);
+                    const dIn = new Date(); dIn.setDate(dIn.getDate() + 38);
+                    
+                    const availPayload = {
+                        DateOut: dOut.toISOString(),
+                        DateIn: dIn.toISOString(),
+                        OfficeOutId: 54, 
+                        OfficeInId: 54,
+                        BookAsCommissioner: true,
+                        PricelistId: 306,
+                        Currency: "EUR"
+                    };
+                    
+                    const resAvail = await fetch(`${RENTEON_API_URL}/bookings/availability`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify(availPayload)
+                    });
+                    
+                    if (resAvail.ok) {
+                        const cars = await resAvail.json();
+                        if (Array.isArray(cars) && cars.length > 0) {
+                            const car = cars[0];
+                            const calcPayload = {
+                                ...availPayload,
+                                CarCategoryId: car.CarCategoryId || car.CategoryId || car.Id
+                            };
+                            
+                            const resCalc = await fetch(`${RENTEON_API_URL}/bookings/calculate`, {
+                                method: 'POST',
+                                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                                body: JSON.stringify(calcPayload)
+                            });
+                            
+                            if (resCalc.ok) {
+                                const calcData = await resCalc.json();
+                                if (calcData.Services && Array.isArray(calcData.Services)) {
+                                    console.log(`Calculation Strategy found ${calcData.Services.length} services!`);
+                                    
+                                    calcData.Services.forEach((s: any) => {
+                                        // Extract Price from nested ServicePrice if available, or fallback
+                                        // Based on debug: s.ServicePrice.AmountTotal seems to be the price
+                                        const price = s.ServicePrice?.AmountTotal || s.Price || 0;
+                                        
+                                        // Standardize object
+                                        const item = {
+                                            ...s,
+                                            Price: price,
+                                            Title: s.Name, // Map Name to Title for consistency
+                                            Id: s.ServiceId || s.Id
+                                        };
+                                        services.push(item);
+                                    });
+                                }
+                            }
+                        }
+                    }
+                } catch (calcErr) {
+                    console.error("Calculation Fallback Failed:", calcErr);
+                }
+             }
+
+             console.log(`Generic/Fallback fetch returned ${services.length} services.`);
              // Split services into equipment and insurances
              for (const s of services) {
                 const name = (s.Name || s.Title || "").toLowerCase();
+                const isMandatory = s.IsMandatory === true;
+                
+                // Skip mandatory car rental fees (usually "Car rental - ...")
+                if (isMandatory && name.includes("car rental")) continue;
+
                 if (name.includes('insurance') || name.includes('cdw') || name.includes('protection') || name.includes('excess') || name.includes('sct') || name.includes('fdw')) {
                     insurances.push(s);
                 } else {

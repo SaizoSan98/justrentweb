@@ -20,7 +20,7 @@ function mapLocationToOfficeId(location: string): number {
   return 53; // Budapest Downtown (Default)
 }
 
-function mapCarToCategoryId(car: any): number {
+export function mapCarToCategoryId(car: any): number {
   const make = car.make.toLowerCase();
   const model = car.model.toLowerCase();
   const transmission = car.transmission?.toLowerCase() || '';
@@ -245,6 +245,72 @@ export async function fetchRenteonServices(): Promise<any[]> {
             console.warn(`Failed to fetch from ${ep}:`, innerError);
         }
     }
+
+    // FALLBACK: Calculation Strategy if standard endpoints return nothing
+    if (allServices.length === 0) {
+        console.log("Standard endpoints returned 0 services. Attempting Calculation Strategy...");
+        try {
+            const dOut = new Date(); dOut.setDate(dOut.getDate() + 35);
+            const dIn = new Date(); dIn.setDate(dIn.getDate() + 38);
+            
+            const availPayload = {
+                DateOut: dOut.toISOString(),
+                DateIn: dIn.toISOString(),
+                OfficeOutId: 54, 
+                OfficeInId: 54,
+                BookAsCommissioner: true,
+                PricelistId: 306,
+                Currency: "EUR"
+            };
+            
+            const resAvail = await fetch(`${RENTEON_API_URL}/bookings/availability`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify(availPayload)
+            });
+            
+            if (resAvail.ok) {
+                const cars = await resAvail.json();
+                if (Array.isArray(cars) && cars.length > 0) {
+                    const car = cars[0];
+                    const calcPayload = {
+                        ...availPayload,
+                        CarCategoryId: car.CarCategoryId || car.CategoryId || car.Id
+                    };
+                    
+                    const resCalc = await fetch(`${RENTEON_API_URL}/bookings/calculate`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify(calcPayload)
+                    });
+                    
+                    if (resCalc.ok) {
+                        const calcData = await resCalc.json();
+                        if (calcData.Services && Array.isArray(calcData.Services)) {
+                            console.log(`Calculation Strategy found ${calcData.Services.length} services!`);
+                            calcData.Services.forEach((s: any) => {
+                                // Extract Price from nested ServicePrice if available
+                                const price = s.ServicePrice?.AmountTotal || s.Price || 0;
+                                const item = {
+                                    ...s,
+                                    Price: price,
+                                    Title: s.Name,
+                                    Id: s.ServiceId || s.Id
+                                };
+                                const id = item.Id;
+                                if (id && !seenIds.has(id)) {
+                                    seenIds.add(id);
+                                    allServices.push(item);
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        } catch (calcErr) {
+            console.error("Calculation Strategy Failed:", calcErr);
+        }
+    }
     
     return allServices;
 
@@ -338,7 +404,7 @@ export async function syncBookingToRenteon(booking: any) {
       DateOut: dateOut,
       DateIn: dateIn,
       Currency: "EUR", 
-      PricelistId: 351, // Found via deep probe
+      PricelistId: 306, // WEB Pricelist (ID 306)
       BookAsCommissioner: true // Required for Agency/Partner API users
     };
 

@@ -1,0 +1,59 @@
+
+TÁRGY: API Integrációs Hiba - Pricelists és Availability probléma (JustRent)
+
+Tisztelt Renteon Support!
+
+A JustRent weboldal API integrációján dolgozunk, és az alábbi blokkoló hibákba ütköztünk az árazás lekérésekor:
+
+Felhasználó: [A te API felhasználóneved, pl. xml...]
+
+1. **Árlisták hiánya**: 
+   A `GET /api/pricelists` végpont üres listát (`[]`) ad vissza, pedig a rendszerben aktív árlistáink vannak (pl. ID 351, ID 306).
+
+2. **Nincs elérhetőség (Availability Error)**:
+   A `POST /api/bookings/calculate` végpont minden kérésre `422 Unprocessable Entity` hibát ad az alábbi üzenettel:
+   `"There are no available cars for given criterion."`
+   
+   Próbáltuk az alábbi paraméterekkel:
+   - Dátumok: Holnapi nap, +30 nap, +180 nap (több napos időtartammal is).
+   - Irodák: Budapest (53) és Vecsés (54).
+   - Árlisták: PricelistId 351 és 306.
+   - Agency mód: `BookAsCommissioner: true` és `false` is.
+   - BookingSourceId: 114 (EXTERNAL), 113 (WEBSVC).
+
+Egyedül a korábbi foglalásokból (History) tudtunk árat kinyerni, de az élő kalkuláció nem működik.
+
+Kérjük, ellenőrizzék, hogy az API felhasználónkhoz:
+1. Hozzá vannak-e rendelve a megfelelő árlisták (Contracts/Pricelists)?
+2. Engedélyezve van-e az 'Agency' típusú foglalás kalkulációja?
+
+Köszönettel,
+JustRent Fejlesztő Csapat
+
+---------------------------------------------------------
+[ENGLISH VERSION FOR SUPPORT]
+
+SUBJECT: API Integration Issue - Empty Pricelists & No Availability (JustRent)
+
+Dear Renteon Support,
+
+We are integrating the JustRent webshop via API and facing blocking issues with price calculation:
+
+1. **Empty Pricelists**:
+   `GET /api/pricelists` returns an empty array `[]`, despite having active pricelists (e.g., ID 351, 306).
+
+2. **No Availability Error**:
+   `POST /api/bookings/calculate` returns `422 Unprocessable Entity` with message:
+   `"There are no available cars for given criterion."`
+   
+   We tested with:
+   - Dates: Tomorrow, +30 days, +180 days (various durations).
+   - Offices: IDs 53 and 54.
+   - Pricelists: IDs 351 and 306.
+   - Modes: `BookAsCommissioner: true` and `false`.
+   - BookingSource: 114, 113.
+
+Please verify if our API user has permissions to access these pricelists and perform calculations.
+
+Best regards,
+JustRent Dev Team
