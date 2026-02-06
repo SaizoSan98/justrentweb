@@ -16,30 +16,34 @@ function findMatchingImage(make: string, model: string): string | null {
     if (!fs.existsSync(dir)) return null
     
     const files = fs.readdirSync(dir)
-    const normalizedMake = make.toLowerCase().trim()
-    const normalizedModel = model.toLowerCase().trim()
-    
-    // 1. Try Exact Match "Make Model.ext"
-    const exactMatch = files.find(f => {
-        const lower = f.toLowerCase()
-        return lower.includes(normalizedMake) && lower.includes(normalizedModel)
-    })
-    
-    if (exactMatch) return `/carpictures/${exactMatch}`
+    // Normalize Make and Model: lowercase, remove accents, handle special chars
+    const normalize = (str: string) => str.toLowerCase().trim()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
+        .replace(/-/g, ' ') // Replace hyphens with spaces
+        .replace(/\(.*\)/g, '') // Remove (8s) etc
+        .trim();
 
+    const normalizedMake = normalize(make);
+    const normalizedModel = normalize(model);
+    
     // 2. Try Partial Match (Relaxed)
     // Split make and model into parts and check if ALL parts of the filename are present in the car data OR vice versa
     const partialMatch = files.find(f => {
-        const fileName = f.toLowerCase().replace(/\.[^/.]+$/, ""); // Remove extension
+        // Normalize filename too
+        const fileName = f.toLowerCase().replace(/\.[^/.]+$/, "")
+            .replace(/_/g, ' ').replace(/-/g, ' ')
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); 
         
         // Simple aliases
         const makeAliases: Record<string, string[]> = {
             'volkswagen': ['vw'],
             'vw': ['volkswagen'],
-            'mercedes-benz': ['mercedes', 'merc'],
-            'mercedes': ['mercedes-benz', 'merc'],
+            'mercedes benz': ['mercedes', 'merc'],
+            'mercedes': ['mercedes benz', 'merc'],
             'bmw': ['bmw'],
-            'toyota': ['toyota']
+            'toyota': ['toyota'],
+            'citroen': ['citroen'],
+            'skoda': ['skoda']
         }
 
         const makeChecks = [normalizedMake, ...(makeAliases[normalizedMake] || [])];
@@ -49,7 +53,7 @@ function findMatchingImage(make: string, model: string): string | null {
         if (hasMake) {
              // Split model into words (e.g. "Yaris Cross" -> ["yaris", "cross"])
              // Remove common technical words like "1.5", "TSI", "DSG", "2.0", "TDI", "4Motion", "SB"
-             const technicalWords = ['1.0', '1.5', '1.6', '2.0', '3.0', 'tsi', 'tdi', 'dsg', '4motion', '4matic', 'cdi', 'tfsi', 'sb', 'sportback', 'hybrid', 'phev', 'mhev', 'auto', 'manual'];
+             const technicalWords = ['1.0', '1.5', '1.6', '2.0', '3.0', 'tsi', 'tdi', 'dsg', '4motion', '4matic', 'cdi', 'tfsi', 'sb', 'sportback', 'hybrid', 'phev', 'mhev', 'auto', 'manual', 'sw', 'class'];
              
              const modelParts = normalizedModel.split(' ')
                 .map(p => p.trim())
@@ -68,7 +72,7 @@ function findMatchingImage(make: string, model: string): string | null {
         // Strategy C: Reverse check - if the Model Name contains the filename (e.g. file "VW Tiguan.webp" matches "Volkswagen Tiguan")
         // Already covered partly by A, but let's be explicit about "Tiguan" matching "Volkswagen Tiguan"
         // If the filename is just a model name (e.g. "puma.png"), check if model contains it
-        if (fileName.length > 3 && normalizedModel.includes(fileName)) return true;
+        if (fileName.length > 2 && normalizedModel.includes(fileName)) return true;
 
         return false;
     })
