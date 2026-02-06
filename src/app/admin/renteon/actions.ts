@@ -45,16 +45,30 @@ function findMatchingImage(make: string, model: string): string | null {
         const makeChecks = [normalizedMake, ...(makeAliases[normalizedMake] || [])];
         const hasMake = makeChecks.some(m => fileName.includes(m));
         
-        // If make is found, check if model parts are found
+        // Strategy A: Make + Model Keyword Match
         if (hasMake) {
              // Split model into words (e.g. "Yaris Cross" -> ["yaris", "cross"])
-             const modelParts = normalizedModel.split(' ').filter(p => p.length > 1);
-             // Check if fileName contains the main model part
-             return modelParts.some(part => fileName.includes(part));
+             // Remove common technical words like "1.5", "TSI", "DSG", "2.0", "TDI", "4Motion", "SB"
+             const technicalWords = ['1.0', '1.5', '1.6', '2.0', '3.0', 'tsi', 'tdi', 'dsg', '4motion', '4matic', 'cdi', 'tfsi', 'sb', 'sportback', 'hybrid', 'phev', 'mhev', 'auto', 'manual'];
+             
+             const modelParts = normalizedModel.split(' ')
+                .map(p => p.trim())
+                .filter(p => p.length > 1 && !technicalWords.includes(p));
+
+             // If we have valid model keywords, at least one must be in the filename
+             if (modelParts.length > 0) {
+                return modelParts.some(part => fileName.includes(part));
+             }
         }
         
-        // Fallback: If filename starts with the model directly (e.g. "Golf.webp")
-        if (fileName.includes(normalizedModel)) return true;
+        // Strategy B: Filename is contained in the full car name (e.g. file: "tiguan", car: "Volkswagen Tiguan 2.0 TDI")
+        // Check if the filename (without extension) appears as a whole word in the model name
+        if (normalizedModel.includes(fileName)) return true;
+
+        // Strategy C: Reverse check - if the Model Name contains the filename (e.g. file "VW Tiguan.webp" matches "Volkswagen Tiguan")
+        // Already covered partly by A, but let's be explicit about "Tiguan" matching "Volkswagen Tiguan"
+        // If the filename is just a model name (e.g. "puma.png"), check if model contains it
+        if (fileName.length > 3 && normalizedModel.includes(fileName)) return true;
 
         return false;
     })
