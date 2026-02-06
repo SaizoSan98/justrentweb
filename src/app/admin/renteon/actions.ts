@@ -197,7 +197,10 @@ function findMatchingImage(make: string, model: string): string | null {
         }
     }
 
-    if (bestScore > 0) return `/carpictures/${bestFile}`;
+    // Threshold: Need at least a moderate match to avoid false positives
+    // e.g. Make Match (20) + One weak token (10) = 30 -> Borderline
+    // We want at least ~40 to be sure, or a strong Model match.
+    if (bestScore >= 40) return `/carpictures/${bestFile}`;
 
     return null
   } catch (e) {
