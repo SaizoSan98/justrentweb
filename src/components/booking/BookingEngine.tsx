@@ -176,31 +176,35 @@ export function BookingEngine({
                          {endTime}
                       </button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-[85vw] max-w-[320px] md:w-auto p-0 md:p-4 flex flex-col md:flex-row gap-0 md:gap-4 overflow-hidden md:overflow-visible rounded-xl" align="center">
-                      <div className="p-2 md:p-0">
-                        <Calendar
-                          mode="single"
-                          selected={dateRange?.to}
-                          onSelect={(date) => setDateRange(prev => ({ from: prev?.from, to: date }))}
-                          className="w-full border-none shadow-none"
-                        />
-                      </div>
-                      <div className="hidden md:block w-px bg-zinc-100 self-stretch" />
-                      <div className="border-t border-zinc-100 md:border-0 p-3 md:p-0 bg-zinc-50 md:bg-white flex flex-col">
-                        <div className="text-xs font-bold text-zinc-400 mb-2 md:hidden uppercase tracking-wider text-center">Return Time</div>
-                        <div className="grid grid-cols-3 md:flex md:flex-col gap-2 md:gap-1 max-h-[160px] md:h-[320px] overflow-y-auto w-full md:w-28 pb-0 md:pb-0 scrollbar-hide">
-                        {TIME_OPTIONS.map(time => (
-                            <button
-                                key={time}
-                                onClick={() => setEndTime(time)}
-                                className={cn(
-                                    "flex-shrink-0 w-full text-sm font-bold py-2.5 px-2 rounded-lg hover:bg-zinc-100 transition-all border border-zinc-200 md:border-0 bg-white md:bg-transparent",
-                                    endTime === time ? "bg-zinc-100 text-zinc-900 hover:bg-zinc-100 border-zinc-200 shadow-sm" : "text-zinc-600"
-                                )}
-                            >
-                                {time}
-                            </button>
-                        ))}
+                    <PopoverContent className="w-auto p-0 overflow-hidden rounded-2xl shadow-2xl border-0" align="center">
+                      <div className="flex flex-col md:flex-row h-[380px]"> {/* Fixed height for consistency */}
+                        <div className="p-2 bg-white h-full flex items-center"> {/* Center calendar vertically */}
+                          <Calendar
+                            mode="single"
+                            selected={dateRange?.to}
+                            onSelect={(date) => setDateRange(prev => ({ from: prev?.from, to: date }))}
+                            className="border-none shadow-none"
+                          />
+                        </div>
+                        <div className="hidden md:block w-px bg-zinc-100 h-full" />
+                        <div className="bg-zinc-50 md:bg-white w-full md:w-32 flex flex-col h-full border-t border-zinc-100 md:border-t-0">
+                          <div className="p-3 pb-2 text-xs font-bold text-zinc-400 uppercase tracking-wider text-center bg-white z-10">Return Time</div>
+                          <div className="flex-1 overflow-y-auto scrollbar-hide p-2 pt-0 space-y-1">
+                          {TIME_OPTIONS.map(time => (
+                              <button
+                                  key={time}
+                                  onClick={() => setEndTime(time)}
+                                  className={cn(
+                                      "w-full text-sm font-bold py-2 rounded-lg transition-all border-2", 
+                                      endTime === time 
+                                        ? "bg-black text-white border-black" 
+                                        : "bg-transparent text-zinc-600 border-transparent hover:bg-zinc-100 hover:text-black"
+                                  )}
+                              >
+                                  {time}
+                              </button>
+                          ))}
+                          </div>
                         </div>
                       </div>
                     </PopoverContent>
