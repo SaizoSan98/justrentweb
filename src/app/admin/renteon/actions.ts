@@ -18,18 +18,24 @@ function findMatchingImage(make: string, model: string): string | null {
     const files = fs.readdirSync(dir)
     
     // Normalize: lowercase, remove accents, handle special chars
-    const normalize = (str: string) => str.toLowerCase().trim()
+    const normalize = (str: string, keepHyphens: boolean = false) => {
+        let s = str.toLowerCase().trim()
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
-        .replace(/-/g, ' ') // Replace hyphens with spaces
-        .replace(/_/g, ' ') // Replace underscores with spaces
         .replace(/\(.*\)/g, '') // Remove (8s) etc
         .replace(/\.[^/.]+$/, "") // Remove extension if passed
         .trim();
 
+        if (!keepHyphens) {
+            s = s.replace(/-/g, ' ').replace(/_/g, ' ');
+        }
+        return s;
+    }
+
     const normalizedMake = normalize(make);
     const normalizedModel = normalize(model);
+    const modelWithHyphens = normalize(model, true);
 
-    // Known Makes to prevent cross-brand matching (e.g. searching for Mazda 6 but finding Audi A6)
+    // Known Makes to prevent cross-brand matching
     const knownMakes = [
         'audi', 'bmw', 'mercedes', 'benz', 'vw', 'volkswagen', 'skoda', 'seat', 'toyota', 'volvo',
         'ford', 'fiat', 'peugeot', 'citroen', 'renault', 'hyundai', 'kia', 'mazda', 'nissan',
@@ -56,20 +62,22 @@ function findMatchingImage(make: string, model: string): string | null {
         '1.0', '1.2', '1.4', '1.5', '1.6', '1.8', '2.0', '2.2', '2.5', '3.0', '4.0', '5.0',
         'tsi', 'tdi', 'dsg', '4motion', '4matic', 'cdi', 'tfsi', 'sb', 'sportback', 
         'hybrid', 'phev', 'mhev', 'auto', 'manual', 'sw', 'class', 'bluehdi', 'crdi',
-        'cross', 'sport', 'awd', '4wd', 'ev', 'electric', 'estate', 'combi', 'avant', 'touring'
+        'cross', 'sport', 'awd', '4wd', 'ev', 'electric', 'estate', 'combi', 'avant', 'touring',
+        'active', 'style', 'ambition', 'business', 'elegance', 'r-line', 'gt-line', 'amg'
     ];
 
     let cleanModel = normalizedModel;
     
-    // Remove Make from Model string if present
-    if (cleanModel.startsWith(normalizedMake)) {
-        cleanModel = cleanModel.substring(normalizedMake.length).trim();
-    }
-    // Also remove alias makes from model string
-    const myAliases = makeAliases[normalizedMake] || [];
-    for (const alias of myAliases) {
-        if (cleanModel.startsWith(alias)) {
-            cleanModel = cleanModel.substring(alias.length).trim();
+    // Aggressive Make Stripping
+    // Remove "Volkswagen" from "Volkswagen T-Roc" even if make is "VW"
+    const allMakes = [normalizedMake, ...(makeAliases[normalizedMake] || [])];
+    // Sort by length desc to remove longest match first (e.g. Mercedes Benz before Mercedes)
+    allMakes.sort((a, b) => b.length - a.length);
+
+    for (const m of allMakes) {
+        if (cleanModel.startsWith(m)) {
+            cleanModel = cleanModel.substring(m.length).trim();
+            break; // Remove only the first occurrence (the make prefix)
         }
     }
 
@@ -77,24 +85,24 @@ function findMatchingImage(make: string, model: string): string | null {
         .map(t => t.trim())
         .filter(t => t.length > 0 && !technicalWords.includes(t));
 
+    // Also prepare a "Merged" model token for cases like "T-Roc" -> "TRoc"
+    const mergedModel = modelTokens.join('');
+
     // Scoring System
     let bestFile: string | null = null;
     let bestScore = 0;
 
     for (const file of files) {
         const normalizedFile = normalize(file);
+        const fileWithHyphens = normalize(file, true);
         let score = 0;
 
         // 1. CHECK FOR CONFLICTING MAKE
-        // If file contains a Make that is NOT our target Make, skip it.
-        // e.g. Searching for "Mazda 6", file "Audi A6". "Audi" is in file. "Audi" != "Mazda". Skip.
         const fileHasOtherMake = knownMakes.some(knownMake => {
-            // Check if knownMake is in filename
             if (normalizedFile.includes(knownMake)) {
-                // It is in filename. Is it OUR make?
-                if (normalizedMake.includes(knownMake)) return false; // It's our make (e.g. "volkswagen" in "vw golf")
-                if (myAliases.some(alias => alias.includes(knownMake) || knownMake.includes(alias))) return false; // It's our alias
-                return true; // It's a DIFFERENT make
+                if (normalizedMake.includes(knownMake)) return false;
+                if ((makeAliases[normalizedMake] || []).some(alias => alias.includes(knownMake) || knownMake.includes(alias))) return false;
+                return true; 
             }
             return false;
         });
@@ -102,25 +110,39 @@ function findMatchingImage(make: string, model: string): string | null {
         if (fileHasOtherMake) continue;
 
         // 2. CHECK FOR OUR MAKE (Bonus)
-        const hasMyMake = normalizedFile.includes(normalizedMake) || myAliases.some(a => normalizedFile.includes(a));
+        const hasMyMake = normalizedFile.includes(normalizedMake) || (makeAliases[normalizedMake] || []).some(a => normalizedFile.includes(a));
         if (hasMyMake) score += 20;
 
         // 3. MODEL MATCHING
+
+        // Strategy E: Exact Token Sequence Match (Strongest)
+        // If "T" and "Roc" are in the model, check if "T Roc" or "TRoc" or "T-Roc" is in file
+        const tokenSequence = modelTokens.join(' '); // "t roc"
+        const tokenSequenceNoSpace = modelTokens.join(''); // "troc"
         
-        // Exact Model Match (strongest)
-        if (normalizedFile === cleanModel || normalizedFile === normalizedModel) score += 100;
+        // Exact Model Match
+        if (normalizedFile === cleanModel) score += 100;
         
-        // Filename contains clean model
+        // "T Roc" in "VW T Roc"
+        else if (normalizedFile.includes(tokenSequence)) score += 90;
+        
+        // "TRoc" in "VW TRoc"
+        else if (normalizedFile.includes(tokenSequenceNoSpace)) score += 90;
+
+        // "T-Roc" in "VW T-ROC" (using hyphenated versions)
+        // We need to check if the clean model part matches the file part preserving hyphens
+        else if (fileWithHyphens.includes(modelWithHyphens.replace(normalizedMake, '').trim())) score += 90;
+
+        // Filename contains clean model (standard include)
         else if (normalizedFile.includes(cleanModel)) score += 80;
         
-        // Model contains filename (Reverse match - e.g. Model="Passat Variant", File="Passat")
+        // Model contains filename
         else if (cleanModel.includes(normalizedFile) && normalizedFile.length > 2) score += 60;
         
-        // Token Matching (Relaxed)
+        // Token Matching
         else {
             let tokenMatches = 0;
             for (const token of modelTokens) {
-                // Exact token match in filename (word boundary would be better but simple include is okay for now if token is long enough)
                 if (normalizedFile.includes(token)) {
                     // Bonus for exact word match
                     const regex = new RegExp(`\\b${token}\\b`);
@@ -134,17 +156,12 @@ function findMatchingImage(make: string, model: string): string | null {
             if (tokenMatches > 0) score += tokenMatches;
         }
 
-        // Special Case: user said "Skoda Fabia" -> "Fabia" is enough.
-        // If we found ANY match and no conflicting make, it's a candidate.
-        
-        // Update Best
         if (score > bestScore) {
             bestScore = score;
             bestFile = file;
         }
     }
 
-    // Threshold: Need at least some match
     if (bestScore > 0) return `/carpictures/${bestFile}`;
 
     return null
