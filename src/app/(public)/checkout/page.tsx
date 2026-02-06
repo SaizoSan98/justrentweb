@@ -3,6 +3,8 @@ import { notFound, redirect } from "next/navigation"
 import { CheckoutForm } from "@/components/booking/CheckoutForm"
 import { Header } from "@/components/layout/Header"
 import { getSession } from "@/lib/auth"
+import { checkRealTimeAvailability } from "@/app/actions/renteon-availability"
+import { mapCarToCategoryId } from "@/lib/renteon"
 
 export const dynamic = 'force-dynamic'
 
@@ -13,10 +15,7 @@ export default async function CheckoutPage({
 }) {
   // 1. Check Auth (Removed strict redirect per user request)
   const session = await getSession()
-  // if (!session?.user) {
-  //   redirect('/login?tab=register&error=login_required_for_booking')
-  // }
-
+  
   const params = await searchParams ?? {}
   const carId = typeof params.carId === 'string' ? params.carId : undefined
   const startDateStr = typeof params.startDate === 'string' ? params.startDate : undefined
@@ -50,11 +49,48 @@ export default async function CheckoutPage({
   const startDate = (startDateStr && startDateStr !== 'undefined') ? new Date(startDateStr) : new Date()
   const endDate = (endDateStr && endDateStr !== 'undefined') ? new Date(endDateStr) : undefined
 
+  // FETCH FRESH RENTEON DATA for this specific car/dates
+  let renteonPrice = 0;
+  let renteonDeposit = 0;
+  
+  if (endDate) {
+      try {
+          const res = await checkRealTimeAvailability(startDate, endDate);
+          if (res.success && Array.isArray(res.data)) {
+              // Find the matching Renteon item for this car
+              const renteonItem = res.data.find((item: any) => {
+                  const catId = item.CarCategoryId || item.CategoryId || item.Id;
+                  return catId === mapCarToCategoryId(car);
+              });
+
+              if (renteonItem) {
+                  renteonPrice = Number(renteonItem.Amount || 0);
+                  renteonDeposit = Number(renteonItem.DepositAmount || renteonItem.Deposit || 0);
+                  console.log(`Checkout: Fetched fresh Renteon price: ${renteonPrice} EUR, Deposit: ${renteonDeposit}`);
+              }
+          }
+      } catch (e) {
+          console.error("Checkout Renteon Fetch Error:", e);
+      }
+  }
+
   // Serialize complex objects for client component
+  // Override DB values with Renteon values if available
+  const durationMs = endDate ? endDate.getTime() - startDate.getTime() : 0;
+  const days = Math.max(1, Math.ceil(durationMs / (1000 * 60 * 60 * 24)));
+  
+  const effectivePricePerDay = renteonPrice > 0 
+      ? renteonPrice / days 
+      : Number(car.pricePerDay);
+
+  const effectiveDeposit = renteonDeposit > 0 
+      ? renteonDeposit 
+      : Number(car.deposit);
+
   const serializedCar = {
     ...car,
-    pricePerDay: Number(car.pricePerDay),
-    deposit: Number(car.deposit),
+    pricePerDay: effectivePricePerDay,
+    deposit: effectiveDeposit,
     fullInsurancePrice: Number(car.fullInsurancePrice),
     unlimitedMileagePrice: Number(car.unlimitedMileagePrice || 0),
     pricingTiers: car.pricingTiers.map(tier => ({

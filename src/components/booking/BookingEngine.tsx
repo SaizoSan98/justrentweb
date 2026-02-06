@@ -40,8 +40,19 @@ export function BookingEngine({
     to: initialEndDate,
   }))
   
-  const [startTime, setStartTime] = React.useState("10:00")
-  const [endTime, setEndTime] = React.useState("10:00")
+  const [startTime, setStartTime] = React.useState(() => {
+    if (initialStartDate) return format(initialStartDate, "HH:mm")
+    
+    // Default to next hour if searching for today
+    const now = new Date()
+    const h = now.getHours() + 1
+    if (h < 24) return `${h.toString().padStart(2, '0')}:00`
+    return "10:00"
+  })
+  const [endTime, setEndTime] = React.useState(() => {
+    if (initialEndDate) return format(initialEndDate, "HH:mm")
+    return startTime // Match start time by default
+  })
   const [departure, setDeparture] = React.useState("Budapest Liszt Ferenc Airport (BUD)")
   const [returnLocation, setReturnLocation] = React.useState("Budapest Liszt Ferenc Airport (BUD)")
   const [error, setError] = React.useState<string | null>(null)

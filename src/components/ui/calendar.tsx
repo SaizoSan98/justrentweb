@@ -112,88 +112,58 @@ function Calendar({
     return false
   }
 
+  // Render
   return (
-    <div className={cn("p-3 sm:p-4 bg-white rounded-xl shadow-sm border border-zinc-200 w-full max-w-[320px] sm:max-w-fit mx-auto", className)}>
+    <div className={cn("p-3 bg-white", className)}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <button 
-          onClick={prevMonth}
-          className="p-1 hover:bg-zinc-100 rounded-full transition-colors"
-          type="button"
-        >
-          <ChevronLeft className="h-5 w-5 text-zinc-600" />
+        <button onClick={prevMonth} className="p-1 hover:bg-gray-100 rounded-full">
+          <ChevronLeft className="h-4 w-4" />
         </button>
-        <div className="font-bold text-base sm:text-lg text-zinc-900 capitalize">
+        <div className="font-semibold text-sm">
           {format(currentMonth, "MMMM yyyy")}
         </div>
-        <button 
-          onClick={nextMonth}
-          className="p-1 hover:bg-zinc-100 rounded-full transition-colors"
-          type="button"
-        >
-          <ChevronRight className="h-5 w-5 text-zinc-600" />
+        <button onClick={nextMonth} className="p-1 hover:bg-gray-100 rounded-full">
+          <ChevronRight className="h-4 w-4" />
         </button>
       </div>
 
-      {/* Grid */}
-      <div className="grid grid-cols-7 gap-1 text-center mb-2">
-        {weekDays.map((d) => (
-          <div key={d} className="text-[10px] sm:text-sm font-bold text-zinc-400 py-1">
-            {d}
+      {/* Weekdays */}
+      <div className="grid grid-cols-7 mb-2 text-center">
+        {weekDays.map((day) => (
+          <div key={day} className="text-[0.8rem] font-medium text-gray-500">
+            {day}
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-7 gap-1 text-center">
-        {calendarDays.map((day, idx) => {
-          const isCurrentMonth = isSameMonth(day, monthStart)
-          const selectedDay = isSelected(day)
-          const inRange = isInRange(day)
-          const isRangeStart = mode === "range" && (selected as DateRange)?.from && isSameDay(day, (selected as DateRange).from!)
-          const isRangeEnd = mode === "range" && (selected as DateRange)?.to && isSameDay(day, (selected as DateRange).to!)
-          const isDisabled = disabled ? disabled(day) : false
-          
-          let bgClass = "bg-transparent"
-          let textClass = isCurrentMonth ? "text-zinc-900" : "text-zinc-300"
-          
-          if (isDisabled) {
-            textClass = "text-zinc-200 cursor-not-allowed"
-            bgClass = "hover:bg-transparent"
-          } else if (selectedDay) {
-            bgClass = "!bg-red-600 shadow-md shadow-red-600/20"
-            textClass = "!text-white font-bold"
-          } else if (inRange) {
-            bgClass = "bg-red-50"
-            textClass = "text-red-900"
-          } else if (isToday(day) && !selectedDay) {
-            bgClass = "bg-zinc-100"
-            textClass = "text-zinc-900 font-bold"
-          }
 
-          // Rounding for range
-          let roundedClass = "rounded-md"
-          if (inRange && !isDisabled) {
-            roundedClass = "rounded-none"
-            if (isRangeStart) roundedClass = "rounded-l-md"
-            if (isRangeEnd) roundedClass = "rounded-r-md"
-          }
+      {/* Days Grid */}
+      <div className="grid grid-cols-7 gap-1 text-center">
+        {calendarDays.map((day, dayIdx) => {
+          const isSelectedDay = isSelected(day)
+          const isCurrentMonth = isSameMonth(day, currentMonth)
+          const isDayToday = isToday(day)
+          const isDisabled = disabled ? disabled(day) : false
+          const inRange = isInRange(day)
 
           return (
-            <button
-              key={day.toISOString()}
-              onClick={() => !isDisabled && handleDayClick(day)}
-              disabled={isDisabled}
-              className={cn(
-                "w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-xs sm:text-sm transition-all hover:bg-zinc-100 mx-auto",
-                bgClass,
-                textClass,
-                roundedClass,
-                selectedDay && "hover:bg-red-700",
-                isDisabled && "hover:bg-transparent opacity-50"
-              )}
-              type="button"
-            >
-              {format(day, "d")}
-            </button>
+            <div key={day.toString()} className="relative p-0.5">
+              <button
+                onClick={() => !isDisabled && handleDayClick(day)}
+                disabled={isDisabled}
+                className={cn(
+                  "h-8 w-8 text-sm p-0 font-normal rounded-full flex items-center justify-center transition-colors relative z-10",
+                  !isCurrentMonth && "text-gray-300 opacity-50", 
+                  isSelectedDay && "bg-red-600 text-white hover:bg-red-700 shadow-md",
+                  !isSelectedDay && isDayToday && "bg-gray-100 text-zinc-900 font-bold",
+                  !isSelectedDay && !isDayToday && isCurrentMonth && "hover:bg-gray-100 text-zinc-900",
+                  isDisabled && "opacity-50 cursor-not-allowed hover:bg-transparent",
+                  inRange && !isSelectedDay && "bg-red-50 text-red-900 rounded-none w-full"
+                )}
+              >
+                {format(day, "d")}
+              </button>
+            </div>
           )
         })}
       </div>

@@ -72,7 +72,7 @@ export default async function FleetPage({
 
   // 2. Renteon Availability Check (Real-time)
   let renteonAvailableCategoryIds: Set<number> | null = null;
-  let renteonPrices = new Map<number, number>(); // Map CatId -> Total Amount
+  let renteonPrices = new Map<number, { amount: number, deposit: number }>(); // Map CatId -> { Amount, Deposit }
   
   // Only check Renteon if we have dates (which we usually do as defaults are set)
   if (startDate && queryEndDate) {
@@ -86,9 +86,12 @@ export default async function FleetPage({
               const catId = item.CarCategoryId || item.CategoryId || item.Id;
               if (catId) {
                   renteonAvailableCategoryIds?.add(catId);
-                  // Store Price if available (Amount is usually Total for the period)
+                  // Store Price & Deposit
                   if (item.Amount) {
-                      renteonPrices.set(catId, Number(item.Amount));
+                      renteonPrices.set(catId, {
+                          amount: Number(item.Amount),
+                          deposit: Number(item.DepositAmount || item.Deposit || 0)
+                      });
                   }
               }
           });
@@ -115,12 +118,16 @@ export default async function FleetPage({
           // Clone car to avoid mutating cached object
           const newCar = { ...car };
           const catId = mapCarToCategoryId(car);
-          const totalAmount = renteonPrices.get(catId);
+          const renteonData = renteonPrices.get(catId);
           
-          if (totalAmount !== undefined) {
+          if (renteonData) {
               // Override pricePerDay with Renteon's effective daily rate
-              // We use Decimal/Number conversion as prisma returns Decimals
-              newCar.pricePerDay = (totalAmount / days) as any;
+              newCar.pricePerDay = (renteonData.amount / days) as any;
+              
+              // Override Deposit
+              if (renteonData.deposit > 0) {
+                  newCar.deposit = renteonData.deposit as any;
+              }
           }
           return newCar;
       });
