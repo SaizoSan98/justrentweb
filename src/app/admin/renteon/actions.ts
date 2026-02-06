@@ -568,6 +568,12 @@ export async function syncCarsFromRenteon() {
                     } : undefined
                 }
 
+                // Try to find local image if Renteon URL is missing or placeholder
+                const localImage = findMatchingImage(make, modelName);
+                if (localImage) {
+                    carData.imageUrl = localImage;
+                }
+
                 // Upsert Car
                 const existing = await prisma.car.findUnique({
                     where: { renteonId: carData.renteonId } as any
