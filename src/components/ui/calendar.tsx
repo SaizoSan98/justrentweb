@@ -131,7 +131,7 @@ function Calendar({
       {/* Weekdays */}
       <div className="grid grid-cols-7 mb-2 text-center">
         {weekDays.map((day) => (
-          <div key={day} className="text-[0.8rem] font-medium text-gray-500">
+          <div key={day} className="text-xs font-bold text-zinc-400 uppercase tracking-wider">
             {day}
           </div>
         ))}
@@ -152,10 +152,10 @@ function Calendar({
                 onClick={() => !isDisabled && handleDayClick(day)}
                 disabled={isDisabled}
                 className={cn(
-                  "h-8 w-8 text-sm p-0 font-normal rounded-full flex items-center justify-center transition-colors relative z-10",
+                  "h-9 w-9 text-base p-0 font-bold rounded-full flex items-center justify-center transition-all relative z-10", // Increased size and font weight
                   !isCurrentMonth && "text-gray-300 opacity-50", 
-                  isSelectedDay && "bg-zinc-900 text-white hover:bg-zinc-800 shadow-md",
-                  !isSelectedDay && isDayToday && "bg-zinc-100 text-zinc-900 font-bold",
+                  isSelectedDay && "bg-zinc-900 text-white hover:bg-zinc-800 shadow-md scale-110", // Added scale effect
+                  !isSelectedDay && isDayToday && "bg-zinc-100 text-zinc-900 font-black",
                   !isSelectedDay && !isDayToday && isCurrentMonth && "hover:bg-zinc-100 text-zinc-900",
                   isDisabled && "opacity-50 cursor-not-allowed hover:bg-transparent",
                   inRange && !isSelectedDay && "bg-zinc-100 text-zinc-900 rounded-none w-full"

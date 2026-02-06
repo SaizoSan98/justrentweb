@@ -134,17 +134,17 @@ export function BookingEngine({
                           className="w-full border-none shadow-none"
                         />
                       </div>
-                      <div className="hidden md:block h-[300px] w-px bg-zinc-100" />
-                      <div className="border-t border-zinc-100 md:border-0 p-3 md:p-0 bg-zinc-50 md:bg-white">
+                      <div className="hidden md:block w-px bg-zinc-100 self-stretch" /> {/* Self-stretch for full height */}
+                      <div className="border-t border-zinc-100 md:border-0 p-3 md:p-0 bg-zinc-50 md:bg-white flex flex-col">
                         <div className="text-xs font-bold text-zinc-400 mb-2 md:hidden uppercase tracking-wider text-center">Pickup Time</div>
-                        <div className="grid grid-cols-3 md:flex md:flex-col gap-2 md:gap-1 max-h-[160px] md:h-[300px] overflow-y-auto w-full md:w-24 pb-0 md:pb-0 scrollbar-hide">
+                        <div className="grid grid-cols-3 md:flex md:flex-col gap-2 md:gap-1 max-h-[160px] md:h-[320px] overflow-y-auto w-full md:w-28 pb-0 md:pb-0 scrollbar-hide"> {/* Increased height and width */}
                         {TIME_OPTIONS.map(time => (
                             <button
                                 key={time}
                                 onClick={() => setStartTime(time)}
                                 className={cn(
-                                    "flex-shrink-0 w-full text-xs font-bold py-2 px-1 md:px-0 rounded-md hover:bg-zinc-200 md:hover:bg-zinc-100 transition-colors border border-zinc-200 md:border-0 bg-white md:bg-transparent",
-                                    startTime === time ? "bg-black text-white hover:bg-black border-black" : "text-zinc-600"
+                                    "flex-shrink-0 w-full text-sm font-bold py-2.5 px-2 rounded-lg hover:bg-zinc-100 transition-all border border-zinc-200 md:border-0 bg-white md:bg-transparent", // Bigger text and padding
+                                    startTime === time ? "bg-zinc-100 text-zinc-900 hover:bg-zinc-100 border-zinc-200 shadow-sm" : "text-zinc-600"
                                 )}
                             >
                                 {time}
@@ -181,17 +181,17 @@ export function BookingEngine({
                           className="w-full border-none shadow-none"
                         />
                       </div>
-                      <div className="hidden md:block h-[300px] w-px bg-zinc-100" />
-                      <div className="border-t border-zinc-100 md:border-0 p-3 md:p-0 bg-zinc-50 md:bg-white">
+                      <div className="hidden md:block w-px bg-zinc-100 self-stretch" />
+                      <div className="border-t border-zinc-100 md:border-0 p-3 md:p-0 bg-zinc-50 md:bg-white flex flex-col">
                         <div className="text-xs font-bold text-zinc-400 mb-2 md:hidden uppercase tracking-wider text-center">Return Time</div>
-                        <div className="grid grid-cols-3 md:flex md:flex-col gap-2 md:gap-1 max-h-[160px] md:h-[300px] overflow-y-auto w-full md:w-24 pb-0 md:pb-0 scrollbar-hide">
+                        <div className="grid grid-cols-3 md:flex md:flex-col gap-2 md:gap-1 max-h-[160px] md:h-[320px] overflow-y-auto w-full md:w-28 pb-0 md:pb-0 scrollbar-hide">
                         {TIME_OPTIONS.map(time => (
                             <button
                                 key={time}
                                 onClick={() => setEndTime(time)}
                                 className={cn(
-                                    "flex-shrink-0 w-full text-xs font-bold py-2 px-1 md:px-0 rounded-md hover:bg-zinc-200 md:hover:bg-zinc-100 transition-colors border border-zinc-200 md:border-0 bg-white md:bg-transparent",
-                                    endTime === time ? "bg-black text-white hover:bg-black border-black" : "text-zinc-600"
+                                    "flex-shrink-0 w-full text-sm font-bold py-2.5 px-2 rounded-lg hover:bg-zinc-100 transition-all border border-zinc-200 md:border-0 bg-white md:bg-transparent",
+                                    endTime === time ? "bg-zinc-100 text-zinc-900 hover:bg-zinc-100 border-zinc-200 shadow-sm" : "text-zinc-600"
                                 )}
                             >
                                 {time}
