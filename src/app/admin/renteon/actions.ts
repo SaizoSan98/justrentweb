@@ -92,6 +92,28 @@ function findMatchingImage(make: string, model: string): string | null {
     // Also prepare a "Merged" model token for cases like "T-Roc" -> "TRoc"
     const mergedModel = modelTokens.join('');
 
+    // Special Handling for "Class" cars (Mercedes A Class, C Class, etc.)
+    // If Model is "A 180" -> tokens ["a", "180"] -> check if "a class" is in filename
+    let classSearch = "";
+    if (normalizedMake.includes("mercedes") || normalizedMake.includes("benz")) {
+        const firstToken = modelTokens[0]; // "a", "c", "e", "s", "v"
+        if (firstToken && firstToken.length === 1 && /^[a-z]$/.test(firstToken)) {
+            classSearch = `${firstToken} class`;
+        } else if (firstToken === "v" || firstToken === "gl" || firstToken === "gle" || firstToken === "glc" || firstToken === "glb" || firstToken === "gla") {
+             // For GLC 220 -> GLC Class is rare, usually just GLC
+        }
+    }
+    // BMW Series handling (BMW 320 -> BMW 3 Series or just BMW 3)
+    let seriesSearch = "";
+    if (normalizedMake.includes("bmw")) {
+        const firstToken = modelTokens[0]; // "320d" -> "3" series? Or "3" if separated.
+        // If token starts with a digit, assume series
+        if (firstToken && /^\d/.test(firstToken)) {
+            const series = firstToken[0];
+            seriesSearch = `${series} series`; // "3 series"
+        }
+    }
+
     // Scoring System
     let bestFile: string | null = null;
     let bestScore = 0;
@@ -159,6 +181,15 @@ function findMatchingImage(make: string, model: string): string | null {
             }
             if (tokenMatches > 0) score += tokenMatches;
         }
+
+        // Bonus for Class/Series match
+        if (classSearch && normalizedFile.includes(classSearch)) score += 50;
+        if (seriesSearch && normalizedFile.includes(seriesSearch)) score += 50;
+        
+        // BMW Special: If model starts with "3", and file contains "bmw 3", big bonus
+        if (normalizedMake.includes("bmw") && modelTokens[0]?.startsWith("3") && normalizedFile.includes("bmw 3")) score += 50;
+        if (normalizedMake.includes("bmw") && modelTokens[0]?.startsWith("5") && normalizedFile.includes("bmw 5")) score += 50;
+        if (normalizedMake.includes("bmw") && modelTokens[0]?.startsWith("x") && normalizedFile.includes(`bmw ${modelTokens[0]}`)) score += 50;
 
         if (score > bestScore) {
             bestScore = score;
