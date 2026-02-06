@@ -16,72 +16,136 @@ function findMatchingImage(make: string, model: string): string | null {
     if (!fs.existsSync(dir)) return null
     
     const files = fs.readdirSync(dir)
-    // Normalize Make and Model: lowercase, remove accents, handle special chars
+    
+    // Normalize: lowercase, remove accents, handle special chars
     const normalize = (str: string) => str.toLowerCase().trim()
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
         .replace(/-/g, ' ') // Replace hyphens with spaces
+        .replace(/_/g, ' ') // Replace underscores with spaces
         .replace(/\(.*\)/g, '') // Remove (8s) etc
+        .replace(/\.[^/.]+$/, "") // Remove extension if passed
         .trim();
 
     const normalizedMake = normalize(make);
     const normalizedModel = normalize(model);
+
+    // Known Makes to prevent cross-brand matching (e.g. searching for Mazda 6 but finding Audi A6)
+    const knownMakes = [
+        'audi', 'bmw', 'mercedes', 'benz', 'vw', 'volkswagen', 'skoda', 'seat', 'toyota', 'volvo',
+        'ford', 'fiat', 'peugeot', 'citroen', 'renault', 'hyundai', 'kia', 'mazda', 'nissan',
+        'opel', 'suzuki', 'tesla', 'honda', 'jeep', 'land rover', 'range rover', 'mini', 'porsche',
+        'lexus', 'jaguar', 'alfa romeo', 'dacia', 'chevrolet', 'mitsubishi', 'subaru', 'omoda',
+        'cupra', 'smart', 'saab', 'lancia', 'chrysler', 'dodge', 'ram', 'infiniti', 'acura'
+    ];
+
+    const makeAliases: Record<string, string[]> = {
+        'volkswagen': ['vw'],
+        'vw': ['volkswagen'],
+        'mercedes benz': ['mercedes', 'merc', 'benz'],
+        'mercedes': ['mercedes benz', 'merc', 'benz'],
+        'bmw': ['bmw'],
+        'toyota': ['toyota'],
+        'citroen': ['citroen'],
+        'skoda': ['skoda'],
+        'land rover': ['range rover'],
+        'range rover': ['land rover']
+    };
+
+    // Prepare Model Tokens (remove Make, technical words)
+    const technicalWords = [
+        '1.0', '1.2', '1.4', '1.5', '1.6', '1.8', '2.0', '2.2', '2.5', '3.0', '4.0', '5.0',
+        'tsi', 'tdi', 'dsg', '4motion', '4matic', 'cdi', 'tfsi', 'sb', 'sportback', 
+        'hybrid', 'phev', 'mhev', 'auto', 'manual', 'sw', 'class', 'bluehdi', 'crdi',
+        'cross', 'sport', 'awd', '4wd', 'ev', 'electric', 'estate', 'combi', 'avant', 'touring'
+    ];
+
+    let cleanModel = normalizedModel;
     
-    // 2. Try Partial Match (Relaxed)
-    // Split make and model into parts and check if ALL parts of the filename are present in the car data OR vice versa
-    const partialMatch = files.find(f => {
-        // Normalize filename too
-        const fileName = f.toLowerCase().replace(/\.[^/.]+$/, "")
-            .replace(/_/g, ' ').replace(/-/g, ' ')
-            .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); 
+    // Remove Make from Model string if present
+    if (cleanModel.startsWith(normalizedMake)) {
+        cleanModel = cleanModel.substring(normalizedMake.length).trim();
+    }
+    // Also remove alias makes from model string
+    const myAliases = makeAliases[normalizedMake] || [];
+    for (const alias of myAliases) {
+        if (cleanModel.startsWith(alias)) {
+            cleanModel = cleanModel.substring(alias.length).trim();
+        }
+    }
+
+    const modelTokens = cleanModel.split(' ')
+        .map(t => t.trim())
+        .filter(t => t.length > 0 && !technicalWords.includes(t));
+
+    // Scoring System
+    let bestFile: string | null = null;
+    let bestScore = 0;
+
+    for (const file of files) {
+        const normalizedFile = normalize(file);
+        let score = 0;
+
+        // 1. CHECK FOR CONFLICTING MAKE
+        // If file contains a Make that is NOT our target Make, skip it.
+        // e.g. Searching for "Mazda 6", file "Audi A6". "Audi" is in file. "Audi" != "Mazda". Skip.
+        const fileHasOtherMake = knownMakes.some(knownMake => {
+            // Check if knownMake is in filename
+            if (normalizedFile.includes(knownMake)) {
+                // It is in filename. Is it OUR make?
+                if (normalizedMake.includes(knownMake)) return false; // It's our make (e.g. "volkswagen" in "vw golf")
+                if (myAliases.some(alias => alias.includes(knownMake) || knownMake.includes(alias))) return false; // It's our alias
+                return true; // It's a DIFFERENT make
+            }
+            return false;
+        });
+
+        if (fileHasOtherMake) continue;
+
+        // 2. CHECK FOR OUR MAKE (Bonus)
+        const hasMyMake = normalizedFile.includes(normalizedMake) || myAliases.some(a => normalizedFile.includes(a));
+        if (hasMyMake) score += 20;
+
+        // 3. MODEL MATCHING
         
-        // Simple aliases
-        const makeAliases: Record<string, string[]> = {
-            'volkswagen': ['vw'],
-            'vw': ['volkswagen'],
-            'mercedes benz': ['mercedes', 'merc'],
-            'mercedes': ['mercedes benz', 'merc'],
-            'bmw': ['bmw'],
-            'toyota': ['toyota'],
-            'citroen': ['citroen'],
-            'skoda': ['skoda']
+        // Exact Model Match (strongest)
+        if (normalizedFile === cleanModel || normalizedFile === normalizedModel) score += 100;
+        
+        // Filename contains clean model
+        else if (normalizedFile.includes(cleanModel)) score += 80;
+        
+        // Model contains filename (Reverse match - e.g. Model="Passat Variant", File="Passat")
+        else if (cleanModel.includes(normalizedFile) && normalizedFile.length > 2) score += 60;
+        
+        // Token Matching (Relaxed)
+        else {
+            let tokenMatches = 0;
+            for (const token of modelTokens) {
+                // Exact token match in filename (word boundary would be better but simple include is okay for now if token is long enough)
+                if (normalizedFile.includes(token)) {
+                    // Bonus for exact word match
+                    const regex = new RegExp(`\\b${token}\\b`);
+                    if (regex.test(normalizedFile)) {
+                         tokenMatches += 15;
+                    } else {
+                         tokenMatches += 10;
+                    }
+                }
+            }
+            if (tokenMatches > 0) score += tokenMatches;
         }
 
-        const makeChecks = [normalizedMake, ...(makeAliases[normalizedMake] || [])];
-        const hasMake = makeChecks.some(m => fileName.includes(m));
+        // Special Case: user said "Skoda Fabia" -> "Fabia" is enough.
+        // If we found ANY match and no conflicting make, it's a candidate.
         
-        // Strategy A: Make + Model Keyword Match
-        if (hasMake) {
-             // Split model into words (e.g. "Yaris Cross" -> ["yaris", "cross"])
-             // Remove common technical words like "1.5", "TSI", "DSG", "2.0", "TDI", "4Motion", "SB"
-             const technicalWords = ['1.0', '1.5', '1.6', '2.0', '3.0', 'tsi', 'tdi', 'dsg', '4motion', '4matic', 'cdi', 'tfsi', 'sb', 'sportback', 'hybrid', 'phev', 'mhev', 'auto', 'manual', 'sw', 'class'];
-             
-             const modelParts = normalizedModel.split(' ')
-                .map(p => p.trim())
-                .filter(p => p.length > 1 && !technicalWords.includes(p));
-
-             // If we have valid model keywords, at least one must be in the filename
-             if (modelParts.length > 0) {
-                return modelParts.some(part => fileName.includes(part));
-             }
+        // Update Best
+        if (score > bestScore) {
+            bestScore = score;
+            bestFile = file;
         }
-        
-        // Strategy B: Filename is contained in the full car name (e.g. file: "tiguan", car: "Volkswagen Tiguan 2.0 TDI")
-        // Check if the filename (without extension) appears as a whole word in the model name
-        if (normalizedModel.includes(fileName)) return true;
+    }
 
-        // Strategy C: Reverse check - if the Model Name contains the filename (e.g. file "VW Tiguan.webp" matches "Volkswagen Tiguan")
-        // Already covered partly by A, but let's be explicit about "Tiguan" matching "Volkswagen Tiguan"
-        // If the filename is just a model name (e.g. "puma.png"), check if model contains it
-        if (fileName.length > 2 && normalizedModel.includes(fileName)) return true;
-
-        // Strategy D: Check if Model Name is IN filename (e.g. Model: "Passat", File: "VW Passat.webp")
-        // This was missing! We checked if filename is in model, but not if model is in filename without make requirement.
-        if (fileName.includes(normalizedModel)) return true;
-
-        return false;
-    })
-
-    if (partialMatch) return `/carpictures/${partialMatch}`
+    // Threshold: Need at least some match
+    if (bestScore > 0) return `/carpictures/${bestFile}`;
 
     return null
   } catch (e) {

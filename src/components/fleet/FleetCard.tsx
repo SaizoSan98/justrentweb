@@ -160,15 +160,17 @@ export function FleetCard({
         {/* Image */}
         <div className="relative aspect-[16/9] w-full flex items-center justify-center my-2 bg-zinc-50 rounded-xl overflow-hidden cursor-pointer" onClick={handleToggle}>
             {/* Brand Logo Overlay */}
-            <div className="absolute top-3 left-3 w-8 h-8 z-10 opacity-50 group-hover:opacity-100 transition-opacity grayscale group-hover:grayscale-0">
-               <Image 
-                  src={getBrandLogo(car.make)}
-                  alt={car.make}
-                  fill
-                  className="object-contain"
-                  unoptimized
-               />
-            </div>
+            {getBrandLogo(car.make) && (
+              <div className="absolute top-3 left-3 w-8 h-8 z-10 opacity-50 group-hover:opacity-100 transition-opacity grayscale group-hover:grayscale-0">
+                <Image 
+                    src={getBrandLogo(car.make)}
+                    alt={car.make}
+                    fill
+                    className="object-contain"
+                    unoptimized
+                />
+              </div>
+            )}
 
             <Image
               src={car.imageUrl || "/placeholder-car.png"}
@@ -221,15 +223,17 @@ export function FleetCard({
            <div className="w-full md:w-[55%] bg-white md:bg-[#0a0a0a] text-zinc-900 md:text-white p-8 relative flex flex-col justify-between">
               
               {/* Brand Logo Watermark */}
-              <div className="absolute top-8 right-8 w-12 h-12 opacity-50 md:opacity-20 z-10">
-                 <Image 
-                    src={getBrandLogo(car.make)}
-                    alt={car.make}
-                    fill
-                    className="object-contain md:invert"
-                    unoptimized
-                 />
-              </div>
+              {getBrandLogo(car.make) && (
+                <div className="absolute top-8 right-8 w-12 h-12 opacity-50 md:opacity-20 z-10">
+                  <Image 
+                      src={getBrandLogo(car.make)}
+                      alt={car.make}
+                      fill
+                      className="object-contain md:invert"
+                      unoptimized
+                  />
+                </div>
+              )}
 
               {/* Header */}
               <div className="space-y-1 relative z-10">
