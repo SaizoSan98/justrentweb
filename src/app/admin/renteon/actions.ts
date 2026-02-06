@@ -74,6 +74,10 @@ function findMatchingImage(make: string, model: string): string | null {
         // If the filename is just a model name (e.g. "puma.png"), check if model contains it
         if (fileName.length > 2 && normalizedModel.includes(fileName)) return true;
 
+        // Strategy D: Check if Model Name is IN filename (e.g. Model: "Passat", File: "VW Passat.webp")
+        // This was missing! We checked if filename is in model, but not if model is in filename without make requirement.
+        if (fileName.includes(normalizedModel)) return true;
+
         return false;
     })
 
