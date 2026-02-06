@@ -114,7 +114,7 @@ function Calendar({
 
   // Render
   return (
-    <div className={cn("p-3 bg-white", className)}>
+    <div className={cn("p-4 bg-white w-[320px]", className)}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <button onClick={prevMonth} className="p-1 hover:bg-gray-100 rounded-full">
@@ -138,7 +138,7 @@ function Calendar({
       </div>
 
       {/* Days Grid */}
-      <div className="grid grid-cols-7 gap-1 text-center">
+      <div className="grid grid-cols-7 gap-y-2 text-center">
         {calendarDays.map((day, dayIdx) => {
           const isSelectedDay = isSelected(day)
           const isCurrentMonth = isSameMonth(day, currentMonth)
