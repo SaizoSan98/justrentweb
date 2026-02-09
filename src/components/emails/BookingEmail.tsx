@@ -94,10 +94,6 @@ export const BookingEmail: React.FC<BookingEmailProps> = ({ booking, type }) => 
           </a>
         </div>
       )}
-      
-      <p style={{ ...p, fontSize: '14px', color: '#71717a', marginTop: '24px' }}>
-        If you have any questions, please reply to this email or contact us at support@justrentandtrans.com.
-      </p>
     </EmailLayout>
   );
 };

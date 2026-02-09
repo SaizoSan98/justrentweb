@@ -94,6 +94,12 @@ export const EmailLayout: React.FC<EmailLayoutProps> = ({ preview, children }) =
             color: '#71717a',
             borderTop: '1px solid #e4e4e7'
           }}>
+            <p style={{ margin: '0 0 8px 0', fontStyle: 'italic' }}>
+              This is an automated message, please do not reply.
+            </p>
+            <p style={{ margin: '0 0 16px 0' }}>
+              For any questions, please contact us at <a href="mailto:booking@jrandtrans.com" style={{ color: '#71717a', textDecoration: 'underline' }}>booking@jrandtrans.com</a>
+            </p>
             <p style={{ margin: '0 0 8px 0' }}>
               &copy; {new Date().getFullYear()} JustRent. All rights reserved.
             </p>

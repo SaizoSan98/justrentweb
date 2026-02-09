@@ -26,10 +26,6 @@ export const WelcomeClientEmail: React.FC<WelcomeClientEmailProps> = ({ name, lo
           Go to Dashboard
         </a>
       </div>
-      
-      <p style={{ ...p, fontSize: '14px', color: '#71717a' }}>
-        If you have any questions or need assistance, feel free to reply to this email.
-      </p>
     </EmailLayout>
   );
 };

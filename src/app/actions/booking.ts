@@ -148,9 +148,21 @@ export async function createBooking(prevState: any, formData: FormData) {
       console.error("Failed to send email:", emailError)
     }
 
-    // 4. Sync to Renteon (Fire and forget, or log errors)
-    // We don't await this to fail the request, but we log the output
-    syncBookingToRenteon(booking).catch(err => console.error("Background Renteon Sync Failed:", err))
+    // 4. Sync to Renteon (Await to ensure it completes)
+    try {
+      console.log("Starting Renteon Sync...")
+      const renteonResult = await syncBookingToRenteon(booking)
+      if (renteonResult.success) {
+        console.log("Renteon Sync Success. ID:", renteonResult.renteonId)
+        // If we add renteonId to schema later, save it here:
+        // await prisma.booking.update({ where: { id: booking.id }, data: { renteonId: renteonResult.renteonId } })
+      } else {
+        console.error("Renteon Sync Failed (API Error):", renteonResult.error)
+        // Optional: Send admin email about sync failure?
+      }
+    } catch (err) {
+      console.error("Renteon Sync Exception:", err)
+    }
 
     return { success: true, bookingId: booking.id }
     
