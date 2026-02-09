@@ -698,7 +698,7 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="unlimitedMileagePrice">Unlimited Mileage Price (EUR)</Label>
+                  <Label htmlFor="unlimitedMileagePrice">Unlimited Mileage Price / Day (EUR)</Label>
                   <Input 
                     name="unlimitedMileagePrice" 
                     type="number" 
