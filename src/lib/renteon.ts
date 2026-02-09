@@ -450,13 +450,23 @@ export async function syncBookingToRenteon(booking: any) {
     console.log("Renteon Create Response (Model ID):", bookingModel.Id);
 
     // 3. Populate Customer Data
+    // NOTE: 'ClientName' might be required at the root level or within Client object depending on specific Renteon config.
+    // Based on error "ClientName is required", we'll ensure it's populated.
+    // Often Name = LastName + FirstName or CompanyName
+    
+    const clientName = booking.isCompany ? booking.companyName : `${booking.lastName} ${booking.firstName}`;
+
     bookingModel.Client = {
         FirstName: booking.firstName,
         LastName: booking.lastName,
         Email: booking.email,
         Tel: booking.phone,
+        Name: clientName // Explicitly adding Name field to Client object
     };
     
+    // Also set ClientName at root if the model supports it (common in some API versions)
+    bookingModel.ClientName = clientName;
+
     bookingModel.FlightNumber = booking.flightNumber;
     bookingModel.Note = booking.comments;
 
