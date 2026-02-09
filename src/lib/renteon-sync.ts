@@ -830,7 +830,7 @@ export async function executeSyncExtras() {
                     where: { id: existing.id },
                     data: {
                         name: name, 
-                        description: description,
+                        // description: description, // PROTECTED: Manual description takes precedence
                         renteonId: renteonId,
                         code: code
                     }
