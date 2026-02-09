@@ -449,13 +449,19 @@ export async function syncBookingToRenteon(booking: any) {
         
         // RETRY STRATEGY: Try to create without specific category if availability fails
         if (err.includes('no available cars') || err.includes('Price Calc Warning') || true) { // Always try retry if first attempt failed
-             console.warn('Retrying Renteon booking without specific category (On Request mode)...');
+             console.warn('Retrying Renteon booking with explicit overbooking flags...');
              const fallbackPayload = { ...createPayload };
-             delete (fallbackPayload as any).CarCategoryId; // Remove category constraint
-             (fallbackPayload as any).CarClassId = null; // Ensure no class constraint either
-             (fallbackPayload as any).IgnoreAvailability = true; // Ensure flag is set
-             (fallbackPayload as any).Force = true;
              
+             // IMPORTANT: CarCategoryId IS required by Renteon, so we must keep it.
+             // Instead, we rely heavily on the overbooking flags.
+             // We also try to set 'OnRequest' which might bypass immediate availability check.
+             
+             (fallbackPayload as any).IgnoreAvailability = true; 
+             (fallbackPayload as any).Force = true;
+             (fallbackPayload as any).Overbooking = true;
+             (fallbackPayload as any).OnRequest = true; // Try to request as "On Request" booking
+             (fallbackPayload as any).Status = 1; // Try to force status to "Quote" or "Pending" if possible (1 usually is Quote/Pending)
+
              try {
                  const retryResponse = await fetch(`${RENTEON_API_URL}/bookings/create`, {
                     method: 'POST',
@@ -469,10 +475,6 @@ export async function syncBookingToRenteon(booking: any) {
                 if (retryResponse.ok) {
                      const retryModel = await retryResponse.json();
                      console.log('Retry Successful. Model ID:', retryModel.Id);
-                     // We need to set the category manually in the model now if possible, or just leave it open
-                     if (categoryId) retryModel.CarCategoryId = categoryId;
-                     
-                     // Proceed with this model
                      return await finalizeBooking(retryModel, booking, token);
                 } else {
                      const retryErr = await retryResponse.text();
