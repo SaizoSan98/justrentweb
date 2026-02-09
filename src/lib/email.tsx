@@ -120,3 +120,11 @@ export async function sendForgotPasswordEmail(user: any, token: string) {
     />
   });
 }
+
+export async function sendAdminNewBookingEmail(booking: any) {
+  return sendEmail({
+    to: 'booking@jrandtrans.com',
+    subject: `New Booking Request - ${booking.car.make} ${booking.car.model}`,
+    component: <BookingEmail booking={booking} type="CONFIRMATION" />
+  });
+}

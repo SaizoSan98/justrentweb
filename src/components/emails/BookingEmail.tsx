@@ -40,7 +40,7 @@ export const BookingEmail: React.FC<BookingEmailProps> = ({ booking, type }) => 
         {booking.car.imageUrl && (
           <div style={{ marginBottom: '20px', textAlign: 'center' }}>
             <img 
-              src={booking.car.imageUrl} 
+              src={booking.car.imageUrl.startsWith('http') ? booking.car.imageUrl : `https://justrentandtrans.com/_next/image?url=${encodeURIComponent(booking.car.imageUrl.startsWith('/') ? `https://justrentandtrans.com${booking.car.imageUrl}` : booking.car.imageUrl)}&w=3840&q=75`} 
               alt={`${booking.car.make} ${booking.car.model}`}
               style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'contain', borderRadius: '8px' }}
             />
@@ -80,7 +80,7 @@ export const BookingEmail: React.FC<BookingEmailProps> = ({ booking, type }) => 
             <tr>
               <td style={{ padding: '8px 0', ...label }}>Total Price</td>
               <td style={{ padding: '8px 0', textAlign: 'right', fontSize: '18px', fontWeight: 'bold', color: '#ff5f00' }}>
-                €{booking.totalPrice.toLocaleString()}
+                €{Number(booking.totalPrice).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
               </td>
             </tr>
           </tbody>

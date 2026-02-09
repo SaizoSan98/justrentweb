@@ -146,17 +146,10 @@ export function UsersTable({ users }: { users: any[] }) {
                           <Button 
                             variant="ghost" 
                             size="icon"
-                            type="button"
-                            onClick={(e) => {
-                                console.log('Delete button clicked for:', user.name);
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setDeletingUser(user);
-                            }}
-                            className="h-8 w-8 text-zinc-400 hover:text-red-700 hover:bg-red-50 z-10 relative cursor-pointer"
-                            title="Delete User Permanently"
+                            className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => setDeletingUser(user)}
                           >
-                            <Trash2 className="w-4 h-4 pointer-events-none" />
+                            <Trash2 className="w-4 h-4" />
                           </Button>
                         </>
                       )}
@@ -331,6 +324,25 @@ export function UsersTable({ users }: { users: any[] }) {
               </div>
             </form>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete User Dialog */}
+      <Dialog open={!!deletingUser} onOpenChange={(open) => !open && setDeletingUser(null)}>
+        <DialogContent className="w-[90%] max-w-[420px] rounded-xl">
+          <DialogHeader>
+            <DialogTitle>Delete User</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-zinc-500">
+              Are you sure you want to delete <span className="font-bold text-zinc-900">{deletingUser?.name}</span>? 
+              This action cannot be undone and will remove all associated data.
+            </p>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setDeletingUser(null)}>Cancel</Button>
+            <Button variant="destructive" onClick={handleDeleteUser}>Delete User</Button>
+          </div>
         </DialogContent>
       </Dialog>
     </>

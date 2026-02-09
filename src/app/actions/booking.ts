@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { getSession } from "@/lib/auth"
-import { sendBookingConfirmationEmail, sendWelcomeUserEmail } from "@/lib/email"
+import { sendBookingConfirmationEmail, sendWelcomeUserEmail, sendAdminNewBookingEmail } from "@/lib/email"
 import { syncBookingToRenteon } from "@/lib/renteon"
 import { login } from "@/lib/auth"
 
@@ -138,6 +138,7 @@ export async function createBooking(prevState: any, formData: FormData) {
     // We wrap this in a try-catch to ensure it doesn't crash the main flow if email fails
     try {
       await sendBookingConfirmationEmail(booking)
+      await sendAdminNewBookingEmail(booking)
       
       // If new user, send welcome email with credentials
       if (isNewUser) {

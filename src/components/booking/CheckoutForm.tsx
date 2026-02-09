@@ -46,9 +46,14 @@ interface CheckoutFormProps {
   settings?: any
   initialInsurance?: string
   initialMileage?: string
+  user?: {
+    name?: string | null
+    email?: string | null
+    phone?: string | null
+  }
 }
 
-export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate: initialEndDate, settings, initialInsurance, initialMileage }: CheckoutFormProps) {
+export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate: initialEndDate, settings, initialInsurance, initialMileage, user }: CheckoutFormProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   
@@ -63,6 +68,12 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
 
   // Extras & Payment State
   const [selectedExtras, setSelectedExtras] = useState<string[]>([])
+  
+  // Renter Details State
+  const [firstName, setFirstName] = useState(user?.name?.split(' ')[0] || '')
+  const [lastName, setLastName] = useState(user?.name?.split(' ').slice(1).join(' ') || '')
+  const [email, setEmail] = useState(user?.email || '')
+  const [phone, setPhone] = useState(user?.phone || '')
   
   // Insurance State Logic
   const defaultInsurance = (car.insuranceOptions && car.insuranceOptions.length > 0) 
@@ -376,19 +387,45 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
           <CardContent className="p-6 grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>First Name *</Label>
-              <Input name="firstName" placeholder="John" required />
+              <Input 
+                name="firstName" 
+                placeholder="John" 
+                required 
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
             </div>
             <div className="space-y-2">
               <Label>Last Name *</Label>
-              <Input name="lastName" placeholder="Doe" required />
+              <Input 
+                name="lastName" 
+                placeholder="Doe" 
+                required 
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
             </div>
             <div className="space-y-2">
               <Label>Email Address *</Label>
-              <Input name="email" type="email" placeholder="john@example.com" required />
+              <Input 
+                name="email" 
+                type="email" 
+                placeholder="john@example.com" 
+                required 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
             <div className="space-y-2">
               <Label>Phone Number *</Label>
-              <Input name="phone" type="tel" placeholder="+36 20 123 4567" required />
+              <Input 
+                name="phone" 
+                type="tel" 
+                placeholder="+36 20 123 4567" 
+                required 
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
             </div>
             <div className="space-y-2">
               <Label>Flight Number</Label>
@@ -508,18 +545,21 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
 
              <div 
                className={cn(
-                 "border-2 rounded-xl p-4 cursor-pointer transition-all flex items-start gap-4",
-                 mileageOption === 'UNLIMITED' ? "border-black bg-zinc-50" : "border-zinc-200 hover:border-zinc-300"
+                 "border-2 rounded-xl p-4 transition-all flex items-start gap-4 opacity-50 cursor-not-allowed",
+                 mileageOption === 'UNLIMITED' ? "border-black bg-zinc-50" : "border-zinc-200"
                )}
-               onClick={() => setMileageOption('UNLIMITED')}
+               // onClick={() => setMileageOption('UNLIMITED')}
              >
                <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center mt-1 shrink-0", mileageOption === 'UNLIMITED' ? "border-black" : "border-zinc-300")}>
                  {mileageOption === 'UNLIMITED' && <div className="w-3 h-3 bg-black rounded-full" />}
                </div>
                <div className="flex-1">
                  <div className="flex justify-between items-center mb-1">
-                   <h4 className="font-bold text-zinc-900">Unlimited km</h4>
-                   <span className="font-bold text-zinc-900">+{Math.round((car.unlimitedMileagePrice || 0) * days)} €</span>
+                   <h4 className="font-bold text-zinc-900 flex items-center gap-2">
+                     Unlimited km
+                     <span className="bg-zinc-200 text-zinc-600 text-[10px] px-1.5 py-0.5 rounded uppercase tracking-wider font-bold">DEV</span>
+                   </h4>
+                   <span className="font-bold text-zinc-400">+{Math.round((car.unlimitedMileagePrice || 0) * days)} €</span>
                  </div>
                </div>
              </div>

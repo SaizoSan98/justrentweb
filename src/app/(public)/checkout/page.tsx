@@ -129,6 +129,7 @@ export default async function CheckoutPage({
           settings={settings}
           initialInsurance={initialInsurance}
           initialMileage={initialMileage}
+          user={session?.user}
         />
       </main>
     </div>
