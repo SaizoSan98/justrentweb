@@ -96,6 +96,7 @@ export async function createBooking(prevState: any, formData: FormData) {
     const companyTaxId = formData.get('companyTaxId') as string
     
     const fullInsurance = formData.get('fullInsurance') === 'true'
+    const insurancePlanId = formData.get('insurancePlanId') as string
     const paymentMethod = formData.get('paymentMethod') as string
     const selectedExtras = JSON.parse(formData.get('selectedExtras') as string) as string[]
 
@@ -121,6 +122,7 @@ export async function createBooking(prevState: any, formData: FormData) {
         companyAddress: isCompany ? companyAddress : null,
         companyTaxId: isCompany ? companyTaxId : null,
         fullInsurance,
+        insurancePlanId: (!insurancePlanId || insurancePlanId === 'stock') ? null : insurancePlanId,
         paymentMethod,
         extras: {
           connect: selectedExtras.map(id => ({ id }))
