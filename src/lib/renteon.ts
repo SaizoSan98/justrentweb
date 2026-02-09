@@ -520,6 +520,10 @@ async function finalizeBooking(bookingModel: any, booking: any, token: string) {
     // Also set ClientName at root if the model supports it (common in some API versions)
     bookingModel.ClientName = clientName;
 
+    // Voucher Number is required for Commissioner/Partner bookings
+    // Use the JustRent booking ID as the voucher number
+    bookingModel.VoucherNumber = booking.id;
+
     bookingModel.FlightNumber = booking.flightNumber;
     bookingModel.Note = booking.comments;
 
