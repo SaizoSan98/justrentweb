@@ -29,15 +29,17 @@ export default async function FleetPage({
   const startDateStr = typeof params.startDate === 'string' ? params.startDate : undefined;
   const endDateStr = typeof params.endDate === 'string' ? params.endDate : undefined;
   
-  // Calculate default start date (Next hour)
+  // Calculate default start date (Current time + 2 hours)
   const defaultStartDate = new Date();
-  defaultStartDate.setHours(defaultStartDate.getHours() + 1);
-  defaultStartDate.setMinutes(0, 0, 0);
+  defaultStartDate.setHours(defaultStartDate.getHours() + 2);
+  // We keep minutes as is, or round them? User said "Feb 10. 11:53" (if now is 9:53). So keep minutes.
+  // defaultStartDate.setMinutes(0, 0, 0); // Removed zeroing minutes
 
   const startDate = startDateStr ? new Date(startDateStr) : defaultStartDate;
   const endDate = endDateStr ? new Date(endDateStr) : undefined;
   
-  const queryEndDate = endDate || new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
+  // Default duration: 3 days
+  const queryEndDate = endDate || new Date(startDate.getTime() + 3 * 24 * 60 * 60 * 1000);
 
   // Base availability filter - ALWAYS applied on server to prevent booking conflicts
   // We now fetch ALL cars that are generally available in fleet, and mark them as rented if they have conflicts
