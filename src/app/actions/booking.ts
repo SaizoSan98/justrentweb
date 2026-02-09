@@ -131,7 +131,8 @@ export async function createBooking(prevState: any, formData: FormData) {
       include: {
         car: true,
         user: true, // Include user to get data for email
-        extras: true // Include extras for Renteon sync
+        extras: true, // Include extras for Renteon sync
+        insurancePlan: true // Include insurance plan for accurate Renteon sync
       }
     })
 

@@ -535,8 +535,28 @@ async function finalizeBooking(bookingModel: any, booking: any, token: string) {
 
     // 4. Handle Extras & Insurance
     
-    // 4a. Full Insurance
-    if (booking.fullInsurance) {
+    // 4a. Insurance Plan (Exact Match)
+    let insuranceMatched = false;
+    
+    if (booking.insurancePlan && booking.insurancePlan.renteonId) {
+        // Find by Renteon ID from InsurancePlan model
+        const plan = bookingModel.Services.find((s: any) => 
+            s.Id.toString() === booking.insurancePlan.renteonId.toString() ||
+            s.ServiceId?.toString() === booking.insurancePlan.renteonId.toString()
+        );
+        
+        if (plan) {
+            plan.IsSelected = true;
+            plan.Quantity = 1;
+            insuranceMatched = true;
+            console.log(`Selected Insurance Plan: ${plan.Name} (ID: ${plan.Id}) via DB Relation`);
+        } else {
+            console.warn(`Insurance Plan '${booking.insurancePlan.name}' (ID: ${booking.insurancePlan.renteonId}) not found in Renteon services.`);
+        }
+    }
+
+    // Fallback: Full Insurance (Boolean flag)
+    if (!insuranceMatched && booking.fullInsurance) {
         // Try to find by multiple criteria
         const fullIns = bookingModel.Services.find((s: any) => 
             s.Name.toLowerCase().includes('full insurance') || 
@@ -548,7 +568,7 @@ async function finalizeBooking(bookingModel: any, booking: any, token: string) {
         if (fullIns) {
             fullIns.IsSelected = true;
             fullIns.Quantity = 1;
-            console.log(`Selected Full Insurance: ${fullIns.Name} (ID: ${fullIns.Id})`);
+            console.log(`Selected Full Insurance: ${fullIns.Name} (ID: ${fullIns.Id}) via Boolean Flag`);
         } else {
             console.warn('Full Insurance requested but no matching service found in Renteon model.');
         }
