@@ -481,7 +481,14 @@ export async function executeSyncCars() {
                                 renteonId: carData.renteonId,
                                 licensePlate: carData.licensePlate,
                                 categories: carData.categories,
-                                pricePerDay: carData.pricePerDay
+                                pricePerDay: carData.pricePerDay,
+                                // PROTECTED MANUAL FIELDS - DO NOT UNCOMMENT OR ADD:
+                                // deposit, 
+                                // extraKmPrice, 
+                                // unlimitedMileagePrice, 
+                                // pickupAfterHoursPrice, 
+                                // returnAfterHoursPrice, 
+                                // fullInsurancePrice
                             } as any
                         })
                         updatedCount++
@@ -577,6 +584,13 @@ export async function executeSyncCars() {
                             categories: carData.categories,
                             renteonId: carData.renteonId,
                             pricePerDay: carData.pricePerDay
+                            // PROTECTED MANUAL FIELDS - DO NOT UNCOMMENT OR ADD:
+                            // deposit, 
+                            // extraKmPrice, 
+                            // unlimitedMileagePrice, 
+                            // pickupAfterHoursPrice, 
+                            // returnAfterHoursPrice, 
+                            // fullInsurancePrice
                         } as any
                     })
                     updatedCount++

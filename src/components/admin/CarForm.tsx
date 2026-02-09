@@ -622,11 +622,11 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
           <Card>
             <CardContent className="p-6 space-y-8">
               
-              <div className="bg-amber-50 p-4 rounded-lg border border-amber-200 text-sm text-amber-800 flex items-start gap-3">
-                 <div className="mt-0.5">⚠️</div>
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 text-sm text-blue-800 flex items-start gap-3">
+                 <div className="mt-0.5">ℹ️</div>
                  <div>
-                    <p className="font-bold">Important Note</p>
-                    <p>Prices below are only used for manually added cars (Local Website Cars). Cars synced from Renteon will use Renteon's dynamic pricing.</p>
+                    <p className="font-bold">Sync Information</p>
+                    <p>Only <strong>Base Rental Price</strong> is updated automatically from Renteon. All other fields (Deposit, Full Insurance, Extra KM, etc.) are managed manually here and will NOT be overwritten.</p>
                  </div>
               </div>
 
