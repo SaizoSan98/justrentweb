@@ -55,7 +55,7 @@ export default async function MyBookingsPage() {
                             <p className="text-sm text-zinc-500">{booking.car.licensePlate}</p>
                         </div>
                         <div className="text-right">
-                            <span className="block text-2xl font-bold text-zinc-900">€{Number(booking.totalPrice)}</span>
+                            <span className="block text-2xl font-bold text-zinc-900">€{Number(booking.totalPrice).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</span>
                             <span className="text-xs text-zinc-500">Total Price</span>
                         </div>
                     </div>
