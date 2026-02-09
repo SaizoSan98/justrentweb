@@ -66,6 +66,7 @@ export async function registerAction(formData: FormData) {
   
   try {
     // Store token (expires in 15 min)
+    console.log(`Creating verification token for ${email}...`);
     await prisma.verificationToken.create({
       data: {
         identifier: email,
@@ -73,9 +74,16 @@ export async function registerAction(formData: FormData) {
         expires: new Date(Date.now() + 15 * 60 * 1000)
       }
     })
+    console.log('Verification token created.');
 
     // Send email
-    await sendVerificationEmail(email, code)
+    console.log(`Sending verification email to ${email}...`);
+    const emailRes = await sendVerificationEmail(email, code)
+    if (emailRes.success) {
+        console.log('Verification email sent successfully.');
+    } else {
+        console.error('Verification email failed:', emailRes.error);
+    }
     
     // Redirect to verification page with data in URL params (safe enough for non-sensitive flow)
     // Ideally we would use a cookie or session, but params work for this simple flow.

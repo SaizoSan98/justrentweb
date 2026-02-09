@@ -22,6 +22,8 @@ async function sendEmail({ to, subject, component }: { to: string, subject: stri
     return { success: false, error: "Missing API Key" };
   }
 
+  console.log(`Sending email via Resend to: ${to}, Subject: ${subject}, From: ${FROM_EMAIL}`);
+
   try {
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
