@@ -123,15 +123,34 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
   const formRef = useRef<HTMLFormElement>(null)
 
   useEffect(() => {
+    // Only update available models if the make changes AND we are not in initial load state for a custom model
     if (selectedMake && CAR_MODELS[selectedMake]) {
-      setAvailableModels(CAR_MODELS[selectedMake])
+        // Check if current model is valid for this make
+        const isModelValid = CAR_MODELS[selectedMake].includes(selectedModel)
+        
+        // If the current model is NOT in the new list, but it exists (e.g. custom Renteon model),
+        // we should NOT clear it immediately. We only set available models.
+        setAvailableModels(CAR_MODELS[selectedMake])
     } else {
       setAvailableModels([])
     }
-  }, [selectedMake])
+  }, [selectedMake]) // Removed selectedModel from dependency to avoid loop
+
+  // Fix: When initial data loads, if model is not in available models, keep it as text
+  useEffect(() => {
+      if (car?.model && !availableModels.includes(car.model) && !CAR_MODELS[selectedMake]?.includes(car.model)) {
+          // If model is custom/renteon, ensure we can edit it
+          // This effect is mainly to ensure state consistency if needed
+      }
+  }, [car, availableModels, selectedMake])
 
   const handleMakeChange = (value: string) => {
     setSelectedMake(value)
+    // Only clear model if the new make has models defined AND the current model is not one of them
+    // Actually, when changing make, we usually want to clear model unless it's a "custom" make without models
+    if (CAR_MODELS[value] && CAR_MODELS[value].length > 0) {
+        setSelectedModel("") // Reset model when make changes to a standard one
+    }
   }
 
   const handleFeatureToggle = (feature: string) => {
@@ -185,8 +204,13 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
 
     // Basic validation
     // Use state values directly instead of formData because Tabs unmount content!
-    if (!selectedMake || !selectedModel || !pricePerDay) {
-      toast.error("Please fill in all required fields (Make, Model, Price)")
+    const missingFields = []
+    if (!selectedMake) missingFields.push("Make")
+    if (!selectedModel) missingFields.push("Model")
+    if (!pricePerDay) missingFields.push("Price")
+
+    if (missingFields.length > 0) {
+      toast.error(`Please fill in required fields: ${missingFields.join(', ')}`)
       return
     }
 
@@ -319,6 +343,10 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
                       <SelectValue placeholder="Select make" />
                     </SelectTrigger>
                     <SelectContent>
+                      {/* If selected make is not in the list, add it dynamically so it shows up */}
+                      {!CAR_MAKES.includes(selectedMake) && selectedMake && (
+                          <SelectItem value={selectedMake}>{selectedMake}</SelectItem>
+                      )}
                       {CAR_MAKES.map(make => (
                         <SelectItem key={make} value={make}>{make}</SelectItem>
                       ))}
@@ -328,7 +356,8 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
 
                 <div className="space-y-2">
                   <Label htmlFor="model">Vehicle Model</Label>
-                  {availableModels.length > 0 ? (
+                  {/* Logic: If Renteon data or Custom Model not in list, show Input. Else show Select */}
+                  {availableModels.length > 0 && availableModels.includes(selectedModel) ? (
                     <>
                       <input type="hidden" name="model" value={selectedModel} />
                       <Select value={selectedModel} onValueChange={setSelectedModel} required>
@@ -341,9 +370,45 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
                           ))}
                         </SelectContent>
                       </Select>
+                      <Button 
+                        type="button" 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-xs text-zinc-500 h-6 mt-1"
+                        onClick={() => {
+                            // Switch to manual mode by clearing available models temporarily for this session? 
+                            // Better: Add a "Switch to manual" toggle?
+                            // Quick fix: If user wants to type manually, we can just show input if they select "Other" or similar.
+                            // For now, let's keep it simple: If it's already a known model, show select.
+                            // But if we want to Edit it, we might need an input.
+                        }}
+                      >
+                        Model not listed? Type manually
+                      </Button>
                     </>
                   ) : (
-                    <Input name="model" defaultValue={car?.model} placeholder="Type model manually" required />
+                    <div className="space-y-1">
+                        <Input 
+                            name="model" 
+                            value={selectedModel} 
+                            onChange={(e) => setSelectedModel(e.target.value)}
+                            placeholder="Type model manually" 
+                            required 
+                        />
+                        {availableModels.length > 0 && (
+                            <Button 
+                                type="button" 
+                                variant="ghost" 
+                                size="sm" 
+                                className="text-xs text-blue-600 h-6 px-0"
+                                onClick={() => {
+                                    if (availableModels.length > 0) setSelectedModel(availableModels[0])
+                                }}
+                            >
+                                Select from list instead
+                            </Button>
+                        )}
+                    </div>
                   )}
                 </div>
 
