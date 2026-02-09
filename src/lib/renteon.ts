@@ -533,13 +533,55 @@ async function finalizeBooking(bookingModel: any, booking: any, token: string) {
         bookingModel.Client.Address1 = booking.companyAddress;
     }
 
-    // 4. Handle Extras
+    // 4. Handle Extras & Insurance
+    
+    // 4a. Full Insurance
     if (booking.fullInsurance) {
-        const fullIns = bookingModel.Services.find((s: any) => s.Name.includes('Full Insurance') || s.Id === 3215 || s.Id === 3213 || s.Id === 3214);
+        // Try to find by multiple criteria
+        const fullIns = bookingModel.Services.find((s: any) => 
+            s.Name.toLowerCase().includes('full insurance') || 
+            s.Name.toLowerCase().includes('full protection') ||
+            s.Id === 3215 || s.Id === 3213 || s.Id === 3214 || 
+            s.ServiceTypeId === 3 // Insurance type often has specific ID
+        );
+        
         if (fullIns) {
             fullIns.IsSelected = true;
             fullIns.Quantity = 1;
+            console.log(`Selected Full Insurance: ${fullIns.Name} (ID: ${fullIns.Id})`);
+        } else {
+            console.warn('Full Insurance requested but no matching service found in Renteon model.');
         }
+    }
+
+    // 4b. Selected Extras (Highway fee, Baby seats, etc.)
+    if (booking.extras && Array.isArray(booking.extras)) {
+        booking.extras.forEach((extra: any) => {
+            let serviceMatch = null;
+
+            // Try match by Renteon ID first
+            if (extra.renteonId) {
+                serviceMatch = bookingModel.Services.find((s: any) => s.Id.toString() === extra.renteonId.toString() || s.ServiceId?.toString() === extra.renteonId.toString());
+            }
+
+            // Fallback to Name match
+            if (!serviceMatch) {
+                serviceMatch = bookingModel.Services.find((s: any) => s.Name.toLowerCase().trim() === extra.name.toLowerCase().trim());
+            }
+            
+            // Fallback to Code match if available
+            if (!serviceMatch && extra.code) {
+                serviceMatch = bookingModel.Services.find((s: any) => s.ServiceCode === extra.code);
+            }
+
+            if (serviceMatch) {
+                serviceMatch.IsSelected = true;
+                serviceMatch.Quantity = 1; // Default to 1 for now, or add quantity field to booking_extras if needed
+                console.log(`Selected Extra: ${extra.name} -> Renteon Service: ${serviceMatch.Name} (ID: ${serviceMatch.Id})`);
+            } else {
+                console.warn(`Extra '${extra.name}' (ID: ${extra.renteonId}) requested but not found in Renteon services list.`);
+            }
+        });
     }
 
     // 5. Save Booking
