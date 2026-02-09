@@ -65,7 +65,10 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
   const [selectedExtras, setSelectedExtras] = useState<string[]>([])
   
   // Insurance State Logic
-  const [selectedInsuranceId, setSelectedInsuranceId] = useState<string>(initialInsurance || "stock")
+  const defaultInsurance = (car.insuranceOptions && car.insuranceOptions.length > 0) 
+      ? [...car.insuranceOptions].sort((a: any, b: any) => (a.plan?.order || 0) - (b.plan?.order || 0))[0].planId 
+      : ""
+  const [selectedInsuranceId, setSelectedInsuranceId] = useState<string>(initialInsurance || defaultInsurance)
   const [mileageOption, setMileageOption] = useState<'LIMITED' | 'UNLIMITED'>(initialMileage as 'LIMITED' | 'UNLIMITED' || 'LIMITED')
   
   const [fullInsurance, setFullInsurance] = useState(false) // Legacy, keeping for compatibility or removing if fully replaced by tiered insurance
@@ -445,27 +448,6 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
             </CardTitle>
           </CardHeader>
           <div className="p-6 space-y-4">
-             {/* Stock Option */}
-             <div 
-                  className={cn(
-                    "border-2 rounded-xl p-4 cursor-pointer transition-all flex items-start gap-4",
-                    selectedInsuranceId === "stock" ? "border-black bg-zinc-50" : "border-zinc-200 hover:border-zinc-300"
-                  )}
-                  onClick={() => setSelectedInsuranceId("stock")}
-                >
-                  <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center mt-1 shrink-0", selectedInsuranceId === "stock" ? "border-black" : "border-zinc-300")}>
-                    {selectedInsuranceId === "stock" && <div className="w-3 h-3 bg-black rounded-full" />}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between items-center mb-1">
-                      <h4 className="font-bold text-zinc-900">Stock Insurance</h4>
-                      <span className="font-bold text-zinc-900">Included</span>
-                    </div>
-                    <p className="text-sm text-zinc-500">Basic coverage.</p>
-                    <p className="text-xs font-semibold text-zinc-700 mt-1">Deposit: €{car.deposit}</p>
-                  </div>
-                </div>
-
              {car.insuranceOptions?.sort((a: any, b: any) => (a.plan?.order || 0) - (b.plan?.order || 0)).map((ins: any) => (
                 <div 
                   key={ins.planId}
