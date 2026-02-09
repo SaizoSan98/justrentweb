@@ -469,8 +469,9 @@ export async function executeSyncCars() {
                         await prisma.car.update({
                             where: { id: existingId },
                             data: {
-                                make: carData.make,
-                                model: carData.model,
+                                // PROTECTED: Manual Make/Model
+                                // make: carData.make,
+                                // model: carData.model,
                                 year: carData.year,
                                 // Only update image if local is missing (PROTECT MANUAL IMAGES)
                                 ...(existing?.imageUrl ? {} : { imageUrl: carData.imageUrl }),
@@ -574,8 +575,9 @@ export async function executeSyncCars() {
                     await prisma.car.update({
                         where: { id: existing.id },
                         data: {
-                            make: carData.make,
-                            model: carData.model,
+                            // PROTECTED: Manual Make/Model
+                            // make: carData.make,
+                            // model: carData.model,
                             // PROTECT MANUAL IMAGES: Only update if existing is null
                             ...(existing.imageUrl ? {} : (localImage ? { imageUrl: localImage } : {})),
                             transmission: carData.transmission as any,
