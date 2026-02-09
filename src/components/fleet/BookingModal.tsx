@@ -223,14 +223,12 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
     })
   }
 
-  // Set default insurance to the cheapest/first one if not set
+  // Set default insurance to "stock"
   useEffect(() => {
-    if (car.insuranceOptions && car.insuranceOptions.length > 0 && !selectedInsuranceId) {
-       // Sort by price to find "Basic"
-       const sorted = [...car.insuranceOptions].sort((a, b) => a.pricePerDay - b.pricePerDay)
-       setSelectedInsuranceId(sorted[0].planId)
+    if (!selectedInsuranceId) {
+       setSelectedInsuranceId("stock")
     }
-  }, [car, selectedInsuranceId])
+  }, [selectedInsuranceId])
 
   if (!isOpen) return null
 
@@ -304,6 +302,26 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                              <h3 className="font-bold text-zinc-900">Insurance & Deposit</h3>
                           </div>
                           <div className="p-4 space-y-3">
+                            {/* Stock Insurance Option */}
+                            <div 
+                                 onClick={() => setSelectedInsuranceId("stock")}
+                                 className={cn(
+                                   "flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all",
+                                   selectedInsuranceId === "stock" ? "border-black bg-zinc-50" : "border-zinc-100 hover:border-zinc-200"
+                                 )}
+                               >
+                                  <div className="flex items-center gap-3">
+                                     <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", selectedInsuranceId === "stock" ? "border-black" : "border-zinc-300")}>
+                                        {selectedInsuranceId === "stock" && <div className="w-2.5 h-2.5 rounded-full bg-black" />}
+                                     </div>
+                                     <div>
+                                        <div className="font-bold text-zinc-900">Stock Insurance</div>
+                                        <div className="text-xs text-zinc-500">Deposit: {car.deposit?.toLocaleString() ?? 0} €</div>
+                                     </div>
+                                  </div>
+                                  <span className="font-bold text-sm">Included</span>
+                               </div>
+
                             {sortedInsurance.map((ins) => (
                                <div 
                                  key={ins.planId}
@@ -387,6 +405,31 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                     <p className="text-zinc-500">Select the coverage that suits you best.</p>
                     
                     <div className="grid gap-4">
+                       {/* Stock Insurance Card */}
+                       <div 
+                             onClick={() => setSelectedInsuranceId("stock")}
+                             className={cn(
+                                "flex items-center justify-between p-6 rounded-2xl border-2 cursor-pointer transition-all bg-white hover:border-zinc-300",
+                                selectedInsuranceId === "stock" ? "border-black shadow-md ring-1 ring-black" : "border-zinc-100"
+                             )}
+                          >
+                             <div className="flex items-center gap-4">
+                                <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0", selectedInsuranceId === "stock" ? "border-black" : "border-zinc-300")}>
+                                   {selectedInsuranceId === "stock" && <div className="w-3 h-3 rounded-full bg-black" />}
+                                </div>
+                                <div>
+                                <div className="font-bold text-lg">Stock Insurance</div>
+                                <div className="text-sm text-zinc-500">Basic coverage</div>
+                                <div className="mt-2 flex gap-4 text-xs font-medium text-zinc-700">
+                                      <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> Deposit: {car.deposit?.toLocaleString() ?? 0} €</span>
+                                   </div>
+                                </div>
+                             </div>
+                             <div className="text-right">
+                                <div className="font-bold text-xl">Included</div>
+                             </div>
+                          </div>
+
                        {sortedInsurance.map((ins) => (
                           <div 
                              key={ins.planId}
@@ -404,13 +447,13 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                                 <div className="font-bold text-lg">{ins.plan?.name}</div>
                                 <div className="text-sm text-zinc-500">{ins.plan?.description || "Standard coverage"}</div>
                                 <div className="mt-2 flex gap-4 text-xs font-medium text-zinc-700">
-                                      <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> Deposit: {ins.deposit?.toLocaleString() ?? 0} Ft</span>
+                                      <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> Deposit: {ins.deposit?.toLocaleString() ?? 0} €</span>
                                    </div>
                                 </div>
                              </div>
                              <div className="text-right">
-                                <div className="font-bold text-xl">{ins.pricePerDay === 0 ? "Included" : `+${ins.pricePerDay.toLocaleString()} Ft/day`}</div>
-                                {ins.pricePerDay > 0 && <div className="text-xs text-zinc-500">Total: {(ins.pricePerDay * days).toLocaleString()} Ft</div>}
+                                <div className="font-bold text-xl">{ins.pricePerDay === 0 ? "Included" : `+${ins.pricePerDay.toLocaleString()} €/day`}</div>
+                                {ins.pricePerDay > 0 && <div className="text-xs text-zinc-500">Total: {(ins.pricePerDay * days).toLocaleString()} €</div>}
                              </div>
                           </div>
                        ))}
