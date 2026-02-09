@@ -479,6 +479,10 @@ export async function syncBookingToRenteon(booking: any) {
         }));
     }
 
+    // Force office ID 54 on save as well
+    bookingModel.OfficeOutId = 54;
+    bookingModel.OfficeInId = 54;
+
     const saveResponse = await fetch(`${RENTEON_API_URL}/bookings/save`, {
       method: 'POST',
       headers: {
