@@ -541,8 +541,8 @@ async function finalizeBooking(bookingModel: any, booking: any, token: string) {
     if (booking.insurancePlan && booking.insurancePlan.renteonId) {
         // Find by Renteon ID from InsurancePlan model
         const plan = bookingModel.Services.find((s: any) => 
-            s.Id.toString() === booking.insurancePlan.renteonId.toString() ||
-            s.ServiceId?.toString() === booking.insurancePlan.renteonId.toString()
+            (s.Id && s.Id.toString() === booking.insurancePlan.renteonId.toString()) ||
+            (s.ServiceId && s.ServiceId.toString() === booking.insurancePlan.renteonId.toString())
         );
         
         if (plan) {
@@ -581,7 +581,10 @@ async function finalizeBooking(bookingModel: any, booking: any, token: string) {
 
             // Try match by Renteon ID first
             if (extra.renteonId) {
-                serviceMatch = bookingModel.Services.find((s: any) => s.Id.toString() === extra.renteonId.toString() || s.ServiceId?.toString() === extra.renteonId.toString());
+                serviceMatch = bookingModel.Services.find((s: any) => 
+                    (s.Id && s.Id.toString() === extra.renteonId.toString()) || 
+                    (s.ServiceId && s.ServiceId.toString() === extra.renteonId.toString())
+                );
             }
 
             // Fallback to Name match
