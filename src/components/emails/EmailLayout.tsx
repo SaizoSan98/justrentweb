@@ -35,11 +35,49 @@ export const EmailLayout: React.FC<EmailLayoutProps> = ({ preview, children }) =
             padding: '32px 40px',
             textAlign: 'center'
           }}>
-            <img 
-              src="https://justrentandtrans.com/jrlogo.PNG" 
-              alt="JustRent" 
-              style={{ height: '40px', objectFit: 'contain' }}
-            />
+            {/* Styled Text Logo (matching site design) */}
+            <div style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+              <table cellPadding="0" cellSpacing="0" border={0} style={{ display: 'inline-table' }}>
+                <tr>
+                  <td style={{ paddingRight: '8px' }}>
+                    <div style={{
+                      backgroundColor: '#ffffff',
+                      color: '#000000',
+                      padding: '4px 8px',
+                      borderRadius: '2px',
+                      fontWeight: '900',
+                      fontSize: '20px',
+                      lineHeight: '1',
+                      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
+                    }}>
+                      JUST
+                    </div>
+                  </td>
+                  <td>
+                    <div style={{
+                      color: '#ffffff',
+                      fontWeight: '900',
+                      fontSize: '20px',
+                      lineHeight: '1',
+                      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
+                    }}>
+                      RENT
+                    </div>
+                    <div style={{
+                      color: '#a1a1aa',
+                      fontSize: '8px',
+                      fontWeight: '700',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                      marginTop: '0px',
+                      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
+                    }}>
+                      Rent a Car
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </div>
           </div>
 
           {/* Content */}
