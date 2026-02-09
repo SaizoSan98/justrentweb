@@ -45,7 +45,7 @@ export const BookingEmail: React.FC<BookingEmailProps> = ({ booking, type }) => 
                 : booking.car.imageUrl
               } 
               alt={`${booking.car.make} ${booking.car.model}`}
-              style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'contain', borderRadius: '8px', backgroundColor: 'transparent' }}
+              style={{ width: '100%', maxWidth: '400px', height: 'auto', display: 'block', margin: '0 auto', borderRadius: '8px', backgroundColor: 'transparent' }}
             />
           </div>
         )}

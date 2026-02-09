@@ -448,32 +448,42 @@ export async function syncBookingToRenteon(booking: any) {
         console.error('Renteon Create Booking Failed. Status:', createResponse.status, 'Error:', err);
         
         // RETRY STRATEGY: Try to create without specific category if availability fails
-        if (err.includes('no available cars')) {
+        if (err.includes('no available cars') || err.includes('Price Calc Warning') || true) { // Always try retry if first attempt failed
              console.warn('Retrying Renteon booking without specific category (On Request mode)...');
              const fallbackPayload = { ...createPayload };
              delete (fallbackPayload as any).CarCategoryId; // Remove category constraint
              (fallbackPayload as any).CarClassId = null; // Ensure no class constraint either
+             (fallbackPayload as any).IgnoreAvailability = true; // Ensure flag is set
+             (fallbackPayload as any).Force = true;
              
-             const retryResponse = await fetch(`${RENTEON_API_URL}/bookings/create`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(fallbackPayload)
-            });
-            
-            if (retryResponse.ok) {
-                 const retryModel = await retryResponse.json();
-                 console.log('Retry Successful. Model ID:', retryModel.Id);
-                 // We need to set the category manually in the model now
-                 retryModel.CarCategoryId = categoryId;
-                 
-                 // Proceed with this model
-                 return await finalizeBooking(retryModel, booking, token);
-            } else {
-                 console.error('Retry Failed as well:', await retryResponse.text());
-            }
+             try {
+                 const retryResponse = await fetch(`${RENTEON_API_URL}/bookings/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(fallbackPayload)
+                });
+                
+                if (retryResponse.ok) {
+                     const retryModel = await retryResponse.json();
+                     console.log('Retry Successful. Model ID:', retryModel.Id);
+                     // We need to set the category manually in the model now if possible, or just leave it open
+                     if (categoryId) retryModel.CarCategoryId = categoryId;
+                     
+                     // Proceed with this model
+                     return await finalizeBooking(retryModel, booking, token);
+                } else {
+                     const retryErr = await retryResponse.text();
+                     console.error('Retry Failed as well:', retryErr);
+                     // If still fails, we can't do much more via API.
+                     return { success: false, error: `Primary and Retry failed: ${retryErr}` };
+                }
+             } catch (retryEx) {
+                 console.error('Retry Exception:', retryEx);
+                 return { success: false, error: 'Retry Exception' };
+             }
         }
         
         return { success: false, error: err };
