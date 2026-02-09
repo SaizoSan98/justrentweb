@@ -29,6 +29,12 @@ export default async function UsersPage() {
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-black text-zinc-900 tracking-tight">Users & Permissions</h1>
+        <Link href="/admin/users/new">
+          <Button className="bg-zinc-900 text-white hover:bg-zinc-800">
+            <Plus className="w-4 h-4 mr-2" />
+            Create User
+          </Button>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
