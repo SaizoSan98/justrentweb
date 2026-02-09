@@ -346,8 +346,13 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                                         <div className="text-xs text-zinc-500">Deposit: {ins.deposit?.toLocaleString() ?? 0} €</div>
                                      </div>
                                   </div>
-                                  <span className="font-bold text-sm">
-                                    {ins.pricePerDay === 0 ? "Included" : `+${Math.round(ins.pricePerDay * days).toLocaleString()} €`}
+                                  <span className="font-bold text-sm text-right">
+                                     {ins.pricePerDay === 0 ? "Included" : (
+                                         <>
+                                             <div>+{Math.round(ins.pricePerDay * days).toLocaleString()} €</div>
+                                             <div className="text-[10px] text-zinc-400">({Math.round(ins.pricePerDay)} € / day)</div>
+                                         </>
+                                     )}
                                   </span>
                                </div>
                             ))}

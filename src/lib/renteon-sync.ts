@@ -244,62 +244,140 @@ function decodeSIPP(sipp: string): string {
 
 async function linkInsurancesToCars() {
     try {
+        const token = await getRenteonToken();
+        if (!token) {
+            console.error("No token for linking insurances");
+            return;
+        }
+
         const plans = await prisma.insurancePlan.findMany();
         const cars = await prisma.car.findMany({ where: { renteonId: { not: null } } });
+        const categories = await fetchCarCategories();
 
         if (plans.length === 0 || cars.length === 0) return;
+
+        // 1. Identify Representative Categories for Mini, Midi, Maxi
+        const representatives: Record<string, number> = {};
+        
+        if (Array.isArray(categories)) {
+            // Helper to find a category ID for a group
+            const findCat = (predicate: (s: string) => boolean) => {
+                const cat = categories.find((c: any) => predicate(c.SIPP));
+                return cat ? cat.Id : null;
+            };
+
+            // Mini: M*, E*
+            representatives['mini'] = findCat(s => !!s && (s.startsWith('M') || s.startsWith('E')));
+            // Midi: C*, I*
+            representatives['midi'] = findCat(s => !!s && (s.startsWith('C') || s.startsWith('I')));
+            // Maxi: S*, F*, P*, L*, X* or *V* (Van)
+            representatives['maxi'] = findCat(s => !!s && (['S', 'F', 'P', 'L', 'X'].includes(s[0]) || (s.length > 1 && ['V', 'K'].includes(s[1]))));
+        }
+
+        // 2. Fetch Prices for each Group
+        const groupPrices: Record<string, any[]> = {};
+        
+        const dOut = new Date(); dOut.setDate(dOut.getDate() + 2);
+        const dIn = new Date(); dIn.setDate(dIn.getDate() + 3); // 1 Day Rental
+        
+        const basePayload = {
+             DateOut: dOut.toISOString(),
+             DateIn: dIn.toISOString(),
+             OfficeOutId: 54, 
+             OfficeInId: 54,
+             BookAsCommissioner: true,
+             PricelistId: 306,
+             Currency: "EUR"
+        };
+
+        for (const [group, catId] of Object.entries(representatives)) {
+            if (!catId) continue;
+            try {
+                const res = await fetch(`${RENTEON_API_URL}/bookings/calculate`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ...basePayload, CarCategoryId: catId })
+                });
+                
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.Services && Array.isArray(data.Services)) {
+                         groupPrices[group] = data.Services
+                            .filter((s: any) => {
+                                const n = (s.Name || "").toLowerCase();
+                                return n.includes('insurance') || n.includes('protect') || n.includes('cdw') || n.includes('sct');
+                            })
+                            .map((s: any) => ({
+                                name: s.Name,
+                                price: s.ServicePrice?.AmountTotal || 0,
+                                deposit: s.InsuranceDepositAmount || 0
+                            }));
+                    }
+                }
+            } catch (e) {
+                console.error(`Failed to fetch prices for group ${group}:`, e);
+            }
+        }
+
+        console.log("Fetched Insurance Prices:", JSON.stringify(groupPrices, null, 2));
 
         let linkedCount = 0;
 
         for (const car of cars) {
-            let baseDeposit = 600;
-            const make = car.make.toLowerCase();
-            const model = car.model.toLowerCase();
+            // Determine Group
+            let group = 'midi'; // Default
+            const lp = car.licensePlate || "";
+            // RT-MDAR-123 -> MDAR
+            const parts = lp.split('-');
+            const sipp = parts.length >= 2 ? parts[1] : ""; 
             
-            if (make.includes('mercedes') || make.includes('bmw') || make.includes('audi') || make.includes('volvo') || make.includes('tesla')) {
-                baseDeposit = 1200;
-            } else if (model.includes('van') || model.includes('transporter') || model.includes('vivaro') || model.includes('trafic')) {
-                baseDeposit = 1000;
-            } else if (make.includes('suzuki') || make.includes('fiat') || (make.includes('toyota') && model.includes('yaris'))) {
-                baseDeposit = 400;
+            if (sipp.length === 4) {
+                 const l1 = sipp[0].toUpperCase();
+                 const l2 = sipp[1].toUpperCase();
+                 if (['F', 'P', 'L', 'X', 'O'].includes(l1) || ['V', 'K'].includes(l2)) group = 'maxi';
+                 else if (['M', 'N', 'E', 'H'].includes(l1)) group = 'mini';
+                 else group = 'midi';
             }
+
+            const prices = groupPrices[group] || groupPrices['midi'] || []; // Fallback to midi
 
             for (const plan of plans) {
                 const pName = plan.name.toLowerCase();
-                let planDeposit = baseDeposit;
+                
+                let match = null;
                 
                 if (pName.includes('full') || pName.includes('sct') || pName.includes('zero')) {
-                    planDeposit = baseDeposit * 0.5; // Lower deposit for full insurance? Or 0?
+                    match = prices.find((p: any) => p.name.toLowerCase().includes('full') || p.name.toLowerCase().includes('sct'));
                 } else if (pName.includes('medium')) {
-                    planDeposit = baseDeposit * 0.75;
+                    match = prices.find((p: any) => p.name.toLowerCase().includes('medium'));
+                } else if (pName.includes('basic') || pName.includes('cdw')) {
+                    match = prices.find((p: any) => p.name.toLowerCase().includes('basic') || p.price === 0);
                 }
 
-                let planPrice = 0;
-                if (pName.includes('full') || pName.includes('sct')) planPrice = 25;
-                else if (pName.includes('medium')) planPrice = 15;
-                else if (pName.includes('basic') || pName.includes('cdw')) planPrice = 10;
-
-                await prisma.carInsurance.upsert({
-                    where: {
-                        carId_planId: {
+                if (match) {
+                     await prisma.carInsurance.upsert({
+                        where: {
+                            carId_planId: {
+                                carId: car.id,
+                                planId: plan.id
+                            }
+                        },
+                        update: {
+                            deposit: match.deposit,
+                            pricePerDay: match.price
+                        },
+                        create: {
                             carId: car.id,
-                            planId: plan.id
+                            planId: plan.id,
+                            deposit: match.deposit,
+                            pricePerDay: match.price
                         }
-                    },
-                    update: {
-                        // PROTECT MANUAL VALUES: Do not overwrite if exists
-                    },
-                    create: {
-                        carId: car.id,
-                        planId: plan.id,
-                        deposit: planDeposit,
-                        pricePerDay: planPrice
-                    }
-                });
-                linkedCount++;
+                    });
+                    linkedCount++;
+                }
             }
         }
-        console.log(`Linked ${linkedCount} insurance options to ${cars.length} cars.`);
+        console.log(`Linked ${linkedCount} insurance options to ${cars.length} cars using REAL Renteon prices.`);
 
     } catch (e) {
         console.error("Failed to link insurances:", e);

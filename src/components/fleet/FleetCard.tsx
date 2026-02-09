@@ -359,8 +359,13 @@ export function FleetCard({
                                     </div>
                                  </div>
                               </div>
-                              <span className="font-bold text-sm">
-                                {ins.pricePerDay === 0 ? "Included" : `+${Math.round(ins.pricePerDay * diffDays).toLocaleString()} €`}
+                              <span className="font-bold text-sm text-right">
+                                 {ins.pricePerDay === 0 ? "Included" : (
+                                     <>
+                                         <div>+{Math.round(ins.pricePerDay * diffDays).toLocaleString()} €</div>
+                                         <div className="text-[10px] text-zinc-400">({Math.round(ins.pricePerDay)} € / day)</div>
+                                     </>
+                                 )}
                               </span>
                            </div>
                        ))}

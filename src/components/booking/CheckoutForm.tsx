@@ -481,7 +481,14 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                   <div className="flex-1">
                     <div className="flex justify-between items-center mb-1">
                       <h4 className="font-bold text-zinc-900">{ins.plan.name}</h4>
-                      <span className="font-bold text-zinc-900">{ins.pricePerDay === 0 ? "Included" : `+€${Math.round(ins.pricePerDay * days)}`}</span>
+                      <span className="font-bold text-zinc-900 text-right">
+                        {ins.pricePerDay === 0 ? "Included" : (
+                            <>
+                                <div>+€{Math.round(ins.pricePerDay * days)}</div>
+                                <div className="text-[10px] text-zinc-400 font-normal">€{Math.round(ins.pricePerDay)} / day</div>
+                            </>
+                        )}
+                      </span>
                     </div>
                     <p className="text-sm text-zinc-500">{ins.plan.description || "Basic coverage."}</p>
                     <p className="text-xs font-semibold text-zinc-700 mt-1">Deposit: €{ins.deposit}</p>

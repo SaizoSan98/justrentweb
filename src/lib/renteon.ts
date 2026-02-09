@@ -13,11 +13,7 @@ let tokenExpiry: number = 0;
 
 // Mapping Helpers
 function mapLocationToOfficeId(location: string): number {
-  const lowerLoc = location.toLowerCase();
-  if (lowerLoc.includes('airport') || lowerLoc.includes('reptér') || lowerLoc.includes('vecsés')) {
-    return 54; // Vecsés, Airport
-  }
-  return 53; // Budapest Downtown (Default)
+  return 54; // Vecsés, Airport (Only office available)
 }
 
 export function mapCarToCategoryId(car: any): number {
