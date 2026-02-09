@@ -158,7 +158,7 @@ export function FleetClientWrapper({ cars, dictionary, options }: FleetClientWra
 
         <div className="mb-6 flex justify-between items-center">
            <h2 className="text-xl font-bold text-zinc-900">
-              Available Vehicles <span className="text-zinc-400 text-sm ml-2">({filteredCars.length})</span>
+              Available Vehicles <span className="text-zinc-400 text-sm ml-2">({filteredCars.filter(c => c.isAvailable !== false).length})</span>
            </h2>
         </div>
 

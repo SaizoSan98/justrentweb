@@ -622,6 +622,14 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
           <Card>
             <CardContent className="p-6 space-y-8">
               
+              <div className="bg-amber-50 p-4 rounded-lg border border-amber-200 text-sm text-amber-800 flex items-start gap-3">
+                 <div className="mt-0.5">⚠️</div>
+                 <div>
+                    <p className="font-bold">Important Note</p>
+                    <p>Prices below are only used for manually added cars (Local Website Cars). Cars synced from Renteon will use Renteon's dynamic pricing.</p>
+                 </div>
+              </div>
+
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="pricePerDay">Base Rental Price / Day (EUR)</Label>
