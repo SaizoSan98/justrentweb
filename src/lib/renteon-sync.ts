@@ -869,7 +869,7 @@ export async function executeSyncExtras() {
                 
                 if (isMandatory && name.includes("car rental")) continue;
 
-                if (name.includes('insurance') || name.includes('cdw') || name.includes('protection') || name.includes('excess') || name.includes('sct') || name.includes('fdw')) {
+                if (name.includes('insurance') || name.includes('cdw') || name.includes('protection') || name.includes('protect') || name.includes('excess') || name.includes('sct') || name.includes('fdw')) {
                     insurances.push(s);
                 } else {
                     equipment.push(s);

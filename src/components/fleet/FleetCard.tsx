@@ -373,21 +373,25 @@ export function FleetCard({
                          </div>
 
                          <div 
-                           onClick={() => setMileageOption('UNLIMITED')}
+                           // DISABLED: Unlimited Mileage Temporarily
+                           // onClick={() => setMileageOption('UNLIMITED')}
                            className={cn(
-                             "flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition-all",
-                             mileageOption === 'UNLIMITED' ? "border-black bg-zinc-50" : "border-zinc-100 hover:border-zinc-200"
+                             "flex items-center justify-between p-3 rounded-xl border-2 transition-all opacity-50 cursor-not-allowed",
+                             mileageOption === 'UNLIMITED' ? "border-black bg-zinc-50" : "border-zinc-100"
                            )}
                          >
                             <div className="flex items-center gap-3">
-                               <div className={cn("w-4 h-4 rounded-full border-2 flex items-center justify-center", mileageOption === 'UNLIMITED' ? "border-black" : "border-zinc-300")}>
-                                  {mileageOption === 'UNLIMITED' && <div className="w-2 h-2 rounded-full bg-black" />}
+                               <div className={cn("w-4 h-4 rounded-full border-2 flex items-center justify-center border-zinc-300")}>
+                                  {/* No checkmark for disabled option */}
                                </div>
                                <div>
-                                  <div className="font-bold text-sm text-zinc-900">Unlimited km</div>
+                                  <div className="font-bold text-sm text-zinc-900 flex items-center gap-2">
+                                      Unlimited km
+                                      <span className="bg-zinc-200 text-zinc-600 text-[8px] px-1 py-0.5 rounded uppercase tracking-wider font-bold">DEV</span>
+                                  </div>
                                </div>
                             </div>
-                            <span className="font-bold text-sm">+{Math.round((car.unlimitedMileagePrice || 0) * diffDays).toLocaleString()} €</span>
+                            <span className="font-bold text-sm text-zinc-400">0 €</span>
                          </div>
                     </div>
                  </div>

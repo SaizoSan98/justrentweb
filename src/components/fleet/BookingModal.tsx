@@ -360,22 +360,26 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                              </div>
 
                              <div 
-                               onClick={() => setMileageOption('UNLIMITED')}
+                               // DISABLED: Unlimited Mileage Temporarily
+                               // onClick={() => setMileageOption('UNLIMITED')}
                                className={cn(
-                                 "flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer transition-all",
-                                 mileageOption === 'UNLIMITED' ? "border-black bg-zinc-50" : "border-zinc-100 hover:border-zinc-200"
+                                 "flex items-center justify-between p-4 rounded-xl border-2 transition-all opacity-50 cursor-not-allowed",
+                                 mileageOption === 'UNLIMITED' ? "border-black bg-zinc-50" : "border-zinc-100"
                                )}
                              >
                                 <div className="flex items-center gap-3">
-                                   <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", mileageOption === 'UNLIMITED' ? "border-black" : "border-zinc-300")}>
-                                      {mileageOption === 'UNLIMITED' && <div className="w-2.5 h-2.5 rounded-full bg-black" />}
+                                   <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center border-zinc-300")}>
+                                      {/* No checkmark for disabled option */}
                                    </div>
                                    <div>
-                                      <div className="font-bold text-zinc-900">Unlimited Mileage</div>
-                                      <div className="text-xs text-zinc-500">Drive without limits</div>
+                                      <div className="font-bold text-zinc-900 flex items-center gap-2">
+                                          Unlimited Mileage
+                                          <span className="bg-zinc-200 text-zinc-600 text-[10px] px-1.5 py-0.5 rounded uppercase tracking-wider font-bold">DEV</span>
+                                      </div>
+                                      <div className="text-xs text-zinc-500">Temporarily unavailable</div>
                                    </div>
                                 </div>
-                                <span className="font-bold text-sm">+{Math.round((car.unlimitedMileagePrice || 0) * days).toLocaleString()} €</span>
+                                <span className="font-bold text-sm text-zinc-400">0 €</span>
                              </div>
                           </div>
                        </div>
