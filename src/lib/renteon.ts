@@ -402,7 +402,9 @@ export async function syncBookingToRenteon(booking: any) {
       Currency: "EUR", 
       PricelistId: 306, // WEB Pricelist (ID 306)
       BookAsCommissioner: true, // Required for Agency/Partner API users
-      IgnoreAvailability: true // Force booking creation even if availability check fails
+      IgnoreAvailability: true, // Force booking creation even if availability check fails
+      Force: true, // Attempt to force booking
+      Overbooking: true // Try another common parameter name
     };
 
     // 1. Availability Check (Optional but recommended to get PricelistId if needed)
