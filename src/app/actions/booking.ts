@@ -152,7 +152,7 @@ export async function createBooking(prevState: any, formData: FormData) {
     try {
       console.log("Starting Renteon Sync...")
       const renteonResult = await syncBookingToRenteon(booking)
-      if (renteonResult.success) {
+      if (renteonResult.success && 'renteonId' in renteonResult) {
         console.log("Renteon Sync Success. ID:", renteonResult.renteonId)
         // If we add renteonId to schema later, save it here:
         // await prisma.booking.update({ where: { id: booking.id }, data: { renteonId: renteonResult.renteonId } })
