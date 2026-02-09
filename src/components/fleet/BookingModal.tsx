@@ -342,7 +342,7 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                                         {selectedInsuranceId === ins.planId && <div className="w-2.5 h-2.5 rounded-full bg-black" />}
                                      </div>
                                      <div>
-                                        <div className="font-bold text-zinc-900">{ins.plan?.name}</div>
+                                        <div className="font-bold text-zinc-900">{ins.plan?.name?.replace(/ - (Mini|Midi|Maxi)/g, "")}</div>
                                         <div className="text-xs text-zinc-500">Deposit: {ins.deposit?.toLocaleString() ?? 0} €</div>
                                      </div>
                                   </div>
@@ -455,7 +455,7 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                                    {selectedInsuranceId === ins.planId && <div className="w-3 h-3 rounded-full bg-black" />}
                                 </div>
                                 <div>
-                                <div className="font-bold text-lg">{ins.plan?.name}</div>
+                                <div className="font-bold text-lg">{ins.plan?.name?.replace(/ - (Mini|Midi|Maxi)/g, "")}</div>
                                 <div className="text-sm text-zinc-500">{ins.plan?.description || "Standard coverage"}</div>
                                 <div className="mt-2 flex gap-4 text-xs font-medium text-zinc-700">
                                       <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> Deposit: {ins.deposit?.toLocaleString() ?? 0} €</span>
@@ -680,7 +680,7 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                           )}
                           {selectedInsurance && (
                              <div className="flex justify-between">
-                                <span>{selectedInsurance.plan?.name}</span>
+                                <span>{selectedInsurance.plan?.name?.replace(/ - (Mini|Midi|Maxi)/g, "")}</span>
                                 <span>{insuranceCost.toLocaleString()} €</span>
                              </div>
                           )}

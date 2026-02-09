@@ -352,7 +352,7 @@ export function FleetCard({
                                     {selectedInsuranceId === ins.planId && <div className="w-2 h-2 rounded-full bg-black" />}
                                  </div>
                                  <div>
-                                    <div className="font-bold text-sm text-zinc-900">{ins.plan.name}</div>
+                                    <div className="font-bold text-sm text-zinc-900">{ins.plan.name?.replace(/ - (Mini|Midi|Maxi)/g, "")}</div>
                                     <div className="text-[10px] text-zinc-500 leading-tight max-w-[180px]">
                                         {ins.plan.description || "Basic coverage"}
                                         <span className="block text-zinc-400">Deposit: {ins.deposit?.toLocaleString() ?? 0} €</span>
@@ -454,7 +454,7 @@ export function FleetCard({
                         )}
                         {selectedOption && (
                              <div className="flex justify-between">
-                                <span className="text-zinc-500">Insurance ({selectedOption.plan.name})</span>
+                                <span className="text-zinc-500">Insurance ({selectedOption.plan.name?.replace(/ - (Mini|Midi|Maxi)/g, "")})</span>
                                 <span className="font-bold text-zinc-900">+{Math.round(insuranceCost).toLocaleString()} €</span>
                             </div>
                         )}

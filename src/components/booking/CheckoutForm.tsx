@@ -480,7 +480,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between items-center mb-1">
-                      <h4 className="font-bold text-zinc-900">{ins.plan.name}</h4>
+                      <h4 className="font-bold text-zinc-900">{ins.plan.name?.replace(/ - (Mini|Midi|Maxi)/g, "")}</h4>
                       <span className="font-bold text-zinc-900 text-right">
                         {ins.pricePerDay === 0 ? "Included" : (
                             <>

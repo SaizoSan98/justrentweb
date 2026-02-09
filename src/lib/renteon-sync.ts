@@ -264,35 +264,43 @@ async function linkInsurancesToCars(
 
         let linkedCount = 0;
 
+        // Fetch all plans fresh from DB (in case we just added new ones)
+        const allPlans = await prisma.insurancePlan.findMany();
+        const planMap = new Map<string, any>(); // Map RenteonID -> Plan
+        const planNameMap = new Map<string, any>(); // Map Name -> Plan
+        
+        for(const p of allPlans) {
+            if (p.renteonId) planMap.set(p.renteonId, p);
+            planNameMap.set(p.name.toLowerCase(), p);
+        }
+
         for (const car of cars) {
             if (!car.renteonId) continue;
             
             // Find Category ID for this car
             const catId = carRentIdToCatId.get(car.renteonId);
-            if (!catId) {
-                // Try finding by license plate SIPP as fallback? 
-                // No, sticking to strict mapping for now.
-                continue;
-            }
+            if (!catId) continue;
 
             // Get prices for this category
-            const prices = insurancesMap.get(catId);
-            if (!prices) continue;
+            const services = insurancesMap.get(catId);
+            if (!services || services.length === 0) continue;
 
-            for (const plan of plans) {
-                const pName = plan.name.toLowerCase();
-                
-                let match = null;
-                
-                if (pName.includes('full') || pName.includes('sct') || pName.includes('zero')) {
-                    match = prices.find((p: any) => p.name.toLowerCase().includes('full') || p.name.toLowerCase().includes('sct'));
-                } else if (pName.includes('medium')) {
-                    match = prices.find((p: any) => p.name.toLowerCase().includes('medium'));
-                } else if (pName.includes('basic') || pName.includes('cdw')) {
-                    match = prices.find((p: any) => p.name.toLowerCase().includes('basic') || p.price === 0);
+            // Clear existing insurances for this car to avoid duplicates/stale links
+            await prisma.carInsurance.deleteMany({
+                where: { carId: car.id }
+            });
+
+            for (const service of services) {
+                // Find matching plan in DB
+                let plan = null;
+                if (service.id) {
+                    plan = planMap.get(service.id.toString());
+                }
+                if (!plan && service.name) {
+                    plan = planNameMap.get(service.name.toLowerCase());
                 }
 
-                if (match) {
+                if (plan) {
                      await prisma.carInsurance.upsert({
                         where: {
                             carId_planId: {
@@ -301,21 +309,21 @@ async function linkInsurancesToCars(
                             }
                         },
                         update: {
-                            deposit: match.deposit,
-                            pricePerDay: match.price
+                            deposit: service.deposit,
+                            pricePerDay: service.price
                         },
                         create: {
                             carId: car.id,
                             planId: plan.id,
-                            deposit: match.deposit,
-                            pricePerDay: match.price
+                            deposit: service.deposit,
+                            pricePerDay: service.price
                         }
                     });
                     linkedCount++;
                 }
             }
         }
-        console.log(`Linked ${linkedCount} insurance options to cars using EXACT Renteon category prices.`);
+        console.log(`Linked ${linkedCount} insurance options to cars using EXACT Renteon Service IDs/Names.`);
 
     } catch (e) {
         console.error("Failed to link insurances:", e);
@@ -333,6 +341,7 @@ export async function executeSyncCars() {
 
     const priceMap = new Map<number, number>();
     const insurancesMap = new Map<number, any[]>();
+    const uniqueServices = new Map<string, any>(); // Collect all unique services found
 
     if (token) {
         console.log("Fetching Real Prices with multi-strategy approach...");
@@ -378,11 +387,22 @@ export async function executeSyncCars() {
                                     const n = (s.Name || "").toLowerCase();
                                     return n.includes('insurance') || n.includes('protect') || n.includes('cdw') || n.includes('sct');
                                 })
-                                .map((s: any) => ({
-                                    name: s.Name,
-                                    price: (s.ServicePrice?.AmountTotal || 0) / 3, // Per day approximation
-                                    deposit: s.InsuranceDepositAmount || 0
-                                }));
+                                .map((s: any) => {
+                                    const serviceData = {
+                                        name: s.Name,
+                                        price: (s.ServicePrice?.AmountTotal || 0) / 3, // Per day approximation
+                                        deposit: s.InsuranceDepositAmount || 0,
+                                        id: s.ServiceId || s.Id,
+                                        code: s.Code
+                                    };
+                                    
+                                    // Collect unique service for Plan creation
+                                    if (serviceData.id) {
+                                        uniqueServices.set(serviceData.id.toString(), serviceData);
+                                    }
+
+                                    return serviceData;
+                                });
                             insurancesMap.set(cat.Id, ins);
                         }
                     }
@@ -390,6 +410,26 @@ export async function executeSyncCars() {
                     console.error(`Price fetch failed for cat ${cat.Id}`);
                 }
             }));
+        }
+    }
+
+    // Sync collected services to DB as InsurancePlans
+    if (uniqueServices.size > 0) {
+        console.log(`Syncing ${uniqueServices.size} discovered insurance plans...`);
+        for (const service of uniqueServices.values()) {
+            await prisma.insurancePlan.upsert({
+                where: { renteonId: service.id.toString() },
+                update: {
+                    name: service.name,
+                    code: service.code
+                },
+                create: {
+                    name: service.name,
+                    renteonId: service.id.toString(),
+                    code: service.code,
+                    isDefault: false
+                }
+            });
         }
     }
 
