@@ -40,7 +40,10 @@ export const BookingEmail: React.FC<BookingEmailProps> = ({ booking, type }) => 
         {booking.car.imageUrl && (
           <div style={{ marginBottom: '20px', textAlign: 'center' }}>
             <img 
-              src={booking.car.imageUrl.startsWith('http') ? booking.car.imageUrl : `https://justrentandtrans.com/_next/image?url=${encodeURIComponent(booking.car.imageUrl.startsWith('/') ? `https://justrentandtrans.com${booking.car.imageUrl}` : booking.car.imageUrl)}&w=3840&q=75`} 
+              src={booking.car.imageUrl.startsWith('/') 
+                ? `https://justrentandtrans.com${booking.car.imageUrl}`
+                : booking.car.imageUrl
+              } 
               alt={`${booking.car.make} ${booking.car.model}`}
               style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'contain', borderRadius: '8px' }}
             />
