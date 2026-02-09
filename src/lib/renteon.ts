@@ -401,7 +401,8 @@ export async function syncBookingToRenteon(booking: any) {
       DateIn: dateIn,
       Currency: "EUR", 
       PricelistId: 306, // WEB Pricelist (ID 306)
-      BookAsCommissioner: true // Required for Agency/Partner API users
+      BookAsCommissioner: true, // Required for Agency/Partner API users
+      IgnoreAvailability: true // Force booking creation even if availability check fails
     };
 
     // 1. Availability Check (Optional but recommended to get PricelistId if needed)
@@ -427,6 +428,7 @@ export async function syncBookingToRenteon(booking: any) {
     }
     
     // 2. Create Booking (In-Memory)
+    console.log("Creating Renteon booking with payload:", JSON.stringify(createPayload, null, 2));
     const createResponse = await fetch(`${RENTEON_API_URL}/bookings/create`, {
       method: 'POST',
       headers: {
@@ -438,11 +440,12 @@ export async function syncBookingToRenteon(booking: any) {
 
     if (!createResponse.ok) {
         const err = await createResponse.text();
-        console.error('Renteon Create Booking Failed:', err);
+        console.error('Renteon Create Booking Failed. Status:', createResponse.status, 'Error:', err);
         return { success: false, error: err };
     }
 
     const bookingModel = await createResponse.json();
+    console.log("Renteon Create Response (Model ID):", bookingModel.Id);
 
     // 3. Populate Customer Data
     bookingModel.Client = {
@@ -483,6 +486,7 @@ export async function syncBookingToRenteon(booking: any) {
     bookingModel.OfficeOutId = 54;
     bookingModel.OfficeInId = 54;
 
+    console.log("Saving Renteon booking model...");
     const saveResponse = await fetch(`${RENTEON_API_URL}/bookings/save`, {
       method: 'POST',
       headers: {
@@ -494,7 +498,8 @@ export async function syncBookingToRenteon(booking: any) {
 
     if (!saveResponse.ok) {
         const err = await saveResponse.text();
-        console.error('Renteon Save Booking Failed:', err);
+        console.error('Renteon Save Booking Failed. Status:', saveResponse.status, 'Error:', err);
+        console.error('Failed Booking Model Payload:', JSON.stringify(bookingModel, null, 2));
         return { success: false, error: err };
     }
 
