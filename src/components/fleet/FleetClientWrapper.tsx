@@ -118,11 +118,18 @@ export function FleetClientWrapper({ cars, dictionary, options }: FleetClientWra
       // Guaranteed Model
       if (filters.guaranteedModel && car.orSimilar) return false
 
-      // Make
+      // Make (Generic Search)
       if (filters.make) {
         const searchTerm = filters.make.toLowerCase()
         const carName = `${car.make} ${car.model}`.toLowerCase()
-        if (!carName.includes(searchTerm)) return false
+        const renteonId = car.renteonId?.toString().toLowerCase() || ""
+        const internalId = car.id.toLowerCase()
+        
+        if (!carName.includes(searchTerm) && 
+            !renteonId.includes(searchTerm) && 
+            !internalId.includes(searchTerm)) {
+            return false
+        }
       }
 
       return true

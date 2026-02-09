@@ -40,19 +40,10 @@ export default async function FleetPage({
   const queryEndDate = endDate || new Date(startDate.getTime() + 24 * 60 * 60 * 1000);
 
   // Base availability filter - ALWAYS applied on server to prevent booking conflicts
+  // We now fetch ALL cars that are generally available in fleet, and mark them as rented if they have conflicts
   const baseWhereClause: any = {
     status: 'AVAILABLE',
-    bookings: {
-      none: {
-        OR: [
-          {
-            startDate: { lte: queryEndDate },
-            endDate: { gte: startDate }
-          }
-        ],
-        status: { in: ['CONFIRMED', 'PENDING'] }
-      }
-    }
+    // We include bookings to check them later for conflicts
   };
 
   // 1. Fetch Local Cars (Catalog)
@@ -64,6 +55,15 @@ export default async function FleetPage({
         pricingTiers: true,
         insuranceOptions: {
           include: { plan: true }
+        },
+        // Include bookings to check availability manually
+        bookings: {
+           where: {
+             status: { in: ['CONFIRMED', 'PENDING'] },
+             startDate: { lte: queryEndDate },
+             endDate: { gte: startDate }
+           },
+           select: { id: true } // We only need existence
         }
       },
       orderBy: {
@@ -110,19 +110,30 @@ export default async function FleetPage({
   }
 
   // 3. Filter Local Cars based on Renteon AND Update Prices
-  let allAvailableCars = localCars;
+  let allAvailableCars = localCars.map(car => ({
+      ...car,
+      isAvailable: (car as any).bookings.length === 0 // Default based on local bookings
+  }));
+
   if (renteonAvailableCategoryIds !== null) {
       // Calculate duration in days for price-per-day calculation
       const durationMs = queryEndDate.getTime() - startDate.getTime();
       const days = Math.max(1, Math.ceil(durationMs / (1000 * 60 * 60 * 24)));
 
-      allAvailableCars = localCars.filter(car => {
-          const catId = mapCarToCategoryId(car);
-          return renteonAvailableCategoryIds?.has(catId);
-      }).map(car => {
+      allAvailableCars = allAvailableCars.map(car => {
           // Clone car to avoid mutating cached object
           const newCar = { ...car };
           const catId = mapCarToCategoryId(car);
+          
+          // Check Renteon availability
+          const isRenteonAvailable = renteonAvailableCategoryIds?.has(catId);
+          
+          // If NOT available in Renteon, mark as unavailable
+          // BUT only if we are relying on Renteon (which we are if renteonAvailableCategoryIds is not null)
+          if (!isRenteonAvailable) {
+              newCar.isAvailable = false;
+          }
+
           const renteonData = renteonPrices.get(catId);
           
           if (renteonData) {
@@ -154,6 +165,7 @@ export default async function FleetPage({
 
   const serializedCars = allAvailableCars.map((car: any) => ({
     ...car,
+    isAvailable: car.isAvailable !== false, // Default to true if undefined
     pricePerDay: Number(car.pricePerDay),
     deposit: Number(car.deposit),
     fullInsurancePrice: Number(car.fullInsurancePrice || 0),

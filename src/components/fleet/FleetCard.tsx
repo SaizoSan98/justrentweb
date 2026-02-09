@@ -45,6 +45,8 @@ type CarType = {
   pickupAfterHoursPrice?: number
   returnAfterHoursPrice?: number
   deposit?: number
+  renteonId?: string | null
+  isAvailable?: boolean
   insuranceOptions?: {
     planId: string
     pricePerDay: number
@@ -115,8 +117,8 @@ export function FleetCard({
   const insuranceOptions = car.insuranceOptions?.sort((a, b) => (a.plan?.order || 0) - (b.plan?.order || 0)) || []
   
   // Initialize default insurance
-  if (!selectedInsuranceId && insuranceOptions.length > 0) {
-      setSelectedInsuranceId(insuranceOptions[0].planId)
+  if (!selectedInsuranceId) {
+      setSelectedInsuranceId("stock")
   }
 
   const selectedOption = insuranceOptions.find(o => o.planId === selectedInsuranceId)
@@ -125,16 +127,28 @@ export function FleetCard({
   
   const finalTotal = totalPrice + insuranceCost + mileageCost
 
+  const isAvailable = car.isAvailable !== false // Default to true if undefined
+
   const handleToggle = () => {
+      if (!isAvailable) return
       setIsExpanded(!isExpanded)
   }
 
   return (
     <div className={cn(
         "group relative bg-white border border-zinc-100 rounded-[2rem] overflow-hidden transition-all duration-300",
-        isExpanded ? "shadow-2xl ring-1 ring-zinc-200 col-span-1 md:col-span-2 xl:col-span-3" : "hover:border-zinc-200 hover:shadow-xl hover:-translate-y-1"
+        isExpanded ? "shadow-2xl ring-1 ring-zinc-200 col-span-1 md:col-span-2 xl:col-span-3" : "hover:border-zinc-200 hover:shadow-xl hover:-translate-y-1",
+        !isAvailable && "opacity-60 grayscale pointer-events-none"
     )}>
       
+      {!isAvailable && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-zinc-100/10 backdrop-blur-[1px]">
+            <div className="bg-zinc-900 text-white px-6 py-2 rounded-full font-black text-xl tracking-widest uppercase border-2 border-white shadow-xl transform -rotate-12">
+                RENTED
+            </div>
+        </div>
+      )}
+
       {/* --- COLLAPSED STATE (DEFAULT CARD) --- */}
       <div className={cn("p-4 flex flex-col h-full", isExpanded && "hidden")}>
         {/* Header */}
@@ -146,6 +160,9 @@ export function FleetCard({
                 <div className="flex flex-wrap items-center gap-2">
                     <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
                         OR SIMILAR
+                    </span>
+                    <span className="text-[10px] font-mono text-zinc-300">
+                        ID: {car.renteonId || car.id.slice(0, 8)}
                     </span>
                 </div>
             </div>
@@ -238,7 +255,10 @@ export function FleetCard({
               {/* Header */}
               <div className="space-y-1 relative z-10">
                  <h2 className="text-3xl font-black uppercase tracking-tight">{car.make} {car.model}</h2>
-                 <p className="text-zinc-500 md:text-zinc-400 text-sm font-bold uppercase tracking-widest">or similar class</p>
+                 <p className="text-zinc-500 md:text-zinc-400 text-sm font-bold uppercase tracking-widest flex items-center gap-2">
+                    <span>or similar class</span>
+                    <span className="font-mono opacity-50">ID: {car.renteonId || car.id.slice(0, 8)}</span>
+                 </p>
                  <p className="text-zinc-500 md:text-white/60 text-sm mt-1">{car.categories?.[0]?.name} {car.transmission} {car.fuelType}</p>
               </div>
 
@@ -296,6 +316,28 @@ export function FleetCard({
                  <div className="space-y-3">
                     <Label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Insurance Plan</Label>
                     <div className="space-y-2">
+                       {/* Stock Insurance Option */}
+                       <div 
+                          onClick={() => setSelectedInsuranceId("stock")}
+                          className={cn(
+                            "flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition-all",
+                            selectedInsuranceId === "stock" ? "border-black bg-zinc-50" : "border-zinc-100 hover:border-zinc-200"
+                          )}
+                        >
+                           <div className="flex items-center gap-3">
+                              <div className={cn("w-4 h-4 rounded-full border-2 flex items-center justify-center", selectedInsuranceId === "stock" ? "border-black" : "border-zinc-300")}>
+                                 {selectedInsuranceId === "stock" && <div className="w-2 h-2 rounded-full bg-black" />}
+                              </div>
+                              <div>
+                                 <div className="font-bold text-sm text-zinc-900">Stock Insurance</div>
+                                 <div className="text-[10px] text-zinc-500 leading-tight max-w-[180px]">
+                                     Deposit: {car.deposit?.toLocaleString() ?? 0} €
+                                 </div>
+                              </div>
+                           </div>
+                           <span className="font-bold text-sm">Included</span>
+                        </div>
+
                        {insuranceOptions.map((ins) => (
                           <div 
                              key={ins.planId}
@@ -311,7 +353,10 @@ export function FleetCard({
                                  </div>
                                  <div>
                                     <div className="font-bold text-sm text-zinc-900">{ins.plan.name}</div>
-                                    <div className="text-[10px] text-zinc-500 leading-tight max-w-[180px]">{ins.plan.description || "Basic coverage"}</div>
+                                    <div className="text-[10px] text-zinc-500 leading-tight max-w-[180px]">
+                                        {ins.plan.description || "Basic coverage"}
+                                        <span className="block text-zinc-400">Deposit: {ins.deposit?.toLocaleString() ?? 0} €</span>
+                                    </div>
                                  </div>
                               </div>
                               <span className="font-bold text-sm">
@@ -396,6 +441,12 @@ export function FleetCard({
                             <span className="text-zinc-500">Base Rental ({diffDays} days)</span>
                             <span className="font-bold text-zinc-900">{totalPrice.toLocaleString()} €</span>
                         </div>
+                        {selectedInsuranceId === 'stock' && (
+                             <div className="flex justify-between">
+                                <span className="text-zinc-500">Insurance (Stock)</span>
+                                <span className="font-bold text-zinc-900">Included</span>
+                            </div>
+                        )}
                         {selectedOption && (
                              <div className="flex justify-between">
                                 <span className="text-zinc-500">Insurance ({selectedOption.plan.name})</span>
