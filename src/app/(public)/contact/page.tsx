@@ -43,7 +43,7 @@ export default async function ContactPage() {
                   <div>
                     <h3 className="text-xl font-bold text-zinc-900 mb-2">Email Us</h3>
                     <p className="text-zinc-500 mb-2">We typically reply within 2 hours.</p>
-                    <a href="mailto:hello@justrent.hu" className="text-lg font-semibold hover:text-red-600 transition-colors">hello@justrent.hu</a>
+                    <a href="mailto:booking@jrandtrans.com" className="text-lg font-semibold hover:text-red-600 transition-colors">booking@jrandtrans.com</a>
                   </div>
                 </div>
 
