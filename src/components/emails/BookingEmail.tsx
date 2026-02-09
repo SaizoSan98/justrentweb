@@ -35,33 +35,52 @@ export const BookingEmail: React.FC<BookingEmailProps> = ({ booking, type }) => 
         <h3 style={{ marginTop: 0, marginBottom: '16px', fontSize: '18px', color: '#09090b' }}>
           Booking Reference: #{booking.id.slice(-8).toUpperCase()}
         </h3>
+
+        {/* Car Image */}
+        {booking.car.imageUrl && (
+          <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+            <img 
+              src={booking.car.imageUrl} 
+              alt={`${booking.car.make} ${booking.car.model}`}
+              style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'contain', borderRadius: '8px' }}
+            />
+          </div>
+        )}
         
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <tbody>
             <tr>
               <td style={{ padding: '8px 0', borderBottom: '1px solid #e4e4e7', ...label }}>Vehicle</td>
               <td style={{ padding: '8px 0', borderBottom: '1px solid #e4e4e7', textAlign: 'right', ...value }}>
-                {booking.car.make} {booking.car.model}
+                <strong>{booking.car.make} {booking.car.model}</strong>
               </td>
             </tr>
             <tr>
               <td style={{ padding: '8px 0', borderBottom: '1px solid #e4e4e7', ...label }}>Pick-up</td>
               <td style={{ padding: '8px 0', borderBottom: '1px solid #e4e4e7', textAlign: 'right', ...value }}>
-                {new Date(booking.startDate).toLocaleString('en-GB', { timeZone: 'UTC' })}<br/>
+                {new Date(booking.startDate).toLocaleString('hu-HU', { timeZone: 'UTC', dateStyle: 'medium', timeStyle: 'short' })}<br/>
                 <span style={{ fontSize: '12px', color: '#71717a' }}>{booking.pickupLocation}</span>
               </td>
             </tr>
             <tr>
               <td style={{ padding: '8px 0', borderBottom: '1px solid #e4e4e7', ...label }}>Return</td>
               <td style={{ padding: '8px 0', borderBottom: '1px solid #e4e4e7', textAlign: 'right', ...value }}>
-                {new Date(booking.endDate).toLocaleString('en-GB', { timeZone: 'UTC' })}<br/>
+                {new Date(booking.endDate).toLocaleString('hu-HU', { timeZone: 'UTC', dateStyle: 'medium', timeStyle: 'short' })}<br/>
                 <span style={{ fontSize: '12px', color: '#71717a' }}>{booking.dropoffLocation}</span>
               </td>
             </tr>
+            {booking.fullInsurance && (
+               <tr>
+                <td style={{ padding: '8px 0', borderBottom: '1px solid #e4e4e7', ...label }}>Insurance</td>
+                <td style={{ padding: '8px 0', borderBottom: '1px solid #e4e4e7', textAlign: 'right', ...value }}>
+                  Full Protection
+                </td>
+              </tr>
+            )}
             <tr>
               <td style={{ padding: '8px 0', ...label }}>Total Price</td>
               <td style={{ padding: '8px 0', textAlign: 'right', fontSize: '18px', fontWeight: 'bold', color: '#ff5f00' }}>
-                €{booking.totalPrice}
+                €{booking.totalPrice.toLocaleString()}
               </td>
             </tr>
           </tbody>
