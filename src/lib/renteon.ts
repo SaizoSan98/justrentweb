@@ -404,7 +404,10 @@ export async function syncBookingToRenteon(booking: any) {
       BookAsCommissioner: true, // Required for Agency/Partner API users
       IgnoreAvailability: true, // Force booking creation even if availability check fails
       Force: true, // Attempt to force booking
-      Overbooking: true // Try another common parameter name
+      Overbooking: true, // Try another common parameter name
+      // If direct booking fails, we might need to skip availability check by not sending CarCategoryId initially?
+      // Or try 'OnRequest': true
+      OnRequest: true
     };
 
     // 1. Availability Check (Optional but recommended to get PricelistId if needed)
@@ -443,10 +446,50 @@ export async function syncBookingToRenteon(booking: any) {
     if (!createResponse.ok) {
         const err = await createResponse.text();
         console.error('Renteon Create Booking Failed. Status:', createResponse.status, 'Error:', err);
+        
+        // RETRY STRATEGY: Try to create without specific category if availability fails
+        if (err.includes('no available cars')) {
+             console.warn('Retrying Renteon booking without specific category (On Request mode)...');
+             const fallbackPayload = { ...createPayload };
+             delete (fallbackPayload as any).CarCategoryId; // Remove category constraint
+             (fallbackPayload as any).CarClassId = null; // Ensure no class constraint either
+             
+             const retryResponse = await fetch(`${RENTEON_API_URL}/bookings/create`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(fallbackPayload)
+            });
+            
+            if (retryResponse.ok) {
+                 const retryModel = await retryResponse.json();
+                 console.log('Retry Successful. Model ID:', retryModel.Id);
+                 // We need to set the category manually in the model now
+                 retryModel.CarCategoryId = categoryId;
+                 
+                 // Proceed with this model
+                 return await finalizeBooking(retryModel, booking, token);
+            } else {
+                 console.error('Retry Failed as well:', await retryResponse.text());
+            }
+        }
+        
         return { success: false, error: err };
     }
 
     const bookingModel = await createResponse.json();
+    return await finalizeBooking(bookingModel, booking, token);
+
+  } catch (error) {
+    console.error('Renteon Sync Exception:', error);
+    return { success: false, error };
+  }
+}
+
+// Helper to finalize and save booking (extracted to avoid code duplication)
+async function finalizeBooking(bookingModel: any, booking: any, token: string) {
     console.log("Renteon Create Response (Model ID):", bookingModel.Id);
 
     // 3. Populate Customer Data
@@ -519,11 +562,6 @@ export async function syncBookingToRenteon(booking: any) {
     console.log('Renteon Booking Sync Successful:', savedBooking.ReservationNumber);
 
     return { success: true, renteonId: savedBooking.ReservationNumber };
-
-  } catch (error) {
-    console.error('Renteon Sync Exception:', error);
-    return { success: false, error };
-  }
 }
 
 // Cancel Booking
