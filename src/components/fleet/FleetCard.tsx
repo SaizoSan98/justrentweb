@@ -144,7 +144,7 @@ export function FleetCard({
       {!isAvailable && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-zinc-100/10 backdrop-blur-[1px]">
             <div className="bg-zinc-900 text-white px-6 py-2 rounded-full font-black text-xl tracking-widest uppercase border-2 border-white shadow-xl transform -rotate-12">
-                RENTED
+                UNAVAILABLE
             </div>
         </div>
       )}

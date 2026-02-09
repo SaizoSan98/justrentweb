@@ -78,69 +78,76 @@ export default async function FleetPage({
   ]);
 
   // 2. Renteon Availability Check (Real-time)
+  
   let renteonAvailableCategoryIds: Set<number> | null = null;
   let renteonPrices = new Map<number, { amount: number, deposit: number }>(); // Map CatId -> { Amount, Deposit }
   
-  // Only check Renteon if we have dates (which we usually do as defaults are set)
+  // Strict Renteon Dependency: We assume failure if check fails.
+  let isRenteonCheckSuccessful = false;
+
+  // Only check Renteon if we have dates
   if (startDate && queryEndDate) {
-      const renteonResult = await checkRealTimeAvailability(startDate, queryEndDate);
-      
-      if (renteonResult.success && Array.isArray(renteonResult.data)) {
-          // Map Renteon results to Category IDs
-          // Renteon availability items typically contain CarCategoryId
-          renteonAvailableCategoryIds = new Set();
-          renteonResult.data.forEach((item: any) => {
-              const catId = item.CarCategoryId || item.CategoryId || item.Id;
-              if (catId) {
-                  renteonAvailableCategoryIds?.add(catId);
-                  // Store Price & Deposit
-                  if (item.Amount) {
-                      renteonPrices.set(catId, {
-                          amount: Number(item.Amount),
-                          deposit: Number(item.DepositAmount || item.Deposit || 0)
-                      });
-                  }
-              }
-          });
-          console.log(`Renteon Real-Time: Found ${renteonAvailableCategoryIds.size} available categories.`);
-      } else {
-          console.warn("Renteon Availability Check Failed or Empty:", renteonResult.error);
-          // If check fails, we might want to fallback to local or show empty. 
-          // For now, if it errors, we treat it as "System unavailable" and fallback to local to avoid empty page on API error.
-          // BUT if it returns success=[] (empty), renteonAvailableCategoryIds will be empty Set, so we show 0 cars.
+      try {
+        const renteonResult = await checkRealTimeAvailability(startDate, queryEndDate);
+        
+        if (renteonResult.success && Array.isArray(renteonResult.data)) {
+            isRenteonCheckSuccessful = true;
+            renteonAvailableCategoryIds = new Set();
+            renteonResult.data.forEach((item: any) => {
+                const catId = item.CarCategoryId || item.CategoryId || item.Id;
+                if (catId) {
+                    renteonAvailableCategoryIds?.add(catId);
+                    if (item.Amount) {
+                        renteonPrices.set(catId, {
+                            amount: Number(item.Amount),
+                            deposit: Number(item.DepositAmount || item.Deposit || 0)
+                        });
+                    }
+                }
+            });
+            console.log(`Renteon Real-Time: Found ${renteonAvailableCategoryIds.size} available categories.`);
+        } else {
+            console.warn("Renteon Availability Check Failed:", renteonResult.error);
+        }
+      } catch (err) {
+          console.error("Renteon Check Exception:", err);
       }
   }
 
   // 3. Filter Local Cars based on Renteon AND Update Prices
-  let allAvailableCars = localCars.map(car => ({
-      ...car,
-      isAvailable: (car as any).bookings.length === 0 // Default based on local bookings
-  }));
+  // STRICT MODE: If Renteon check fails or returns empty, we default to UNAVAILABLE.
+  // We use localCars as the base list.
+  
+  let allAvailableCars = localCars.map(car => {
+      // Default to unavailable if Renteon check wasn't successful or if car not in Renteon list
+      // We ignore local bookings because "nincs helyi elérhetőség, csak Renteonból dolgozunk"
+      let isAvailable = false;
+      
+      if (isRenteonCheckSuccessful && renteonAvailableCategoryIds) {
+           const catId = mapCarToCategoryId(car);
+           if (renteonAvailableCategoryIds.has(catId)) {
+               isAvailable = true;
+           }
+      }
 
-  if (renteonAvailableCategoryIds !== null) {
+      return {
+          ...car,
+          isAvailable
+      };
+  });
+
+  if (isRenteonCheckSuccessful && renteonAvailableCategoryIds) {
       // Calculate duration in days for price-per-day calculation
       const durationMs = queryEndDate.getTime() - startDate.getTime();
       const days = Math.max(1, Math.ceil(durationMs / (1000 * 60 * 60 * 24)));
 
       allAvailableCars = allAvailableCars.map(car => {
-          // Clone car to avoid mutating cached object
           const newCar = { ...car };
           const catId = mapCarToCategoryId(car);
-          
-          // Check Renteon availability
-          const isRenteonAvailable = renteonAvailableCategoryIds?.has(catId);
-          
-          // If NOT available in Renteon, mark as unavailable
-          // BUT only if we are relying on Renteon (which we are if renteonAvailableCategoryIds is not null)
-          if (!isRenteonAvailable) {
-              newCar.isAvailable = false;
-          }
-
           const renteonData = renteonPrices.get(catId);
           
           if (renteonData) {
               // Override pricePerDay with Renteon's effective daily rate
-              // Round to nearest integer to avoid decimals like 109.993
               newCar.pricePerDay = Math.round(renteonData.amount / days) as any;
               
               // Override Deposit
@@ -151,6 +158,16 @@ export default async function FleetPage({
           return newCar;
       });
   }
+
+  // SORTING: Available first (Price ASC), then Unavailable (Price ASC)
+  allAvailableCars.sort((a, b) => {
+      // 1. Availability (Available first)
+      if (a.isAvailable && !b.isAvailable) return -1;
+      if (!a.isAvailable && b.isAvailable) return 1;
+      
+      // 2. Price (Cheapest first)
+      return (Number(a.pricePerDay) - Number(b.pricePerDay));
+  });
 
   // Derive filter options from available cars
   const availableCategories = Array.from(new Set(allAvailableCars.flatMap(car => car.categories.map(c => c.name)))).sort();

@@ -138,7 +138,13 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
   // Insurance Cost & Deposit
   const selectedInsurance = car.insuranceOptions?.find((o: any) => o.planId === selectedInsuranceId)
   const insuranceCost = selectedInsurance ? selectedInsurance.pricePerDay * days : 0
-  const currentDeposit = selectedInsurance ? selectedInsurance.deposit : (car.deposit || 0)
+  
+  // Stock deposit is always car.deposit
+  // If selectedInsurance is "stock" (or empty string default), we use car.deposit
+  // If selectedInsurance is a plan, we use that plan's deposit
+  const currentDeposit = (selectedInsuranceId === 'stock' || !selectedInsuranceId) 
+      ? (car.deposit || 0) 
+      : (selectedInsurance ? selectedInsurance.deposit : (car.deposit || 0))
 
   // Extras Cost
   const extrasCost = selectedExtras.reduce((acc, id) => {
@@ -653,18 +659,24 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                        <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
                              <span>Car Rental</span>
-                             <span>{rentalCost.toLocaleString()} Ft</span>
+                             <span>{rentalCost.toLocaleString()} €</span>
                           </div>
                           {mileageOption === 'UNLIMITED' && (
                              <div className="flex justify-between">
                                 <span>Unlimited Mileage</span>
-                                <span>{mileageCost.toLocaleString()} Ft</span>
+                                <span>{mileageCost.toLocaleString()} €</span>
+                             </div>
+                          )}
+                          {selectedInsuranceId === 'stock' && (
+                             <div className="flex justify-between">
+                                <span>Stock Insurance</span>
+                                <span>Included</span>
                              </div>
                           )}
                           {selectedInsurance && (
                              <div className="flex justify-between">
                                 <span>{selectedInsurance.plan?.name}</span>
-                                <span>{insuranceCost.toLocaleString()} Ft</span>
+                                <span>{insuranceCost.toLocaleString()} €</span>
                              </div>
                           )}
                           {selectedExtras.map(id => {
@@ -674,13 +686,13 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                              return (
                                 <div key={id} className="flex justify-between">
                                    <span>{ex.name}</span>
-                                   <span>{cost.toLocaleString()} Ft</span>
+                                   <span>{cost.toLocaleString()} €</span>
                                 </div>
                              )
                           })}
                           <div className="flex justify-between text-zinc-500 pt-2 border-t border-zinc-100">
                              <span>Fees</span>
-                             <span>{totalFees.toLocaleString()} Ft</span>
+                             <span>{totalFees.toLocaleString()} €</span>
                           </div>
                           
                           <div className="flex justify-between pt-2 text-zinc-600">
@@ -691,7 +703,7 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                        
                        <div className="flex justify-between items-center pt-4 border-t border-zinc-100">
                           <span className="font-bold text-xl">Total</span>
-                          <span className="font-black text-2xl">{totalCost.toLocaleString()} Ft</span>
+                          <span className="font-black text-2xl">{totalCost.toLocaleString()} €</span>
                        </div>
                     </div>
                     
