@@ -488,11 +488,40 @@ export async function deleteUser(userId: string) {
     // So we must delete related data first.
     
     // 1. Delete Bookings
-    await prisma.booking.deleteMany({
-        where: { userId }
+    // We need to delete dependent records of bookings first if cascading is not set up correctly in DB
+    // Booking has relations: CarInsurance, Extra (M-N via _BookingToExtra table)
+    
+    // Find all bookings for this user to get their IDs
+    const userBookings = await prisma.booking.findMany({
+      where: { userId },
+      select: { id: true }
     })
     
-    // 2. Delete User
+    const bookingIds = userBookings.map(b => b.id)
+
+    if (bookingIds.length > 0) {
+      // Delete CarInsurance entries linked to these bookings (if any - wait, CarInsurance is linked to Car and Plan, not Booking directly in schema provided?)
+      // Schema says: CarInsurance is linked to Car and Plan. 
+      // Booking has `insurancePlanId`. 
+      // But let's check `DamageReport`? 
+      // DamageReport is linked to Car, but not Booking directly in schema provided? 
+      // Let's re-read schema.
+      // Schema: 
+      // Booking has `extras`. 
+      // _BookingToExtra table handles M-N. Prisma handles this automatically on delete of Booking usually.
+      
+      // Let's explicitly delete bookings.
+      await prisma.booking.deleteMany({
+        where: { userId }
+      })
+    }
+    
+    // 2. Delete Verification Tokens (if any)
+    await prisma.verificationToken.deleteMany({
+      where: { identifier: targetUser?.email }
+    })
+
+    // 3. Delete User
     await prisma.user.delete({
       where: { id: userId }
     })
