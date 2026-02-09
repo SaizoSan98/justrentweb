@@ -29,11 +29,10 @@ export default async function FleetPage({
   const startDateStr = typeof params.startDate === 'string' ? params.startDate : undefined;
   const endDateStr = typeof params.endDate === 'string' ? params.endDate : undefined;
   
-  // Calculate default start date (Current time + 2 hours)
+  // Calculate default start date (Tomorrow to avoid 'too soon' availability issues from Renteon)
   const defaultStartDate = new Date();
-  defaultStartDate.setHours(defaultStartDate.getHours() + 2);
-  // We keep minutes as is, or round them? User said "Feb 10. 11:53" (if now is 9:53). So keep minutes.
-  // defaultStartDate.setMinutes(0, 0, 0); // Removed zeroing minutes
+  defaultStartDate.setDate(defaultStartDate.getDate() + 1); // +24 hours
+  // defaultStartDate.setHours(defaultStartDate.getHours() + 2); // Old logic was too aggressive
 
   const startDate = startDateStr ? new Date(startDateStr) : defaultStartDate;
   const endDate = endDateStr ? new Date(endDateStr) : undefined;
