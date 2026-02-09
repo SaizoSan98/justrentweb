@@ -42,8 +42,9 @@ export function BookingEngine({
     }
 
     const start = new Date()
-    start.setHours(start.getHours() + 2)
-    // Keep minutes as is
+    // Default Start: +24h to avoid Renteon "too soon" availability issues
+    start.setDate(start.getDate() + 1)
+    // start.setHours(start.getHours() + 2) // Old logic
     
     const end = new Date(start)
     end.setDate(end.getDate() + 3)
@@ -62,9 +63,10 @@ export function BookingEngine({
     // But format needs HH:mm.
     // And we have specific TIME_OPTIONS (00 or 30).
     // Let's just default to what the date says, but rounded to nearest 30m or kept as is?
-    // The previous logic was:
+    // Default to next day + 2h logic
     const now = new Date()
-    now.setHours(now.getHours() + 2)
+    now.setDate(now.getDate() + 1) // +24h
+    // now.setHours(now.getHours() + 2)
     
     const h = now.getHours()
     const m = now.getMinutes()
