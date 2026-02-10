@@ -244,10 +244,10 @@ export async function fetchRenteonServices(): Promise<any[]> {
 
     // FALLBACK: Calculation Strategy if standard endpoints return nothing
     if (allServices.length === 0) {
-        console.log("Standard endpoints returned 0 services. Attempting Calculation Strategy...");
+        console.log("Standard endpoints returned 0 services. Attempting Calculation Strategy (1 Day)...");
         try {
             const dOut = new Date(); dOut.setDate(dOut.getDate() + 35);
-            const dIn = new Date(); dIn.setDate(dIn.getDate() + 38);
+            const dIn = new Date(dOut); dIn.setDate(dIn.getDate() + 1); // 1 day to detect per-day vs fixed
             
             const availPayload = {
                 DateOut: dOut.toISOString(),

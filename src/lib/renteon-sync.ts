@@ -737,7 +737,7 @@ export async function executeSyncCars() {
 
 export async function executeSyncExtras() {
     try {
-        console.log("Starting Extras/Services Sync...");
+        console.log("Starting Extras/Services Sync... (UPDATED VERSION)");
         const token = await getRenteonToken();
         if (!token) return { error: "No token" };
 
@@ -801,10 +801,10 @@ export async function executeSyncExtras() {
              const services = await fetchRenteonServices();
              
              if (services.length === 0) {
-                console.log("Standard endpoints returned 0. Attempting to extract services via Dummy Calculation...");
+                console.log("Standard endpoints returned 0. Attempting to extract services via Dummy Calculation (1 Day)...");
                 try {
                     const dOut = new Date(); dOut.setDate(dOut.getDate() + 35);
-                    const dIn = new Date(); dIn.setDate(dIn.getDate() + 38);
+                    const dIn = new Date(dOut); dIn.setDate(dIn.getDate() + 1); // 1 day simulation to distinguish per-day vs fixed
                     
                     const availPayload = {
                         DateOut: dOut.toISOString(),
@@ -932,6 +932,13 @@ export async function executeSyncExtras() {
             const description = s.Description || "";
             const price = s.Price || s.Total || 0;
 
+            let priceType = "PER_DAY";
+            if (s.ServicePrice) {
+                if (s.ServicePrice.IsOneTimePayment || s.ServicePrice.MaxDurationMeasuringUnitForPayment === 1) {
+                    priceType = "PER_RENTAL";
+                }
+            }
+
             let existing = null;
             if (renteonId) {
                 existing = await prisma.extra.findUnique({ where: { renteonId } });
@@ -947,6 +954,7 @@ export async function executeSyncExtras() {
                         name: name,
                         description: description,
                         price: price,
+                        priceType: priceType,
                         renteonId: renteonId,
                         code: code
                     }
@@ -957,6 +965,7 @@ export async function executeSyncExtras() {
                         name: name,
                         description: description,
                         price: price,
+                        priceType: priceType,
                         renteonId: renteonId,
                         code: code
                     }
