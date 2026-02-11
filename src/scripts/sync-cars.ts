@@ -1,5 +1,5 @@
 
-import { PrismaClient } from "@prisma/client"
+import { PrismaClient, Transmission } from "@prisma/client"
 import { config } from "dotenv"
 import crypto from 'crypto';
 
@@ -81,8 +81,11 @@ export async function syncCarsFromRenteon() {
 
             // Map Transmission
             // Renteon: cat.CarTransmissionType.Name (e.g. "Automatic")
-            // DB: 'manual' | 'automatic'
-            const transmission = cat.CarTransmissionType?.Name?.toLowerCase().includes('auto') ? 'automatic' : 'manual';
+            // DB: 'MANUAL' | 'AUTOMATIC'
+            const transmissionName = cat.CarTransmissionType?.Name?.toLowerCase() || '';
+            const transmission: Transmission = transmissionName.includes('auto') || transmissionName.includes('dsg') 
+                ? Transmission.AUTOMATIC 
+                : Transmission.MANUAL;
 
             // Map Image
             // Renteon: model.ImageURL (often empty, but check)
@@ -103,7 +106,7 @@ export async function syncCarsFromRenteon() {
                         make: make,
                         model: modelName,
                         year: model.Year || new Date().getFullYear(),
-                        transmission: transmission as any, // Cast to any to avoid enum issues if mismatch
+                        transmission: transmission, 
                         seats: cat.PassengerCapacity || 5,
                         doors: cat.NumberOfDoors || 5,
                         // Update other fields if needed
@@ -116,7 +119,7 @@ export async function syncCarsFromRenteon() {
                         make: make,
                         model: modelName,
                         year: model.Year || new Date().getFullYear(),
-                        transmission: transmission as any,
+                        transmission: transmission,
                         seats: cat.PassengerCapacity || 5,
                         doors: cat.NumberOfDoors || 5,
                         renteonId: renteonId,
