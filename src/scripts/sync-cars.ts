@@ -120,11 +120,9 @@ export async function syncCarsFromRenteon() {
                         seats: cat.PassengerCapacity || 5,
                         doors: cat.NumberOfDoors || 5,
                         renteonId: renteonId,
-                        pricePerDay: 0, // Default, will be updated by insurance sync
-                        // available: true, // Field might not exist or named differently
-                        // images: [] // Empty initially
-                        type: cat.CarModel || "Car", // Fallback type
-                        engine: model.FuelTypeName || "Petrol"
+                        pricePerDay: 0,
+                        licensePlate: "TBD", // Required field fallback
+                        mileage: 0, // Required field fallback
                     }
                 });
                 stats.created++;
