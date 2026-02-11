@@ -112,7 +112,10 @@ async function cleanup() {
     
     // Add manual override for XC90 and others known to be missing from fetchCarCategories list
     // If the list from fetchCarCategories doesn't contain model 504, we need to manually map it.
-    carToCatMap.set("504", 371); // XC90 -> Cat 371 (which we fallback to 322)
+    // OMODA 5 (579) -> Cat 330
+    // XC90 (504) -> Cat 371
+    carToCatMap.set("504", 371); 
+    carToCatMap.set("579", 330);
 
     categories.forEach((cat: any) => {
         if (cat.CarModels) {
@@ -198,23 +201,11 @@ async function cleanup() {
 
     let processedCount = 0;
     
-    // Map of fallback categories if primary fails (e.g. 330 -> 329)
-    const fallbackCats: Record<number, number> = {
-        330: 329, // Large SUV -> Medium SUV (likely same insurances)
-        290: 301, // Compact SUV -> Compact (likely same insurances)
-        292: 301, // Intermediate -> Compact
-        297: 301,
-        322: 329,
-        370: 329,
-        384: 294, // Van -> Van
-        348: 330,
-        324: 301,
-        325: 301,
-        298: 301,
-        412: 301,
-        581: 291,
-        371: 322 // XC90 -> XC60/Premium SUV
-    };
+    // Map of fallback categories - DEPRECATED/REMOVED per user request
+    // We will ONLY use valid services found for the exact category.
+    // If a category returns no services (e.g. OMODA Cat 330), we will NOT fake it.
+    // However, we need to handle cases where Renteon API returns 422 for valid categories.
+    // The date retry logic is the only allowed "trick".
 
     // Process each car
     for (const car of cars) {
@@ -235,18 +226,12 @@ async function cleanup() {
             console.log(`Fetching services for Category ${catId}...`)
             let validServices = await fetchServicesForCat(catId)
             
-            // Fallback if failed
-            if (!validServices && fallbackCats[catId]) {
-                 const fallbackId = fallbackCats[catId];
-                 console.log(`Failed to fetch for ${catId}, trying fallback ${fallbackId}...`);
-                 // Ensure fallback is fetched
-                 if (!catToValidServices.has(fallbackId)) {
-                      const fbServices = await fetchServicesForCat(fallbackId);
-                      catToValidServices.set(fallbackId, fbServices);
-                 }
-                 validServices = catToValidServices.get(fallbackId);
-            }
-
+            // NO FALLBACKS allowed.
+            // If validServices is null, it means we can't get data from Renteon for this category.
+            // This might mean the car should have NO insurances in our system, or we keep old ones?
+            // User said: "mindent távolitsál el az oldalról ami nem a renteonhoz kapcsollódik".
+            // So if we can't verify it, we should probably treat it as "No Insurances Available".
+            
             if (validServices) {
                 catToValidServices.set(catId, validServices)
             } else {
@@ -257,12 +242,20 @@ async function cleanup() {
 
         const validServicesMap = catToValidServices.get(catId)
         
-        if (!validServicesMap) {
-            console.warn(`Skipping cleanup for Car ${car.id} - No valid services found for Cat ${catId}`)
-            continue
+    // If validServicesMap is null, it means we FAILED to get data from Renteon.
+    // User wants ONLY Renteon data.
+    // So if we have NO data from Renteon, we should probably DELETE all insurances for this car
+    // to avoid showing fake/old/invalid data.
+    if (!validServicesMap) {
+        console.warn(`[Car ${car.id}] No valid services from Renteon (Cat ${catId}). Deleting ALL insurances to ensure purity.`)
+        const deleteResult = await prisma.carInsurance.deleteMany({ where: { carId: car.id } });
+        if (deleteResult.count > 0) {
+            console.log(`[Car ${car.id}] Deleted ${deleteResult.count} insurances (clean slate).`)
         }
+        continue
+    }
 
-        // --- PERFORM SYNC ---
+    // --- PERFORM SYNC ---
         
         // 1. DELETE invalid insurances
         // Identify which current insurances are NOT in the valid set
