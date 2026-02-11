@@ -244,7 +244,9 @@ export async function createCar(formData: FormData) {
           }))
         },
         insuranceOptions: {
-            create: insurancePlans.map((plan: any) => ({
+            create: insurancePlans
+              .filter((plan: any) => formData.get(`insurance_enabled_${plan.id}`) === 'true')
+              .map((plan: any) => ({
                 planId: plan.id,
                 pricePerDay: parseFloat(formData.get(`insurance_price_${plan.id}`) as string) || 0,
                 deposit: parseFloat(formData.get(`insurance_deposit_${plan.id}`) as string) || 0
@@ -371,7 +373,9 @@ export async function updateCar(formData: FormData) {
         },
         insuranceOptions: {
             deleteMany: {},
-            create: insurancePlans.map((plan: any) => ({
+            create: insurancePlans
+              .filter((plan: any) => formData.get(`insurance_enabled_${plan.id}`) === 'true')
+              .map((plan: any) => ({
                 planId: plan.id,
                 pricePerDay: parseFloat(formData.get(`insurance_price_${plan.id}`) as string) || 0,
                 deposit: parseFloat(formData.get(`insurance_deposit_${plan.id}`) as string) || 0

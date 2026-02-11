@@ -80,37 +80,41 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
   const [additionalImages, setAdditionalImages] = useState<string[]>(car?.images || [])
   
   // Insurance Plans State
-  const [insuranceValues, setInsuranceValues] = useState<Record<string, { price: string, deposit: string }>>({})
+  const [insuranceValues, setInsuranceValues] = useState<Record<string, { price: string, deposit: string, enabled: boolean }>>({})
 
   useEffect(() => {
     if (car?.insuranceOptions) {
-      const initial: Record<string, { price: string, deposit: string }> = {}
+      const initial: Record<string, { price: string, deposit: string, enabled: boolean }> = {}
+      
+      // First, mark existing options as enabled
       car.insuranceOptions.forEach((opt: any) => {
         initial[opt.planId] = { 
             price: opt.pricePerDay?.toString() || "0", 
-            deposit: opt.deposit?.toString() || "0" 
+            deposit: opt.deposit?.toString() || "0",
+            enabled: true
         }
       })
       
-      // Also ensure plans not in car.insuranceOptions but in insurancePlans are initialized
+      // Initialize others as disabled
       insurancePlans.forEach((plan: any) => {
           if (!initial[plan.id]) {
-              initial[plan.id] = { price: "0", deposit: "0" }
+              initial[plan.id] = { price: "0", deposit: "0", enabled: false }
           }
       })
       
       setInsuranceValues(initial)
     } else if (insurancePlans.length > 0) {
         // Initialize with defaults if new car or no existing options
-        const initial: Record<string, { price: string, deposit: string }> = {}
+        const initial: Record<string, { price: string, deposit: string, enabled: boolean }> = {}
         insurancePlans.forEach((plan: any) => {
-             initial[plan.id] = { price: "0", deposit: "0" }
+             // Default to disabled for new cars, user must select applicable plans
+             initial[plan.id] = { price: "0", deposit: "0", enabled: false }
         })
         setInsuranceValues(initial)
     }
   }, [car, insurancePlans])
 
-  const handleInsuranceChange = (planId: string, field: 'price' | 'deposit', value: string) => {
+  const handleInsuranceChange = (planId: string, field: 'price' | 'deposit' | 'enabled', value: any) => {
     setInsuranceValues(prev => ({
         ...prev,
         [planId]: {
@@ -269,6 +273,7 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
 
       // Insurance Options (Fix: Properly map insuranceValues to form fields)
       Object.keys(insuranceValues).forEach(planId => {
+          data.append(`insurance_enabled_${planId}`, insuranceValues[planId].enabled ? 'true' : 'false')
           data.append(`insurance_price_${planId}`, insuranceValues[planId].price)
           data.append(`insurance_deposit_${planId}`, insuranceValues[planId].deposit)
       })
@@ -582,11 +587,20 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
                     </div>
                 )}
                 {insurancePlans.map((plan: any) => (
-                  <div key={plan.id} className="grid md:grid-cols-3 gap-4 p-4 border rounded-lg bg-zinc-50/50">
-                    <div className="flex flex-col justify-center">
-                      <h4 className="font-bold">{plan.name}</h4>
-                      {plan.isDefault && <span className="text-xs text-zinc-500">Default Plan</span>}
-                      {plan.description && <p className="text-xs text-zinc-400 mt-1">{plan.description}</p>}
+                  <div key={plan.id} className={`grid md:grid-cols-3 gap-4 p-4 border rounded-lg ${insuranceValues[plan.id]?.enabled ? 'bg-zinc-50/50 border-blue-200' : 'bg-zinc-100 opacity-60'}`}>
+                    <div className="flex flex-col justify-center gap-2">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                            id={`ins-enable-${plan.id}`}
+                            checked={insuranceValues[plan.id]?.enabled || false}
+                            onCheckedChange={(checked) => handleInsuranceChange(plan.id, 'enabled', checked === true)}
+                        />
+                        <Label htmlFor={`ins-enable-${plan.id}`} className="font-bold cursor-pointer">{plan.name}</Label>
+                      </div>
+                      <div className="pl-6">
+                        {plan.isDefault && <span className="text-xs text-zinc-500 block">Default Plan</span>}
+                        {plan.description && <p className="text-xs text-zinc-400">{plan.description}</p>}
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor={`ins-price-${plan.id}`}>Daily Price Add-on (€)</Label>
@@ -597,6 +611,7 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
                         placeholder="0"
                         value={insuranceValues[plan.id]?.price || ""}
                         onChange={(e) => handleInsuranceChange(plan.id, 'price', e.target.value)}
+                        disabled={!insuranceValues[plan.id]?.enabled}
                       />
                       <input type="hidden" name={`insurance_price_${plan.id}`} value={insuranceValues[plan.id]?.price || "0"} />
                     </div>
@@ -609,6 +624,7 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
                         placeholder="0"
                         value={insuranceValues[plan.id]?.deposit || ""}
                         onChange={(e) => handleInsuranceChange(plan.id, 'deposit', e.target.value)}
+                        disabled={!insuranceValues[plan.id]?.enabled}
                       />
                       <input type="hidden" name={`insurance_deposit_${plan.id}`} value={insuranceValues[plan.id]?.deposit || "0"} />
                     </div>
