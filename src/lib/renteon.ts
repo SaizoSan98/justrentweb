@@ -29,6 +29,7 @@ export function mapCarToCategoryId(car: any): number {
     if (model.includes('tiguan')) return 330;
     if (model.includes('taigo')) return 331;
     if (model.includes('t-roc') && model.includes('cabrio')) return 383;
+    if (model.includes('t-roc')) return 290;
     if (model.includes('golf') && model.includes('variant')) return 301;
     if (model.includes('golf')) return 301; // Fallback
     if (model.includes('arteon')) return 292; // Similar to Passat group
@@ -64,7 +65,7 @@ export function mapCarToCategoryId(car: any): number {
     if (model.includes('yaris') && model.includes('cross')) return 290;
     if (model.includes('corolla')) {
         if (model.includes('ts') || model.includes('touring')) return 298;
-        return 327; // Sedan
+        return 290; // Sedan (in 290 group with T-Cross/T-Roc)
     }
     if (model.includes('proace')) return 294;
   }
@@ -76,7 +77,7 @@ export function mapCarToCategoryId(car: any): number {
   }
 
   if (make.includes('mercedes')) {
-    if (model.includes('a-class') || model.includes('a 180')) return 324; // Or 290 based on code list
+    if (model.includes('a-class') || model.includes('a 180')) return 290;
     if (model.includes('cla')) return 332;
     if (model.includes('glb')) return 359;
     if (model.includes('gla')) return 370;
