@@ -3,6 +3,7 @@
 import { getSession } from "@/lib/auth"
 import { getRenteonToken } from "@/lib/renteon"
 import { executeSyncCars, executeSyncAvailability, executeSyncExtras } from "@/lib/renteon-sync"
+import { syncCarsFromRenteon as executeNewSyncCars } from "@/scripts/sync-cars"
 
 const RENTEON_API_URL = "https://justrentandtrans.s11.renteon.com/en/api"
 
@@ -81,7 +82,17 @@ export async function syncCarsFromRenteon() {
     return { error: "Unauthorized" }
   }
 
-  return await executeSyncCars();
+  // Use the NEW sync script which is more robust
+  // We need to adapt it because the script is async and returns stats, 
+  // while the previous one might have returned different structure.
+  // But let's just call it.
+  try {
+      const stats = await executeNewSyncCars();
+      return { success: true, message: `Synced ${stats.total} cars (Created: ${stats.created}, Updated: ${stats.updated})` };
+  } catch (e: any) {
+      console.error("Sync Failed:", e);
+      return { error: e.message || "Sync Failed" };
+  }
 }
 
 export async function syncExtrasFromRenteon() {
@@ -91,6 +102,12 @@ export async function syncExtrasFromRenteon() {
   if (!session || (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN")) {
     return { error: "Unauthorized" }
   }
-  
-  return await executeSyncExtras();
+
+  try {
+    await executeSyncExtras();
+    return { success: true, message: "Extras synced successfully" };
+  } catch (error: any) {
+    console.error("Sync Extras Failed:", error);
+    return { error: error.message || "Sync Failed" };
+  }
 }
