@@ -111,6 +111,10 @@ export function mapCarToCategoryId(car: any): number {
       if (model.includes('tarraco')) return 330;
   }
 
+  if (make.includes('omoda') || model.includes('omoda')) {
+      return 330;
+  }
+
   // Default fallback if no match found (use a generic category like Golf/Compact)
   return 301; 
 }

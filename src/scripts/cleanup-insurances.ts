@@ -193,6 +193,23 @@ async function cleanup() {
 
     let processedCount = 0;
     
+    // Map of fallback categories if primary fails (e.g. 330 -> 329)
+    const fallbackCats: Record<number, number> = {
+        330: 329, // Large SUV -> Medium SUV (likely same insurances)
+        290: 301, // Compact SUV -> Compact (likely same insurances)
+        292: 301, // Intermediate -> Compact
+        297: 301,
+        322: 329,
+        370: 329,
+        384: 294, // Van -> Van
+        348: 330,
+        324: 301,
+        325: 301,
+        298: 301,
+        412: 301,
+        581: 291
+    };
+
     // Process each car
     for (const car of cars) {
         if (!car.renteonId) continue;
@@ -210,7 +227,20 @@ async function cleanup() {
         // Get or Fetch valid services for this category
         if (!catToValidServices.has(catId)) {
             console.log(`Fetching services for Category ${catId}...`)
-            const validServices = await fetchServicesForCat(catId)
+            let validServices = await fetchServicesForCat(catId)
+            
+            // Fallback if failed
+            if (!validServices && fallbackCats[catId]) {
+                 const fallbackId = fallbackCats[catId];
+                 console.log(`Failed to fetch for ${catId}, trying fallback ${fallbackId}...`);
+                 // Ensure fallback is fetched
+                 if (!catToValidServices.has(fallbackId)) {
+                      const fbServices = await fetchServicesForCat(fallbackId);
+                      catToValidServices.set(fallbackId, fbServices);
+                 }
+                 validServices = catToValidServices.get(fallbackId);
+            }
+
             if (validServices) {
                 catToValidServices.set(catId, validServices)
             } else {
