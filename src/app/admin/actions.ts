@@ -9,17 +9,43 @@ import { logout, login } from "@/lib/auth"
 import fs from "fs"
 import path from "path"
 import { writeFile, mkdir } from "fs/promises"
+import sharp from "sharp"
+
+const TARGET_WIDTH = 1200
+const TARGET_HEIGHT = 800
 
 // Helper to upload image (Vercel Blob OR Local Fallback)
-async function uploadImage(file: File): Promise<string | null> {
+async function uploadImage(file: File, options: { flip?: boolean } = {}): Promise<string | null> {
   if (!file || file.size === 0) return null
+
+  // Process image with Sharp
+  let buffer: Buffer
+  try {
+    const arrayBuffer = await file.arrayBuffer()
+    let pipeline = sharp(Buffer.from(arrayBuffer))
+      .resize(TARGET_WIDTH, TARGET_HEIGHT, {
+        fit: 'cover', // crop to cover dimensions
+        position: 'center'
+      })
+
+    if (options.flip) {
+      pipeline = pipeline.flop() // flop is horizontal flip in sharp
+    }
+
+    buffer = await pipeline.toBuffer()
+  } catch (error: any) {
+    console.error("Image processing failed:", error)
+    throw new Error(`Failed to process image: ${error.message}`)
+  }
 
   // 1. Try Vercel Blob if configured (or use fallback token provided by user)
   const blobToken = process.env.BLOB_READ_WRITE_TOKEN || "vercel_blob_rw_bitpGQyeJHd07dgO_icHpH8DSy5m2Ouz04tszzrEjZZNHMd"
 
   if (blobToken) {
     try {
-      const blob = await put(file.name, file, { 
+      // Create a file-like object from buffer if put supports it, or just pass buffer
+      // put accepts string | Buffer | Stream | Blob
+      const blob = await put(file.name, buffer, { 
         access: 'public',
         token: blobToken,
         addRandomSuffix: true
@@ -44,9 +70,6 @@ async function uploadImage(file: File): Promise<string | null> {
     }
 
     try {
-      const bytes = await file.arrayBuffer()
-      const buffer = Buffer.from(bytes)
-      
       // Create unique filename
       const timestamp = Date.now()
       const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
@@ -156,11 +179,12 @@ export async function createCar(formData: FormData) {
 
   let imageUrl = formData.get('imageUrl') as string
   const imageFile = formData.get('image') as File
+  const flipImage = formData.get('flipImage') === 'true'
   const additionalImagesRaw = formData.get('additionalImages') // Expecting multiple files logic on client but here basic
 
   if (imageFile && imageFile.size > 0) {
     try {
-      const uploadedUrl = await uploadImage(imageFile)
+      const uploadedUrl = await uploadImage(imageFile, { flip: flipImage })
       if (uploadedUrl) {
         imageUrl = uploadedUrl
       }
@@ -282,10 +306,11 @@ export async function updateCar(formData: FormData) {
   
   let imageUrl = formData.get('imageUrl') as string // Existing URL if no new file
   const imageFile = formData.get('image') as File
+  const flipImage = formData.get('flipImage') === 'true'
   
   if (imageFile && imageFile.size > 0) {
     try {
-      const uploadedUrl = await uploadImage(imageFile)
+      const uploadedUrl = await uploadImage(imageFile, { flip: flipImage })
       if (uploadedUrl) {
         imageUrl = uploadedUrl
       }

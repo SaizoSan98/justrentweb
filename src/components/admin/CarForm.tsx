@@ -76,6 +76,7 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
     car?.pricingTiers || []
   )
   const [imagePreview, setImagePreview] = useState<string | null>(car?.imageUrl || null)
+  const [flipImage, setFlipImage] = useState<boolean>(false)
   const [additionalImages, setAdditionalImages] = useState<string[]>(car?.images || [])
   
   // Insurance Plans State
@@ -257,6 +258,7 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
       // Handle Image manually
       if (fileInputRef.current?.files?.[0]) {
         data.append('image', fileInputRef.current.files[0])
+        data.append('flipImage', flipImage ? 'true' : 'false')
       }
       // If editing and no new image, we might need to handle keeping existing URL logic on server,
       // or pass imageUrl if we had it in state. Server action handles this if 'image' is missing but we need to pass 'imageUrl' hidden input?
@@ -868,6 +870,18 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
                       Choose Main Image
                     </Button>
                     <p className="text-xs text-zinc-500">Supported formats: JPG, PNG, WebP</p>
+                    
+                    <div className="flex items-center space-x-2 pt-2">
+                      <Checkbox 
+                        id="flipImage" 
+                        checked={flipImage} 
+                        onCheckedChange={(checked) => setFlipImage(checked === true)}
+                      />
+                      <Label htmlFor="flipImage" className="cursor-pointer font-normal">
+                        Flip Horizontal (Mirror)
+                      </Label>
+                    </div>
+                    <p className="text-xs text-zinc-500">Check this if the car is facing left to make it face right.</p>
                   </div>
                 </div>
               </div>
