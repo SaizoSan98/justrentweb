@@ -99,13 +99,32 @@ async function cleanup() {
     console.log(`Found ${cars.length} cars with Renteon ID.`)
 
     // 2. Fetch Categories from Renteon to know which category ID belongs to which car
-    const categories = await fetchCarCategories()
+    // Also build Group Map for fallback
+    console.log("Fetching category definitions from Renteon...")
     const token = await getRenteonToken()
+    const categoriesRes = await fetch(`${RENTEON_API_URL}/carCategories`, {
+         headers: { 'Authorization': `Bearer ${token}` }
+    })
+    const categories = await categoriesRes.json()
     
-    if (!categories || !token) {
-        console.error("Failed to fetch Renteon data.")
-        return
-    }
+    // Map: Category ID -> Insurance Group Name (e.g. 290 -> "Midi")
+    const catToGroupMap = new Map<number, string>()
+    // Map: Group Name -> List of Categories
+    const groupToCatsMap = new Map<string, number[]>()
+
+    categories.forEach((cat: any) => {
+        const insGroup = cat.Groups?.find((g: any) => g.TypeName === 'Insurance');
+        const groupName = insGroup ? insGroup.Name : 'UNKNOWN';
+        
+        catToGroupMap.set(cat.Id, groupName);
+        
+        if (!groupToCatsMap.has(groupName)) {
+            groupToCatsMap.set(groupName, []);
+        }
+        groupToCatsMap.get(groupName)?.push(cat.Id);
+    });
+
+    console.log(`Mapped ${catToGroupMap.size} categories to groups.`);
 
     // Map: Car Renteon ID -> Category ID
     const carToCatMap = new Map<string, number>()
@@ -119,27 +138,19 @@ async function cleanup() {
 
     categories.forEach((cat: any) => {
         if (cat.CarModels) {
-            cat.CarModels.forEach((model: any) => {
-                carToCatMap.set(model.Id.toString(), cat.Id)
+            cat.CarModels.forEach((m: any) => {
+                carToCatMap.set(m.Id.toString(), cat.Id)
             })
-        }
-        // Also map representative car if no models list
-        if (cat.Id) {
-             // Fallback: If we can't map exact ID, we might need another way.
-             // But usually CarModels is populated.
         }
     })
 
-    // 3. For each category, fetch its VALID services/insurances
-    // Map: Category ID -> Set of Valid Service IDs (strings)
-    const catToValidServices = new Map<number, any>() // Changed to 'any' to hold Map<serviceId, {price, deposit}>
+    console.log(`Mapped ${carToCatMap.size} car models to categories.`)
+    
+    // Cache for valid services per category
+    const catToValidServices = new Map<number, any>()
+    // Cache for valid services per GROUP (e.g. "Midi" -> services)
+    const groupToValidServices = new Map<string, any>()
 
-    // We need to be careful. fetchCarCategories doesn't return services.
-    // We must use the calculation trick or assume we have a map.
-    // Let's use the same logic as sync: Calculate for each category to get EXACT services.
-    
-    console.log("Fetching valid services per category...")
-    
     // Helper to find valid services with retries on dates
     const fetchServicesForCat = async (catId: number) => {
         const offsets = [30, 60, 90, 120, 180, 240, 300];
@@ -177,6 +188,7 @@ async function cleanup() {
                                 const id = (s.ServiceId || s.Id).toString();
                                 validServices.set(id, {
                                     id: id,
+                                    name: s.Name, // Keep name to match by text if ID differs
                                     price: (s.ServicePrice?.AmountTotal || 0) / 3,
                                     deposit: s.InsuranceDepositAmount || 0
                                 });
@@ -190,7 +202,62 @@ async function cleanup() {
             }
         }
         return null;
+    };
+
+    // Helper to get services for a group
+    async function getServicesForGroup(groupName: string): Promise<Map<string, any> | null> {
+        if (groupToValidServices.has(groupName)) {
+            return groupToValidServices.get(groupName)!;
+        }
+
+        console.log(`Attempting to find valid services for Group '${groupName}'...`);
+        const candidateCats = groupToCatsMap.get(groupName) || [];
+        
+        // Prioritize known working categories to save time
+        const priorityCats = [293 /* Ceed SW for Midi */, 322 /* X4 for Maxi */, 292 /* Passat for Standard */, 401 /* 208 for Mini */];
+        const sortedCandidates = candidateCats.sort((a, b) => {
+             const aP = priorityCats.includes(a) ? 1 : 0;
+             const bP = priorityCats.includes(b) ? 1 : 0;
+             return bP - aP;
+        });
+
+        for (const catId of sortedCandidates) {
+            // Check if we already fetched for this cat
+            if (catToValidServices.has(catId) && catToValidServices.get(catId)) {
+                const services = catToValidServices.get(catId)!;
+                groupToValidServices.set(groupName, services);
+                console.log(` -> Found reference category: ${catId}`);
+                return services;
+            }
+            
+            // Try fetch
+            if (!catToValidServices.has(catId)) {
+                 const services = await fetchServicesForCat(catId);
+                 catToValidServices.set(catId, services);
+                 if (services) {
+                     groupToValidServices.set(groupName, services);
+                     console.log(` -> Found reference category: ${catId}`);
+                     return services;
+                 }
+            }
+        }
+        
+        console.warn(` -> NO working category found for Group '${groupName}'`);
+        
+        // Fallback for empty groups:
+        // If 'Standard' is empty, try 'Midi' (Passat/Superb -> Golf/Ceed prices is better than nothing)
+        // If 'Mini' is empty, try 'Midi'
+        // If 'Unknown' is empty, try 'Midi'
+        if (['Standard', 'Mini', 'UNKNOWN'].includes(groupName)) {
+            console.log(` -> Fallback: Using 'Midi' services for empty Group '${groupName}'`);
+            return getServicesForGroup('Midi');
+        }
+
+        groupToValidServices.set(groupName, null);
+        return null;
     }
+
+    console.log("Fetching valid services per category...")
 
     // Pre-fetch plans to map Renteon Service ID to DB Plan ID
     const allPlans = await prisma.insurancePlan.findMany();
@@ -242,11 +309,19 @@ async function cleanup() {
 
         const validServicesMap = catToValidServices.get(catId)
         
-    // If validServicesMap is null, it means we FAILED to get data from Renteon.
-    // User wants ONLY Renteon data.
-    // So if we have NO data from Renteon, we should probably DELETE all insurances for this car
-    // to avoid showing fake/old/invalid data.
-    if (!validServicesMap) {
+    // If validServicesMap is null, try to fallback to Group Services
+    let finalServicesMap = catToValidServices.get(catId)
+
+    if (!finalServicesMap) {
+        // Try Group Sync
+        const groupName = catToGroupMap.get(catId);
+        if (groupName) {
+            console.log(`[Car ${car.id}] Cat ${catId} failed. Trying Group '${groupName}' sync...`);
+            finalServicesMap = await getServicesForGroup(groupName);
+        }
+    }
+
+    if (!finalServicesMap) {
         console.warn(`[Car ${car.id}] No valid services from Renteon (Cat ${catId}). Deleting ALL insurances to ensure purity.`)
         const deleteResult = await prisma.carInsurance.deleteMany({ where: { carId: car.id } });
         if (deleteResult.count > 0) {
@@ -256,78 +331,96 @@ async function cleanup() {
     }
 
     // --- PERFORM SYNC ---
-        
-        // 1. DELETE invalid insurances
-        // Identify which current insurances are NOT in the valid set
-        const invalidInsurances = car.insuranceOptions.filter(opt => {
-             // Find the plan for this option
-             // We need to check if the plan's renteonId matches any valid service ID
-             // But opt only has planId. We need to look up the plan.
-             // We can do this efficiently by checking if planId corresponds to a valid Renteon Service
-             
-             // Wait, opt is CarInsurance. We need to know its plan's renteonId.
-             // We don't have plan loaded in 'include: { insuranceOptions: true }' - wait, we need 'include: { insuranceOptions: { include: { plan: true } } }'
-             // Or we can just use our 'planMap' reversed or look up planId.
-             
-             // Let's rely on planMap which maps RenteonID -> Plan.
-             // We can build a set of Valid Plan IDs for this car.
-             return false; // logic placeholder
-        });
-        
-        // Build Valid Plan IDs Set
-        const validPlanIds = new Set<string>();
-        for (const [serviceId, _] of validServicesMap.entries()) {
-            const plan = planMap.get(serviceId);
-            if (plan) validPlanIds.add(plan.id);
-        }
-        
-        // Delete where planId is NOT in validPlanIds
-        const deleteResult = await prisma.carInsurance.deleteMany({
-            where: {
-                carId: car.id,
-                planId: { notIn: Array.from(validPlanIds) }
-            }
-        });
-        
-        if (deleteResult.count > 0) {
-            console.log(`[Car ${car.id}] Deleted ${deleteResult.count} invalid insurances.`)
-        }
-
-        // 2. UPSERT valid insurances (Add missing, Update existing)
-        for (const [serviceId, serviceData] of validServicesMap.entries()) {
-            const plan = planMap.get(serviceId);
-            if (plan) {
-                // Upsert
-                await prisma.carInsurance.upsert({
-                    where: {
-                        carId_planId: {
-                            carId: car.id,
-                            planId: plan.id
-                        }
-                    },
-                    update: {
-                        deposit: serviceData.deposit,
-                        pricePerDay: serviceData.price
-                    },
-                    create: {
-                        carId: car.id,
-                        planId: plan.id,
-                        deposit: serviceData.deposit,
-                        pricePerDay: serviceData.price
-                    }
-                });
-                // console.log(`[Car ${car.id}] Synced ${plan.name}`)
-            } else {
-                console.warn(`[Car ${car.id}] Valid Service ${serviceId} has no corresponding DB Plan!`)
-            }
-        }
-        
-        processedCount++;
+    
+    // Build a map of "Valid Service Name" -> Service Data (for lookup by name)
+    const validServiceNames = new Map<string, any>();
+    for (const s of Array.from(finalServicesMap.values())) {
+        const service = s as any;
+        validServiceNames.set((service.name || "").toLowerCase(), service);
     }
 
-    console.log(`Cleanup finished. Processed ${processedCount} cars.`)
+    // 1. DELETE invalid insurances
+    // We need to fetch existing ones with Plan included to check names
+    const existingInsurances = await prisma.carInsurance.findMany({
+        where: { carId: car.id },
+        include: { plan: true }
+    });
+    
+    for (const ins of existingInsurances) {
+         const planName = (ins.plan.name || "").toLowerCase();
+         // It is valid if:
+         // 1. The Renteon Service ID matches (if we stored it on CarInsurance? No, we store Plan ID)
+         // 2. The Plan Name matches one of the Valid Service Names (semantic match)
+         
+         const isValid = validServiceNames.has(planName);
+         
+         if (!isValid) {
+             // Try fuzzy match? "Medium protect - Midi" vs "Medium protect"
+             // But usually names are exact from Renteon Sync.
+             console.log(`[Car ${car.id}] Deleting invalid insurance: ${ins.plan.name}`)
+             await prisma.carInsurance.delete({ where: { id: ins.id } })
+         }
+    }
+
+    // 2. UPSERT valid insurances
+    for (const [serviceId, service] of finalServicesMap.entries()) {
+        const serviceNameLower = service.name.toLowerCase();
+        
+        // Find corresponding Plan in DB
+        let plan = allPlans.find(p => p.name.toLowerCase() === serviceNameLower);
+        
+        // If plan not found, maybe create it? Or log error?
+        // We usually expect Plans to be seeded.
+        if (!plan) {
+             // Try partial match if exact fails
+             plan = allPlans.find(p => serviceNameLower.includes(p.name.toLowerCase()) && p.name.length > 5);
+        }
+
+        if (plan) {
+            // Update or Create CarInsurance
+            // We use findFirst instead of upsert because composite unique might be tricky or we want custom logic
+            const existing = await prisma.carInsurance.findFirst({
+                where: {
+                    carId: car.id,
+                    planId: plan.id
+                }
+            });
+
+            if (existing) {
+                // Update price/deposit if changed
+                if (existing.pricePerDay !== service.price || existing.deposit !== service.deposit) {
+                    await prisma.carInsurance.update({
+                        where: { id: existing.id },
+                        data: {
+                            pricePerDay: service.price,
+                            deposit: service.deposit
+                        }
+                    });
+                    // console.log(`[Car ${car.id}] Updated ${service.name}: ${service.price}/${service.deposit}`);
+                }
+            } else {
+                // Create
+                await prisma.carInsurance.create({
+                    data: {
+                        carId: car.id,
+                        planId: plan.id,
+                        pricePerDay: service.price,
+                        deposit: service.deposit
+                    }
+                });
+                console.log(`[Car ${car.id}] Added ${service.name}: ${service.price}/${service.deposit}`);
+            }
+        } else {
+            console.warn(`[Car ${car.id}] No Plan found for service: ${service.name}`);
+        }
+    }
+    
+    processedCount++;
+    } // end for car
+
+    console.log(`Cleanup finished. Processed ${processedCount} cars.`);
 }
 
 cleanup()
-    .catch(e => console.error(e))
-    .finally(async () => await prisma.$disconnect())
+    .catch(console.error)
+    .finally(() => prisma.$disconnect())
