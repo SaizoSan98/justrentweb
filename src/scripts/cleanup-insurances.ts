@@ -109,6 +109,11 @@ async function cleanup() {
 
     // Map: Car Renteon ID -> Category ID
     const carToCatMap = new Map<string, number>()
+    
+    // Add manual override for XC90 and others known to be missing from fetchCarCategories list
+    // If the list from fetchCarCategories doesn't contain model 504, we need to manually map it.
+    carToCatMap.set("504", 371); // XC90 -> Cat 371 (which we fallback to 322)
+
     categories.forEach((cat: any) => {
         if (cat.CarModels) {
             cat.CarModels.forEach((model: any) => {
@@ -207,7 +212,8 @@ async function cleanup() {
         325: 301,
         298: 301,
         412: 301,
-        581: 291
+        581: 291,
+        371: 322 // XC90 -> XC60/Premium SUV
     };
 
     // Process each car

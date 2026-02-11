@@ -102,7 +102,12 @@ export function mapCarToCategoryId(car: any): number {
   
   if (make.includes('volvo')) {
     if (model.includes('xc60')) return 322;
-    if (model.includes('xc90')) return 371;
+    if (model.includes('xc90')) return 371; // Still mapped to Category 371? 
+    // Wait, if user says ID is 504, that's likely the Model ID.
+    // The Category ID for XC90 needs to be determined.
+    // If I return a category ID here, it's used for searching availability.
+    // The previous mapping was 371.
+    // Let's keep 371 for now as the category, but if 504 is the model, the sync script will map 504 -> Category.
   }
 
   if (make.includes('seat')) {
