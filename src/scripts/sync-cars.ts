@@ -124,7 +124,9 @@ export async function syncCarsFromRenteon() {
                         doors: cat.NumberOfDoors || 5,
                         renteonId: renteonId,
                         pricePerDay: 0,
-                        licensePlate: "TBD", // Required field fallback
+                        // Generate a unique placeholder license plate based on Renteon ID to avoid collisions
+                        // Format: RT-{MakeFirst2}-{ModelFirst2}-{RenteonID}
+                        licensePlate: `RT-${make.substring(0,2).toUpperCase()}${modelName.substring(0,2).toUpperCase()}-${renteonId}`, 
                         mileage: 0, // Required field fallback
                     }
                 });
