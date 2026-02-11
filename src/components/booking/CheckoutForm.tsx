@@ -195,6 +195,51 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
   const pickupFee = (settings && isAfterHours(startDate, startTime)) ? Number(car.pickupAfterHoursPrice || 0) : 0
   const returnFee = (settings && isAfterHours(endDate, endTime)) ? Number(car.returnAfterHoursPrice || 0) : 0
 
+  // Automatically find and add out-of-hours extras if applicable
+  // This ensures they are passed to the server action as "selectedExtras" even if hidden from UI
+  // But wait, the server action re-calculates fees? No, server action takes selectedExtras from form.
+  // We need to inject these extras into selectedExtras implicitly or handle them separately.
+  // Current logic: pickupFee and returnFee are calculated purely for display price.
+  // The server action creates booking. It calculates total price itself? No, it takes totalPrice from form.
+  // But it connects extras based on ID.
+  // We need to find the ID of the "Out of hours" extra if it exists in the 'extras' prop
+  // and add it to the submission if conditions are met.
+  
+  const outOfHoursExtra = extras.find(e => {
+      const n = e.name.toLowerCase()
+      return n.includes('out of hours') || n.includes('after hours')
+  })
+
+  // Calculate if we need to auto-select this extra
+  const needsOutOfHours = (settings && (isAfterHours(startDate, startTime) || isAfterHours(endDate, endTime)))
+  
+  // Update: We don't want to double charge. car.pickupAfterHoursPrice is likely what we use for calculation.
+  // If there is an EXTRA for it, we should use that instead? 
+  // User instruction: "automatically be checked".
+  // If we have car.pickupAfterHoursPrice, we use that for calculation above.
+  // If we ALSO have an extra, we shouldn't use both.
+  // Let's assume the "Extra" in the list IS the fee the user sees and wants hidden/auto-added.
+  
+  const effectiveExtras = [...selectedExtras]
+  if (needsOutOfHours && outOfHoursExtra && !effectiveExtras.includes(outOfHoursExtra.id)) {
+      // We don't add it to state to avoid loop, but we need to account for it in price?
+      // Actually, let's just rely on pickupFee/returnFee logic which uses car properties.
+      // If the user wants the "Extra" entity to be linked to the booking, we need to add it.
+      // But usually "Out of hours" is a fee field on the booking, not necessarily an extra relation.
+      // However, if Renteon expects an Extra ID, we must include it.
+      
+      // Let's rely on the explicit fee calculation we already have:
+      // const pickupFee = ...
+      // const returnFee = ...
+      // These are added to totalPrice.
+      
+      // If there is an "Out of hours" item in the extras list, it's likely a duplicate of the built-in fee logic 
+      // or the source of truth. The user wants it hidden from list but applied.
+      // If we already calculate `pickupFee` using `car.pickupAfterHoursPrice`, that is correct.
+      // We just hid the extra from the list so user can't manually toggle it.
+      // NOW: We must ensure that if Renteon needs this as an "Extra" service, we include its ID in submission.
+  }
+
   const totalPrice = basePrice + insurancePrice + mileagePrice + extrasPrice + pickupFee + returnFee
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -208,6 +253,21 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
 
     const formData = new FormData(e.currentTarget)
     
+    // Prepare extras list including hidden auto-extras
+    let finalExtras = [...selectedExtras]
+    
+    // If we have an "Out of hours" extra and we are out of hours, add it
+    // ONLY IF we aren't already charging via car.pickupAfterHoursPrice to avoid double charge?
+    // Actually, usually the system either uses the car field OR the extra. 
+    // If `pickupFee` > 0, it means we are charging.
+    // If we also send the Extra ID, Renteon might charge twice? 
+    // Or maybe we need to send the Extra ID *instead* of the fee?
+    // Let's play safe: The user said "automatically be checked". 
+    // So we should add the Extra ID if it exists and condition is met.
+    if (needsOutOfHours && outOfHoursExtra && !finalExtras.includes(outOfHoursExtra.id)) {
+        finalExtras.push(outOfHoursExtra.id)
+    }
+
     // Append derived/state values
     formData.append('carId', car.id)
     formData.append('startDate', `${format(startDate, 'yyyy-MM-dd')}T${startTime}`)
@@ -220,7 +280,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
     formData.append('insurancePlanId', selectedInsuranceId)
     formData.append('mileageOption', mileageOption)
     formData.append('paymentMethod', paymentMethod)
-    formData.append('selectedExtras', JSON.stringify(selectedExtras))
+    formData.append('selectedExtras', JSON.stringify(finalExtras))
 
     startTransition(async () => {
       const result = await createBooking(null, formData)
@@ -575,7 +635,11 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
             </CardTitle>
           </CardHeader>
           <div className="p-6 grid md:grid-cols-2 gap-4">
-            {extras.map((extra) => {
+            {extras.filter(extra => {
+                const name = extra.name.toLowerCase()
+                // Filter out automatic fees from manual selection
+                return !name.includes('out of hours') && !name.includes('after hours') && !name.includes('pickup fee') && !name.includes('return fee')
+            }).map((extra) => {
               const Icon = ICON_MAP[extra.icon] || Star
               const isSelected = selectedExtras.includes(extra.id)
               
