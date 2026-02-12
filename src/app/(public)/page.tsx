@@ -40,7 +40,7 @@ export default async function LandingPage() {
         isFeatured: true,
         status: 'AVAILABLE'
     },
-    take: 4,
+    take: 6,
     include: { categories: true }
   })
 

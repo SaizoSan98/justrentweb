@@ -473,21 +473,6 @@ export async function executeSyncCars() {
             return 'MANUAL'
         }
 
-        const getFallbackPrice = (make: string, model: string, group: string) => {
-            const lowerMake = (make || '').toLowerCase();
-            const lowerModel = (model || '').toLowerCase();
-            const lowerGroup = (group || '').toLowerCase();
-
-            if (lowerGroup.includes('luxury') || lowerGroup.includes('premium') || lowerMake.includes('porsche') || lowerMake.includes('tesla') || lowerModel.includes('x5') || lowerModel.includes('gle')) return 150;
-            if (lowerGroup.includes('fullsize') || lowerGroup.includes('standard') || lowerMake.includes('mercedes') || lowerMake.includes('bmw') || lowerMake.includes('audi')) return 90;
-            if (lowerGroup.includes('intermediate') || lowerModel.includes('octavia') || lowerModel.includes('corolla')) return 70;
-            if (lowerGroup.includes('compact') || lowerModel.includes('golf') || lowerModel.includes('astra')) return 60;
-            if (lowerGroup.includes('economy') || lowerModel.includes('polo') || lowerModel.includes('yaris')) return 45;
-            if (lowerGroup.includes('mini') || lowerModel.includes('up') || lowerModel.includes('aygo')) return 40;
-            
-            return 55; 
-        };
-
         if (cat.CarModels && Array.isArray(cat.CarModels) && cat.CarModels.length > 0) {
             for (const model of cat.CarModels) {
                 const make = model.CarMakeName || cat.CarMakeName || 'Unknown';
@@ -497,8 +482,24 @@ export async function executeSyncCars() {
                     modelName = modelName.substring(make.length).trim();
                 }
 
-                const fallbackPrice = getFallbackPrice(make, modelName, groupName);
-                const finalPrice = priceMap.get(cat.Id) || fallbackPrice;
+                const finalPrice = priceMap.get(cat.Id);
+                if (!finalPrice) {
+                    console.log(`Skipping ${make} ${modelName} - No Renteon Price`);
+                    continue;
+                }
+
+                // STRICT MODE: Check for Insurances
+                const carInsurances = insurancesMap.get(cat.Id);
+                if (!carInsurances || carInsurances.length === 0) {
+                     console.log(`Skipping ${make} ${modelName} - No Insurance options found`);
+                     continue;
+                }
+
+                // STRICT MODE: Check for SIPP
+                if (!cat.SIPP || cat.SIPP.length < 4) {
+                     console.log(`Skipping ${make} ${modelName} - Invalid SIPP`);
+                     continue;
+                }
 
                 const carData = {
                     make: make,
@@ -602,107 +603,9 @@ export async function executeSyncCars() {
                 }
             }
         } else {
-            const make = cat.CarMakeName || cat.CarModel?.split(' ')[0] || 'Unknown';
-            let modelName = cat.CarModel || 'Unknown';
-             if (modelName.toLowerCase().startsWith(make.toLowerCase())) {
-                modelName = modelName.substring(make.length).trim();
-            }
-
-            const fallbackPrice = getFallbackPrice(make, modelName, groupName);
-            const finalPrice = priceMap.get(cat.Id) || fallbackPrice;
-
-            const localImage = findMatchingImage(make, modelName);
-            const finalImageUrl = localImage || cat.CarModelImageURL || null;
-
-            const carData = {
-                make: make,
-                model: modelName,
-                year: new Date().getFullYear(),
-                licensePlate: `RT-${cat.SIPP}-${cat.Id}`,
-                seats: cat.PassengerCapacity || 5,
-                pricePerDay: finalPrice,
-                imageUrl: finalImageUrl,
-                status: 'AVAILABLE',
-                renteonId: cat.Id.toString(),
-                mileage: 0,
-                fuelType: mapFuelType(cat.FuelTypes?.[0]?.Name),
-                transmission: mapTransmission(cat.CarTransmissionType?.Name),
-                categories: categoryId ? {
-                        connect: { id: categoryId }
-                } : undefined
-            }
-
-            let existing = await prisma.car.findUnique({ 
-                where: { renteonId: carData.renteonId } as any 
-            });
-
-            if (!existing) {
-                existing = await prisma.car.findUnique({ 
-                    where: { licensePlate: carData.licensePlate } 
-                });
-            }
-            
-            try {
-                if (existing) {
-                    await prisma.car.update({
-                        where: { id: existing.id },
-                        data: {
-                            // PROTECTED: Manual Make/Model
-                            // make: carData.make,
-                            // model: carData.model,
-                            // PROTECT MANUAL IMAGES: Only update if existing is null
-                            ...(existing.imageUrl ? {} : (localImage ? { imageUrl: localImage } : {})),
-                            transmission: carData.transmission as any,
-                            fuelType: carData.fuelType as any,
-                            seats: carData.seats,
-                            categories: carData.categories,
-                            renteonId: carData.renteonId,
-                            pricePerDay: carData.pricePerDay
-                            // PROTECTED MANUAL FIELDS - DO NOT UNCOMMENT OR ADD:
-                            // deposit, 
-                            // extraKmPrice, 
-                            // unlimitedMileagePrice, 
-                            // pickupAfterHoursPrice, 
-                            // returnAfterHoursPrice, 
-                            // fullInsurancePrice
-                        } as any
-                    })
-                    updatedCount++
-                } else {
-                     await prisma.car.create({
-                        data: {
-                            ...carData,
-                            status: 'AVAILABLE',
-                            transmission: carData.transmission as any,
-                            fuelType: carData.fuelType as any,
-                        } as any
-                    })
-                    createdCount++
-                }
-            } catch (err: any) {
-                 if (err.code === 'P2002') {
-                    console.warn(`Duplicate conflict for ${carData.renteonId}, retrying update...`);
-                    const conflict = await prisma.car.findFirst({
-                        where: { 
-                            OR: [
-                                { renteonId: carData.renteonId },
-                                { licensePlate: carData.licensePlate }
-                            ]
-                         } as any
-                    });
-                    
-                    if (conflict) {
-                         await prisma.car.update({
-                            where: { id: conflict.id },
-                            data: {
-                                renteonId: carData.renteonId,
-                                pricePerDay: carData.pricePerDay
-                            } as any
-                        });
-                    }
-                }
-                console.error(`Failed to sync fallback car ${carData.renteonId}`, err.message);
-            }
+             // STRICT MODE: No standalone car creation without valid CarModels array
+             // This entire block was relying on fallback data for categories without specific models
+             console.log(`Skipping Category ${cat.Id} - No CarModels array (Strict Mode)`);
         }
     }
     
