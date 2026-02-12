@@ -136,7 +136,8 @@ export function BookingEngine({
                 <FleetDatePicker 
                     date={date} 
                     setDate={handleDateChange} 
-                    triggerClassName="text-zinc-900 font-bold p-0 h-auto hover:text-zinc-700 justify-start w-full"
+                    triggerClassName="text-zinc-900 font-bold p-0 h-auto hover:text-zinc-700 justify-center md:justify-start w-full text-center md:text-left"
+                    onSave={handleSearch}
                 />
             </div>
          </div>

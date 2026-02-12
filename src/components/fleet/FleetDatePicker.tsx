@@ -31,15 +31,16 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area"
 
 interface FleetDatePickerProps {
-  date: { from: Date | undefined; to: Date | undefined }
-  setDate: (date: { from: Date | undefined; to: Date | undefined }) => void
-  className?: string
-  triggerClassName?: string
-}
-
-export function FleetDatePicker({ date, setDate, className, triggerClassName }: FleetDatePickerProps) {
-  const [isOpen, setIsOpen] = React.useState(false)
-  const [isMobile, setIsMobile] = React.useState(false)
+    date: { from: Date | undefined; to: Date | undefined }
+    setDate: (date: { from: Date | undefined; to: Date | undefined }) => void
+    className?: string
+    triggerClassName?: string
+    onSave?: () => void
+  }
+  
+  export function FleetDatePicker({ date, setDate, className, triggerClassName, onSave }: FleetDatePickerProps) {
+    const [isOpen, setIsOpen] = React.useState(false)
+    const [isMobile, setIsMobile] = React.useState(false)
 
   // Detect mobile
   React.useEffect(() => {
@@ -144,13 +145,16 @@ export function FleetDatePicker({ date, setDate, className, triggerClassName }: 
          />
       </div>
 
-      {/* Footer (Mobile Only mostly) */}
-      <div className="p-4 border-t border-zinc-100 bg-white md:hidden mt-auto">
+      {/* Footer (Mobile & Desktop) */}
+      <div className="p-4 border-t border-zinc-100 bg-white mt-auto">
          <Button 
             className="w-full bg-[#ff5f00] hover:bg-[#ff5f00]/90 text-white font-black h-12 rounded-xl uppercase tracking-wider"
-            onClick={() => setIsOpen(false)}
+            onClick={() => {
+                setIsOpen(false)
+                if (onSave) onSave()
+            }}
          >
-            Confirm Dates
+            Search
          </Button>
       </div>
     </div>
@@ -171,13 +175,13 @@ export function FleetDatePicker({ date, setDate, className, triggerClassName }: 
     >
         {date?.from ? (
             date.to ? (
-                <div className="flex flex-col items-start gap-0.5 w-full">
+                <div className="flex flex-col items-center md:items-start gap-0.5 w-full">
                     <span className="flex items-center gap-2 text-sm md:text-base whitespace-nowrap">
                         {format(date.from, "MMM dd")} 
                         <span className="text-zinc-400">|</span>
                         {format(date.to, "MMM dd")}
                     </span>
-                    <span className="text-[10px] text-zinc-500 font-medium flex items-center gap-2">
+                    <span className="text-[10px] text-zinc-500 font-medium flex items-center justify-center md:justify-start gap-2">
                         {format(date.from, "HH:mm")}
                         <ArrowRight className="w-3 h-3" />
                         {format(date.to, "HH:mm")}
