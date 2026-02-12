@@ -6,12 +6,7 @@ import { format, addDays } from "date-fns"
 import { Calendar as CalendarIcon, MapPin, ChevronRight, Search } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+import { FleetDatePicker } from "./FleetDatePicker"
 import { useRouter, useSearchParams } from "next/navigation"
 
 interface FleetTopBarProps {
@@ -32,8 +27,11 @@ export function FleetTopBar({ searchParams }: FleetTopBarProps) {
     to: searchParams?.endDate ? new Date(searchParams.endDate) : addDays(new Date(), 3),
   })
 
-  const handleDateSelect = (range: any) => {
-    setDate(range)
+  // Ensure type compatibility for the state setter
+  const handleDateChange = (range: { from: Date | undefined; to: Date | undefined } | undefined) => {
+    if (range) {
+        setDate(range)
+    }
   }
 
   const handleSearch = () => {
@@ -55,7 +53,7 @@ export function FleetTopBar({ searchParams }: FleetTopBarProps) {
       <div className="container mx-auto py-4">
         <div className="flex flex-col lg:flex-row gap-4 items-center bg-zinc-900 p-2 rounded-xl border border-zinc-800">
             
-            {/* Location (Static for now as per usual requests, but can be made dynamic) */}
+            {/* Location (Static for now) */}
             <div className="flex-1 w-full lg:w-auto px-4 py-2 border-r border-zinc-800/50">
                 <div className="flex items-center gap-2 text-zinc-500 text-xs font-bold uppercase tracking-wider mb-1">
                     <MapPin className="w-3 h-3" /> Pick Up & Return
@@ -70,42 +68,7 @@ export function FleetTopBar({ searchParams }: FleetTopBarProps) {
                 <div className="flex items-center gap-2 text-zinc-500 text-xs font-bold uppercase tracking-wider mb-1">
                     <CalendarIcon className="w-3 h-3" /> Rental Dates
                 </div>
-                <Popover>
-                    <PopoverTrigger asChild>
-                        <Button
-                            id="date"
-                            variant={"ghost"}
-                            className={cn(
-                                "w-full justify-start text-left font-bold text-white p-0 hover:bg-transparent hover:text-red-500 h-auto",
-                                !date && "text-muted-foreground"
-                            )}
-                        >
-                            {date?.from ? (
-                                date.to ? (
-                                    <span className="flex items-center gap-2">
-                                        {format(date.from, "LLL dd, HH:mm")} 
-                                        <ChevronRight className="w-4 h-4 text-zinc-600" />
-                                        {format(date.to, "LLL dd, HH:mm")}
-                                    </span>
-                                ) : (
-                                    format(date.from, "LLL dd, HH:mm")
-                                )
-                            ) : (
-                                <span>Pick a date</span>
-                            )}
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0 bg-zinc-900 border-zinc-800 text-white" align="start">
-                        <Calendar
-                            mode="range"
-                            defaultMonth={date?.from}
-                            selected={date}
-                            onSelect={handleDateSelect}
-                            numberOfMonths={2}
-                            className="bg-zinc-950 text-white"
-                        />
-                    </PopoverContent>
-                </Popover>
+                <FleetDatePicker date={date} setDate={handleDateChange} />
             </div>
 
             {/* Search Button */}
