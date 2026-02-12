@@ -440,21 +440,21 @@ export function FleetCard({
 
               {/* Bottom Total & CTA */}
               <div className="mt-8 pt-6 border-t border-zinc-800">
-                  <div className="flex justify-between items-end mb-4">
-                      <div>
-                          <span className="block text-3xl font-black text-white tracking-tighter leading-none">
+                  <div className="flex justify-between items-end mb-4 gap-4">
+                      <div className="flex-1 min-w-0">
+                          <span className="block text-3xl font-black text-white tracking-tighter leading-none whitespace-nowrap">
                               {Math.round(finalTotal / diffDays).toLocaleString()} €
                               <span className="text-sm text-zinc-500 font-bold ml-1">/ day</span>
                           </span>
-                          <span className="text-xs text-zinc-400 font-medium mt-1 block">
+                          <span className="text-xs text-zinc-400 font-medium mt-1 block truncate">
                               Total for {diffDays} days: <span className="text-white">{finalTotal.toLocaleString()} €</span>
                           </span>
-                          <span className="text-xs text-zinc-500 font-bold mt-1 block flex items-center gap-1.5">
-                              <Shield className="w-3 h-3" />
-                              Security Deposit: <span className="text-zinc-300">€{currentDeposit.toLocaleString()}</span>
+                          <span className="text-xs text-zinc-500 font-bold mt-1 block flex items-center gap-1.5 truncate">
+                              <Shield className="w-3 h-3 shrink-0" />
+                              <span className="truncate">Security Deposit: <span className="text-zinc-300">€{currentDeposit.toLocaleString()}</span></span>
                           </span>
                       </div>
-                      <Link href={`/checkout?carId=${car.id}&insurance=${selectedInsuranceId}&mileage=${mileageOption}&startDate=${startDate.toISOString()}&endDate=${endDate?.toISOString()}`} className="w-1/2">
+                      <Link href={`/checkout?carId=${car.id}&insurance=${selectedInsuranceId}&mileage=${mileageOption}&startDate=${startDate.toISOString()}&endDate=${endDate?.toISOString()}`} className="w-[140px] shrink-0">
                         <Button className="w-full bg-white hover:bg-zinc-200 text-black font-black h-12 rounded-xl uppercase tracking-wider transition-colors shadow-lg shadow-zinc-900/50">
                             Book Now
                         </Button>
