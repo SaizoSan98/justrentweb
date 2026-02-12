@@ -144,7 +144,7 @@ export function FleetClientWrapper({ cars, dictionary, options }: FleetClientWra
     <div className="flex flex-col gap-8">
       
       {/* Top Controls: Result Count & Filter Toggle */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-4">
            <h2 className="text-xl font-bold text-zinc-900">
               Available Vehicles <span className="text-zinc-400 text-sm ml-2">({filteredCars.filter(c => c.isAvailable !== false).length})</span>
            </h2>
@@ -152,10 +152,11 @@ export function FleetClientWrapper({ cars, dictionary, options }: FleetClientWra
            <Button 
                 onClick={() => setShowFilters(!showFilters)}
                 variant="outline"
-                className="gap-2 border-zinc-200 hover:border-black hover:bg-black hover:text-white transition-all rounded-full"
+                size="sm"
+                className="gap-2 border-zinc-200 hover:border-black hover:bg-black hover:text-white transition-all rounded-full h-9 px-4 text-xs font-bold uppercase tracking-wider"
            >
-               <SlidersHorizontal className="w-4 h-4" />
-               {showFilters ? 'Hide Filters' : 'Show Filters'}
+               <SlidersHorizontal className="w-3.5 h-3.5" />
+               {showFilters ? 'Hide Filters' : 'Filters'}
            </Button>
       </div>
 
@@ -167,9 +168,9 @@ export function FleetClientWrapper({ cars, dictionary, options }: FleetClientWra
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="overflow-hidden bg-white border border-zinc-100 rounded-3xl"
+                className="overflow-hidden"
             >
-                <div className="p-6 md:p-8">
+                <div className="py-4">
                     <FleetFilters 
                         filters={filters} 
                         onChange={handleFilterChange} 
@@ -191,7 +192,7 @@ export function FleetClientWrapper({ cars, dictionary, options }: FleetClientWra
       {/* Main Grid */}
       <div className="flex-1">
         {filteredCars.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredCars.map((car) => (
                   <FleetCard 
                     key={car.id}

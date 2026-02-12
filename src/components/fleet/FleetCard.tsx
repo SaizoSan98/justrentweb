@@ -153,11 +153,11 @@ export function FleetCard({
       <div className={cn("p-6 flex flex-col h-full bg-[#f3f4f6]", isExpanded && "hidden")}>
         {/* Header */}
         <div className="mb-4">
-            <h3 className="text-2xl font-black text-zinc-900 tracking-tight leading-none mb-1">
+            <h3 className="text-2xl font-black text-zinc-900 tracking-tight leading-none mb-1 line-clamp-1">
                 {car.make} {car.model}
             </h3>
             <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-2">
-                <span>{car.categories?.[0]?.name || "Car Class"}</span>
+                <span className="truncate">{car.categories?.[0]?.name || "Car Class"}</span>
                 <span className="text-zinc-300">|</span>
                 <span>OR SIMILAR</span>
             </p>

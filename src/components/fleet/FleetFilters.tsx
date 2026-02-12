@@ -34,12 +34,12 @@ export function FleetFilters({
   const seatsList = options?.seats || [2, 4, 5, 7, 9]
   
   return (
-    <div className="space-y-8 text-zinc-900 bg-white">
+    <div className="space-y-6 text-zinc-900 bg-zinc-50/50 p-6 rounded-3xl border border-zinc-100">
       
       {/* Vehicle Category */}
-      <div className="space-y-4">
+      <div className="space-y-3">
          <div className="flex items-center justify-between">
-            <h4 className="font-bold text-sm uppercase tracking-wider text-zinc-900">Vehicle Category</h4>
+            <h4 className="font-bold text-xs uppercase tracking-wider text-zinc-500">Vehicle Category</h4>
         </div>
         <div className="flex flex-wrap gap-2">
           {categoriesList.map((category: string) => {
@@ -68,12 +68,12 @@ export function FleetFilters({
         </div>
       </div>
 
-      <div className="h-px bg-zinc-100 w-full" />
+      <div className="h-px bg-zinc-200/50 w-full" />
 
       {/* Transmission */}
-      <div className="space-y-4">
+      <div className="space-y-3">
          <div className="flex items-center justify-between">
-            <h4 className="font-bold text-sm uppercase tracking-wider text-zinc-900">Gear Shift</h4>
+            <h4 className="font-bold text-xs uppercase tracking-wider text-zinc-500">Gear Shift</h4>
         </div>
         <div className="flex flex-wrap gap-2">
           {transmissionsList.map((transmission: string) => {
@@ -102,12 +102,12 @@ export function FleetFilters({
         </div>
       </div>
 
-      <div className="h-px bg-zinc-100 w-full" />
+      <div className="h-px bg-zinc-200/50 w-full" />
 
       {/* Fuel Type */}
-      <div className="space-y-4">
+      <div className="space-y-3">
          <div className="flex items-center justify-between">
-            <h4 className="font-bold text-sm uppercase tracking-wider text-zinc-900">Fuel Type</h4>
+            <h4 className="font-bold text-xs uppercase tracking-wider text-zinc-500">Fuel Type</h4>
         </div>
         <div className="flex flex-wrap gap-2">
           {fuelTypesList.map((fuel: string) => {
@@ -136,12 +136,12 @@ export function FleetFilters({
         </div>
       </div>
 
-      <div className="h-px bg-zinc-100 w-full" />
+      <div className="h-px bg-zinc-200/50 w-full" />
 
       {/* Seats */}
-      <div className="space-y-4">
+      <div className="space-y-3">
          <div className="flex items-center justify-between">
-            <h4 className="font-bold text-sm uppercase tracking-wider text-zinc-900">Seats</h4>
+            <h4 className="font-bold text-xs uppercase tracking-wider text-zinc-500">Seats</h4>
         </div>
         <div className="flex flex-wrap gap-2">
           {seatsList.map((seat: number) => {
@@ -170,12 +170,12 @@ export function FleetFilters({
         </div>
       </div>
 
-      <div className="h-px bg-zinc-100 w-full" />
+      <div className="h-px bg-zinc-200/50 w-full" />
 
       {/* Options */}
-      <div className="space-y-4">
+      <div className="space-y-3">
          <div className="flex items-center justify-between">
-            <h4 className="font-bold text-sm uppercase tracking-wider text-zinc-900">Options</h4>
+            <h4 className="font-bold text-xs uppercase tracking-wider text-zinc-500">Options</h4>
         </div>
         <div className="flex flex-wrap gap-2">
             <Button
