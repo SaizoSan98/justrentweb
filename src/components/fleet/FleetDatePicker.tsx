@@ -25,9 +25,11 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 interface FleetDatePickerProps {
   date: { from: Date | undefined; to: Date | undefined }
   setDate: (date: { from: Date | undefined; to: Date | undefined }) => void
+  className?: string
+  triggerClassName?: string
 }
 
-export function FleetDatePicker({ date, setDate }: FleetDatePickerProps) {
+export function FleetDatePicker({ date, setDate, className, triggerClassName }: FleetDatePickerProps) {
   const [isOpen, setIsOpen] = React.useState(false)
   const [isMobile, setIsMobile] = React.useState(false)
 
@@ -154,16 +156,17 @@ export function FleetDatePicker({ date, setDate }: FleetDatePickerProps) {
         onClick={() => setIsOpen(true)}
         className={cn(
             "w-full justify-start text-left font-bold text-white p-0 hover:bg-transparent hover:text-red-500 h-auto",
-            !date.from && "text-muted-foreground"
+            !date.from && "text-muted-foreground",
+            triggerClassName
         )}
         {...props}
     >
         {date?.from ? (
             date.to ? (
-                <div className="flex flex-col items-start gap-0.5">
-                    <span className="flex items-center gap-2 text-sm md:text-base">
+                <div className="flex flex-col items-start gap-0.5 w-full">
+                    <span className="flex items-center gap-2 text-sm md:text-base whitespace-nowrap">
                         {format(date.from, "MMM dd")} 
-                        <span className="text-zinc-600">-</span>
+                        <span className="text-zinc-400">|</span>
                         {format(date.to, "MMM dd")}
                     </span>
                     <span className="text-[10px] text-zinc-500 font-medium flex items-center gap-2">

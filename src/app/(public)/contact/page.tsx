@@ -32,7 +32,7 @@ export default async function ContactPage() {
                   <div>
                     <h3 className="text-xl font-bold text-zinc-900 mb-2">Phone Support</h3>
                     <p className="text-zinc-500 mb-2">Available 24/7 for urgent inquiries.</p>
-                    <a href="tel:+3612345678" className="text-lg font-semibold hover:text-red-600 transition-colors">+36 1 234 5678</a>
+                    <a href="tel:+36204048186" className="text-lg font-semibold hover:text-red-600 transition-colors">+36 20 404 8186</a>
                   </div>
                 </div>
 
@@ -54,9 +54,8 @@ export default async function ContactPage() {
                   <div>
                     <h3 className="text-xl font-bold text-zinc-900 mb-2">Main Office</h3>
                     <p className="text-zinc-500 leading-relaxed">
-                      Budapest Liszt Ferenc Airport<br/>
-                      Terminal 2B, Arrivals Level<br/>
-                      1185 Budapest, Hungary
+                      2220 Vecsés,<br/>
+                      Dózsa György út 86.
                     </p>
                   </div>
                 </div>

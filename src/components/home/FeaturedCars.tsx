@@ -88,6 +88,21 @@ export function FeaturedCars({ cars }: FeaturedCarsProps) {
              <Link href={`/fleet?category=${car.categories?.[0]?.name}`} className="block h-full">
                 <div className="bg-[#f3f4f6] rounded-[2.5rem] p-8 h-full border border-zinc-100 shadow-lg transition-all duration-500 group-hover:shadow-2xl group-hover:-translate-y-2 relative overflow-hidden flex flex-col">
                     
+                    {/* Brand Logo Overlay */}
+                    {getBrandLogo(car.make) && (
+                        <div className="absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none z-0 scale-150">
+                             <div className="relative w-full h-full">
+                                <Image 
+                                    src={getBrandLogo(car.make)}
+                                    alt={car.make}
+                                    fill
+                                    className="object-contain"
+                                    unoptimized
+                                />
+                             </div>
+                        </div>
+                    )}
+
                     {/* Badge */}
                     <div className="relative z-10 mb-4">
                          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-black/20">

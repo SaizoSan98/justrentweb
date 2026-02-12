@@ -4,7 +4,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Users, Briefcase, Gauge, Info, Check, Shield, Zap, CreditCard, MapPin, Calendar, ArrowRight, ChevronLeft, AlertCircle, Settings, Fuel, X } from "lucide-react"
+import { Users, Briefcase, Gauge, Info, Check, Shield, Zap, CreditCard, MapPin, Calendar, ArrowRight, ChevronLeft, AlertCircle, Settings, Fuel, X, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -47,6 +47,7 @@ type CarType = {
   deposit?: number
   renteonId?: string | null
   isAvailable?: boolean
+  isFeatured?: boolean
   insuranceOptions?: {
     planId: string
     pricePerDay: number
@@ -151,7 +152,16 @@ export function FleetCard({
       )}
 
       {/* --- COLLAPSED STATE (DEFAULT CARD) --- */}
-      <div className={cn("p-6 flex flex-col h-full bg-[#18181b] border border-zinc-800 rounded-[2rem]", isExpanded && "hidden")}>
+      <div className={cn("p-6 flex flex-col h-full bg-[#18181b] border border-zinc-800 rounded-[2rem] relative overflow-hidden", isExpanded && "hidden")}>
+        
+        {/* Featured Badge */}
+        {car.isFeatured && (
+            <div className="absolute top-0 right-0 z-20 bg-yellow-500 text-black text-[10px] font-black px-3 py-1.5 rounded-bl-2xl uppercase tracking-wider flex items-center gap-1 shadow-lg shadow-yellow-500/20">
+                <Star className="w-3 h-3 fill-black" />
+                Featured
+            </div>
+        )}
+
         {/* Header */}
         <div className="mb-4">
             <h3 className="text-2xl font-black text-white tracking-tight leading-none mb-1 line-clamp-1">
@@ -189,11 +199,27 @@ export function FleetCard({
 
         {/* Image */}
         <div className="relative w-full h-[220px] flex items-center justify-center my-4 overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-500" onClick={handleToggle}>
+            
+            {/* Brand Logo Overlay */}
+            {getBrandLogo(car.make) && (
+                <div className="absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none select-none z-0 scale-150">
+                    <div className="relative w-full h-full">
+                        <Image 
+                            src={getBrandLogo(car.make)}
+                            alt={car.make}
+                            fill
+                            className="object-contain invert"
+                            unoptimized
+                        />
+                    </div>
+                </div>
+            )}
+
             <Image
               src={car.imageUrl || "/placeholder-car.png"}
               alt={`${car.make} ${car.model}`}
               fill
-              className="object-contain object-center"
+              className="object-contain object-center z-10"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
         </div>

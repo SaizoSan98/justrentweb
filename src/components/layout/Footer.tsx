@@ -63,11 +63,11 @@ export function Footer() {
             <ul className="space-y-6 text-zinc-400">
               <li className="flex items-start gap-4">
                 <MapPin className="w-6 h-6 text-red-600 shrink-0 mt-1" />
-                <span>Budapest Liszt Ferenc Airport<br/>Terminal 2B, Arrivals Level</span>
+                <span>2220 Vecsés, Dózsa György út 86.</span>
               </li>
               <li className="flex items-center gap-4">
                 <Phone className="w-6 h-6 text-red-600 shrink-0" />
-                <a href="tel:+3612345678" className="hover:text-white transition-colors">+36 1 234 5678</a>
+                <a href="tel:+36204048186" className="hover:text-white transition-colors">+36 20 404 8186</a>
               </li>
               <li className="flex items-center gap-4">
                 <Mail className="w-6 h-6 text-red-600 shrink-0" />
@@ -80,7 +80,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-white/10 gap-6">
           <p className="text-zinc-500 text-sm">© 2026 JustRent Budapest. All rights reserved.</p>
           <div className="flex gap-8 text-sm text-zinc-500">
-             <span>Created by K.D Budapest</span>
+             <span>Created by: <a href="https://nixovisual.hu" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">NixoVisual</a></span>
           </div>
         </div>
       </div>
