@@ -102,8 +102,12 @@ export function FeaturedCars({ cars }: FeaturedCarsProps) {
                             {car.make} {car.model}
                         </h3>
                         <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-2">
-                            <span>{car.categories?.[0]?.name || "Car Class"}</span>
-                            <span className="text-zinc-300">|</span>
+                            {car.categories?.[0]?.name && (
+                                <>
+                                    <span>{car.categories[0].name}</span>
+                                    <span className="text-zinc-300">|</span>
+                                </>
+                            )}
                             <span>OR SIMILAR</span>
                         </p>
                     </div>

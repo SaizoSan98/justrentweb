@@ -157,8 +157,12 @@ export function FleetCard({
                 {car.make} {car.model}
             </h3>
             <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
-                <span className="truncate">{car.categories?.[0]?.name || "Car Class"}</span>
-                <span className="text-zinc-600">|</span>
+                {car.categories?.[0]?.name && (
+                    <>
+                        <span className="truncate">{car.categories[0].name}</span>
+                        <span className="text-zinc-600">|</span>
+                    </>
+                )}
                 <span>OR SIMILAR</span>
             </p>
         </div>
