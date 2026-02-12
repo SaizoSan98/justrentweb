@@ -144,7 +144,7 @@ export function FeaturedCars({ cars }: FeaturedCarsProps) {
                              <div>
                                 <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1">Daily Rate</p>
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-4xl font-black text-red-600">€{Number(car.pricePerDay).toLocaleString()}</span>
+                                    <span className="text-4xl font-black text-red-600">€{Math.round(Number(car.pricePerDay)).toLocaleString()}</span>
                                     <span className="text-zinc-400 font-medium">/ day</span>
                                 </div>
                              </div>

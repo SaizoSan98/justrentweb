@@ -103,12 +103,12 @@ export function FleetCard({
   const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)))
   
   // Calculate price based on duration
-  let pricePerDay = car.pricePerDay
+  let pricePerDay = Math.round(car.pricePerDay)
   const matchingTier = car.pricingTiers?.find(
     t => diffDays >= t.minDays && (t.maxDays === null || diffDays <= t.maxDays)
   )
   if (matchingTier) {
-    pricePerDay = matchingTier.pricePerDay
+    pricePerDay = Math.round(matchingTier.pricePerDay)
   }
   
   const totalPrice = pricePerDay * diffDays
@@ -150,83 +150,62 @@ export function FleetCard({
       )}
 
       {/* --- COLLAPSED STATE (DEFAULT CARD) --- */}
-      <div className={cn("p-4 flex flex-col h-full", isExpanded && "hidden")}>
+      <div className={cn("p-6 flex flex-col h-full bg-[#f3f4f6]", isExpanded && "hidden")}>
         {/* Header */}
-        <div className="flex justify-between items-start mb-2">
-            <div className="space-y-1">
-                <h3 className="text-xl font-black text-zinc-900 tracking-tight leading-none min-h-[3rem] flex flex-col justify-center">
-                    <span>{car.make} <span className="text-zinc-500 font-bold">{car.model}</span></span>
-                </h3>
-                <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                        OR SIMILAR
-                    </span>
-                    <span className="text-[10px] font-mono text-zinc-300">
-                        ID: {car.renteonId || car.id.slice(0, 8)}
-                    </span>
-                </div>
+        <div className="mb-4">
+            <h3 className="text-2xl font-black text-zinc-900 tracking-tight leading-none mb-1">
+                {car.categories?.[0]?.name || "Car Class"} {car.transmission === 'AUTOMATIC' ? 'Automatic' : 'Manual'}
+            </h3>
+            <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider">
+                {car.make} {car.model} <span className="text-zinc-400 font-medium ml-1">OR SIMILAR</span>
+            </p>
+        </div>
+
+        {/* Specs - Chips */}
+        <div className="flex flex-wrap gap-2 mb-4">
+            <div className="bg-zinc-200/80 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                <span className="text-xs font-bold text-zinc-600">{car.fuelType} Vehicle</span>
             </div>
-            
-            {/* Price Badge */}
-            <div className="text-right">
-                 <span className="text-2xl font-black text-zinc-900 tracking-tighter block leading-none">{pricePerDay.toLocaleString()} €</span>
-                 <span className="text-[10px] font-bold text-zinc-400 uppercase">/ day</span>
+            <div className="bg-zinc-200/80 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                <Users className="w-3.5 h-3.5 text-zinc-600" />
+                <span className="text-xs font-bold text-zinc-600">{car.seats}</span>
+            </div>
+            <div className="bg-zinc-200/80 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                <Briefcase className="w-3.5 h-3.5 text-zinc-600" />
+                <span className="text-xs font-bold text-zinc-600">{car.suitcases}</span>
+            </div>
+            <div className="bg-zinc-200/80 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                <Gauge className="w-3.5 h-3.5 text-zinc-600" />
+                <span className="text-xs font-bold text-zinc-600">{car.transmission === 'AUTOMATIC' ? 'Auto' : 'Manual'}</span>
             </div>
         </div>
 
         {/* Image */}
-        <div className="relative aspect-[16/9] w-full flex items-center justify-center my-2 bg-zinc-50 rounded-xl overflow-hidden cursor-pointer" onClick={handleToggle}>
-            {/* Brand Logo Overlay */}
-            {getBrandLogo(car.make) && (
-              <div className="absolute top-3 left-3 w-8 h-8 z-10 opacity-50 group-hover:opacity-100 transition-opacity grayscale group-hover:grayscale-0">
-                <Image 
-                    src={getBrandLogo(car.make)}
-                    alt={car.make}
-                    fill
-                    className="object-contain"
-                    unoptimized
-                />
-              </div>
-            )}
-
+        <div className="relative aspect-[16/9] w-full flex items-center justify-center my-2 overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-500" onClick={handleToggle}>
             <Image
               src={car.imageUrl || "/placeholder-car.png"}
               alt={`${car.make} ${car.model}`}
               fill
-              className="object-contain p-2 hover:scale-105 transition-transform duration-500"
+              className="object-contain"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
         </div>
 
-        {/* Specs - Compact Grid */}
-        <div className="grid grid-cols-4 gap-2 mb-4">
-            <div className="flex flex-col items-center justify-center p-2 bg-zinc-50 rounded-lg">
-                <Users className="w-4 h-4 text-zinc-900 mb-1" />
-                <span className="text-[10px] font-bold text-zinc-500">{car.seats}</span>
-            </div>
-            <div className="flex flex-col items-center justify-center p-2 bg-zinc-50 rounded-lg">
-                <Briefcase className="w-4 h-4 text-zinc-900 mb-1" />
-                <span className="text-[10px] font-bold text-zinc-500">{car.suitcases}</span>
-            </div>
-            <div className="flex flex-col items-center justify-center p-2 bg-zinc-50 rounded-lg">
-                <Gauge className="w-4 h-4 text-zinc-900 mb-1" />
-                <span className="text-[10px] font-bold text-zinc-500">{car.transmission === 'AUTOMATIC' ? 'Auto' : 'Man'}</span>
-            </div>
-            <div className="flex flex-col items-center justify-center p-2 bg-zinc-50 rounded-lg">
-                <Fuel className="w-4 h-4 text-zinc-900 mb-1" />
-                <span className="text-[10px] font-bold text-zinc-500">{car.fuelType}</span>
-            </div>
-        </div>
-
         {/* Footer Actions */}
-        <div className="mt-auto pt-2 border-t border-zinc-100 flex items-center justify-between gap-4">
-             <div className="text-xl font-black text-zinc-900">
-                Total: {totalPrice.toLocaleString()} €
+        <div className="mt-auto pt-4 flex items-end justify-between">
+             <div>
+                <div className="flex items-baseline gap-1">
+                    <span className="text-3xl font-black text-zinc-900 tracking-tighter">${pricePerDay.toLocaleString()}</span>
+                    <span className="text-sm text-zinc-500 font-medium">/day</span>
+                </div>
+                <div className="text-xs text-zinc-500 mt-1">
+                    ${finalTotal.toLocaleString()} total inc taxes and fees
+                </div>
              </div>
+             
              <Button 
                 onClick={handleToggle}
-                size="sm"
-                className="bg-black text-white hover:bg-zinc-800 font-bold rounded-lg px-6 h-9 text-xs uppercase tracking-wider"
+                className="bg-[#c92a2a] hover:bg-[#b02525] text-white font-bold rounded-lg px-8 h-10 text-sm shadow-lg shadow-red-900/10"
             >
                 Select
             </Button>

@@ -1,6 +1,7 @@
 
 import { NextResponse } from "next/server";
-import { executeSyncCars, executeSyncAvailability } from "@/lib/renteon-sync";
+import { executeSyncAvailability } from "@/lib/renteon-sync";
+import { strictSync } from "@/scripts/strict-sync";
 
 export const maxDuration = 300; // 5 minutes
 export const dynamic = 'force-dynamic';
@@ -17,8 +18,12 @@ export async function GET(req: Request) {
         
         console.log("Starting Automatic Sync (Cron)...");
         
-        // Run syncs
-        const carsResult = await executeSyncCars();
+        // 1. Strict Car Sync (Catalog + Prices)
+        // This might reset statuses to AVAILABLE, so we must run availability check after.
+        const carsResult = await strictSync();
+        
+        // 2. Availability Sync (Bookings)
+        // This ensures rented cars are marked correctly.
         const availResult = await executeSyncAvailability();
         
         return NextResponse.json({

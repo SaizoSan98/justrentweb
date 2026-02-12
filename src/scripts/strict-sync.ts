@@ -87,8 +87,11 @@ async function getRenteonToken(): Promise<string> {
 
 // --- Sync Logic ---
 
-async function strictSync() {
+export async function strictSync() {
     console.log("🔒 STARTING STRICT RENTEON SYNC (No Fallbacks, No Calculations)...");
+    
+    let createdCount = 0;
+    let updatedCount = 0;
     
     // 0. Purge existing data to ensure clean slate (as requested earlier)
     // We assume purge-db was run, but let's be safe and do upserts/deletes carefully.
@@ -169,7 +172,7 @@ async function strictSync() {
 
             // If we have price and services, this category is VALID.
             // Add all cars in this category to validCars list.
-            const pricePerDay = data.Total / 3;
+            const pricePerDay = Math.round(data.Total / 3);
 
             console.log(`  ✅ Valid Data! Price: ${pricePerDay.toFixed(2)} EUR/day. Insurances: ${insurances.length}. Extras: ${extras.length}. Unlimited Mileage: ${unlimitedMileage}`);
 
@@ -273,6 +276,13 @@ async function strictSync() {
                 unlimitedMileagePrice: 0, 
             }
         });
+        
+        // Track stats
+        if (dbCar.createdAt.getTime() === dbCar.updatedAt.getTime()) {
+             createdCount++;
+        } else {
+             updatedCount++;
+        }
 
         // Sync Insurances for this Car
         // We first need to ensure InsurancePlans exist
@@ -331,9 +341,19 @@ async function strictSync() {
         console.log(`Deleted ${deleted.count} cars that did not meet validation criteria.`);
     }
 
-    console.log("✅ STRICT SYNC COMPLETE.");
+    console.log(`\n✅ Strict Sync Complete. Created: ${createdCount}, Updated: ${updatedCount}.`);
+    
+    return {
+        success: true,
+        total: validCars.length,
+        created: createdCount,
+        updated: updatedCount
+    };
 }
 
-strictSync()
-    .catch(console.error)
-    .finally(() => prisma.$disconnect());
+// Allow running directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+    strictSync()
+        .catch(console.error)
+        .finally(() => prisma.$disconnect());
+}

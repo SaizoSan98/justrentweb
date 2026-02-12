@@ -3,7 +3,7 @@
 import { getSession } from "@/lib/auth"
 import { getRenteonToken } from "@/lib/renteon"
 import { executeSyncCars, executeSyncAvailability, executeSyncExtras } from "@/lib/renteon-sync"
-import { syncCarsFromRenteon as executeNewSyncCars } from "@/scripts/sync-cars"
+import { strictSync as executeNewSyncCars } from "@/scripts/strict-sync"
 
 const RENTEON_API_URL = "https://justrentandtrans.s11.renteon.com/en/api"
 
