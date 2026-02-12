@@ -149,6 +149,10 @@ export default async function FleetPage({
               // Override pricePerDay with Renteon's effective daily rate
               newCar.pricePerDay = Math.round(renteonData.amount / days) as any;
               
+              // CLEAR Pricing Tiers so the UI uses this exact price
+              // This prevents FleetCard from recalculating based on static DB tiers
+              newCar.pricingTiers = [];
+              
               // DO NOT Override Deposit - User wants manual control
               // if (renteonData.deposit > 0) {
               //    newCar.deposit = renteonData.deposit as any;
