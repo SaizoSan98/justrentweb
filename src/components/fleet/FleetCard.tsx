@@ -183,12 +183,12 @@ export function FleetCard({
         </div>
 
         {/* Image */}
-        <div className="relative aspect-[16/9] w-full flex items-center justify-center my-2 overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-500" onClick={handleToggle}>
+        <div className="relative w-full h-[220px] flex items-center justify-center my-4 overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-500" onClick={handleToggle}>
             <Image
               src={car.imageUrl || "/placeholder-car.png"}
               alt={`${car.make} ${car.model}`}
               fill
-              className="object-contain"
+              className="object-contain object-center"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
         </div>

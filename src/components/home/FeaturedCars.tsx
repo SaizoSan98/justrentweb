@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowRight, Gauge, Fuel, Users, Star, ChevronLeft, ChevronRight } from "lucide-react"
+import { ArrowRight, Gauge, Fuel, Users, Star, ChevronLeft, ChevronRight, Briefcase } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { getBrandLogo } from "@/lib/brand-logos"
@@ -18,6 +18,7 @@ interface Car {
   transmission: string
   fuelType: string
   seats: number
+  suitcases?: number
   categories: { name: string }[]
 }
 
@@ -85,74 +86,65 @@ export function FeaturedCars({ cars }: FeaturedCarsProps) {
             className="snap-center shrink-0 w-[85vw] md:w-[60vw] lg:w-[40vw] xl:w-[30vw] relative group"
           >
              <Link href={`/fleet?category=${car.categories?.[0]?.name}`} className="block h-full">
-                <div className="bg-zinc-50 rounded-[2.5rem] p-8 h-full border border-zinc-100 shadow-lg transition-all duration-500 group-hover:shadow-2xl group-hover:-translate-y-2 relative overflow-hidden">
-                    
-                    {/* Background Pattern */}
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-bl-full -mr-16 -mt-16 transition-transform group-hover:scale-110 duration-700" />
-                    
-                    {/* Brand Logo Watermark */}
-                    {getBrandLogo(car.make) && (
-                      <div className="absolute top-8 right-8 w-12 h-12 z-10 opacity-30 grayscale group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500">
-                          <Image 
-                              src={getBrandLogo(car.make)}
-                              alt={car.make}
-                              fill
-                              className="object-contain"
-                              unoptimized
-                          />
-                      </div>
-                    )}
+                <div className="bg-[#f3f4f6] rounded-[2.5rem] p-8 h-full border border-zinc-100 shadow-lg transition-all duration-500 group-hover:shadow-2xl group-hover:-translate-y-2 relative overflow-hidden flex flex-col">
                     
                     {/* Badge */}
-                    <div className="relative z-10 mb-8">
+                    <div className="relative z-10 mb-4">
                          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-black/20">
                             <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-                            Top Pick
+                            Popular Choice
                          </span>
                     </div>
 
+                    {/* Header */}
+                    <div className="relative z-10 mb-4">
+                        <h3 className="text-3xl font-black text-zinc-900 tracking-tight leading-none mb-1">
+                            {car.make} {car.model}
+                        </h3>
+                        <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-2">
+                            <span>{car.categories?.[0]?.name || "Car Class"}</span>
+                            <span className="text-zinc-300">|</span>
+                            <span>OR SIMILAR</span>
+                        </p>
+                    </div>
+
+                    {/* Specs - Chips */}
+                    <div className="flex flex-wrap gap-2 mb-6 relative z-10">
+                        <div className="bg-zinc-200/80 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                            <span className="text-xs font-bold text-zinc-600">{car.fuelType} Vehicle</span>
+                        </div>
+                        <div className="bg-zinc-200/80 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                            <Users className="w-3.5 h-3.5 text-zinc-600" />
+                            <span className="text-xs font-bold text-zinc-600">{car.seats}</span>
+                        </div>
+                        <div className="bg-zinc-200/80 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                            <Gauge className="w-3.5 h-3.5 text-zinc-600" />
+                            <span className="text-xs font-bold text-zinc-600">{car.transmission === 'AUTOMATIC' ? 'Auto' : 'Manual'}</span>
+                        </div>
+                    </div>
+
                     {/* Car Image */}
-                    <div className="relative z-10 aspect-[16/10] mb-8">
+                    <div className="relative z-10 w-full h-[240px] mb-6 flex-shrink-0">
                         <Image 
                             src={car.imageUrl || "/placeholder-car.png"}
                             alt={`${car.make} ${car.model}`}
                             fill
-                            className="object-contain drop-shadow-2xl transition-transform duration-700 group-hover:scale-110"
+                            className="object-contain object-center drop-shadow-2xl transition-transform duration-700 group-hover:scale-110"
                         />
                     </div>
 
-                    {/* Info */}
-                    <div className="relative z-10">
-                        <div className="flex justify-between items-start mb-6">
-                            <div>
-                                <h3 className="text-3xl font-black text-zinc-900 mb-2 uppercase italic tracking-tighter">
-                                    {car.make} {car.model}
-                                </h3>
-                                <div className="flex flex-wrap gap-3 text-sm font-bold text-zinc-500">
-                                    <span className="px-3 py-1 bg-white border border-zinc-100 rounded-lg shadow-sm">{car.categories?.[0]?.name || "Car"}</span>
-                                    <span className="px-3 py-1 bg-white border border-zinc-100 rounded-lg shadow-sm flex items-center gap-1">
-                                        <Gauge className="w-3 h-3" /> {car.transmission === 'AUTOMATIC' ? 'Auto' : 'Manual'}
-                                    </span>
-                                    <span className="px-3 py-1 bg-white border border-zinc-100 rounded-lg shadow-sm flex items-center gap-1">
-                                        <Users className="w-3 h-3" /> {car.seats} Seats
-                                    </span>
-                                </div>
+                    {/* Footer */}
+                    <div className="relative z-10 pt-6 mt-4 border-t border-zinc-200 flex items-end justify-between">
+                         <div>
+                            <div className="flex items-baseline gap-1">
+                                <span className="text-4xl font-black text-zinc-900 tracking-tighter">€{Math.round(Number(car.pricePerDay)).toLocaleString()}</span>
+                                <span className="text-sm text-zinc-500 font-medium">/ day</span>
                             </div>
-                        </div>
-
-                        <div className="flex items-end justify-between pt-6 border-t border-zinc-200">
-                             <div>
-                                <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1">Daily Rate</p>
-                                <div className="flex items-baseline gap-1">
-                                    <span className="text-4xl font-black text-red-600">€{Math.round(Number(car.pricePerDay)).toLocaleString()}</span>
-                                    <span className="text-zinc-400 font-medium">/ day</span>
-                                </div>
-                             </div>
-                             
-                             <div className="w-14 h-14 rounded-full bg-black text-white flex items-center justify-center group-hover:bg-red-600 transition-colors duration-300 shadow-lg group-hover:shadow-red-600/30">
-                                <ArrowRight className="w-6 h-6 -rotate-45 group-hover:rotate-0 transition-transform duration-300" />
-                             </div>
-                        </div>
+                         </div>
+                         
+                         <div className="bg-[#c92a2a] text-white px-8 py-3 rounded-lg font-bold text-sm shadow-lg shadow-red-900/10 group-hover:bg-[#b02525] transition-colors">
+                            Select
+                         </div>
                     </div>
                 </div>
              </Link>
