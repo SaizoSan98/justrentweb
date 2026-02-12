@@ -57,4 +57,17 @@ git reset --hard 1bfd1f5
 ## 📝 Következő Mentések Helye
 Ide írd majd be az újabb stabil pontokat a fejlesztés során.
 
+### 3. Deposit Separation, Calendar UI Fix & Visual Enhancements - 2026.02.12
+**Commit Hash:** `3f78149`
+**Leírás:**
+- **Deposit Leválasztás:** A deposit most már külön, a végösszeg alatt jelenik meg a Fleet kártyákon és a Checkout oldalon is.
+- **Naptár UI Javítás:** Egységesített `FleetDatePicker` használata a `BookingEngine`-ben, a design a kért "pipe" elválasztós stílust követi.
+- **Footer Info Frissítés:** Telefonszám (+36 20 404 8186), cím (2220 Vecsés, Dózsa György út 86.) és "Created by NixoVisual" link frissítve.
+- **Visual Enhancements:** Márka logó overlay a kocsik képe mögött (Homepage & Fleet), Featured Badge (csillagos plecsni) a kiemelt autókon.
+
+**Visszaállítási Parancs:**
+```bash
+git reset --hard 3f78149
+```
+
 *   [Hely a következő mentésnek...]
