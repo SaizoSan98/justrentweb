@@ -135,6 +135,9 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
   const selectedInsurance = car.insuranceOptions?.find((opt: any) => opt.planId === selectedInsuranceId)
   const insurancePrice = selectedInsurance ? (selectedInsurance.pricePerDay * days) : 0
   
+  // Deposit Calculation
+  const currentDeposit = selectedInsurance ? selectedInsurance.deposit : (car.deposit || 0)
+  
   // Calculate Mileage Price
   const mileagePrice = mileageOption === 'UNLIMITED' ? ((car.unlimitedMileagePrice || 0) * days) : 0
   
@@ -897,9 +900,26 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                             <span className="text-zinc-900 font-bold">Total</span>
                             <span className="text-2xl font-black text-red-600">€{totalPrice.toLocaleString()}</span>
                         </div>
+                        
+                        <div className="pt-3 border-t border-zinc-100 flex justify-between items-center">
+                             <div className="flex items-center gap-1.5 text-zinc-500 font-bold text-xs uppercase tracking-wider">
+                                <ShieldCheck className="w-3.5 h-3.5" />
+                                Security Deposit
+                             </div>
+                             <span className="font-bold text-zinc-900">€{currentDeposit.toLocaleString()}</span>
+                        </div>
                     </div>
                 </DialogContent>
               </Dialog>
+              
+              {/* Visible Deposit Field below Total */}
+              <div className="pt-4 border-t border-zinc-800 flex justify-between items-center">
+                   <div className="flex items-center gap-2 text-zinc-400 font-bold text-xs uppercase tracking-wider">
+                      <ShieldCheck className="w-4 h-4" />
+                      Security Deposit
+                   </div>
+                   <span className="font-bold text-white text-lg">€{currentDeposit.toLocaleString()}</span>
+              </div>
             </div>
           </Card>
 

@@ -126,6 +126,7 @@ export function FleetCard({
   const mileageCost = mileageOption === 'UNLIMITED' ? ((car.unlimitedMileagePrice || 0) * diffDays) : 0
   
   const finalTotal = totalPrice + insuranceCost + mileageCost
+  const currentDeposit = selectedOption?.deposit ?? car.deposit ?? 0
 
   const isAvailable = car.isAvailable !== false // Default to true if undefined
 
@@ -206,6 +207,10 @@ export function FleetCard({
                 </div>
                 <div className="text-sm font-bold text-zinc-400 mt-1">
                     €{finalTotal.toLocaleString()} <span className="text-xs font-normal text-zinc-600">total</span>
+                </div>
+                <div className="text-[10px] font-bold text-zinc-500 mt-0.5 flex items-center gap-1">
+                    <Shield className="w-3 h-3 text-zinc-600" />
+                    Deposit: <span className="text-zinc-300">€{currentDeposit.toLocaleString()}</span>
                 </div>
              </div>
              
@@ -417,6 +422,10 @@ export function FleetCard({
                           </span>
                           <span className="text-xs text-zinc-400 font-medium mt-1 block">
                               Total for {diffDays} days: <span className="text-white">{finalTotal.toLocaleString()} €</span>
+                          </span>
+                          <span className="text-xs text-zinc-500 font-bold mt-1 block flex items-center gap-1.5">
+                              <Shield className="w-3 h-3" />
+                              Security Deposit: <span className="text-zinc-300">€{currentDeposit.toLocaleString()}</span>
                           </span>
                       </div>
                       <Link href={`/checkout?carId=${car.id}&insurance=${selectedInsuranceId}&mileage=${mileageOption}&startDate=${startDate.toISOString()}&endDate=${endDate?.toISOString()}`} className="w-1/2">
