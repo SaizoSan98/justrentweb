@@ -130,19 +130,6 @@ export function AdminSidebarContent({ user, className, onLinkClick }: AdminSideb
           </Button>
         </Link>
 
-        <Link href="/admin/cars/new" onClick={onLinkClick}>
-          <Button 
-            variant="ghost" 
-            className={cn(
-              "w-full justify-start text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50",
-              isActive('/admin/cars/new') && "bg-red-50 text-red-600 border-l-2 border-red-600 rounded-l-none"
-            )}
-          >
-            <PlusCircle className="mr-3 h-5 w-5" />
-            Add New Car
-          </Button>
-        </Link>
-
         <div className="pt-4 pb-2">
           <p className="px-4 text-xs font-bold text-zinc-400 uppercase tracking-wider">Management</p>
         </div>

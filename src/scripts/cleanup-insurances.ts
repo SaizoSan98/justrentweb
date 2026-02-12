@@ -376,6 +376,20 @@ async function cleanup() {
              plan = allPlans.find(p => serviceNameLower.includes(p.name.toLowerCase()) && p.name.length > 5);
         }
 
+        if (!plan) {
+            // CREATE new plan from Renteon Service
+            console.log(`Creating new Insurance Plan from Renteon: ${service.name}`);
+            plan = await prisma.insurancePlan.create({
+                data: {
+                    name: service.name,
+                    description: "Imported from Renteon",
+                    renteonId: service.id
+                }
+            });
+            // Update local cache
+            allPlans.push(plan);
+        }
+
         if (plan) {
             // Update or Create CarInsurance
             // We use findFirst instead of upsert because composite unique might be tricky or we want custom logic
