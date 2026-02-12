@@ -7,6 +7,14 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog"
+import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -204,14 +212,25 @@ export function FleetDatePicker({ date, setDate, className, triggerClassName }: 
     )
   }
 
+  // Desktop: Use Dialog for centered modal experience
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-        <PopoverTrigger asChild>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogTrigger asChild>
             <TriggerButton />
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0 bg-white border-zinc-100 shadow-2xl rounded-2xl overflow-hidden" align="start">
+        </DialogTrigger>
+        <DialogContent className="max-w-3xl p-0 bg-white border-zinc-100 shadow-2xl rounded-2xl overflow-hidden gap-0">
+            <DialogHeader className="sr-only">
+                <DialogTitle>Select Dates</DialogTitle>
+            </DialogHeader>
             <Content />
-        </PopoverContent>
-    </Popover>
+            {/* Close Button Override */}
+            <button 
+                onClick={() => setIsOpen(false)}
+                className="absolute right-4 top-4 p-2 bg-zinc-100 hover:bg-zinc-200 rounded-full transition-colors z-50"
+            >
+                <X className="w-4 h-4 text-zinc-900" />
+            </button>
+        </DialogContent>
+    </Dialog>
   )
 }
