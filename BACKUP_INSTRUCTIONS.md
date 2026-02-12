@@ -70,4 +70,32 @@ Ide írd majd be az újabb stabil pontokat a fejlesztés során.
 git reset --hard 3f78149
 ```
 
+### 4. FINAL - Mobile Fixes & Deposit Alignment - 2026.02.12
+**Commit Hash:** `189a4de`
+**Leírás:**
+- **Mobile UI Fixes:**
+  - `BookingEngine`: "Budapest Airport" felirat középre igazítva mobilon.
+  - `FleetDatePicker`: Mobil nézetben 1 hónap látható, lapozó gombokkal, dupla "X" eltávolítva.
+  - `FleetCard`: A "Security Deposit" szöveg nem csúszik össze a "Book Now" gombbal (flex layout javítás).
+- **Funkcionális Javítás:** Dátumváltáskor az időpont nem ugrik vissza 00:00-ra, hanem megmarad.
+- **Állapot:** Ez a végleges, átadásra kész verzió (FINAL).
+
+**Visszaállítási Parancs:**
+```bash
+git reset --hard 189a4de
+```
+
+### 5. ULTRA STRICT SYNC & Featured Fix - 2026.02.12
+**Commit Hash:** `5e4e6fd`
+**Leírás:**
+- **Adatbázis Tisztítás:** Törölve minden fallback/dummy generálási logika. A rendszer CSAK a Renteon API-ból származó, validált (árazott, biztosított, SIPP-kódolt) autókat engedi be.
+- **Eredmény:** Pontosan 22 valid autó az adatbázisban.
+- **Featured Limit:** A főoldali kiemelt autók száma 4-ről 6-ra növelve.
+- **Biztonság:** A `prisma/seed.ts` megtisztítva a demo autóktól.
+
+**Visszaállítási Parancs:**
+```bash
+git reset --hard 5e4e6fd
+```
+
 *   [Hely a következő mentésnek...]
