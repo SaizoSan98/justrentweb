@@ -6,6 +6,8 @@ import { ActiveFilters } from "./ActiveFilters"
 import { FleetCard } from "./FleetCard"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
+import { SlidersHorizontal } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 interface FleetClientWrapperProps {
   cars: any[]
@@ -31,6 +33,8 @@ export function FleetClientWrapper({ cars, dictionary, options }: FleetClientWra
     guaranteedModel: searchParams.get("guaranteedModel") === "true",
     make: searchParams.get("make") || ""
   })
+
+  const [showFilters, setShowFilters] = useState(false)
 
   // Sync state with URL when URL changes (e.g. back button)
   useEffect(() => {
@@ -137,33 +141,57 @@ export function FleetClientWrapper({ cars, dictionary, options }: FleetClientWra
   }, [cars, filters])
 
   return (
-    <div className="flex flex-col lg:flex-row gap-12">
-      {/* Sidebar Filters */}
-      <aside className="lg:w-64 shrink-0">
-        <FleetFilters 
-          filters={filters} 
-          onChange={handleFilterChange} 
-          options={options}
-          dictionary={dictionary}
-        />
-      </aside>
-
-      {/* Main Grid */}
-      <div className="flex-1">
-        <ActiveFilters 
-          filters={filters} 
-          onChange={handleFilterChange} 
-          onClearAll={handleClearAll}
-        />
-
-        <div className="mb-6 flex justify-between items-center">
+    <div className="flex flex-col gap-8">
+      
+      {/* Top Controls: Result Count & Filter Toggle */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
            <h2 className="text-xl font-bold text-zinc-900">
               Available Vehicles <span className="text-zinc-400 text-sm ml-2">({filteredCars.filter(c => c.isAvailable !== false).length})</span>
            </h2>
-        </div>
+           
+           <Button 
+                onClick={() => setShowFilters(!showFilters)}
+                variant="outline"
+                className="gap-2 border-zinc-200 hover:border-black hover:bg-black hover:text-white transition-all rounded-full"
+           >
+               <SlidersHorizontal className="w-4 h-4" />
+               {showFilters ? 'Hide Filters' : 'Show Filters'}
+           </Button>
+      </div>
 
+      {/* Collapsible Filters */}
+      <AnimatePresence>
+        {showFilters && (
+            <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="overflow-hidden bg-white border border-zinc-100 rounded-3xl"
+            >
+                <div className="p-6 md:p-8">
+                    <FleetFilters 
+                        filters={filters} 
+                        onChange={handleFilterChange} 
+                        options={options}
+                        dictionary={dictionary}
+                    />
+                </div>
+            </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* Active Filters Summary */}
+      <ActiveFilters 
+          filters={filters} 
+          onChange={handleFilterChange} 
+          onClearAll={handleClearAll}
+      />
+
+      {/* Main Grid */}
+      <div className="flex-1">
         {filteredCars.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredCars.map((car) => (
                   <FleetCard 
                     key={car.id}

@@ -154,10 +154,12 @@ export function FleetCard({
         {/* Header */}
         <div className="mb-4">
             <h3 className="text-2xl font-black text-zinc-900 tracking-tight leading-none mb-1">
-                {car.categories?.[0]?.name || "Car Class"} {car.transmission === 'AUTOMATIC' ? 'Automatic' : 'Manual'}
+                {car.make} {car.model}
             </h3>
-            <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider">
-                {car.make} {car.model} <span className="text-zinc-400 font-medium ml-1">OR SIMILAR</span>
+            <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-2">
+                <span>{car.categories?.[0]?.name || "Car Class"}</span>
+                <span className="text-zinc-300">|</span>
+                <span>OR SIMILAR</span>
             </p>
         </div>
 
@@ -195,11 +197,11 @@ export function FleetCard({
         <div className="mt-auto pt-4 flex items-end justify-between">
              <div>
                 <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-black text-zinc-900 tracking-tighter">${pricePerDay.toLocaleString()}</span>
+                    <span className="text-3xl font-black text-zinc-900 tracking-tighter">€{pricePerDay.toLocaleString()}</span>
                     <span className="text-sm text-zinc-500 font-medium">/day</span>
                 </div>
-                <div className="text-xs text-zinc-500 mt-1">
-                    ${finalTotal.toLocaleString()} total inc taxes and fees
+                <div className="text-sm font-bold text-zinc-800 mt-1">
+                    €{finalTotal.toLocaleString()} <span className="text-xs font-normal text-zinc-500">total</span>
                 </div>
              </div>
              
