@@ -227,13 +227,6 @@ interface FleetDatePickerProps {
                 <DialogTitle>Select Dates</DialogTitle>
             </DialogHeader>
             <Content />
-            {/* Close Button Override */}
-            <button 
-                onClick={() => setIsOpen(false)}
-                className="absolute right-4 top-4 p-2 bg-zinc-100 hover:bg-zinc-200 rounded-full transition-colors z-50"
-            >
-                <X className="w-4 h-4 text-zinc-900" />
-            </button>
         </DialogContent>
     </Dialog>
   )

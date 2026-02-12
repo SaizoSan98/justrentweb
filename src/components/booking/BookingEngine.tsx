@@ -28,15 +28,27 @@ export function BookingEngine({
 }: BookingEngineProps) {
   const router = useRouter()
   
-  const [date, setDate] = React.useState<{ from: Date | undefined; to: Date | undefined }>(() => {
-    // Default Logic: Start Now + 6 hours, Duration 3 days
-    // We create a new date object for "now"
+  const [date, setDate] = React.useState<{ from: Date | undefined; to: Date | undefined }>({
+    from: undefined,
+    to: undefined
+  })
+
+  // Initialize with client-side time to prevent hydration mismatch
+  React.useEffect(() => {
+    if (initialStartDate && initialEndDate) {
+        setDate({
+            from: initialStartDate,
+            to: initialEndDate
+        })
+        return
+    }
+
     const now = new Date()
     
     // Calculate start date: Now + 6 hours
     const start = initialStartDate ? new Date(initialStartDate) : new Date(now.getTime() + 6 * 60 * 60 * 1000)
     
-    // Round minutes to nearest 30 (optional, but good for UX)
+    // Round minutes to nearest 30
     const minutes = start.getMinutes()
     if (minutes > 0 && minutes <= 30) start.setMinutes(30)
     else if (minutes > 30) {
@@ -44,20 +56,17 @@ export function BookingEngine({
         start.setHours(start.getHours() + 1)
     }
     
-    // If no initial date provided, ensure we set seconds/ms to 0 for clean comparison
-    if (!initialStartDate) {
-        start.setSeconds(0)
-        start.setMilliseconds(0)
-    }
+    // Clean seconds/ms
+    start.setSeconds(0)
+    start.setMilliseconds(0)
 
     const end = initialEndDate ? new Date(initialEndDate) : new Date(start)
     if (!initialEndDate) {
         end.setDate(end.getDate() + 3)
-        // Keep same time as start by default
     }
     
-    return { from: start, to: end }
-  })
+    setDate({ from: start, to: end })
+  }, [initialStartDate, initialEndDate])
 
   // Ensure type compatibility for the state setter
   const handleDateChange = (range: { from: Date | undefined; to: Date | undefined } | undefined) => {
@@ -99,7 +108,7 @@ export function BookingEngine({
 
   // New Slim Design
   return (
-    <div className={cn("w-full relative z-20 max-w-4xl mx-auto", className)}>
+    <div className={cn("w-full relative z-20 max-w-3xl mx-auto", className)}>
       {error && (
         <div className="mb-2 px-4 py-2 bg-red-50 text-red-600 text-xs font-bold rounded-lg border border-red-100 flex items-center gap-2 animate-in slide-in-from-bottom-2">
             <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
@@ -112,7 +121,7 @@ export function BookingEngine({
       )}>
          
          {/* Location */}
-         <div className="flex-1 w-full px-6 py-3 md:py-2 relative group cursor-pointer hover:bg-zinc-50 rounded-full transition-colors">
+         <div className="flex-1 w-full px-6 py-3 md:py-2 relative group cursor-pointer hover:bg-zinc-50 rounded-full transition-colors flex flex-col justify-center">
             <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-0.5">Pick-up & Return</label>
             <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-zinc-400 group-hover:text-red-600 transition-colors" />
@@ -129,14 +138,14 @@ export function BookingEngine({
          <div className="hidden md:block w-px h-8 bg-gradient-to-b from-transparent via-zinc-200 to-transparent mx-2" />
 
          {/* Unified Date Picker */}
-         <div className="flex-[1.5] w-full px-6 py-3 md:py-2 relative group hover:bg-zinc-50 rounded-full transition-colors">
-            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-0.5">Rental Dates</label>
-            <div className="flex items-center gap-2">
+         <div className="flex-[1.5] w-full px-6 py-3 md:py-2 relative group hover:bg-zinc-50 rounded-full transition-colors flex flex-col items-center justify-center">
+            <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-0.5 text-center w-full">Rental Dates</label>
+            <div className="flex items-center justify-center gap-2 w-full">
                 <CalendarIcon className="w-4 h-4 text-zinc-400 group-hover:text-red-600 transition-colors" />
                 <FleetDatePicker 
                     date={date} 
                     setDate={handleDateChange} 
-                    triggerClassName="text-zinc-900 font-bold p-0 h-auto hover:text-zinc-700 justify-center md:justify-start w-full text-center md:text-left"
+                    triggerClassName="text-zinc-900 font-bold p-0 h-auto hover:text-zinc-700 justify-center w-full text-center"
                     onSave={handleSearch}
                 />
             </div>
