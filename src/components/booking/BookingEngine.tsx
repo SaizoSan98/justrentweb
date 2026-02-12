@@ -73,7 +73,7 @@ export function BookingEngine({
 
   // New Slim Design
   return (
-    <div className={cn("w-full relative z-20 max-w-5xl mx-auto", className)}>
+    <div className={cn("w-full relative z-20 max-w-4xl mx-auto", className)}>
       <div className={cn(
           "bg-white rounded-3xl md:rounded-full p-2 flex flex-col md:flex-row items-center border-none ring-0 outline-none",
           !noShadow && "shadow-2xl"
@@ -97,7 +97,7 @@ export function BookingEngine({
          <div className="hidden md:block w-px h-8 bg-gradient-to-b from-transparent via-zinc-200 to-transparent mx-2" />
 
          {/* Unified Date Picker */}
-         <div className="flex-[2] w-full px-6 py-3 md:py-2 relative group hover:bg-zinc-50 rounded-full transition-colors">
+         <div className="flex-[1.5] w-full px-6 py-3 md:py-2 relative group hover:bg-zinc-50 rounded-full transition-colors">
             <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-0.5">Rental Dates</label>
             <div className="flex items-center gap-2">
                 <CalendarIcon className="w-4 h-4 text-zinc-400 group-hover:text-red-600 transition-colors" />
