@@ -29,17 +29,31 @@ export function BookingEngine({
   const router = useRouter()
   
   const [date, setDate] = React.useState<{ from: Date | undefined; to: Date | undefined }>(() => {
-    // Default Logic: Start Now + 24h, Duration 3 days
-    const start = initialStartDate ? new Date(initialStartDate) : new Date()
+    // Default Logic: Start Now + 6 hours, Duration 3 days
+    // We create a new date object for "now"
+    const now = new Date()
+    
+    // Calculate start date: Now + 6 hours
+    const start = initialStartDate ? new Date(initialStartDate) : new Date(now.getTime() + 6 * 60 * 60 * 1000)
+    
+    // Round minutes to nearest 30 (optional, but good for UX)
+    const minutes = start.getMinutes()
+    if (minutes > 0 && minutes <= 30) start.setMinutes(30)
+    else if (minutes > 30) {
+        start.setMinutes(0)
+        start.setHours(start.getHours() + 1)
+    }
+    
+    // If no initial date provided, ensure we set seconds/ms to 0 for clean comparison
     if (!initialStartDate) {
-        start.setDate(start.getDate() + 1)
-        start.setHours(10, 0, 0, 0)
+        start.setSeconds(0)
+        start.setMilliseconds(0)
     }
 
     const end = initialEndDate ? new Date(initialEndDate) : new Date(start)
     if (!initialEndDate) {
         end.setDate(end.getDate() + 3)
-        end.setHours(10, 0, 0, 0)
+        // Keep same time as start by default
     }
     
     return { from: start, to: end }
@@ -63,6 +77,18 @@ export function BookingEngine({
       return
     }
 
+    // Validate that start date is at least 6 hours from now (approx)
+    // We allow a small buffer (e.g. 5.5 hours) to avoid edge cases with time ticking
+    const now = new Date()
+    const minStart = new Date(now.getTime() + 5.5 * 60 * 60 * 1000) 
+    
+    if (date.from < minStart) {
+        // Automatically adjust if too early? Or show error?
+        // User asked: "anélkül ne engedjen tovább hogy az ne lenne beállítva" -> imply strict check
+        setError("Pickup time must be at least 6 hours from now.")
+        return
+    }
+
     const params = new URLSearchParams()
     
     params.set("startDate", date.from.toISOString())
@@ -74,6 +100,12 @@ export function BookingEngine({
   // New Slim Design
   return (
     <div className={cn("w-full relative z-20 max-w-4xl mx-auto", className)}>
+      {error && (
+        <div className="mb-2 px-4 py-2 bg-red-50 text-red-600 text-xs font-bold rounded-lg border border-red-100 flex items-center gap-2 animate-in slide-in-from-bottom-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+            {error}
+        </div>
+      )}
       <div className={cn(
           "bg-white rounded-3xl md:rounded-full p-2 flex flex-col md:flex-row items-center border-none ring-0 outline-none",
           !noShadow && "shadow-2xl"

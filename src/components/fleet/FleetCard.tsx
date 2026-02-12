@@ -200,10 +200,10 @@ export function FleetCard({
         {/* Image */}
         <div className="relative w-full h-[220px] flex items-center justify-center my-4 overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-500" onClick={handleToggle}>
             
-            {/* Brand Logo Overlay */}
+            {/* Brand Logo Overlay - Top of Image */}
             {getBrandLogo(car.make) && (
-                <div className="absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none select-none z-0 scale-150">
-                    <div className="relative w-full h-full">
+                <div className="absolute top-0 w-full h-full flex items-start justify-center pt-4 opacity-[0.1] pointer-events-none select-none z-0">
+                    <div className="relative w-32 h-32">
                         <Image 
                             src={getBrandLogo(car.make)}
                             alt={car.make}

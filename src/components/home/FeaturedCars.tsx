@@ -88,21 +88,6 @@ export function FeaturedCars({ cars }: FeaturedCarsProps) {
              <Link href={`/fleet?category=${car.categories?.[0]?.name}`} className="block h-full">
                 <div className="bg-[#f3f4f6] rounded-[2.5rem] p-8 h-full border border-zinc-100 shadow-lg transition-all duration-500 group-hover:shadow-2xl group-hover:-translate-y-2 relative overflow-hidden flex flex-col">
                     
-                    {/* Brand Logo Overlay */}
-                    {getBrandLogo(car.make) && (
-                        <div className="absolute inset-0 flex items-center justify-center opacity-[0.05] pointer-events-none z-0 scale-150">
-                             <div className="relative w-full h-full">
-                                <Image 
-                                    src={getBrandLogo(car.make)}
-                                    alt={car.make}
-                                    fill
-                                    className="object-contain"
-                                    unoptimized
-                                />
-                             </div>
-                        </div>
-                    )}
-
                     {/* Badge */}
                     <div className="relative z-10 mb-4">
                          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-black/20">
@@ -144,11 +129,27 @@ export function FeaturedCars({ cars }: FeaturedCarsProps) {
 
                     {/* Car Image */}
                     <div className="relative z-10 w-full h-[240px] mb-6 flex-shrink-0">
+                        
+                        {/* Brand Logo Overlay - Top of Image */}
+                        {getBrandLogo(car.make) && (
+                            <div className="absolute top-0 w-full h-full flex items-start justify-center pt-4 opacity-[0.1] pointer-events-none select-none z-0">
+                                <div className="relative w-32 h-32">
+                                    <Image 
+                                        src={getBrandLogo(car.make)}
+                                        alt={car.make}
+                                        fill
+                                        className="object-contain"
+                                        unoptimized
+                                    />
+                                </div>
+                            </div>
+                        )}
+
                         <Image 
                             src={car.imageUrl || "/placeholder-car.png"}
                             alt={`${car.make} ${car.model}`}
                             fill
-                            className="object-contain object-center drop-shadow-2xl transition-transform duration-700 group-hover:scale-110"
+                            className="object-contain object-center drop-shadow-2xl transition-transform duration-700 group-hover:scale-110 z-10"
                         />
                     </div>
 
