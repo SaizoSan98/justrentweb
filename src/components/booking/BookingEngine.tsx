@@ -121,14 +121,14 @@ export function BookingEngine({
       )}>
          
          {/* Location */}
-         <div className="flex-1 w-full px-6 py-3 md:py-2 relative group cursor-pointer hover:bg-zinc-50 rounded-full transition-colors flex flex-col justify-center">
+         <div className="flex-1 w-full px-6 py-3 md:py-2 relative group cursor-pointer hover:bg-zinc-50 rounded-full transition-colors flex flex-col justify-center items-center md:items-start">
             <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block mb-0.5">Pick-up & Return</label>
             <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-zinc-400 group-hover:text-red-600 transition-colors" />
                 <input 
                   type="text" 
                   value="Budapest Airport" 
-                  className="w-full text-sm font-bold text-zinc-900 bg-transparent outline-none truncate cursor-pointer"
+                  className="w-full text-sm font-bold text-zinc-900 bg-transparent outline-none truncate cursor-pointer text-center md:text-left"
                   readOnly
                 />
             </div>

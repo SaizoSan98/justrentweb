@@ -93,8 +93,25 @@ interface FleetDatePickerProps {
     </div>
   )
 
+  const handleCalendarSelect = (newDate: { from: Date | undefined; to: Date | undefined } | undefined) => {
+    if (!newDate) {
+        setDate({ from: undefined, to: undefined })
+        return
+    }
+
+    const adjustTime = (target: Date, source: Date | undefined) => {
+        if (!source) return setHours(setMinutes(target, 0), 10) // Default 10:00
+        return setHours(setMinutes(target, source.getMinutes()), source.getHours())
+    }
+
+    const finalFrom = newDate.from ? adjustTime(newDate.from, date.from) : undefined
+    const finalTo = newDate.to ? adjustTime(newDate.to, date.to) : undefined
+
+    setDate({ from: finalFrom, to: finalTo })
+  }
+
   const Content = () => (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col">
       {/* Top Bar: Dates & Times */}
       <div className="flex flex-col md:flex-row gap-4 p-4 border-b border-zinc-100 bg-white">
         {/* Pick Up */}
@@ -137,8 +154,8 @@ interface FleetDatePickerProps {
             mode="range"
             defaultMonth={date.from || new Date()}
             selected={date}
-            onSelect={setDate}
-            numberOfMonths={isMobile ? 12 : 2}
+            onSelect={handleCalendarSelect}
+            numberOfMonths={isMobile ? 1 : 2}
             orientation={isMobile ? "vertical" : "horizontal"}
             className="w-full border-0"
             disabled={(d) => d < startOfToday()}
@@ -167,7 +184,7 @@ interface FleetDatePickerProps {
         variant="ghost"
         onClick={() => setIsOpen(true)}
         className={cn(
-            "w-full justify-start text-left font-bold text-white p-0 hover:bg-transparent hover:text-red-500 h-auto",
+            "w-full justify-center text-center font-bold text-white p-0 hover:bg-transparent hover:text-red-500 h-auto",
             !date.from && "text-muted-foreground",
             triggerClassName
         )}
@@ -175,13 +192,13 @@ interface FleetDatePickerProps {
     >
         {date?.from ? (
             date.to ? (
-                <div className="flex flex-col items-center md:items-start gap-0.5 w-full">
-                    <span className="flex items-center gap-2 text-sm md:text-base whitespace-nowrap">
+                <div className="flex flex-col items-center gap-0.5 w-full">
+                    <span className="flex items-center justify-center gap-2 text-sm md:text-base whitespace-nowrap">
                         {format(date.from, "MMM dd")} 
                         <span className="text-zinc-400">|</span>
                         {format(date.to, "MMM dd")}
                     </span>
-                    <span className="text-[10px] text-zinc-500 font-medium flex items-center justify-center md:justify-start gap-2">
+                    <span className="text-[10px] text-zinc-500 font-medium flex items-center justify-center gap-2">
                         {format(date.from, "HH:mm")}
                         <ArrowRight className="w-3 h-3" />
                         {format(date.to, "HH:mm")}
@@ -203,7 +220,7 @@ interface FleetDatePickerProps {
             <SheetTrigger asChild>
                 <TriggerButton />
             </SheetTrigger>
-            <SheetContent side="bottom" className="h-[95vh] p-0 rounded-t-[2rem] overflow-hidden bg-white">
+            <SheetContent side="bottom" showCloseButton={false} className="h-auto max-h-[95vh] p-0 rounded-t-[2rem] overflow-hidden bg-white">
                 <SheetHeader className="px-6 py-4 border-b border-zinc-100 flex flex-row items-center justify-between">
                     <SheetTitle className="text-lg font-black text-zinc-900 uppercase tracking-tight">Select Dates</SheetTitle>
                     <SheetClose className="rounded-full bg-zinc-100 p-2 hover:bg-zinc-200 transition-colors">
