@@ -772,13 +772,22 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
             </div>
 
             <div 
-              className={cn("border-2 rounded-xl p-4 cursor-pointer flex items-center gap-4", paymentMethod === 'PAY_ONLINE' ? "border-red-600 bg-red-50/10" : "border-zinc-200")}
-              onClick={() => handlePaymentMethodChange('PAY_ONLINE')}
+              className={cn(
+                "border-2 rounded-xl p-4 transition-all flex items-center gap-4 opacity-50 cursor-not-allowed bg-zinc-50/50",
+                paymentMethod === 'PAY_ONLINE' ? "border-red-600 bg-red-50/10" : "border-zinc-200"
+              )}
+              // onClick={() => handlePaymentMethodChange('PAY_ONLINE')}
             >
               <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", paymentMethod === 'PAY_ONLINE' ? "border-red-600 bg-red-600" : "border-zinc-300")}>
                 {paymentMethod === 'PAY_ONLINE' && <div className="w-2 h-2 bg-white rounded-full" />}
               </div>
-              <span className="font-bold text-zinc-900">{dictionary.booking.pay_online}</span>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2">
+                    <span className="font-bold text-zinc-900">{dictionary.booking.pay_online}</span>
+                    <span className="bg-zinc-200 text-zinc-600 text-[10px] px-1.5 py-0.5 rounded uppercase tracking-wider font-bold">COMING SOON</span>
+                </div>
+                <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider">DEV MODE - DISABLED</span>
+              </div>
             </div>
 
             {/* Stripe Element Container */}
