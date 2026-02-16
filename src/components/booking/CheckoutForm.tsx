@@ -933,7 +933,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                 className="mt-1"
               />
               <Label htmlFor="terms" className="text-sm text-zinc-600 font-normal leading-relaxed cursor-pointer">
-                I accept the <a href="#" className="text-red-600 font-bold hover:underline">General Terms and Conditions</a> and <a href="#" className="text-red-600 font-bold hover:underline">Privacy Policy</a>. I acknowledge that I have read and understood them.
+                I accept the <a href="/uploads/Terms%20And%20Conditions%20JR.pdf" target="_blank" rel="noopener noreferrer" className="text-red-600 font-bold hover:underline">General Terms and Conditions</a> and <a href="#" className="text-red-600 font-bold hover:underline">Privacy Policy</a>. I acknowledge that I have read and understood them.
               </Label>
             </div>
           </div>
