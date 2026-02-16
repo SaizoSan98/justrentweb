@@ -264,7 +264,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
   
   const handlePaymentMethodChange = async (method: string) => {
       setPaymentMethod(method)
-      if (method === 'PAY_ONLINE' && !clientSecret) {
+      if (method === 'PAY_ONLINE') {
           // Fetch secret
           try {
               const res = await fetch("/api/create-payment-intent", {
@@ -279,6 +279,8 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
           } catch (err) {
               console.error("Failed to init payment", err);
           }
+      } else {
+        setClientSecret(null)
       }
   }
 
