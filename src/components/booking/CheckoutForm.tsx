@@ -38,6 +38,8 @@ const ICON_MAP: Record<string, any> = {
   Star: Star
 }
 
+import { Dictionary } from "@/lib/dictionary"
+
 interface CheckoutFormProps {
   car: any
   extras: any[]
@@ -51,9 +53,10 @@ interface CheckoutFormProps {
     email?: string | null
     phone?: string | null
   }
+  dictionary: Dictionary
 }
 
-export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate: initialEndDate, settings, initialInsurance, initialMileage, user }: CheckoutFormProps) {
+export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate: initialEndDate, settings, initialInsurance, initialMileage, user, dictionary }: CheckoutFormProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   
@@ -305,7 +308,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
           <CardHeader className="border-b border-zinc-100 bg-white flex flex-row items-center justify-between py-4">
             <CardTitle className="text-xl font-bold flex items-center gap-2">
               <CalendarIcon className="w-5 h-5 text-red-600" />
-              Booking Details
+              {dictionary.booking.booking_details}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
@@ -314,17 +317,17 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-sm font-bold text-zinc-900">
                   <div className="w-2 h-2 rounded-full bg-red-600" />
-                  Pick-up
+                  {dictionary.booking.pickup}
                 </div>
                 <div className="space-y-3 pl-4 border-l-2 border-zinc-100">
                   <div className="space-y-1">
-                    <Label className="text-xs text-zinc-500">Date & Time</Label>
+                    <Label className="text-xs text-zinc-500">{dictionary.hero.time}</Label>
                     <div className="flex gap-2">
                         <Popover>
                             <PopoverTrigger asChild>
                                 <Button variant="outline" className="w-full justify-start text-left font-normal">
                                     <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {startDate ? format(startDate, "PPP") : <span>Pick a date</span>}
+                                    {startDate ? format(startDate, "PPP") : <span>{dictionary.booking.pick_a_date}</span>}
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-4 flex gap-4" align="start">
@@ -360,7 +363,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs text-zinc-500">Location</Label>
+                    <Label className="text-xs text-zinc-500">{dictionary.booking.location}</Label>
                     <Input 
                       value={pickupLocation}
                       readOnly
@@ -374,17 +377,17 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-sm font-bold text-zinc-900">
                   <div className="w-2 h-2 rounded-full bg-red-600" />
-                  Drop-off
+                  {dictionary.booking.return}
                 </div>
                 <div className="space-y-3 pl-4 border-l-2 border-zinc-100">
                   <div className="space-y-1">
-                    <Label className="text-xs text-zinc-500">Date & Time</Label>
+                    <Label className="text-xs text-zinc-500">{dictionary.hero.time}</Label>
                     <div className="flex gap-2">
                         <Popover>
                             <PopoverTrigger asChild>
                                 <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !endDate && "border-red-500")}>
                                     <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {endDate ? format(endDate, "PPP") : <span>Pick a date</span>}
+                                    {endDate ? format(endDate, "PPP") : <span>{dictionary.booking.pick_a_date}</span>}
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-4 flex gap-4" align="start">
@@ -420,7 +423,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs text-zinc-500">Location</Label>
+                    <Label className="text-xs text-zinc-500">{dictionary.booking.location}</Label>
                     <Input 
                       value={dropoffLocation}
                       readOnly
@@ -433,8 +436,8 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
 
             {/* Total Duration */}
             <div className="mt-6 pt-6 border-t border-zinc-100 flex items-center justify-between bg-zinc-50 p-4 rounded-lg">
-              <span className="text-zinc-500 font-medium">Total Duration</span>
-              <span className="text-xl font-black text-zinc-900">{days} Days</span>
+              <span className="text-zinc-500 font-medium">{dictionary.booking.total_duration}</span>
+              <span className="text-xl font-black text-zinc-900">{days} {dictionary.common.days}</span>
             </div>
           </CardContent>
         </Card>
@@ -444,12 +447,12 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
           <CardHeader className="border-b border-zinc-100 bg-white">
             <CardTitle className="text-xl font-bold flex items-center gap-2">
               <User className="w-5 h-5 text-red-600" />
-              Renter Details
+              {dictionary.booking.renter_details}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6 grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>First Name *</Label>
+              <Label>{dictionary.booking.first_name} *</Label>
               <Input 
                 name="firstName" 
                 placeholder="John" 
@@ -459,7 +462,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
               />
             </div>
             <div className="space-y-2">
-              <Label>Last Name *</Label>
+              <Label>{dictionary.booking.last_name} *</Label>
               <Input 
                 name="lastName" 
                 placeholder="Doe" 
@@ -469,7 +472,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
               />
             </div>
             <div className="space-y-2">
-              <Label>Email Address *</Label>
+              <Label>{dictionary.booking.email} *</Label>
               <Input 
                 name="email" 
                 type="email" 
@@ -480,7 +483,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
               />
             </div>
             <div className="space-y-2">
-              <Label>Phone Number *</Label>
+              <Label>{dictionary.booking.phone} *</Label>
               <Input 
                 name="phone" 
                 type="tel" 
@@ -491,11 +494,11 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
               />
             </div>
             <div className="space-y-2">
-              <Label>Flight Number</Label>
+              <Label>{dictionary.booking.flight_number}</Label>
               <Input name="flightNumber" placeholder="Optional" />
             </div>
             <div className="md:col-span-2 space-y-2">
-              <Label>Comments</Label>
+              <Label>{dictionary.booking.comments}</Label>
               <Textarea name="comments" placeholder="Any special requests?" />
             </div>
           </CardContent>
@@ -506,17 +509,17 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
           <CardHeader className="border-b border-zinc-100 bg-white flex flex-row items-center justify-between">
             <CardTitle className="text-xl font-bold flex items-center gap-2">
               <BriefcaseIcon className="w-5 h-5 text-red-600" />
-              Company Details
+              {dictionary.booking.company_details}
             </CardTitle>
             <div className="flex items-center space-x-2">
-              <Label htmlFor="company-mode" className="text-sm text-zinc-500">I need an invoice</Label>
+              <Label htmlFor="company-mode" className="text-sm text-zinc-500">{dictionary.booking.need_invoice}</Label>
               <Switch id="company-mode" checked={isCompany} onCheckedChange={setIsCompany} />
             </div>
           </CardHeader>
           {isCompany && (
             <CardContent className="p-6 grid md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
               <div className="space-y-2">
-                <Label>Company Name *</Label>
+                <Label>{dictionary.booking.company_name} *</Label>
                 <Input name="companyName" required={isCompany} />
               </div>
               <div className="space-y-2">
@@ -544,7 +547,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
           <CardHeader className="border-b border-zinc-100 bg-white">
             <CardTitle className="text-xl font-bold flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-red-600" />
-              Insurance Plan
+              {dictionary.booking.insurance_plan}
             </CardTitle>
           </CardHeader>
           <div className="p-6 space-y-4">
@@ -564,16 +567,16 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                     <div className="flex justify-between items-center mb-1">
                       <h4 className="font-bold text-zinc-900">{ins.plan.name?.replace(/ - (Mini|Midi|Maxi)/g, "")}</h4>
                       <span className="font-bold text-zinc-900 text-right">
-                        {ins.pricePerDay === 0 ? "Included" : (
+                        {ins.pricePerDay === 0 ? dictionary.booking.included : (
                             <>
                                 <div>+€{Math.round(ins.pricePerDay * days)}</div>
-                                <div className="text-[10px] text-zinc-400 font-normal">€{Math.round(ins.pricePerDay)} / day</div>
+                                <div className="text-[10px] text-zinc-400 font-normal">€{Math.round(ins.pricePerDay)} {dictionary.booking.per_day}</div>
                             </>
                         )}
                       </span>
                     </div>
                     <p className="text-sm text-zinc-500">{ins.plan.description || "Basic coverage."}</p>
-                    <p className="text-xs font-semibold text-zinc-700 mt-1">Deposit: €{ins.deposit}</p>
+                    <p className="text-xs font-semibold text-zinc-700 mt-1">{dictionary.booking.security_deposit}: €{ins.deposit}</p>
                   </div>
                 </div>
              ))}
@@ -584,7 +587,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
           <CardHeader className="border-b border-zinc-100 bg-white">
             <CardTitle className="text-xl font-bold flex items-center gap-2">
               <Gauge className="w-5 h-5 text-red-600" />
-              Mileage
+              {dictionary.booking.mileage}
             </CardTitle>
           </CardHeader>
           <div className="p-6 space-y-4">
@@ -600,8 +603,8 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                </div>
                <div className="flex-1">
                  <div className="flex justify-between items-center mb-1">
-                   <h4 className="font-bold text-zinc-900">{car.dailyMileageLimit || 300} km / day</h4>
-                   <span className="font-bold text-zinc-900">Included</span>
+                   <h4 className="font-bold text-zinc-900">{car.dailyMileageLimit || 300} {dictionary.common.km} {dictionary.booking.per_day}</h4>
+                   <span className="font-bold text-zinc-900">{dictionary.booking.included}</span>
                  </div>
                </div>
              </div>
@@ -619,7 +622,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                <div className="flex-1">
                  <div className="flex justify-between items-center mb-1">
                    <h4 className="font-bold text-zinc-900 flex items-center gap-2">
-                     Unlimited km
+                     {dictionary.fleet.unlimited} {dictionary.common.km}
                      <span className="bg-zinc-200 text-zinc-600 text-[10px] px-1.5 py-0.5 rounded uppercase tracking-wider font-bold">DEV</span>
                    </h4>
                    <span className="font-bold text-zinc-400">+{Math.round((car.unlimitedMileagePrice || 0) * days)} €</span>
@@ -634,7 +637,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
           <CardHeader className="border-b border-zinc-100 bg-white">
             <CardTitle className="text-xl font-bold flex items-center gap-2">
               <Star className="w-5 h-5 text-red-600" />
-              Extras
+              {dictionary.booking.extras}
             </CardTitle>
           </CardHeader>
           <div className="p-6 grid md:grid-cols-2 gap-4">
@@ -673,7 +676,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                     </div>
                     <p className="text-xs text-zinc-500 line-clamp-2 mb-2">{extra.description}</p>
                     <span className="text-xs font-bold text-zinc-900 bg-zinc-100 px-2 py-1 rounded-full">
-                      €{extra.price} {extra.priceType === 'PER_DAY' ? '/ day' : '/ rental'}
+                      €{extra.price} {extra.priceType === 'PER_DAY' ? dictionary.booking.per_day : dictionary.booking.per_rental}
                     </span>
                   </div>
                 </div>
@@ -687,7 +690,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
           <CardHeader className="border-b border-zinc-100 bg-white">
             <CardTitle className="text-xl font-bold flex items-center gap-2">
               <Wallet className="w-5 h-5 text-red-600" />
-              Payment Method
+              {dictionary.booking.payment_method}
             </CardTitle>
           </CardHeader>
           <div className="p-6 space-y-4">
@@ -698,7 +701,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
               <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", paymentMethod === 'CASH_ON_SITE' ? "border-red-600 bg-red-600" : "border-zinc-300")}>
                 {paymentMethod === 'CASH_ON_SITE' && <div className="w-2 h-2 bg-white rounded-full" />}
               </div>
-              <span className="font-bold text-zinc-900">Cash on site</span>
+              <span className="font-bold text-zinc-900">{dictionary.booking.cash_on_site}</span>
             </div>
             
             <div 
@@ -708,14 +711,14 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
               <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", paymentMethod === 'CARD_ON_SITE' ? "border-red-600 bg-red-600" : "border-zinc-300")}>
                 {paymentMethod === 'CARD_ON_SITE' && <div className="w-2 h-2 bg-white rounded-full" />}
               </div>
-              <span className="font-bold text-zinc-900">Credit Card on site</span>
+              <span className="font-bold text-zinc-900">{dictionary.booking.card_on_site}</span>
             </div>
 
             <div className="border-2 border-zinc-100 rounded-xl p-4 flex items-center gap-4 opacity-50 cursor-not-allowed bg-zinc-50">
               <div className="w-5 h-5 rounded-full border-2 border-zinc-200" />
               <div className="flex justify-between items-center flex-1">
-                <span className="font-bold text-zinc-400">Prepayment (Credit Card)</span>
-                <span className="text-xs font-bold bg-zinc-200 text-zinc-500 px-2 py-1 rounded">Coming Soon</span>
+                <span className="font-bold text-zinc-400">{dictionary.booking.prepayment}</span>
+                <span className="text-xs font-bold bg-zinc-200 text-zinc-500 px-2 py-1 rounded">{dictionary.booking.coming_soon}</span>
               </div>
             </div>
           </div>
@@ -728,7 +731,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
         <div className="sticky top-24 space-y-6">
           <Card className="border-0 shadow-lg bg-zinc-900 text-white overflow-hidden">
             <div className="p-6 border-b border-zinc-800">
-              <h3 className="text-lg font-bold mb-4">Booking Summary</h3>
+              <h3 className="text-lg font-bold mb-4">{dictionary.booking.booking_summary}</h3>
               <div className="flex items-start gap-4 mb-6">
                 <div className="relative w-24 h-16 bg-white rounded-lg overflow-hidden">
                   <Image 
@@ -743,7 +746,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                   <div className="text-zinc-400 text-sm">{car.category}</div>
                   <div className="flex items-center gap-2 mt-2">
                      <CreditCard className="w-4 h-4 text-zinc-400" />
-                     <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">MINIMUM DRIVER AGE: 21 YEARS</span>
+                     <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{dictionary.booking.min_driver_age}</span>
                   </div>
                 </div>
               </div>
@@ -752,7 +755,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                 <div className="flex items-center gap-3">
                   <CalendarIcon className="w-4 h-4 text-red-500" />
                   <div>
-                    <div className="text-zinc-400 text-xs">Pick-up</div>
+                    <div className="text-zinc-400 text-xs">{dictionary.booking.pickup}</div>
                     <Popover>
                         <PopoverTrigger asChild>
                             <button className="font-bold hover:bg-zinc-100 px-1 -ml-1 rounded transition-colors text-left">
@@ -789,11 +792,11 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                 <div className="flex items-center gap-3">
                   <CalendarIcon className="w-4 h-4 text-red-500" />
                   <div>
-                    <div className="text-zinc-400 text-xs">Drop-off</div>
+                    <div className="text-zinc-400 text-xs">{dictionary.booking.return}</div>
                     <Popover>
                         <PopoverTrigger asChild>
                             <button className="font-bold hover:bg-zinc-100 px-1 -ml-1 rounded transition-colors text-left">
-                                {endDate ? format(endDate, 'MMM d, yyyy') : 'Select Date'} {endTime}
+                                {endDate ? format(endDate, 'MMM d, yyyy') : dictionary.hero.pick_date} {endTime}
                             </button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-4 flex gap-4" align="start">
@@ -828,8 +831,8 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                     {days}
                   </div>
                   <div>
-                    <div className="text-zinc-400 text-xs">Duration</div>
-                    <div className="font-bold">{days} Days</div>
+                    <div className="text-zinc-400 text-xs">{dictionary.booking.duration}</div>
+                    <div className="font-bold">{days} {dictionary.common.days}</div>
                   </div>
                 </div>
               </div>
@@ -840,33 +843,33 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
               <Dialog>
                 <DialogTrigger asChild>
                     <button type="button" className="w-full flex justify-between items-center group">
-                        <span className="text-zinc-400 font-medium group-hover:text-white transition-colors">Total Price</span>
+                        <span className="text-zinc-400 font-medium group-hover:text-white transition-colors">{dictionary.booking.total_price}</span>
                         <div className="flex items-center gap-2">
                              <span className="text-3xl font-black text-red-500">€{totalPrice.toLocaleString()}</span>
-                             <div className="bg-zinc-800 text-zinc-400 text-[10px] px-2 py-1 rounded uppercase font-bold group-hover:bg-zinc-700 transition-colors">Details</div>
+                             <div className="bg-zinc-800 text-zinc-400 text-[10px] px-2 py-1 rounded uppercase font-bold group-hover:bg-zinc-700 transition-colors">{dictionary.fleet.details}</div>
                         </div>
                     </button>
                 </DialogTrigger>
                 <DialogContent className="w-[90%] sm:max-w-[425px] bg-white text-zinc-900 border-zinc-200 rounded-2xl">
                     <DialogHeader>
-                        <DialogTitle className="text-xl font-bold">Price Breakdown</DialogTitle>
+                        <DialogTitle className="text-xl font-bold">{dictionary.booking.price_breakdown}</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-3 pt-4">
                         <div className="flex justify-between">
-                            <span className="text-zinc-500">Car Rental ({days} days)</span>
+                            <span className="text-zinc-500">{dictionary.booking.car_rental} ({days} {dictionary.common.days})</span>
                             <span className="font-bold">€{basePrice.toLocaleString()}</span>
                         </div>
                         
                         {insurancePrice > 0 && (
                             <div className="flex justify-between text-green-600">
-                                <span>Insurance</span>
+                                <span>{dictionary.hero.insurance}</span>
                                 <span>+€{insurancePrice.toLocaleString()}</span>
                             </div>
                         )}
 
                         {mileagePrice > 0 && (
                             <div className="flex justify-between text-zinc-500">
-                                <span>Unlimited Mileage</span>
+                                <span>{dictionary.fleet.unlimited} {dictionary.common.km}</span>
                                 <span>+€{mileagePrice.toLocaleString()}</span>
                             </div>
                         )}
@@ -885,26 +888,26 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
 
                         {pickupFee > 0 && (
                             <div className="flex justify-between text-zinc-500">
-                                <span>After Hours Pickup</span>
+                                <span>{dictionary.booking.after_hours_pickup}</span>
                                 <span>+€{pickupFee.toLocaleString()}</span>
                             </div>
                         )}
                         {returnFee > 0 && (
                             <div className="flex justify-between text-zinc-500">
-                                <span>After Hours Return</span>
+                                <span>{dictionary.booking.after_hours_return}</span>
                                 <span>+€{returnFee.toLocaleString()}</span>
                             </div>
                         )}
 
                         <div className="pt-4 border-t border-zinc-100 flex justify-between items-end mt-4">
-                            <span className="text-zinc-900 font-bold">Total</span>
+                            <span className="text-zinc-900 font-bold">{dictionary.fleet.total}</span>
                             <span className="text-2xl font-black text-red-600">€{totalPrice.toLocaleString()}</span>
                         </div>
                         
                         <div className="pt-3 border-t border-zinc-100 flex justify-between items-center">
                              <div className="flex items-center gap-1.5 text-zinc-500 font-bold text-xs uppercase tracking-wider">
                                 <ShieldCheck className="w-3.5 h-3.5" />
-                                Security Deposit
+                                {dictionary.booking.security_deposit}
                              </div>
                              <span className="font-bold text-zinc-900">€{currentDeposit.toLocaleString()}</span>
                         </div>
@@ -916,7 +919,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
               <div className="pt-4 border-t border-zinc-800 flex justify-between items-center">
                    <div className="flex items-center gap-2 text-zinc-400 font-bold text-xs uppercase tracking-wider">
                       <ShieldCheck className="w-4 h-4" />
-                      Security Deposit
+                      {dictionary.booking.security_deposit}
                    </div>
                    <span className="font-bold text-white text-lg">€{currentDeposit.toLocaleString()}</span>
               </div>
@@ -933,7 +936,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                 className="mt-1"
               />
               <Label htmlFor="terms" className="text-sm text-zinc-600 font-normal leading-relaxed cursor-pointer">
-                I accept the <a href="/uploads/Terms%20And%20Conditions%20JR.pdf" target="_blank" rel="noopener noreferrer" className="text-red-600 font-bold hover:underline">General Terms and Conditions</a> and <a href="#" className="text-red-600 font-bold hover:underline">Privacy Policy</a>. I acknowledge that I have read and understood them.
+                {dictionary.booking.terms_accept_intro} <a href="/uploads/Terms%20And%20Conditions%20JR.pdf" target="_blank" rel="noopener noreferrer" className="text-red-600 font-bold hover:underline">{dictionary.booking.general_terms}</a> {dictionary.booking.and} <a href="#" className="text-red-600 font-bold hover:underline">{dictionary.booking.privacy_policy}</a>{dictionary.booking.terms_accept_outro}
               </Label>
             </div>
           </div>
@@ -943,11 +946,12 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
             className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-6 text-lg uppercase tracking-wide shadow-xl shadow-red-600/20"
             disabled={!termsAccepted || isPending}
           >
-            {isPending ? "Processing..." : "Confirm Booking"}
+            {isPending ? dictionary.booking.processing : dictionary.booking.confirm_booking}
           </Button>
         </div>
       </div>
     </form>
+
   )
 }
 

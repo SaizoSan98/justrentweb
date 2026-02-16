@@ -38,10 +38,11 @@
 - [x] Jármű létrehozás (CarForm) javítása (State-alapú adatkezelés, Validáció, Visszajelzések)
 - [x] Képfeltöltés stabilizálása (Vercel Blob + Helyi Fallback)
 - [x] Tesztelési jegyzőkönyv (TESTING_GUIDE.md)
+- [x] Email értesítések (Resend/SendGrid)
+- [x] Többnyelvűség (i18n) teljes implementációja (fordítások folyamatban)
 - [ ] Végső tesztelés és hibajavítás
 - [ ] Élesítés (Deployment)
 
 ## Következő Lépések (Future)
-- [ ] Email értesítések (Resend/SendGrid)
 - [ ] Online fizetés (Stripe) integráció
-- [ ] Többnyelvűség (i18n) teljes implementációja
+

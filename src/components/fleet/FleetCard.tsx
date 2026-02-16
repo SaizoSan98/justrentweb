@@ -4,12 +4,12 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Users, Briefcase, Gauge, Info, Check, Shield, Zap, CreditCard, MapPin, Calendar, ArrowRight, ChevronLeft, AlertCircle, Settings, Fuel, X, Star } from "lucide-react"
+import { Users, Briefcase, Gauge, Shield, CreditCard, Fuel, X, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils"
 import { getBrandLogo } from "@/lib/brand-logos"
+import { Dictionary } from "@/lib/dictionary"
 
 type PricingTier = {
   minDays: number
@@ -73,7 +73,7 @@ export function FleetCard({
   searchParams,
   redirectToFleet,
   extras = [],
-  dictionary = {},
+  dictionary,
   variant = 'light'
 }: { 
   car: CarType,
@@ -83,7 +83,7 @@ export function FleetCard({
   },
   redirectToFleet?: boolean,
   extras?: Extra[],
-  dictionary?: any,
+  dictionary: Dictionary,
   variant?: 'light' | 'dark'
 }) {
   const [isExpanded, setIsExpanded] = useState(false)
@@ -146,7 +146,7 @@ export function FleetCard({
       {!isAvailable && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-zinc-100/10 backdrop-blur-[1px]">
             <div className="bg-zinc-900 text-white px-6 py-2 rounded-full font-black text-xl tracking-widest uppercase border-2 border-white shadow-xl transform -rotate-12">
-                UNAVAILABLE
+                {dictionary.fleet.unavailable}
             </div>
         </div>
       )}
@@ -158,7 +158,7 @@ export function FleetCard({
         {car.isFeatured && (
             <div className="absolute top-0 right-0 z-20 bg-yellow-500 text-black text-[10px] font-black px-3 py-1.5 rounded-bl-2xl uppercase tracking-wider flex items-center gap-1 shadow-lg shadow-yellow-500/20">
                 <Star className="w-3 h-3 fill-black" />
-                Featured
+                {dictionary.fleet.featured}
             </div>
         )}
 
@@ -174,14 +174,14 @@ export function FleetCard({
                         <span className="text-zinc-600">|</span>
                     </>
                 )}
-                <span>OR SIMILAR</span>
+                <span>{dictionary.fleet.similar?.toUpperCase() || "OR SIMILAR"}</span>
             </p>
         </div>
 
         {/* Specs - Chips */}
         <div className="flex flex-wrap gap-2 mb-4">
             <div className="bg-zinc-800/50 border border-zinc-700/50 px-3 py-1.5 rounded-full flex items-center gap-1.5">
-                <span className="text-xs font-bold text-zinc-300">{car.fuelType} Vehicle</span>
+                <span className="text-xs font-bold text-zinc-300">{car.fuelType} {dictionary.fleet.vehicle}</span>
             </div>
             <div className="bg-zinc-800/50 border border-zinc-700/50 px-3 py-1.5 rounded-full flex items-center gap-1.5">
                 <Users className="w-3.5 h-3.5 text-zinc-400" />
@@ -193,7 +193,7 @@ export function FleetCard({
             </div>
             <div className="bg-zinc-800/50 border border-zinc-700/50 px-3 py-1.5 rounded-full flex items-center gap-1.5">
                 <Gauge className="w-3.5 h-3.5 text-zinc-400" />
-                <span className="text-xs font-bold text-zinc-300">{car.transmission === 'AUTOMATIC' ? 'Auto' : 'Manual'}</span>
+                <span className="text-xs font-bold text-zinc-300">{car.transmission === 'AUTOMATIC' ? dictionary.common.automatic : dictionary.common.manual}</span>
             </div>
         </div>
 
@@ -229,14 +229,14 @@ export function FleetCard({
              <div>
                 <div className="flex items-baseline gap-1">
                     <span className="text-3xl font-black text-white tracking-tighter">€{pricePerDay.toLocaleString()}</span>
-                    <span className="text-sm text-zinc-500 font-medium">/day</span>
+                    <span className="text-sm text-zinc-500 font-medium">{dictionary.booking.per_day}</span>
                 </div>
                 <div className="text-sm font-bold text-zinc-400 mt-1">
-                    €{finalTotal.toLocaleString()} <span className="text-xs font-normal text-zinc-600">total</span>
+                    €{finalTotal.toLocaleString()} <span className="text-xs font-normal text-zinc-600">{dictionary.fleet.total?.toLowerCase()}</span>
                 </div>
                 <div className="text-[10px] font-bold text-zinc-500 mt-0.5 flex items-center gap-1">
                     <Shield className="w-3 h-3 text-zinc-600" />
-                    Deposit: <span className="text-zinc-300">€{currentDeposit.toLocaleString()}</span>
+                    {dictionary.fleet.deposit}: <span className="text-zinc-300">€{currentDeposit.toLocaleString()}</span>
                 </div>
              </div>
              
@@ -244,7 +244,7 @@ export function FleetCard({
                 onClick={handleToggle}
                 className="bg-white text-black hover:bg-zinc-200 font-black rounded-xl px-8 h-10 text-sm uppercase tracking-wider transition-colors"
             >
-                Select
+                {dictionary.fleet.select}
             </Button>
         </div>
       </div>
@@ -272,7 +272,7 @@ export function FleetCard({
               <div className="space-y-1 relative z-10">
                  <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tight text-white">{car.make} {car.model}</h2>
                  <p className="text-zinc-400 text-sm font-bold uppercase tracking-widest flex items-center gap-2">
-                    <span>or similar class</span>
+                    <span>{dictionary.fleet.or_similar_class}</span>
                     <span className="font-mono opacity-50 text-zinc-600">|</span>
                     <span className="font-mono opacity-50">ID: {car.renteonId || car.id.slice(0, 8)}</span>
                  </p>
@@ -297,22 +297,22 @@ export function FleetCard({
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 relative z-10">
                   <div className="flex flex-col gap-1 p-3 rounded-xl bg-zinc-800/30 border border-zinc-800 backdrop-blur-sm">
                      <Users className="w-5 h-5 text-zinc-400 mb-1" /> 
-                     <span className="text-xs text-zinc-500 uppercase font-bold tracking-wider">Seats</span>
+                     <span className="text-xs text-zinc-500 uppercase font-bold tracking-wider">{dictionary.fleet.seats}</span>
                      <span className="text-sm font-bold text-white">{car.seats}</span>
                   </div>
                   <div className="flex flex-col gap-1 p-3 rounded-xl bg-zinc-800/30 border border-zinc-800 backdrop-blur-sm">
                      <Briefcase className="w-5 h-5 text-zinc-400 mb-1" /> 
-                     <span className="text-xs text-zinc-500 uppercase font-bold tracking-wider">Luggage</span>
-                     <span className="text-sm font-bold text-white">{car.suitcases} Bags</span>
+                     <span className="text-xs text-zinc-500 uppercase font-bold tracking-wider">{dictionary.fleet.suitcases}</span>
+                     <span className="text-sm font-bold text-white">{car.suitcases} {dictionary.fleet.bags}</span>
                   </div>
                   <div className="flex flex-col gap-1 p-3 rounded-xl bg-zinc-800/30 border border-zinc-800 backdrop-blur-sm">
                      <Gauge className="w-5 h-5 text-zinc-400 mb-1" /> 
-                     <span className="text-xs text-zinc-500 uppercase font-bold tracking-wider">Gearbox</span>
-                     <span className="text-sm font-bold text-white">{car.transmission === 'AUTOMATIC' ? 'Auto' : 'Manual'}</span>
+                     <span className="text-xs text-zinc-500 uppercase font-bold tracking-wider">{dictionary.fleet.transmission}</span>
+                     <span className="text-sm font-bold text-white">{car.transmission === 'AUTOMATIC' ? dictionary.common.automatic : dictionary.common.manual}</span>
                   </div>
                   <div className="flex flex-col gap-1 p-3 rounded-xl bg-zinc-800/30 border border-zinc-800 backdrop-blur-sm">
                      <Fuel className="w-5 h-5 text-zinc-400 mb-1" /> 
-                     <span className="text-xs text-zinc-500 uppercase font-bold tracking-wider">Fuel</span>
+                     <span className="text-xs text-zinc-500 uppercase font-bold tracking-wider">{dictionary.fleet.fuel}</span>
                      <span className="text-sm font-bold text-white">{car.fuelType}</span>
                   </div>
               </div>
@@ -320,7 +320,7 @@ export function FleetCard({
               {/* Age Restriction Note */}
               <div className="flex items-center gap-2 mt-6 text-zinc-500 text-xs font-bold uppercase tracking-wider opacity-60">
                   <CreditCard className="w-3 h-3" />
-                  <span>Minimum driver age: 21 years</span>
+                  <span>{dictionary.booking.min_driver_age}</span>
               </div>
            </div>
 
@@ -335,12 +335,12 @@ export function FleetCard({
                  <X className="w-5 h-5" />
               </button>
 
-              <h3 className="font-black text-white mb-6 text-lg tracking-tight">Booking Configuration</h3>
+              <h3 className="font-black text-white mb-6 text-lg tracking-tight">{dictionary.fleet.booking_configuration}</h3>
 
               <div className="space-y-6 flex-1 overflow-y-auto pr-2 custom-scrollbar">
                  {/* Insurance Options */}
                  <div className="space-y-3">
-                    <Label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Insurance Plan</Label>
+                    <Label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">{dictionary.booking.insurance_plan}</Label>
                     <div className="space-y-2">
                        {insuranceOptions.map((ins) => (
                           <div 
@@ -365,14 +365,14 @@ export function FleetCard({
                                         {ins.plan.name?.replace(/ - (Mini|Midi|Maxi)/g, "")}
                                     </div>
                                     <div className="text-[11px] text-zinc-500 leading-tight mt-0.5">
-                                        {ins.plan.description || "Standard coverage protection"}
-                                        <span className="block text-zinc-400 font-medium mt-0.5">Deposit: {ins.deposit?.toLocaleString() ?? 0} €</span>
+                                        {ins.plan.description || dictionary.fleet.standard_protection}
+                                        <span className="block text-zinc-400 font-medium mt-0.5">{dictionary.fleet.deposit}: {ins.deposit?.toLocaleString() ?? 0} €</span>
                                     </div>
                                  </div>
                               </div>
                               <div className="text-right">
                                  {ins.pricePerDay === 0 ? (
-                                     <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider bg-emerald-400/10 px-2 py-1 rounded">Included</span>
+                                     <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider bg-emerald-400/10 px-2 py-1 rounded">{dictionary.booking.included}</span>
                                  ) : (
                                      <>
                                          <div className={cn("font-bold text-sm", selectedInsuranceId === ins.planId ? "text-white" : "text-zinc-300")}>
@@ -389,7 +389,7 @@ export function FleetCard({
 
                  {/* Mileage Options */}
                  <div className="space-y-3">
-                    <Label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Mileage</Label>
+                    <Label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">{dictionary.fleet.mileage}</Label>
                     <div className="space-y-2">
                          <div 
                            onClick={() => setMileageOption('LIMITED')}
@@ -409,12 +409,12 @@ export function FleetCard({
                                </div>
                                <div>
                                   <div className={cn("font-bold text-sm transition-colors", mileageOption === 'LIMITED' ? "text-white" : "text-zinc-300")}>
-                                      {car.dailyMileageLimit || 300} km / day
+                                      {car.dailyMileageLimit || 300} {dictionary.common.km} / {dictionary.common.day}
                                   </div>
-                                  <div className="text-[11px] text-zinc-500 mt-0.5">Standard daily allowance</div>
+                                  <div className="text-[11px] text-zinc-500 mt-0.5">{dictionary.fleet.standard_allowance}</div>
                                </div>
                             </div>
-                            <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider bg-emerald-400/10 px-2 py-1 rounded">Included</span>
+                            <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider bg-emerald-400/10 px-2 py-1 rounded">{dictionary.booking.included}</span>
                          </div>
 
                          <div 
@@ -427,8 +427,8 @@ export function FleetCard({
                                <div className="w-5 h-5 rounded-full border-2 border-zinc-700 flex items-center justify-center"></div>
                                <div>
                                   <div className="font-bold text-sm text-zinc-500 flex items-center gap-2">
-                                      Unlimited km
-                                      <span className="bg-zinc-800 text-zinc-500 text-[8px] px-1.5 py-0.5 rounded uppercase tracking-wider font-bold">Soon</span>
+                                      {dictionary.fleet.unlimited} {dictionary.common.km}
+                                      <span className="bg-zinc-800 text-zinc-500 text-[8px] px-1.5 py-0.5 rounded uppercase tracking-wider font-bold">{dictionary.booking.coming_soon}</span>
                                   </div>
                                </div>
                             </div>
@@ -444,19 +444,19 @@ export function FleetCard({
                       <div className="flex-1 min-w-0">
                           <span className="block text-3xl font-black text-white tracking-tighter leading-none whitespace-nowrap">
                               {Math.round(finalTotal / diffDays).toLocaleString()} €
-                              <span className="text-sm text-zinc-500 font-bold ml-1">/ day</span>
+                              <span className="text-sm text-zinc-500 font-bold ml-1">{dictionary.booking.per_day}</span>
                           </span>
                           <span className="text-xs text-zinc-400 font-medium mt-1 block truncate">
-                              Total for {diffDays} days: <span className="text-white">{finalTotal.toLocaleString()} €</span>
+                              {dictionary.fleet.total_for} {diffDays} {dictionary.common.days}: <span className="text-white">{finalTotal.toLocaleString()} €</span>
                           </span>
                           <span className="text-xs text-zinc-500 font-bold mt-1 block flex items-center gap-1.5 truncate">
                               <Shield className="w-3 h-3 shrink-0" />
-                              <span className="truncate">Security Deposit: <span className="text-zinc-300">€{currentDeposit.toLocaleString()}</span></span>
+                              <span className="truncate">{dictionary.booking.security_deposit}: <span className="text-zinc-300">€{currentDeposit.toLocaleString()}</span></span>
                           </span>
                       </div>
                       <Link href={`/checkout?carId=${car.id}&insurance=${selectedInsuranceId}&mileage=${mileageOption}&startDate=${startDate.toISOString()}&endDate=${endDate?.toISOString()}`} className="w-[140px] shrink-0">
                         <Button className="w-full bg-white hover:bg-zinc-200 text-black font-black h-12 rounded-xl uppercase tracking-wider transition-colors shadow-lg shadow-zinc-900/50">
-                            Book Now
+                            {dictionary.fleet.book_now}
                         </Button>
                       </Link>
                   </div>
@@ -465,29 +465,29 @@ export function FleetCard({
                       onClick={() => setShowBreakdown(!showBreakdown)}
                       className="text-[10px] font-bold text-zinc-500 underline uppercase tracking-wider hover:text-zinc-300 transition-colors"
                   >
-                      {showBreakdown ? 'Hide Breakdown' : 'Price Breakdown'}
+                      {showBreakdown ? dictionary.fleet.hide_breakdown : dictionary.booking.price_breakdown}
                   </button>
                   
                   {showBreakdown && (
                     <div className="mt-4 p-4 bg-zinc-900 rounded-xl space-y-2 text-xs animate-in slide-in-from-top-2 border border-zinc-800">
                         <div className="flex justify-between">
-                            <span className="text-zinc-400">Base Rental ({diffDays} days)</span>
+                            <span className="text-zinc-400">{dictionary.fleet.base_rental} ({diffDays} {dictionary.common.days})</span>
                             <span className="font-bold text-zinc-200">{totalPrice.toLocaleString()} €</span>
                         </div>
                         {selectedOption && (
                              <div className="flex justify-between">
-                                <span className="text-zinc-400">Insurance ({selectedOption.plan.name?.replace(/ - (Mini|Midi|Maxi)/g, "")})</span>
+                                <span className="text-zinc-400">{dictionary.fleet.insurance} ({selectedOption.plan.name?.replace(/ - (Mini|Midi|Maxi)/g, "")})</span>
                                 <span className="font-bold text-zinc-200">+{Math.round(insuranceCost).toLocaleString()} €</span>
                             </div>
                         )}
                         {mileageOption === 'UNLIMITED' && (
                              <div className="flex justify-between">
-                                <span className="text-zinc-400">Unlimited Mileage</span>
+                                <span className="text-zinc-400">{dictionary.fleet.unlimited_mileage}</span>
                                 <span className="font-bold text-zinc-200">+{Math.round(mileageCost).toLocaleString()} €</span>
                             </div>
                         )}
                         <div className="flex justify-between pt-2 border-t border-zinc-800 mt-2">
-                             <span className="font-bold text-white">Total</span>
+                             <span className="font-bold text-white">{dictionary.fleet.total}</span>
                              <span className="font-bold text-white">{finalTotal.toLocaleString()} €</span>
                         </div>
                     </div>

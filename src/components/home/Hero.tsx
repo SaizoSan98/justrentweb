@@ -135,8 +135,8 @@ export function Hero({ dictionary, carCount }: { dictionary?: Dictionary; carCou
             className="max-w-5xl mx-auto px-4"
           >
             <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black text-white tracking-tighter leading-[0.85] mb-6 md:mb-8 drop-shadow-2xl text-center">
-                RENT A CAR <br/>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-zinc-400">BUDAPEST</span>
+                JUST RENT <br/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-200 to-zinc-400">RENT A CAR</span>
             </h1>
             
             <p className="text-base sm:text-xl md:text-2xl text-white/90 max-w-xl mx-auto leading-relaxed font-medium drop-shadow-lg text-center mb-12 md:mb-0">
