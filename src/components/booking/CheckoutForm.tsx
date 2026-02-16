@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState, useTransition, useRef, forwardRef, useImperativeHandle } from "react"
 import Image from "next/image"
 import { differenceInDays, format, addDays } from "date-fns"
 import { Calendar as CalendarIcon, MapPin, Check, ShieldCheck, CreditCard, Wallet, PlaneLanding, PlaneTakeoff, Baby, User, Map as MapIcon, Snowflake, Star, Clock, Edit2, Gauge } from "lucide-react"
@@ -39,6 +39,10 @@ const ICON_MAP: Record<string, any> = {
 }
 
 import { Dictionary } from "@/lib/dictionary"
+import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 interface CheckoutFormProps {
   car: any
@@ -59,6 +63,7 @@ interface CheckoutFormProps {
 export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate: initialEndDate, settings, initialInsurance, initialMileage, user, dictionary }: CheckoutFormProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+  const stripePaymentRef = useRef<any>(null)
   
   // Booking Details State
   const [startDate, setStartDate] = useState<Date>(initialStartDate)
@@ -89,6 +94,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
   const [isCompany, setIsCompany] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState("CASH_ON_SITE")
   const [termsAccepted, setTermsAccepted] = useState(false)
+  const [clientSecret, setClientSecret] = useState<string | null>(null)
   
   // Calculation Logic
   const TIME_OPTIONS = Array.from({ length: 48 }).map((_, i) => {
@@ -248,6 +254,34 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
 
   const totalPrice = basePrice + insurancePrice + mileagePrice + extrasPrice + pickupFee + returnFee
 
+  // Fetch PaymentIntent when payment method is online
+  // We use useEffect to call the API only when needed
+  // Note: In a real app, you might want to create the intent only when the user clicks "Pay" or "Confirm"
+  // But Stripe Elements needs a clientSecret to render.
+  // So if "Pay Online" is selected, we fetch it.
+  
+  // Better approach: Only show PaymentElement when "Pay Online" is selected AND we have a secret.
+  
+  const handlePaymentMethodChange = async (method: string) => {
+      setPaymentMethod(method)
+      if (method === 'PAY_ONLINE' && !clientSecret) {
+          // Fetch secret
+          try {
+              const res = await fetch("/api/create-payment-intent", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ amount: totalPrice, currency: "eur" }),
+              });
+              const data = await res.json();
+              if (data.clientSecret) {
+                  setClientSecret(data.clientSecret);
+              }
+          } catch (err) {
+              console.error("Failed to init payment", err);
+          }
+      }
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     
@@ -289,11 +323,32 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
     formData.append('selectedExtras', JSON.stringify(finalExtras))
 
     startTransition(async () => {
-      const result = await createBooking(null, formData)
-      if (result.success) {
-        router.push(`/booking/success/${result.bookingId}`)
-      } else {
-        alert(result.error)
+      try {
+        const result = await createBooking(null, formData)
+        
+        if (result.success) {
+          if (paymentMethod === 'PAY_ONLINE' && clientSecret) {
+            if (stripePaymentRef.current) {
+               const { error } = await stripePaymentRef.current.confirmPayment(result.bookingId)
+               if (error) {
+                 // In case of error, the user stays on the page.
+                 // We should probably show a better error message.
+                 alert(error.message || "Payment failed. Please try again.")
+               }
+               // If successful, Stripe redirects automatically.
+            } else {
+               // Fallback if ref is missing
+               router.push(`/booking/success/${result.bookingId}`)
+            }
+          } else {
+            router.push(`/booking/success/${result.bookingId}`)
+          }
+        } else {
+          alert(result.error || "Booking failed")
+        }
+      } catch (error) {
+        console.error("Booking error:", error)
+        alert("An unexpected error occurred.")
       }
     })
   }
@@ -696,7 +751,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
           <div className="p-6 space-y-4">
             <div 
               className={cn("border-2 rounded-xl p-4 cursor-pointer flex items-center gap-4", paymentMethod === 'CASH_ON_SITE' ? "border-red-600 bg-red-50/10" : "border-zinc-200")}
-              onClick={() => setPaymentMethod('CASH_ON_SITE')}
+              onClick={() => handlePaymentMethodChange('CASH_ON_SITE')}
             >
               <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", paymentMethod === 'CASH_ON_SITE' ? "border-red-600 bg-red-600" : "border-zinc-300")}>
                 {paymentMethod === 'CASH_ON_SITE' && <div className="w-2 h-2 bg-white rounded-full" />}
@@ -706,7 +761,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
             
             <div 
               className={cn("border-2 rounded-xl p-4 cursor-pointer flex items-center gap-4", paymentMethod === 'CARD_ON_SITE' ? "border-red-600 bg-red-50/10" : "border-zinc-200")}
-              onClick={() => setPaymentMethod('CARD_ON_SITE')}
+              onClick={() => handlePaymentMethodChange('CARD_ON_SITE')}
             >
               <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", paymentMethod === 'CARD_ON_SITE' ? "border-red-600 bg-red-600" : "border-zinc-300")}>
                 {paymentMethod === 'CARD_ON_SITE' && <div className="w-2 h-2 bg-white rounded-full" />}
@@ -714,13 +769,24 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
               <span className="font-bold text-zinc-900">{dictionary.booking.card_on_site}</span>
             </div>
 
-            <div className="border-2 border-zinc-100 rounded-xl p-4 flex items-center gap-4 opacity-50 cursor-not-allowed bg-zinc-50">
-              <div className="w-5 h-5 rounded-full border-2 border-zinc-200" />
-              <div className="flex justify-between items-center flex-1">
-                <span className="font-bold text-zinc-400">{dictionary.booking.prepayment}</span>
-                <span className="text-xs font-bold bg-zinc-200 text-zinc-500 px-2 py-1 rounded">{dictionary.booking.coming_soon}</span>
+            <div 
+              className={cn("border-2 rounded-xl p-4 cursor-pointer flex items-center gap-4", paymentMethod === 'PAY_ONLINE' ? "border-red-600 bg-red-50/10" : "border-zinc-200")}
+              onClick={() => handlePaymentMethodChange('PAY_ONLINE')}
+            >
+              <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", paymentMethod === 'PAY_ONLINE' ? "border-red-600 bg-red-600" : "border-zinc-300")}>
+                {paymentMethod === 'PAY_ONLINE' && <div className="w-2 h-2 bg-white rounded-full" />}
               </div>
+              <span className="font-bold text-zinc-900">{dictionary.booking.pay_online}</span>
             </div>
+
+            {/* Stripe Element Container */}
+            {paymentMethod === 'PAY_ONLINE' && clientSecret && (
+                <div className="p-4 border border-zinc-200 rounded-xl bg-white mt-4">
+                    <Elements stripe={stripePromise} options={{ clientSecret }}>
+                        <StripePaymentForm ref={stripePaymentRef} />
+                    </Elements>
+                </div>
+            )}
           </div>
         </Card>
 
@@ -954,6 +1020,43 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
 
   )
 }
+
+const StripePaymentForm = forwardRef<any, any>((props, ref) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useImperativeHandle(ref, () => ({
+    confirmPayment: async (bookingId: string) => {
+      if (!stripe || !elements) {
+        return { error: { message: "Stripe not initialized" } };
+      }
+
+      const { error } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/booking/success/${bookingId}`,
+        },
+      });
+
+      if (error) {
+        setErrorMessage(error.message || "Payment failed");
+        return { error };
+      }
+      
+      return { success: true };
+    }
+  }));
+
+  return (
+    <>
+      <PaymentElement />
+      {errorMessage && <div className="text-red-500 text-sm mt-2">{errorMessage}</div>}
+    </>
+  );
+});
+
+StripePaymentForm.displayName = "StripePaymentForm";
 
 function BriefcaseIcon({ className }: { className?: string }) {
   return (

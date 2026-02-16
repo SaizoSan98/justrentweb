@@ -274,7 +274,7 @@ export const dictionaries = {
       flight_number: "מספר טיסה (אופציונלי)",
       comments: "הערות / בקשות מיוחדות",
       payment_method: "שיטת תשלום",
-      pay_onsite: "תשלום בעת ההגעה",
+      pay_onsite: "תשלום במקום",
       pay_online: "תשלום אונליין",
       terms_agree: "אני מסכים לתנאים וההגבלות",
       complete_booking: "השלם הזמנה",
