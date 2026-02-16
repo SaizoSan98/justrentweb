@@ -98,4 +98,17 @@ git reset --hard 189a4de
 git reset --hard 5e4e6fd
 ```
 
+### 6. PRODUCTION READY - Correct Env & Insurance Fix - 2026.02.16
+**Commit Hash:** `03eebe6`
+**Leírás:**
+- **Éles Környezeti Beállítások:** Minden localhost URL és teszt adatbázis cím lecserélve a `justrentandtrans.com` domainre és a Neon adatbázisra.
+- **Renteon Sync Fix:** Javítva a biztosítási árak kalkulációja (korábban a 3 napos teljes árat vette napi díjnak). Most már a valós napi díjat számolja.
+- **Email:** Feladó átírva `booking@justrentandtrans.com`-ra.
+- **Default Insurance:** A Basic Insurance az alapértelmezett választás a Fleet és Checkout oldalakon, és ennek a kaucióját mutatjuk.
+
+**Visszaállítási Parancs:**
+```bash
+git reset --hard 03eebe6
+```
+
 *   [Hely a következő mentésnek...]
