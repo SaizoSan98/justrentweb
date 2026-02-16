@@ -5,6 +5,8 @@ import { Header } from "@/components/layout/Header"
 import { getSession } from "@/lib/auth"
 import { checkRealTimeAvailability } from "@/app/actions/renteon-availability"
 import { mapCarToCategoryId } from "@/lib/renteon"
+import { cookies } from "next/headers"
+import { dictionaries } from "@/lib/dictionary"
 
 export const dynamic = 'force-dynamic'
 
@@ -13,6 +15,10 @@ export default async function CheckoutPage({
 }: {
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
+  const cookieStore = await cookies()
+  const lang = cookieStore.get("NEXT_LOCALE")?.value || "en"
+  const dictionary = dictionaries[lang as keyof typeof dictionaries] || dictionaries.en
+
   // 1. Check Auth (Removed strict redirect per user request)
   const session = await getSession()
   
@@ -113,7 +119,7 @@ export default async function CheckoutPage({
 
   return (
     <div className="min-h-screen bg-zinc-50">
-      <Header user={session?.user} />
+      <Header user={session?.user} dictionary={dictionary} lang={lang} />
       
       <main className="container mx-auto px-6 pt-32 pb-12">
         <div className="mb-8">
@@ -130,6 +136,7 @@ export default async function CheckoutPage({
           initialInsurance={initialInsurance}
           initialMileage={initialMileage}
           user={session?.user}
+          dictionary={dictionary}
         />
       </main>
     </div>
