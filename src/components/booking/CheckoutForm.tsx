@@ -84,9 +84,9 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
   const [phone, setPhone] = useState(user?.phone || '')
   
   // Insurance State Logic
-  const defaultInsurance = (car.insuranceOptions && car.insuranceOptions.length > 0) 
-      ? [...car.insuranceOptions].sort((a: any, b: any) => (a.plan?.order || 0) - (b.plan?.order || 0))[0].planId 
-      : ""
+  const sortedInsurances = (car.insuranceOptions || []).sort((a: any, b: any) => (a.plan?.order || 0) - (b.plan?.order || 0))
+  const defaultInsurance = sortedInsurances.length > 0 ? sortedInsurances[0].planId : ""
+  
   const [selectedInsuranceId, setSelectedInsuranceId] = useState<string>(initialInsurance || defaultInsurance)
   const [mileageOption, setMileageOption] = useState<'LIMITED' | 'UNLIMITED'>(initialMileage as 'LIMITED' | 'UNLIMITED' || 'LIMITED')
   

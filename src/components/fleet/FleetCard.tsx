@@ -118,11 +118,10 @@ export function FleetCard({
   const insuranceOptions = car.insuranceOptions?.sort((a, b) => (a.plan?.order || 0) - (b.plan?.order || 0)) || []
   
   // Initialize default insurance
-  if (!selectedInsuranceId && insuranceOptions.length > 0) {
-      setSelectedInsuranceId(insuranceOptions[0].planId)
-  }
+  const defaultInsuranceId = insuranceOptions.length > 0 ? insuranceOptions[0].planId : ""
+  const effectiveInsuranceId = selectedInsuranceId || defaultInsuranceId
 
-  const selectedOption = insuranceOptions.find(o => o.planId === selectedInsuranceId)
+  const selectedOption = insuranceOptions.find(o => o.planId === effectiveInsuranceId)
   const insuranceCost = selectedOption ? selectedOption.pricePerDay * diffDays : 0
   const mileageCost = mileageOption === 'UNLIMITED' ? ((car.unlimitedMileagePrice || 0) * diffDays) : 0
   

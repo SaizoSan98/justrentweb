@@ -9,10 +9,11 @@ const RENTEON_TOKEN_URL = `${RENTEON_BASE_URL}/token`;
 const RENTEON_API_URL = `${RENTEON_BASE_URL}/api`;
 
 async function getRenteonToken(): Promise<string> {
-    const clientId = process.env.RENTEON_CLIENT_ID || '';
-    const clientSecret = process.env.RENTEON_CLIENT_SECRET || '';
-    const username = process.env.RENTEON_USERNAME || '';
-    const password = process.env.RENTEON_PASSWORD || '';
+    // Use env vars or fallbacks
+    const clientId = process.env.RENTEON_CLIENT_ID || 'Inhouse.Web';
+    const clientSecret = process.env.RENTEON_CLIENT_SECRET || '2016-Web';
+    const username = process.env.RENTEON_USERNAME || 'Web01';
+    const password = process.env.RENTEON_PASSWORD || '0pp.4fgt!RtZZ1';
     
     const salt = crypto.randomBytes(16).toString('hex');
     const compositeKey = `${username}${salt}${clientSecret}${password}${salt}${clientSecret}${clientId}`;
@@ -126,7 +127,12 @@ async function analyzeRenteonData() {
                 data.Services.forEach((s: any) => {
                     // Filter meaningful services
                     if (['Insurance', 'Car rent', 'Additional fee', 'Additional equipment'].includes(s.ServiceTypeName)) {
-                         console.log(`    - [${s.ServiceTypeName}] ${s.Name}: ${s.ServicePrice.AmountTotal} EUR (Deposit: ${s.InsuranceDepositAmount || 0} EUR)`);
+                        console.log(`    - [${s.ServiceTypeName}] ${s.Name}:`);
+                        console.log(`      PriceAmount: ${s.ServicePrice?.Amount}`);
+                        console.log(`      PriceAmountTotal: ${s.ServicePrice?.AmountTotal}`);
+                        console.log(`      PriceCurrency: ${s.ServicePrice?.Currency}`);
+                        console.log(`      IsOneTimePayment: ${s.ServicePrice?.IsOneTimePayment}`);
+                        console.log(`      InsuranceDepositAmount: ${s.InsuranceDepositAmount}`);
                     }
                 });
             }

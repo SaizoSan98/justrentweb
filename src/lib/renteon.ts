@@ -132,10 +132,10 @@ export async function getRenteonToken(): Promise<string> {
   }
 
   try {
-    const clientId = process.env.RENTEON_CLIENT_ID || '';
-    const clientSecret = process.env.RENTEON_CLIENT_SECRET || '';
-    const username = process.env.RENTEON_USERNAME || '';
-    const password = process.env.RENTEON_PASSWORD || '';
+    const clientId = process.env.RENTEON_CLIENT_ID || 'Inhouse.Web';
+    const clientSecret = process.env.RENTEON_CLIENT_SECRET || '2016-Web';
+    const username = process.env.RENTEON_USERNAME || 'Web01';
+    const password = process.env.RENTEON_PASSWORD || '0pp.4fgt!RtZZ1';
     
     // Generate Salt (8-50 chars)
     const salt = crypto.randomBytes(16).toString('hex');

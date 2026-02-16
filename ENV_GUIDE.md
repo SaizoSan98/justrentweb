@@ -5,7 +5,7 @@ A projekted helyes működéséhez a Vercel felületén (Settings -> Environment
 ## 1. Adatbázis (Neon.tech)
 Ezt a **Neon.tech** konzoljáról kapod meg, amikor létrehozol egy új projektet.
 *   **Kulcs:** `DATABASE_URL`
-*   **Érték:** `postgresql://neondb_owner:...........@ep-cool-....neon.tech/neondb?sslmode=require`
+*   **Érték:** `postgresql://neondb_owner:npg_Ajym8oSBW6ip@ep-winter-boat-agjo2h36-pooler.c-2.eu-central-1.aws.neon.tech/neondb?sslmode=require`
     *   *Hol találod:* Neon Dashboard -> "Connection Details" doboz. Válaszd a "Prisma" tabot, ha van, de a sima Postgres URL is jó.
 
 ## 2. Képtárolás (Vercel Blob)
@@ -16,15 +16,15 @@ Ezt a **Vercel** "Storage" fülén kapod meg, ha hozzáadsz egy új Blob tárol�
 
 ## 3. Renteon API Integráció
 Az autóbérlő rendszerrel való szinkronizációhoz.
-*   `RENTEON_CLIENT_ID`: A kapott ID (pl. 553)
-*   `RENTEON_USERNAME`: A felhasználónév (pl. justrent.agg.api)
-*   `RENTEON_PASSWORD`: A jelszó
-*   `RENTEON_CLIENT_SECRET`: A titkos kulcs (Client Secret) - **Ez még hiányzik!**
+*   `RENTEON_CLIENT_ID`: Inhouse.Web
+*   `RENTEON_USERNAME`: Web01
+*   `RENTEON_PASSWORD`: 0pp.4fgt!RtZZ1
+*   `RENTEON_CLIENT_SECRET`: 2016-Web
 
 ## 4. (Opcionális/Később) Autentikáció (NextAuth)
 Ha majd bekapcsoljuk a bejelentkezést, ezek kellenek majd:
 *   `AUTH_SECRET`: Egy hosszú véletlenszerű string (generálható terminálban: `openssl rand -base64 32`).
-*   `AUTH_URL`: A domained címe (pl. `https://justrentweb.vercel.app` vagy lokálisan `http://localhost:3000`).
+*   `AUTH_URL`: A domained címe (pl. `https://justrentandtrans.com`).
 
 ---
 

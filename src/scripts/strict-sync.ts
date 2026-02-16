@@ -57,10 +57,23 @@ interface ValidatedCarData {
 
 // --- Auth ---
 async function getRenteonToken(): Promise<string> {
-    const clientId = process.env.RENTEON_CLIENT_ID || '';
-    const clientSecret = process.env.RENTEON_CLIENT_SECRET || '';
-    const username = process.env.RENTEON_USERNAME || '';
-    const password = process.env.RENTEON_PASSWORD || '';
+    // Force use of known working credentials (fallback) if env vars are suspicious or failing
+    // const clientId = process.env.RENTEON_CLIENT_ID || 'Inhouse.Web';
+    // const clientSecret = process.env.RENTEON_CLIENT_SECRET || 'a9EwgO0aJir1qn9HfZOs8oNINqPPL2yb7nOv3CC3YcE=';
+    // const username = process.env.RENTEON_USERNAME || 'Web01';
+    // const password = process.env.RENTEON_PASSWORD || '0pp.4fgt!RtZZ1';
+
+    // Use env vars or fallbacks
+    const clientId = process.env.RENTEON_CLIENT_ID || 'Inhouse.Web';
+    const clientSecret = process.env.RENTEON_CLIENT_SECRET || '2016-Web';
+    const username = process.env.RENTEON_USERNAME || 'Web01';
+    const password = process.env.RENTEON_PASSWORD || '0pp.4fgt!RtZZ1';
+
+    // console.log(`DEBUG: ClientID: '${clientId}', Username: '${username}'`);
+
+    if (!clientId || !clientSecret || !username || !password) {
+        throw new Error('Missing Renteon credentials');
+    }
     
     const salt = crypto.randomBytes(16).toString('hex');
     const compositeKey = `${username}${salt}${clientSecret}${password}${salt}${clientSecret}${clientId}`;
@@ -80,7 +93,10 @@ async function getRenteonToken(): Promise<string> {
         body: params
     });
 
-    if (!response.ok) throw new Error(`Token Error: ${response.status}`);
+    if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`Token Error: ${response.status} ${text}`);
+    }
     const data = await response.json();
     return data.access_token;
 }
@@ -207,7 +223,13 @@ export async function strictSync() {
     });
 
     for (const extra of uniqueExtras.values()) {
-        const price = extra.ServicePrice.Amount || (extra.ServicePrice.IsOneTimePayment ? extra.ServicePrice.AmountTotal : extra.ServicePrice.AmountTotal / 3);
+        // If OneTime, use AmountTotal (full price).
+        // If PerDay, use AmountTotal / 3 (since we probed for 3 days).
+        // NOTE: Renteon seems to return Total Amount in 'Amount' field too for calculated bookings.
+        const price = extra.ServicePrice.IsOneTimePayment 
+            ? extra.ServicePrice.AmountTotal 
+            : (extra.ServicePrice.AmountTotal / 3);
+            
         const priceType = extra.ServicePrice.IsOneTimePayment ? 'ONE_TIME' : 'PER_DAY';
 
         await prisma.extra.upsert({
@@ -223,7 +245,61 @@ export async function strictSync() {
                 price: price,
                 priceType: priceType,
                 renteonId: extra.ServiceId.toString(),
-                // code: extra.ServiceId.toString()
+                icon: 'Star'
+            }
+        });
+    }
+
+    // 4. Sync Insurance Plans (Global)
+    // We assume same plan names have same meaning. 
+    // We need to define an order: Basic (included) < Medium < Premium
+    const uniqueInsurances = new Map<string, RenteonService>();
+    validCars.forEach(v => {
+        v.insurances.forEach(i => uniqueInsurances.set(i.Name, i));
+    });
+
+    for (const ins of uniqueInsurances.values()) {
+        let order = 1;
+        let description = "Basic protection.";
+        const nameLower = ins.Name.toLowerCase();
+
+        // Renteon Logic:
+        // Usually "CDW" or "Basic" is default.
+        // "SCDW" or "Medium" is mid.
+        // "Full" or "Premium" is top.
+        
+        if (nameLower.includes('basic') || nameLower.includes('cdw') && !nameLower.includes('super')) {
+            order = 1;
+            description = "Basic coverage with excess.";
+        } else if (nameLower.includes('medium') || nameLower.includes('smart') || nameLower.includes('scdw')) {
+            order = 2;
+            description = "Reduced excess coverage.";
+        } else if (nameLower.includes('full') || nameLower.includes('premium') || nameLower.includes('maxi')) {
+            order = 3;
+            description = "Full coverage with zero excess.";
+        } else if (nameLower.includes('mini')) {
+            order = 1;
+            description = "Minimum coverage.";
+        } else if (nameLower.includes('midi')) {
+            order = 2;
+            description = "Medium coverage.";
+        } else if (nameLower.includes('maxi')) {
+            order = 3;
+            description = "Maximum coverage.";
+        }
+
+        await prisma.insurancePlan.upsert({
+            where: { renteonId: ins.ServiceId.toString() },
+            update: {
+                name: ins.Name,
+                description,
+                order
+            },
+            create: {
+                name: ins.Name,
+                description,
+                order,
+                renteonId: ins.ServiceId.toString()
             }
         });
     }
@@ -287,25 +363,23 @@ export async function strictSync() {
         // Sync Insurances for this Car
         // We first need to ensure InsurancePlans exist
         for (const ins of insurances) {
-            // Create/Update Plan
-            const plan = await prisma.insurancePlan.upsert({
-                where: { renteonId: ins.ServiceId.toString() }, // Use renteonId as unique identifier
-                update: {
-                    name: ins.Name,
-                    description: "Imported from Renteon",
-                },
-                create: {
-                    name: ins.Name,
-                    description: "Imported from Renteon",
-                    renteonId: ins.ServiceId.toString()
-                }
+            // Find existing plan (created in step 4)
+            const plan = await prisma.insurancePlan.findUnique({
+                where: { renteonId: ins.ServiceId.toString() }
             });
+
+            if (!plan) {
+                console.warn(`Plan not found for service ${ins.Name} (ID: ${ins.ServiceId}). Skipping.`);
+                continue;
+            }
 
             // Link to Car
             // Calculate daily price correctly
+            // Renteon returns TOTAL amount for the duration (3 days) in Amount/AmountTotal fields for insurance.
+            // We must divide by 3 to get the daily rate if it's not a one-time payment.
             const dailyPrice = ins.ServicePrice.IsOneTimePayment 
-                ? ins.ServicePrice.Amount 
-                : (ins.ServicePrice.Amount || ins.ServicePrice.AmountTotal / 3);
+                ? ins.ServicePrice.AmountTotal 
+                : (ins.ServicePrice.AmountTotal / 3);
 
             await prisma.carInsurance.upsert({
                 where: {
