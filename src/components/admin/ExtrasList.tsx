@@ -55,7 +55,7 @@ export function ExtrasList({ extras, translations = [] }: { extras: any[], trans
                   <p className="text-zinc-500 text-sm mb-1">{extra.description}</p>
                   <div className="flex items-center gap-2">
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-zinc-100 text-zinc-800">
-                      €{Number(extra.price).toFixed(1)} {extra.priceType === 'PER_DAY' ? '/ day' : '/ rental'}
+                      €{Number(Number(extra.price).toFixed(1))} {extra.priceType === 'PER_DAY' ? '/ day' : '/ rental'}
                     </span>
                   </div>
                 </div>

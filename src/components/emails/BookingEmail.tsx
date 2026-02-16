@@ -83,7 +83,7 @@ export const BookingEmail: React.FC<BookingEmailProps> = ({ booking, type }) => 
             <tr>
               <td style={{ padding: '8px 0', ...label }}>Total Price</td>
               <td style={{ padding: '8px 0', textAlign: 'right', fontSize: '18px', fontWeight: 'bold', color: '#ff5f00' }}>
-                €{Number(booking.totalPrice).toFixed(1)}
+                €{Number(Number(booking.totalPrice).toFixed(1))}
               </td>
             </tr>
           </tbody>

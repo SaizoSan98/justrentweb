@@ -227,15 +227,15 @@ export function FleetCard({
         <div className="mt-auto pt-4 flex items-end justify-between border-t border-zinc-800/50">
              <div>
                 <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-black text-white tracking-tighter">€{pricePerDay.toFixed(1)}</span>
+                    <span className="text-3xl font-black text-white tracking-tighter">€{Number(pricePerDay.toFixed(1))}</span>
                     <span className="text-sm text-zinc-500 font-medium">{dictionary.booking.per_day}</span>
                 </div>
                 <div className="text-sm font-bold text-zinc-400 mt-1">
-                    €{finalTotal.toFixed(1)} <span className="text-xs font-normal text-zinc-600">{dictionary.fleet.total?.toLowerCase()}</span>
+                    €{Number(finalTotal.toFixed(1))} <span className="text-xs font-normal text-zinc-600">{dictionary.fleet.total?.toLowerCase()}</span>
                 </div>
                 <div className="text-[10px] font-bold text-zinc-500 mt-0.5 flex items-center gap-1">
                     <Shield className="w-3 h-3 text-zinc-600" />
-                    {dictionary.fleet.deposit}: <span className="text-zinc-300">€{currentDeposit.toFixed(1)}</span>
+                    {dictionary.fleet.deposit}: <span className="text-zinc-300">€{Number(currentDeposit.toFixed(1))}</span>
                 </div>
              </div>
              
@@ -365,7 +365,7 @@ export function FleetCard({
                                     </div>
                                     <div className="text-[11px] text-zinc-500 leading-tight mt-0.5">
                                         {ins.plan.description || dictionary.fleet.standard_protection}
-                                        <span className="block text-zinc-400 font-medium mt-0.5">{dictionary.fleet.deposit}: {(ins.deposit ?? 0).toFixed(1)} €</span>
+                                        <span className="block text-zinc-400 font-medium mt-0.5">{dictionary.fleet.deposit}: {Number((ins.deposit ?? 0).toFixed(1))} €</span>
                                     </div>
                                  </div>
                               </div>
@@ -375,9 +375,9 @@ export function FleetCard({
                                  ) : (
                                      <>
                                          <div className={cn("font-bold text-sm", selectedInsuranceId === ins.planId ? "text-white" : "text-zinc-300")}>
-                                            +{(ins.pricePerDay * diffDays).toFixed(1)} €
+                                            +{Number((ins.pricePerDay * diffDays).toFixed(1))} €
                                          </div>
-                                         <div className="text-[10px] text-zinc-500">({ins.pricePerDay.toFixed(1)} €/day)</div>
+                                         <div className="text-[10px] text-zinc-500">({Number(ins.pricePerDay.toFixed(1))} €/day)</div>
                                      </>
                                  )}
                               </div>
@@ -442,15 +442,15 @@ export function FleetCard({
                   <div className="flex justify-between items-end mb-4 gap-4">
                       <div className="flex-1 min-w-0">
                           <span className="block text-3xl font-black text-white tracking-tighter leading-none whitespace-nowrap">
-                              {(finalTotal / diffDays).toFixed(1)} €
+                              {Number((finalTotal / diffDays).toFixed(1))} €
                               <span className="text-sm text-zinc-500 font-bold ml-1">{dictionary.booking.per_day}</span>
                           </span>
                           <span className="text-xs text-zinc-400 font-medium mt-1 block truncate">
-                              {dictionary.fleet.total_for} {diffDays} {dictionary.common.days}: <span className="text-white">{finalTotal.toFixed(1)} €</span>
+                              {dictionary.fleet.total_for} {diffDays} {dictionary.common.days}: <span className="text-white">{Number(finalTotal.toFixed(1))} €</span>
                           </span>
                           <span className="text-xs text-zinc-500 font-bold mt-1 block flex items-center gap-1.5 truncate">
                               <Shield className="w-3 h-3 shrink-0" />
-                              <span className="truncate">{dictionary.booking.security_deposit}: <span className="text-zinc-300">€{currentDeposit.toFixed(1)}</span></span>
+                              <span className="truncate">{dictionary.booking.security_deposit}: <span className="text-zinc-300">€{Number(currentDeposit.toFixed(1))}</span></span>
                           </span>
                       </div>
                       <Link href={`/checkout?carId=${car.id}&insurance=${selectedInsuranceId}&mileage=${mileageOption}&startDate=${startDate.toISOString()}&endDate=${endDate?.toISOString()}`} className="w-[140px] shrink-0">
@@ -471,23 +471,23 @@ export function FleetCard({
                     <div className="mt-4 p-4 bg-zinc-900 rounded-xl space-y-2 text-xs animate-in slide-in-from-top-2 border border-zinc-800">
                         <div className="flex justify-between">
                             <span className="text-zinc-400">{dictionary.fleet.base_rental} ({diffDays} {dictionary.common.days})</span>
-                            <span className="font-bold text-zinc-200">{totalPrice.toFixed(1)} €</span>
+                            <span className="font-bold text-zinc-200">{Number(totalPrice.toFixed(1))} €</span>
                         </div>
                         {selectedOption && (
                              <div className="flex justify-between">
                                 <span className="text-zinc-400">{dictionary.fleet.insurance} ({selectedOption.plan.name?.replace(/ - (Mini|Midi|Maxi)/g, "")})</span>
-                                <span className="font-bold text-zinc-200">+{insuranceCost.toFixed(1)} €</span>
+                                <span className="font-bold text-zinc-200">+{Number(insuranceCost.toFixed(1))} €</span>
                             </div>
                         )}
                         {mileageOption === 'UNLIMITED' && (
                              <div className="flex justify-between">
                                 <span className="text-zinc-400">{dictionary.fleet.unlimited_mileage}</span>
-                                <span className="font-bold text-zinc-200">+{mileageCost.toFixed(1)} €</span>
+                                <span className="font-bold text-zinc-200">+{Number(mileageCost.toFixed(1))} €</span>
                             </div>
                         )}
                         <div className="flex justify-between pt-2 border-t border-zinc-800 mt-2">
                              <span className="font-bold text-white">{dictionary.fleet.total}</span>
-                             <span className="font-bold text-white">{finalTotal.toFixed(1)} €</span>
+                             <span className="font-bold text-white">{Number(finalTotal.toFixed(1))} €</span>
                         </div>
                     </div>
                   )}

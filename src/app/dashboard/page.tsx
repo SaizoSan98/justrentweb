@@ -74,7 +74,7 @@ export default async function DashboardPage() {
                 </div>
               </div>
               <div className="space-y-1">
-                <span className="text-4xl font-bold">{totalSpent.toFixed(1)}</span>
+                <span className="text-4xl font-bold">{Number(totalSpent.toFixed(1))}</span>
                 <p className="text-zinc-500 text-sm">Total Revenue</p>
               </div>
             </CardContent>
@@ -134,7 +134,7 @@ export default async function DashboardPage() {
                             <Calendar className="w-3 h-3" /> 
                             {new Date(booking.startDate).toLocaleDateString()} - {new Date(booking.endDate).toLocaleDateString()}
                         </span>
-                        <span className="font-medium text-zinc-900">€{Number(booking.totalPrice).toFixed(1)}</span>
+                        <span className="font-medium text-zinc-900">€{Number(Number(booking.totalPrice).toFixed(1))}</span>
                     </div>
                   </div>
                   <Link href={`/dashboard/bookings`}>

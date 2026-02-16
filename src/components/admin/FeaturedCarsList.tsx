@@ -62,7 +62,7 @@ export function FeaturedCarsList({ cars }: { cars: any[] }) {
                   <p className="text-xs text-zinc-500">{car.licensePlate}</p>
                 </div>
                 <div className="text-right">
-                  <span className="block font-bold text-zinc-900">€{Number(car.pricePerDay).toFixed(1)}</span>
+                  <span className="block font-bold text-zinc-900">€{Number(Number(car.pricePerDay).toFixed(1))}</span>
                   <span className="text-xs text-zinc-500">/day</span>
                 </div>
               </div>

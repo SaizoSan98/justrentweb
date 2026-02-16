@@ -72,7 +72,7 @@ export function CarsTable({ cars }: { cars: any[] }) {
                     {car.licensePlate}
                     {car.renteonId && <div className="text-[10px] text-blue-600 mt-0.5">Renteon ID: {car.renteonId}</div>}
                   </td>
-                  <td className="px-6 py-4 font-bold text-zinc-900">€{Number(car.pricePerDay).toFixed(1)}</td>
+                  <td className="px-6 py-4 font-bold text-zinc-900">€{Number(Number(car.pricePerDay).toFixed(1))}</td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
                       car.status === 'AVAILABLE' ? 'bg-green-100 text-green-800 border border-green-200' :

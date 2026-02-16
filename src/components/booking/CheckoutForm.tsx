@@ -626,8 +626,8 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                       <span className="font-bold text-zinc-900 text-right">
                         {ins.pricePerDay === 0 ? dictionary.booking.included : (
                             <>
-                                <div>+€{(ins.pricePerDay * days).toFixed(1)}</div>
-                                <div className="text-[10px] text-zinc-400 font-normal">€{ins.pricePerDay.toFixed(1)} {dictionary.booking.per_day}</div>
+                                <div>+€{Number((ins.pricePerDay * days).toFixed(1))}</div>
+                                <div className="text-[10px] text-zinc-400 font-normal">€{Number(ins.pricePerDay.toFixed(1))} {dictionary.booking.per_day}</div>
                             </>
                         )}
                       </span>
@@ -682,7 +682,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                      {dictionary.fleet.unlimited} {dictionary.common.km}
                      <span className="bg-zinc-200 text-zinc-600 text-[10px] px-1.5 py-0.5 rounded uppercase tracking-wider font-bold">DEV</span>
                    </h4>
-                   <span className="font-bold text-zinc-400">+{((car.unlimitedMileagePrice || 0) * days).toFixed(1)} €</span>
+                   <span className="font-bold text-zinc-400">+{Number(((car.unlimitedMileagePrice || 0) * days).toFixed(1))} €</span>
                  </div>
                </div>
              </div>
@@ -733,7 +733,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                     </div>
                     <p className="text-xs text-zinc-500 line-clamp-2 mb-2">{extra.description}</p>
                     <span className="text-xs font-bold text-zinc-900 bg-zinc-100 px-2 py-1 rounded-full">
-                      €{extra.price.toFixed(1)} {extra.priceType === 'PER_DAY' ? dictionary.booking.per_day : dictionary.booking.per_rental}
+                      €{Number(extra.price.toFixed(1))} {extra.priceType === 'PER_DAY' ? dictionary.booking.per_day : dictionary.booking.per_rental}
                     </span>
                   </div>
                 </div>
@@ -922,7 +922,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                     <button type="button" className="w-full flex justify-between items-center group">
                         <span className="text-zinc-400 font-medium group-hover:text-white transition-colors">{dictionary.booking.total_price}</span>
                         <div className="flex items-center gap-2">
-                             <span className="text-3xl font-black text-red-500">€{totalPrice.toFixed(1)}</span>
+                             <span className="text-3xl font-black text-red-500">€{Number(totalPrice.toFixed(1))}</span>
                              <div className="bg-zinc-800 text-zinc-400 text-[10px] px-2 py-1 rounded uppercase font-bold group-hover:bg-zinc-700 transition-colors">{dictionary.fleet.details}</div>
                         </div>
                     </button>
@@ -934,20 +934,20 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                     <div className="space-y-3 pt-4">
                         <div className="flex justify-between">
                             <span className="text-zinc-500">{dictionary.booking.car_rental} ({days} {dictionary.common.days})</span>
-                            <span className="font-bold">€{basePrice.toFixed(1)}</span>
+                            <span className="font-bold">€{Number(basePrice.toFixed(1))}</span>
                         </div>
                         
                         {insurancePrice > 0 && (
                             <div className="flex justify-between text-green-600">
                                 <span>{dictionary.hero.insurance}</span>
-                                <span>+€{insurancePrice.toFixed(1)}</span>
+                                <span>+€{Number(insurancePrice.toFixed(1))}</span>
                             </div>
                         )}
 
                         {mileagePrice > 0 && (
                             <div className="flex justify-between text-zinc-500">
                                 <span>{dictionary.fleet.unlimited} {dictionary.common.km}</span>
-                                <span>+€{mileagePrice.toFixed(1)}</span>
+                                <span>+€{Number(mileagePrice.toFixed(1))}</span>
                             </div>
                         )}
 
@@ -958,7 +958,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                             return (
                                 <div key={id} className="flex justify-between text-zinc-500">
                                     <span>{extra.name}</span>
-                                    <span>+€{price.toFixed(1)}</span>
+                                    <span>+€{Number(price.toFixed(1))}</span>
                                 </div>
                             )
                         })}
@@ -966,19 +966,19 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                         {pickupFee > 0 && (
                             <div className="flex justify-between text-zinc-500">
                                 <span>{dictionary.booking.after_hours_pickup}</span>
-                                <span>+€{pickupFee.toFixed(1)}</span>
+                                <span>+€{Number(pickupFee.toFixed(1))}</span>
                             </div>
                         )}
                         {returnFee > 0 && (
                             <div className="flex justify-between text-zinc-500">
                                 <span>{dictionary.booking.after_hours_return}</span>
-                                <span>+€{returnFee.toFixed(1)}</span>
+                                <span>+€{Number(returnFee.toFixed(1))}</span>
                             </div>
                         )}
 
                         <div className="pt-4 border-t border-zinc-100 flex justify-between items-end mt-4">
                             <span className="text-zinc-900 font-bold">{dictionary.fleet.total}</span>
-                            <span className="text-2xl font-black text-red-600">€{totalPrice.toFixed(1)}</span>
+                            <span className="text-2xl font-black text-red-600">€{Number(totalPrice.toFixed(1))}</span>
                         </div>
                         
                         <div className="pt-3 border-t border-zinc-100 flex justify-between items-center">
@@ -986,7 +986,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                                 <ShieldCheck className="w-3.5 h-3.5" />
                                 {dictionary.booking.security_deposit}
                              </div>
-                             <span className="font-bold text-zinc-900">€{currentDeposit.toFixed(1)}</span>
+                             <span className="font-bold text-zinc-900">€{Number(currentDeposit.toFixed(1))}</span>
                         </div>
                     </div>
                 </DialogContent>
@@ -998,7 +998,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                       <ShieldCheck className="w-4 h-4" />
                       {dictionary.booking.security_deposit}
                    </div>
-                   <span className="font-bold text-white text-lg">€{currentDeposit.toFixed(1)}</span>
+                   <span className="font-bold text-white text-lg">€{Number(currentDeposit.toFixed(1))}</span>
               </div>
             </div>
           </Card>

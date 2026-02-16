@@ -63,7 +63,7 @@ export default async function BookingSuccessPage({
                 </div>
                 <div className="text-right">
                   <div className="text-zinc-400 text-sm uppercase tracking-wider mb-1">Total Amount</div>
-                  <div className="text-2xl font-bold text-red-500">€{Number(booking.totalPrice).toFixed(1)}</div>
+                  <div className="text-2xl font-bold text-red-500">€{Number(Number(booking.totalPrice).toFixed(1))}</div>
                 </div>
               </div>
             </CardHeader>
@@ -130,12 +130,12 @@ export default async function BookingSuccessPage({
                     <div className="space-y-3">
                       <div className="flex justify-between">
                         <span className="text-sm text-zinc-500">Vehicle Rental</span>
-                        <span className="text-sm font-medium">€{Number(booking.totalPrice).toFixed(1)}</span>
+                        <span className="text-sm font-medium">€{Number(Number(booking.totalPrice).toFixed(1))}</span>
                       </div>
                       {/* Extras would go here if we stored their individual prices in booking or calculated them */}
                       <div className="pt-2 border-t border-zinc-100 flex justify-between items-center">
                         <span className="text-sm font-bold">Total Due</span>
-                        <span className="text-lg font-bold text-red-600">€{Number(booking.totalPrice).toFixed(1)}</span>
+                        <span className="text-lg font-bold text-red-600">€{Number(Number(booking.totalPrice).toFixed(1))}</span>
                       </div>
                     </div>
                   </div>

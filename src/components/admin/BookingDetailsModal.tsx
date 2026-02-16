@@ -185,7 +185,7 @@ export function BookingDetailsModal({ booking }: BookingDetailsModalProps) {
                         </div>
                         <div className="pt-3 border-t border-zinc-200 flex justify-between items-center">
                             <span className="font-bold text-zinc-900">Total Amount</span>
-                            <span className="text-xl font-black text-zinc-900">€{Number(booking.totalPrice).toFixed(1)}</span>
+                            <span className="text-xl font-black text-zinc-900">€{Number(Number(booking.totalPrice).toFixed(1))}</span>
                         </div>
                     </div>
                 </div>
