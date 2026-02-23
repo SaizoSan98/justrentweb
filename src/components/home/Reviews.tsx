@@ -69,30 +69,30 @@ export function Reviews() {
                 key={idx}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1, duration: 0.5 }}
-                className="bg-white p-8 rounded-3xl border border-zinc-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative group"
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="bg-white p-6 md:p-8 rounded-3xl border border-zinc-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative group"
               >
-                 <Quote className="absolute top-8 right-8 w-8 h-8 text-zinc-100 group-hover:text-red-50 transition-colors" />
+                 <Quote className="absolute top-6 right-6 md:top-8 md:right-8 w-6 h-6 md:w-8 md:h-8 text-zinc-100 group-hover:text-red-50 transition-colors" />
                  
-                 <div className="flex items-center gap-1 mb-6">
+                 <div className="flex items-center gap-1 mb-4 md:mb-6">
                     {[...Array(review.rating)].map((_, i) => (
-                       <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                       <Star key={i} className="w-3.5 h-3.5 md:w-4 md:h-4 fill-yellow-400 text-yellow-400" />
                     ))}
                  </div>
 
-                 <p className="text-zinc-600 text-sm leading-relaxed mb-6 flex-grow italic">
+                 <p className="text-zinc-600 text-sm leading-relaxed mb-6 flex-grow italic line-clamp-4 md:line-clamp-6">
                     "{review.text}"
                  </p>
 
                  <div className="mt-auto pt-6 border-t border-zinc-100 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center font-bold text-zinc-400 text-sm">
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-zinc-100 flex items-center justify-center font-bold text-zinc-400 text-xs md:text-sm shrink-0">
                        {review.name.charAt(0)}
                     </div>
-                    <div>
-                       <div className="font-bold text-zinc-900 text-sm">{review.name}</div>
-                       <div className="text-xs text-zinc-400 font-medium flex items-center gap-1">
-                          <img src="/google-logo.svg" alt="Google" className="w-3 h-3 opacity-50 grayscale" onError={(e) => e.currentTarget.style.display = 'none'} />
+                    <div className="min-w-0">
+                       <div className="font-bold text-zinc-900 text-sm truncate">{review.name}</div>
+                       <div className="text-xs text-zinc-400 font-medium flex items-center gap-1 truncate">
+                          <img src="/google-logo.svg" alt="Google" className="w-3 h-3 opacity-50 grayscale shrink-0" onError={(e) => e.currentTarget.style.display = 'none'} />
                           Verified Review
                        </div>
                     </div>
