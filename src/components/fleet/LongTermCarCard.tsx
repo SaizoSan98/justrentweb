@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import { Users, Gauge, Fuel, Check, Info, ArrowRight, Loader2 } from "lucide-react"
+import { Users, Gauge, Fuel, Check, Info, ArrowRight, Loader2, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
@@ -201,10 +201,17 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
         </div>
       </DialogTrigger>
 
-      <DialogContent className="max-w-3xl p-0 overflow-hidden bg-white">
-        <div className="grid md:grid-cols-2">
+      <DialogContent className="max-w-3xl w-[95vw] md:w-full p-0 overflow-hidden bg-white max-h-[90vh] flex flex-col md:block">
+        <div className="absolute right-4 top-4 z-50">
+            <DialogTrigger asChild>
+                <Button variant="ghost" size="icon" className="bg-black/10 hover:bg-black/20 text-black rounded-full backdrop-blur-sm">
+                    <X className="w-4 h-4" />
+                </Button>
+            </DialogTrigger>
+        </div>
+        <div className="grid md:grid-cols-2 h-full overflow-y-auto md:overflow-visible">
            {/* Left: Image & Specs */}
-           <div className="bg-zinc-100 p-8 flex flex-col">
+           <div className="bg-zinc-100 p-6 md:p-8 flex flex-col shrink-0">
               <div className="relative aspect-[4/3] w-full mb-6 mix-blend-multiply">
                  {car.imageUrl ? (
                     <Image 
@@ -219,7 +226,7 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
               </div>
 
               <div className="mt-auto space-y-4">
-                 <div className="grid grid-cols-2 gap-4">
+                 <div className="grid grid-cols-2 gap-3 md:gap-4">
                     <div className="bg-white p-3 rounded-xl">
                        <div className="text-xs text-zinc-500 mb-1">Transmission</div>
                        <div className="font-bold text-sm flex items-center gap-2">
@@ -253,9 +260,9 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
            </div>
 
            {/* Right: Calculator & Form */}
-           <div className="p-8 flex flex-col h-full overflow-y-auto max-h-[90vh]">
-              <DialogHeader className="mb-6">
-                 <DialogTitle className="text-3xl font-black text-zinc-900 tracking-tight uppercase leading-none">
+           <div className="p-6 md:p-8 flex flex-col h-full">
+              <DialogHeader className="mb-6 pt-4 md:pt-0">
+                 <DialogTitle className="text-2xl md:text-3xl font-black text-zinc-900 tracking-tight uppercase leading-none">
                     {car.make} <span className="text-red-600">{car.model}</span>
                  </DialogTitle>
                  {car.description && (
@@ -300,12 +307,12 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
                  </div>
               </div>
 
-              <div className="mt-auto">
+              <div className="mt-auto pb-4 md:pb-0">
                  {showInquiryForm ? (
                     <form onSubmit={handleInquirySubmit} className="space-y-4 bg-zinc-50 p-6 rounded-2xl border border-zinc-100 animate-in fade-in slide-in-from-bottom-4">
                         <div className="flex justify-between items-center mb-2">
                             <h4 className="font-bold text-zinc-900">Send Inquiry</h4>
-                            <Button variant="ghost" size="sm" onClick={() => setShowInquiryForm(false)} className="h-6 w-6 p-0">
+                            <Button type="button" variant="ghost" size="sm" onClick={() => setShowInquiryForm(false)} className="h-6 w-6 p-0">
                                 <span className="sr-only">Close</span>
                                 <span aria-hidden="true">&times;</span>
                             </Button>

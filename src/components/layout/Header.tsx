@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Logo } from "@/components/ui/logo"
-import { Menu, X, User, LogOut, Globe } from "lucide-react"
+import { Menu, X, User, LogOut, Globe, ArrowRight } from "lucide-react"
 import { LanguageSwitcher } from "./LanguageSwitcher"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -218,26 +218,102 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className={cn(
-                    "md:hidden rounded-full w-10 h-10",
+                    "md:hidden rounded-full w-10 h-10 transition-colors",
                     (isScrolled || !transparent) ? "text-zinc-900 hover:bg-zinc-100" : "text-white hover:bg-white/20"
                 )}>
-                  <Menu className="w-5 h-5" />
+                  <Menu className="w-6 h-6" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-white p-0 flex flex-col z-[60]">
-                {/* ... existing mobile menu content ... */}
-                <div className="p-6 border-b border-zinc-100 flex items-center justify-between">
+              <SheetContent side="right" className="w-full sm:w-[400px] bg-zinc-900 border-l border-zinc-800 p-0 flex flex-col z-[60]">
+                <div className="p-6 flex items-center justify-between">
                   <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Logo variant="dark" />
+                    <Logo variant="light" />
                   </Link>
+                  <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)} className="text-zinc-400 hover:text-white hover:bg-white/10 rounded-full">
+                    <X className="w-6 h-6" />
+                  </Button>
                 </div>
                 
-                <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
-                  <nav className="flex flex-col gap-4">
-                    <Link href="/" className="text-lg font-bold text-zinc-900" onClick={() => setIsMobileMenuOpen(false)}>{t('home')}</Link>
-                    <Link href="/fleet" className="text-lg font-bold text-zinc-900" onClick={() => setIsMobileMenuOpen(false)}>{t('fleet')}</Link>
-                    <Link href="/contact" className="text-lg font-bold text-zinc-900" onClick={() => setIsMobileMenuOpen(false)}>{t('contact')}</Link>
+                <div className="flex-1 overflow-y-auto px-6 py-8 flex flex-col justify-between">
+                  <nav className="flex flex-col gap-6">
+                    {[
+                      { href: "/", label: t('home') },
+                      { href: "/fleet", label: t('fleet') },
+                      { href: "/long-term", label: "Long Term", badge: "New" },
+                      { href: "/contact", label: t('contact') }
+                    ].map((link, idx) => (
+                      <Link 
+                        key={link.href}
+                        href={link.href} 
+                        className="group flex items-center justify-between text-3xl font-black text-white tracking-tight hover:text-red-500 transition-colors"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <span className="flex items-center gap-3">
+                          {link.label}
+                          {link.badge && (
+                            <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider transform -translate-y-1">
+                              {link.badge}
+                            </span>
+                          )}
+                        </span>
+                        <ArrowRight className="w-6 h-6 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-red-600" />
+                      </Link>
+                    ))}
                   </nav>
+
+                  <div className="space-y-6">
+                    {user ? (
+                      <div className="bg-zinc-800/50 rounded-2xl p-4 border border-zinc-700">
+                        <div className="flex items-center gap-4 mb-4">
+                          <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center font-bold text-white">
+                            {getInitials(user.name)}
+                          </div>
+                          <div>
+                            <div className="font-bold text-white">{user.name}</div>
+                            <div className="text-xs text-zinc-400">{user.email}</div>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Link href={user.role === 'ADMIN' ? "/admin" : "/dashboard"} onClick={() => setIsMobileMenuOpen(false)}>
+                            <Button variant="outline" className="w-full justify-start border-zinc-600 text-zinc-300 hover:text-white hover:bg-zinc-700 hover:border-zinc-500">
+                              <LayoutDashboard className="w-4 h-4 mr-2" />
+                              Dashboard
+                            </Button>
+                          </Link>
+                          <form action={logoutAction} className="w-full">
+                             <Button type="submit" variant="outline" className="w-full justify-start border-red-900/30 text-red-400 hover:text-red-300 hover:bg-red-900/20 hover:border-red-900/50">
+                                <LogOut className="w-4 h-4 mr-2" />
+                                Log out
+                             </Button>
+                          </form>
+                        </div>
+                      </div>
+                    ) : (
+                       <div className="grid gap-3">
+                          <AuthModal 
+                            trigger={
+                              <Button className="w-full bg-white text-black hover:bg-zinc-200 font-bold h-12 text-lg rounded-xl">
+                                Log In
+                              </Button>
+                            }
+                          />
+                          <AuthModal 
+                            trigger={
+                              <Button variant="outline" className="w-full border-zinc-700 text-white hover:bg-zinc-800 font-bold h-12 text-lg rounded-xl">
+                                Sign Up
+                              </Button>
+                            }
+                          />
+                       </div>
+                    )}
+                    
+                    <div className="flex items-center justify-between text-zinc-500 text-xs font-medium uppercase tracking-widest pt-6 border-t border-zinc-800">
+                      <span>© {new Date().getFullYear()} JustRent</span>
+                      <div className="flex gap-4">
+                         <LanguageSwitcher currentLang={lang} variant="dark" />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>
