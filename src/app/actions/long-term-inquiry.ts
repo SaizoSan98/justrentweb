@@ -19,11 +19,26 @@ export async function submitLongTermInquiry(formData: FormData) {
   }
 
   try {
+    // Check if API key is present
+    if (!process.env.RESEND_API_KEY) {
+      console.warn("RESEND_API_KEY is missing")
+      // In dev mode, simulate success if key is missing
+      if (process.env.NODE_ENV === 'development') {
+          console.log("Dev mode (no key): Simulated email sending success")
+          return { success: true }
+      }
+      return { error: "Server configuration error (missing email key)" }
+    }
+
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
+    const adminEmail = process.env.ADMIN_EMAIL || 'booking@jrandtrans.com'
+
     // Send email to admin
     await resend.emails.send({
-      from: 'JustRent Inquiry <noreply@justrent.hu>', // Adjust domain
-      to: ['booking@jrandtrans.com'], // Or env var
+      from: `JustRent Inquiry <${fromEmail}>`,
+      to: [adminEmail],
       subject: `New Long Term Inquiry: ${carName}`,
+      replyTo: email,
       html: `
         <h2>New Long Term Rental Inquiry</h2>
         <p><strong>Vehicle:</strong> ${carName}</p>
@@ -42,7 +57,7 @@ export async function submitLongTermInquiry(formData: FormData) {
 
     // Send confirmation to user
     await resend.emails.send({
-      from: 'JustRent <noreply@justrent.hu>',
+      from: `JustRent <${fromEmail}>`,
       to: [email],
       subject: `Inquiry Received: ${carName}`,
       html: `
@@ -57,10 +72,9 @@ export async function submitLongTermInquiry(formData: FormData) {
     return { success: true }
   } catch (error) {
     console.error("Failed to send inquiry email:", error)
-    // In dev mode without API key, simulate success
+    // Return the actual error in dev mode for debugging
     if (process.env.NODE_ENV === 'development') {
-        console.log("Dev mode: Simulated email sending success")
-        return { success: true }
+        return { error: `Dev Error: ${(error as Error).message}` }
     }
     return { error: "Failed to send inquiry. Please try again later." }
   }

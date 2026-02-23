@@ -16,10 +16,24 @@ export async function submitContactForm(formData: FormData) {
   }
 
   try {
+    // Check if API key is present
+    if (!process.env.RESEND_API_KEY) {
+      console.warn("RESEND_API_KEY is missing")
+      // In dev mode, simulate success if key is missing
+      if (process.env.NODE_ENV === 'development') {
+          console.log("Dev mode (no key): Simulated email sending success")
+          return { success: true }
+      }
+      return { error: "Server configuration error (missing email key)" }
+    }
+
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
+    const adminEmail = process.env.ADMIN_EMAIL || 'booking@jrandtrans.com'
+
     // Send email to admin
     await resend.emails.send({
-      from: 'JustRent Contact <noreply@justrent.hu>',
-      to: ['booking@jrandtrans.com'],
+      from: `JustRent Contact <${fromEmail}>`,
+      to: [adminEmail],
       subject: `New Contact Message: ${subject}`,
       replyTo: email,
       html: `
@@ -38,7 +52,7 @@ export async function submitContactForm(formData: FormData) {
 
     // Send confirmation to user
     await resend.emails.send({
-      from: 'JustRent <noreply@justrent.hu>',
+      from: `JustRent <${fromEmail}>`,
       to: [email],
       subject: `We received your message: ${subject}`,
       html: `
@@ -53,9 +67,9 @@ export async function submitContactForm(formData: FormData) {
     return { success: true }
   } catch (error) {
     console.error("Failed to send contact email:", error)
+    // Return the actual error in dev mode for debugging
     if (process.env.NODE_ENV === 'development') {
-        console.log("Dev mode: Simulated email sending success")
-        return { success: true }
+        return { error: `Dev Error: ${(error as Error).message}` }
     }
     return { error: "Failed to send message. Please try again later." }
   }
