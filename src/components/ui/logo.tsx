@@ -9,12 +9,12 @@ interface LogoProps {
 export function Logo({ className, variant = "dark" }: LogoProps) {
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      {/* White/Black Rectangle with JUST */}
+      {/* White/Black Rectangle with just */}
       <div className={cn(
         "px-2 py-1 rounded-sm font-black tracking-tighter text-lg leading-none select-none flex items-center justify-center",
-        variant === "dark" ? "bg-zinc-900 text-white" : "bg-white text-black"
+        variant === "dark" ? "bg-red-600 text-white" : "bg-red-600 text-white"
       )}>
-        JUST
+        just
       </div>
       
       {/* RENT text */}

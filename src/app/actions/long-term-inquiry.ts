@@ -30,12 +30,14 @@ export async function submitLongTermInquiry(formData: FormData) {
       return { error: "Server configuration error (missing email key)" }
     }
 
-    const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev'
+    // Use EMAIL_FROM to match src/lib/email.tsx convention
+    const fromEmail = process.env.EMAIL_FROM || 'JustRent <booking@jrandtrans.com>'
+    // Use hardcoded admin email as in src/lib/email.tsx for consistency, or env var
     const adminEmail = process.env.ADMIN_EMAIL || 'booking@jrandtrans.com'
 
     // Send email to admin
     await resend.emails.send({
-      from: `JustRent Inquiry <${fromEmail}>`,
+      from: fromEmail,
       to: [adminEmail],
       subject: `New Long Term Inquiry: ${carName}`,
       replyTo: email,
@@ -57,7 +59,7 @@ export async function submitLongTermInquiry(formData: FormData) {
 
     // Send confirmation to user
     await resend.emails.send({
-      from: `JustRent <${fromEmail}>`,
+      from: fromEmail,
       to: [email],
       subject: `Inquiry Received: ${carName}`,
       html: `
