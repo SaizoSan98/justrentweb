@@ -6,6 +6,7 @@ import { BookingEngine } from "@/components/booking/BookingEngine";
 import { Header } from "@/components/layout/Header";
 import { prisma } from "@/lib/prisma";
 import { FeaturedCars } from "@/components/home/FeaturedCars"
+import { Reviews } from "@/components/home/Reviews"
 import { getSession } from "@/lib/auth"
 import { Hero } from "@/components/home/Hero"
 import { cookies } from "next/headers"
@@ -79,6 +80,9 @@ export default async function LandingPage() {
       {serializedFeaturedCars.length > 0 && (
           <FeaturedCars cars={serializedFeaturedCars} />
       )}
+
+      {/* Reviews Section */}
+      <Reviews />
 
       {/* Feature Grid */}
       <FeatureGrid />
