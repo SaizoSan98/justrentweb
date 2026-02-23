@@ -67,8 +67,8 @@ export function ContactForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="phone">Phone (Optional)</Label>
-        <Input id="phone" type="tel" placeholder="+36..." className="bg-zinc-50 border-zinc-200" />
+        <Label htmlFor="phone">Phone</Label>
+        <Input id="phone" type="tel" placeholder="+36..." className="bg-zinc-50 border-zinc-200" required />
       </div>
 
       <div className="space-y-2">

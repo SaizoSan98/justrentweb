@@ -160,7 +160,21 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
   const totalCost = rentalCost + mileageCost + insuranceCost + extrasCost + totalFees
 
   // --- Handlers ---
-  const handleNext = () => setStep(prev => Math.min(prev + 1, 5))
+  const handleNext = () => {
+    if (step === 4) {
+      // Validate Driver Details
+      if (!driverDetails.firstName || !driverDetails.lastName || !driverDetails.email || !driverDetails.phone) {
+        toast.error("Please fill in all required fields (Name, Email, Phone)")
+        return
+      }
+      // Validate Company Details if selected
+      if (isCompany && (!companyDetails.name || !companyDetails.taxId || !companyDetails.address)) {
+        toast.error("Please fill in all company details")
+        return
+      }
+    }
+    setStep(prev => Math.min(prev + 1, 5))
+  }
   const handleBack = () => setStep(prev => Math.max(prev - 1, 1))
 
   const handleBookingSubmit = async () => {
@@ -526,12 +540,13 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                           />
                        </div>
                        <div className="space-y-2">
-                          <Label>Phone</Label>
+                          <Label>Phone *</Label>
                           <Input 
                              type="tel"
                              value={driverDetails.phone} 
                              onChange={(e) => setDriverDetails({...driverDetails, phone: e.target.value})}
                              placeholder="+36 30 123 4567" 
+                             required
                           />
                        </div>
                        <div className="space-y-2">

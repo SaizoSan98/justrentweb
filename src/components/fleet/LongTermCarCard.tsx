@@ -3,9 +3,13 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import { Users, Gauge, Fuel, Check, Info, ArrowRight } from "lucide-react"
+import { Users, Gauge, Fuel, Check, Info, ArrowRight, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { toast } from "sonner"
 import {
   Dialog,
   DialogContent,
@@ -19,8 +23,9 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import Link from "next/link"
+import { submitLongTermInquiry } from "@/app/actions/long-term-inquiry"
 
-interface LongTermCar {
+export interface LongTermCar {
   id: string
   make: string
   model: string
@@ -41,6 +46,10 @@ interface LongTermCar {
 export function LongTermCarCard({ car }: { car: LongTermCar }) {
   const [duration, setDuration] = useState(12)
   const [currentPrice, setCurrentPrice] = useState(Number(car.monthlyPrice))
+  
+  // Inquiry Form State
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showInquiryForm, setShowInquiryForm] = useState(false)
 
   useEffect(() => {
     let price = Number(car.monthlyPrice)
@@ -58,6 +67,28 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
     
     setCurrentPrice(price)
   }, [duration, car])
+
+  const handleInquirySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    
+    const formData = new FormData(e.currentTarget)
+    formData.append("carId", car.id)
+    formData.append("carName", `${car.make} ${car.model}`)
+    formData.append("duration", duration.toString())
+    formData.append("monthlyPrice", currentPrice.toString())
+    
+    const result = await submitLongTermInquiry(formData)
+    
+    setIsSubmitting(false)
+    
+    if (result.success) {
+        toast.success("Inquiry sent successfully! We will contact you shortly.")
+        setShowInquiryForm(false)
+    } else {
+        toast.error(result.error || "Failed to send inquiry. Please try again.")
+    }
+  }
 
   return (
     <Dialog>
@@ -261,18 +292,67 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
               </div>
 
               <div className="mt-auto">
-                 <Link 
-                    href={`/contact?carName=${encodeURIComponent(`${car.make} ${car.model}`)}&duration=${duration}&price=${currentPrice}`}
-                    className="w-full"
-                 >
-                    <Button className="w-full bg-red-600 hover:bg-red-700 text-white font-bold h-14 text-lg rounded-xl shadow-lg shadow-red-600/20 transition-all hover:scale-[1.02] active:scale-[0.98]">
-                       Inquire Now
-                       <ArrowRight className="ml-2 w-5 h-5" />
-                    </Button>
-                 </Link>
-                 <p className="text-center text-xs text-zinc-400 mt-4">
-                    No payment required now. Send an inquiry to check availability.
-                 </p>
+                 {showInquiryForm ? (
+                    <form onSubmit={handleInquirySubmit} className="space-y-4 bg-zinc-50 p-6 rounded-2xl border border-zinc-100 animate-in fade-in slide-in-from-bottom-4">
+                        <div className="flex justify-between items-center mb-2">
+                            <h4 className="font-bold text-zinc-900">Send Inquiry</h4>
+                            <Button variant="ghost" size="sm" onClick={() => setShowInquiryForm(false)} className="h-6 w-6 p-0">
+                                <span className="sr-only">Close</span>
+                                <span aria-hidden="true">&times;</span>
+                            </Button>
+                        </div>
+                        
+                        <div className="space-y-2">
+                            <Label htmlFor="name">Name</Label>
+                            <Input id="name" name="name" placeholder="John Doe" required className="bg-white" />
+                        </div>
+                        
+                        <div className="space-y-2">
+                            <Label htmlFor="email">Email</Label>
+                            <Input id="email" name="email" type="email" placeholder="john@example.com" required className="bg-white" />
+                        </div>
+                        
+                        <div className="space-y-2">
+                            <Label htmlFor="phone">Phone</Label>
+                            <Input id="phone" name="phone" type="tel" placeholder="+36..." required className="bg-white" />
+                        </div>
+                        
+                        <div className="space-y-2">
+                            <Label htmlFor="message">Message (Optional)</Label>
+                            <Textarea 
+                                id="message" 
+                                name="message" 
+                                placeholder="Any specific questions?" 
+                                className="bg-white min-h-[80px]" 
+                                defaultValue={`I am interested in renting the ${car.make} ${car.model} for ${duration} months.`}
+                            />
+                        </div>
+
+                        <Button type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white font-bold h-12 rounded-xl" disabled={isSubmitting}>
+                            {isSubmitting ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Sending...
+                                </>
+                            ) : (
+                                "Send Request"
+                            )}
+                        </Button>
+                    </form>
+                 ) : (
+                    <>
+                        <Button 
+                            onClick={() => setShowInquiryForm(true)}
+                            className="w-full bg-red-600 hover:bg-red-700 text-white font-bold h-14 text-lg rounded-xl shadow-lg shadow-red-600/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                        >
+                           Inquire Now
+                           <ArrowRight className="ml-2 w-5 h-5" />
+                        </Button>
+                        <p className="text-center text-xs text-zinc-400 mt-4">
+                            No payment required now. Send an inquiry to check availability.
+                        </p>
+                    </>
+                 )}
               </div>
            </div>
         </div>
