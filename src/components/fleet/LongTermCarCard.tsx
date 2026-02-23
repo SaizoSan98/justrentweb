@@ -3,9 +3,21 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
-import { Users, Gauge, Fuel, Check } from "lucide-react"
+import { Users, Gauge, Fuel, Check, Info, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import Link from "next/link"
 
 interface LongTermCar {
@@ -48,112 +60,223 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
   }, [duration, car])
 
   return (
-    <div className="group relative bg-white border border-zinc-200 rounded-3xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
-      
-      {/* Image */}
-      <div className="relative h-56 bg-zinc-100 flex items-center justify-center p-4 shrink-0">
-        {car.imageUrl ? (
-          <Image 
-            src={car.imageUrl} 
-            alt={`${car.make} ${car.model}`}
-            fill
-            className="object-contain object-center transition-transform duration-500 group-hover:scale-105 p-4"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-zinc-300">
-             No Image
-          </div>
-        )}
-        <div className="absolute top-4 right-4 z-10">
-           <Badge className="bg-black text-white hover:bg-black uppercase tracking-wider font-bold">
-              Long Term
-           </Badge>
-        </div>
-      </div>
-
-      <div className="p-6 flex flex-col flex-grow">
-        {/* Header */}
-        <div className="mb-4">
-          <h3 className="text-2xl font-black text-zinc-900 tracking-tight leading-none mb-1">
-            {car.make} {car.model}
-          </h3>
-          <p className="text-zinc-500 text-sm font-bold uppercase tracking-wider">
-            {car.year} • {car.transmission}
-          </p>
-        </div>
-
-        {/* Specs */}
-        <div className="flex flex-wrap gap-2 mb-6">
-           <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-600 bg-zinc-100 px-3 py-1.5 rounded-full">
-              <Users className="w-3.5 h-3.5" />
-              {car.seats} Seats
-           </div>
-           <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-600 bg-zinc-100 px-3 py-1.5 rounded-full">
-              <Fuel className="w-3.5 h-3.5" />
-              {car.fuelType}
-           </div>
-           <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-600 bg-zinc-100 px-3 py-1.5 rounded-full">
-              <Gauge className="w-3.5 h-3.5" />
-              {car.transmission}
-           </div>
-        </div>
-        
-        {/* Features Preview */}
-        {car.features.length > 0 && (
-            <div className="mb-6 space-y-1">
-                {car.features.slice(0, 3).map((feature, idx) => (
-                    <div key={idx} className="flex items-center gap-2 text-xs text-zinc-500">
-                        <Check className="w-3 h-3 text-green-500" />
-                        {feature}
-                    </div>
-                ))}
-                {car.features.length > 3 && (
-                    <div className="text-xs text-zinc-400 pl-5">+{car.features.length - 3} more features</div>
-                )}
-            </div>
-        )}
-
-        <div className="mt-auto space-y-6">
-           {/* Duration Slider */}
-           <div className="space-y-3 bg-zinc-50 p-4 rounded-xl border border-zinc-100">
-              <div className="flex justify-between items-center">
-                 <span className="text-xs font-bold uppercase text-zinc-500 tracking-wider">Rental Duration</span>
-                 <span className="text-sm font-black text-zinc-900">{duration} Months</span>
-              </div>
-              <input 
-                 type="range" 
-                 min="1" 
-                 max="12" 
-                 value={duration} 
-                 onChange={(e) => setDuration(parseInt(e.target.value))}
-                 className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-red-600"
+    <Dialog>
+      <DialogTrigger asChild>
+        <div className="group relative bg-white border border-zinc-200 rounded-3xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full cursor-pointer">
+          
+          {/* Image */}
+          <div className="relative h-56 bg-zinc-100 flex items-center justify-center p-4 shrink-0">
+            {car.imageUrl ? (
+              <Image 
+                src={car.imageUrl} 
+                alt={`${car.make} ${car.model}`}
+                fill
+                className="object-contain object-center transition-transform duration-500 group-hover:scale-105 p-4"
               />
-              <div className="flex justify-between text-[10px] text-zinc-400 font-medium uppercase tracking-wider">
-                 <span>1 Mo</span>
-                 <span>6 Mo</span>
-                 <span>12+ Mo</span>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-zinc-300">
+                 No Image
+              </div>
+            )}
+            <div className="absolute top-4 right-4 z-10">
+               <Badge className="bg-black text-white hover:bg-black uppercase tracking-wider font-bold">
+                  Long Term
+               </Badge>
+            </div>
+          </div>
+
+          <div className="p-6 flex flex-col flex-grow">
+            {/* Header */}
+            <div className="mb-4">
+              <h3 className="text-2xl font-black text-zinc-900 tracking-tight leading-none mb-1">
+                {car.make} {car.model}
+              </h3>
+              <p className="text-zinc-500 text-sm font-bold uppercase tracking-wider">
+                {car.year} • {car.transmission}
+              </p>
+            </div>
+
+            {/* Specs */}
+            <div className="flex flex-wrap gap-2 mb-6">
+               <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-600 bg-zinc-100 px-3 py-1.5 rounded-full">
+                  <Users className="w-3.5 h-3.5" />
+                  {car.seats} Seats
+               </div>
+               <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-600 bg-zinc-100 px-3 py-1.5 rounded-full">
+                  <Fuel className="w-3.5 h-3.5" />
+                  {car.fuelType}
+               </div>
+               <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-600 bg-zinc-100 px-3 py-1.5 rounded-full">
+                  <Gauge className="w-3.5 h-3.5" />
+                  {car.transmission}
+               </div>
+            </div>
+            
+            {/* Features Preview */}
+            {car.features.length > 0 && (
+                <div className="mb-6 space-y-1" onClick={(e) => e.stopPropagation()}>
+                    {car.features.slice(0, 3).map((feature, idx) => (
+                        <div key={idx} className="flex items-center gap-2 text-xs text-zinc-500">
+                            <Check className="w-3 h-3 text-green-500" />
+                            {feature}
+                        </div>
+                    ))}
+                    {car.features.length > 3 && (
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button className="text-xs text-zinc-400 pl-5 hover:text-zinc-600 hover:underline transition-colors text-left">
+                              +{car.features.length - 3} more features
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-64 p-4">
+                            <div className="space-y-2">
+                              <h4 className="font-bold text-sm mb-2">All Features</h4>
+                              {car.features.map((feature, idx) => (
+                                <div key={idx} className="flex items-center gap-2 text-xs text-zinc-600">
+                                  <Check className="w-3 h-3 text-green-500 shrink-0" />
+                                  {feature}
+                                </div>
+                              ))}
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                    )}
+                </div>
+            )}
+
+            <div className="mt-auto pt-6 border-t border-zinc-100 flex items-end justify-between">
+               <div>
+                  <div className="flex items-baseline gap-1">
+                     <span className="text-sm text-zinc-500 font-bold">from</span>
+                     <span className="text-3xl font-black text-red-600 tracking-tighter">€{Number(car.monthlyPrice)}</span>
+                     <span className="text-sm text-zinc-500 font-bold">/ month</span>
+                  </div>
+               </div>
+               
+               <Button className="bg-black hover:bg-zinc-800 text-white font-bold rounded-xl px-6">
+                  View Deal
+               </Button>
+            </div>
+          </div>
+        </div>
+      </DialogTrigger>
+
+      <DialogContent className="max-w-3xl p-0 overflow-hidden bg-white">
+        <div className="grid md:grid-cols-2">
+           {/* Left: Image & Specs */}
+           <div className="bg-zinc-100 p-8 flex flex-col">
+              <div className="relative aspect-[4/3] w-full mb-6 mix-blend-multiply">
+                 {car.imageUrl ? (
+                    <Image 
+                       src={car.imageUrl} 
+                       alt={`${car.make} ${car.model}`}
+                       fill
+                       className="object-contain"
+                    />
+                 ) : (
+                    <div className="w-full h-full flex items-center justify-center text-zinc-300">No Image</div>
+                 )}
+              </div>
+
+              <div className="mt-auto space-y-4">
+                 <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-white p-3 rounded-xl">
+                       <div className="text-xs text-zinc-500 mb-1">Transmission</div>
+                       <div className="font-bold text-sm flex items-center gap-2">
+                          <Gauge className="w-4 h-4 text-zinc-400" />
+                          {car.transmission}
+                       </div>
+                    </div>
+                    <div className="bg-white p-3 rounded-xl">
+                       <div className="text-xs text-zinc-500 mb-1">Fuel Type</div>
+                       <div className="font-bold text-sm flex items-center gap-2">
+                          <Fuel className="w-4 h-4 text-zinc-400" />
+                          {car.fuelType}
+                       </div>
+                    </div>
+                    <div className="bg-white p-3 rounded-xl">
+                       <div className="text-xs text-zinc-500 mb-1">Seats</div>
+                       <div className="font-bold text-sm flex items-center gap-2">
+                          <Users className="w-4 h-4 text-zinc-400" />
+                          {car.seats} Persons
+                       </div>
+                    </div>
+                    <div className="bg-white p-3 rounded-xl">
+                       <div className="text-xs text-zinc-500 mb-1">Year</div>
+                       <div className="font-bold text-sm flex items-center gap-2">
+                          <Info className="w-4 h-4 text-zinc-400" />
+                          {car.year}
+                       </div>
+                    </div>
+                 </div>
               </div>
            </div>
 
-           <div className="pt-4 border-t border-zinc-100 flex items-end justify-between">
-              <div>
-                 <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-black text-red-600 tracking-tighter">€{currentPrice}</span>
-                    <span className="text-sm text-zinc-500 font-bold">/ month</span>
+           {/* Right: Calculator & Form */}
+           <div className="p-8 flex flex-col h-full overflow-y-auto max-h-[90vh]">
+              <DialogHeader className="mb-6">
+                 <DialogTitle className="text-3xl font-black text-zinc-900 tracking-tight uppercase leading-none">
+                    {car.make} <span className="text-red-600">{car.model}</span>
+                 </DialogTitle>
+                 {car.description && (
+                    <p className="text-zinc-500 text-sm mt-2 leading-relaxed">
+                       {car.description}
+                    </p>
+                 )}
+              </DialogHeader>
+
+              <div className="space-y-8 mb-8">
+                 {/* Duration Slider */}
+                 <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                       <span className="text-sm font-bold uppercase text-zinc-500 tracking-wider">Rental Duration</span>
+                       <span className="text-lg font-black text-zinc-900">{duration} Months</span>
+                    </div>
+                    <input 
+                       type="range" 
+                       min="1" 
+                       max="12" 
+                       value={duration} 
+                       onChange={(e) => setDuration(parseInt(e.target.value))}
+                       className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-red-600"
+                    />
+                    <div className="flex justify-between text-xs text-zinc-400 font-medium uppercase tracking-wider">
+                       <span>1 Mo</span>
+                       <span>6 Mo</span>
+                       <span>12+ Mo</span>
+                    </div>
                  </div>
-                 <div className="text-xs text-zinc-400 font-medium mt-1">
-                    Deposit: €{Number(car.deposit)}
+
+                 {/* Price Display */}
+                 <div className="bg-zinc-50 p-6 rounded-2xl border border-zinc-100">
+                    <div className="flex items-end justify-between mb-2">
+                       <span className="text-zinc-500 font-medium">Monthly Rate</span>
+                       <span className="text-4xl font-black text-zinc-900 tracking-tighter">€{currentPrice}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm text-zinc-400 pt-4 border-t border-zinc-200/50">
+                       <span>Security Deposit</span>
+                       <span className="font-bold text-zinc-600">€{Number(car.deposit)}</span>
+                    </div>
                  </div>
               </div>
-              
-              <Link href="/contact">
-                <Button className="bg-black hover:bg-zinc-800 text-white font-bold rounded-xl px-6">
-                   Inquire
-                </Button>
-              </Link>
+
+              <div className="mt-auto">
+                 <Link 
+                    href={`/contact?carName=${encodeURIComponent(`${car.make} ${car.model}`)}&duration=${duration}&price=${currentPrice}`}
+                    className="w-full"
+                 >
+                    <Button className="w-full bg-red-600 hover:bg-red-700 text-white font-bold h-14 text-lg rounded-xl shadow-lg shadow-red-600/20 transition-all hover:scale-[1.02] active:scale-[0.98]">
+                       Inquire Now
+                       <ArrowRight className="ml-2 w-5 h-5" />
+                    </Button>
+                 </Link>
+                 <p className="text-center text-xs text-zinc-400 mt-4">
+                    No payment required now. Send an inquiry to check availability.
+                 </p>
+              </div>
            </div>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }

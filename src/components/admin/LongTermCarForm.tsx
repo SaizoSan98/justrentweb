@@ -233,11 +233,6 @@ export function LongTermCarForm({ car, isEditing = false }: LongTermCarFormProps
             </CardContent>
           </Card>
 
-        </div>
-
-        {/* Right Column: Pricing & Image */}
-        <div className="space-y-8">
-          
           {/* Pricing */}
           <Card>
              <CardContent className="p-6 space-y-6">
@@ -334,6 +329,11 @@ export function LongTermCarForm({ car, isEditing = false }: LongTermCarFormProps
              </CardContent>
           </Card>
 
+        </div>
+
+        {/* Right Column: Pricing & Image */}
+        <div className="space-y-8">
+          
           {/* Image */}
           <Card>
              <CardContent className="p-6 space-y-6">
