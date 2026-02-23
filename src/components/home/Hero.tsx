@@ -88,31 +88,7 @@ export function Hero({ dictionary, carCount }: { dictionary?: Dictionary; carCou
            </div>
         </motion.div>
 
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 1.4, duration: 0.5 }}
-          className="absolute bottom-[25%] left-[20%] hidden lg:flex flex-col items-center gap-2 group cursor-pointer z-30"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-        >
-           <div className="relative">
-              <span className="absolute -inset-2 rounded-full bg-white/30 animate-ping delay-700" />
-              <div className="w-4 h-4 bg-white rounded-full relative z-10 shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
-              <div className="h-16 w-px bg-gradient-to-t from-white via-white/50 to-transparent absolute bottom-4 left-1/2 -translate-x-1/2" />
-           </div>
-           <div className="bg-black/60 backdrop-blur-xl border border-white/20 p-4 rounded-2xl transform -translate-y-24 opacity-0 group-hover:opacity-100 transition-all duration-300 shadow-2xl">
-              <div className="flex items-center gap-4">
-                 <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/10">
-                    <MapPin className="w-5 h-5 text-white" />
-                 </div>
-                 <div>
-                    <div className="text-white font-bold text-base">Budapest</div>
-                    <div className="text-white/60 text-[10px] uppercase tracking-wider font-medium">Free Delivery</div>
-                 </div>
-              </div>
-           </div>
-        </motion.div>
+
 
         {/* Original Floating Elements (kept as requested or replaced? User said "pin them on random places". I'll keep the new pins primarily but maybe keep one floating element if it looks good. Actually the new pins are better. I'll remove the old ones to avoid clutter.) */}
 
