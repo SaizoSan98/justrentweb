@@ -25,7 +25,7 @@ export function Hero({ dictionary, carCount }: { dictionary?: Dictionary; carCou
         {/* Background Image with Parallax-like feel */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/rs6.avif"
+            src="/background2.jpg"
             alt="Car Rental Budapest"
             fill
             className="object-cover object-center"
