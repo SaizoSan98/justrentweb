@@ -3,9 +3,10 @@ import { prisma } from "@/lib/prisma"
 import { LongTermCarForm } from "@/components/admin/LongTermCarForm"
 import { notFound } from "next/navigation"
 
-export default async function EditLongTermCarPage({ params }: { params: { id: string } }) {
+export default async function EditLongTermCarPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const car = await prisma.longTermCar.findUnique({
-    where: { id: params.id }
+    where: { id }
   })
 
   if (!car) notFound()
@@ -14,9 +15,9 @@ export default async function EditLongTermCarPage({ params }: { params: { id: st
   const serializedCar = {
     ...car,
     monthlyPrice: Number(car.monthlyPrice),
-    price1to3: Number(car.price1to3),
-    price4to6: Number(car.price4to6),
-    price7plus: Number(car.price7plus),
+    price1to3: Number((car as any).price1to3 ?? 0),
+    price4to6: Number((car as any).price4to6 ?? 0),
+    price7plus: Number((car as any).price7plus ?? 0),
     deposit: Number(car.deposit),
   }
 
