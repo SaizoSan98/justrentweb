@@ -8,17 +8,17 @@ const reviews = [
   {
     name: "Botond Gáspár",
     rating: 5,
-    text: "Profi csapat, korrekt és rugalmas ügyintézés. Az autót makulátlan állapotban kaptam meg, az adminisztráció pedig gyors és gördülékeny volt. Kedvező árak, megbízható szolgáltatás. minden szempontból elégedett vagyok. Biztosan fogok még itt bérelni!"
+    text: "Professional team, fair and flexible administration. I received the car in immaculate condition, and the paperwork was quick and smooth. Favorable prices, reliable service. I am satisfied in every respect. I will definitely rent here again!"
   },
   {
     name: "Tamás Czifra",
     rating: 5,
-    text: "Autóbérlési céllal kerestük fel a céget, akik még aznap megtalálták az utazásunkhoz kért autót. A csapat segítőkész és összeszedett, minden kérdésemre azonnal válaszoltak. A gépkocsit tisztán és megtankolva kaptuk meg (természetesen így is adtuk vissza), megkoronázta a hosszú utat ez a korrekt hozzáállás. Csak ajánlani tudom őket mindenkinek!"
+    text: "We contacted the company for car rental purposes, and they found the car requested for our trip the same day. The team is helpful and organized, they answered all my questions immediately. We received the car clean and refueled (of course we returned it the same way), this fair attitude crowned the long journey. I can only recommend them to everyone!"
   },
   {
     name: "Jázmin Farkas",
     rating: 5,
-    text: "Ma autót béreltem a Just Rent and Trans cégtől, és rendkívül pozitív élményben volt részem. Az ügyfélszolgálat nagyon kedves és segítőkész volt, ami már az első pillanattól kellemes benyomást tett rám. Az autó, amit kaptam, rendkívül igényes volt, jól karbantartott és tiszta. Összességében egy profi szolgáltatást kaptam, amelyet mindenkinek szívesen ajánlok, aki megbízható autókölcsönzőt keres."
+    text: "I rented a car from Just Rent and Trans today, and I had an extremely positive experience. The customer service was very kind and helpful, which made a pleasant impression on me from the very first moment. The car I received was extremely demanding, well-maintained and clean. Overall, I received a professional service, which I would recommend to anyone looking for a reliable car rental company."
   },
   {
     name: "רפאל טולידאנו",
