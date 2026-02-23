@@ -41,8 +41,8 @@ export const EmailLayout: React.FC<EmailLayoutProps> = ({ preview, children }) =
                 <tr>
                   <td style={{ paddingRight: '8px' }}>
                     <div style={{
-                      backgroundColor: '#ffffff',
-                      color: '#000000',
+                      backgroundColor: '#dc2626',
+                      color: '#ffffff',
                       padding: '4px 8px',
                       borderRadius: '2px',
                       fontWeight: '900',
@@ -50,7 +50,7 @@ export const EmailLayout: React.FC<EmailLayoutProps> = ({ preview, children }) =
                       lineHeight: '1',
                       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
                     }}>
-                      JUST
+                      just
                     </div>
                   </td>
                   <td>

@@ -1,6 +1,7 @@
 "use server"
 
 import { Resend } from 'resend'
+import { LongTermInquiryEmail } from '@/components/emails/LongTermInquiryEmail'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -41,20 +42,16 @@ export async function submitLongTermInquiry(formData: FormData) {
       to: [adminEmail],
       subject: `New Long Term Inquiry: ${carName}`,
       replyTo: email,
-      html: `
-        <h2>New Long Term Rental Inquiry</h2>
-        <p><strong>Vehicle:</strong> ${carName}</p>
-        <p><strong>Duration:</strong> ${duration} months</p>
-        <p><strong>Monthly Price:</strong> €${monthlyPrice}</p>
-        <br/>
-        <h3>Customer Details</h3>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Phone:</strong> ${phone}</p>
-        <br/>
-        <h3>Message</h3>
-        <p>${message || "No additional message."}</p>
-      `
+      react: <LongTermInquiryEmail 
+        carName={carName}
+        duration={duration}
+        monthlyPrice={monthlyPrice}
+        customerName={name}
+        customerEmail={email}
+        customerPhone={phone}
+        message={message}
+        type="ADMIN"
+      />
     })
 
     // Send confirmation to user
@@ -62,13 +59,16 @@ export async function submitLongTermInquiry(formData: FormData) {
       from: fromEmail,
       to: [email],
       subject: `Inquiry Received: ${carName}`,
-      html: `
-        <h2>Thank you for your inquiry, ${name}!</h2>
-        <p>We have received your request for the <strong>${carName}</strong>.</p>
-        <p>Our team will review your request and get back to you shortly regarding availability and next steps.</p>
-        <br/>
-        <p>Best regards,<br/>JustRent Team</p>
-      `
+      react: <LongTermInquiryEmail 
+        carName={carName}
+        duration={duration}
+        monthlyPrice={monthlyPrice}
+        customerName={name}
+        customerEmail={email}
+        customerPhone={phone}
+        message={message}
+        type="CUSTOMER"
+      />
     })
 
     return { success: true }
