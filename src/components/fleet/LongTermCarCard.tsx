@@ -201,14 +201,7 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
         </div>
       </DialogTrigger>
 
-      <DialogContent className="max-w-3xl w-[95vw] md:w-full p-0 overflow-hidden bg-white max-h-[90vh] flex flex-col md:block">
-        <div className="absolute right-4 top-4 z-50">
-            <DialogTrigger asChild>
-                <Button variant="ghost" size="icon" className="bg-black/10 hover:bg-black/20 text-black rounded-full backdrop-blur-sm">
-                    <X className="w-4 h-4" />
-                </Button>
-            </DialogTrigger>
-        </div>
+      <DialogContent className="max-w-3xl w-[95vw] md:w-full p-0 overflow-hidden bg-white max-h-[90vh] flex flex-col md:block rounded-2xl md:rounded-3xl border-none shadow-2xl">
         <div className="grid md:grid-cols-2 h-full overflow-y-auto md:overflow-visible">
            {/* Left: Image & Specs */}
            <div className="bg-zinc-100 p-6 md:p-8 flex flex-col shrink-0">

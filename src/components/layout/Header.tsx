@@ -234,7 +234,7 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
                   </Button>
                 </div>
                 
-                <div className="flex-1 overflow-y-auto px-6 py-8 flex flex-col justify-between">
+                <div className="flex-1 overflow-y-auto px-6 py-8 flex flex-col justify-between pb-24">
                   <nav className="flex flex-col gap-6">
                     {[
                       { href: "/", label: t('home') },
