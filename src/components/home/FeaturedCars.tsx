@@ -85,7 +85,11 @@ export function FeaturedCars({ cars }: FeaturedCarsProps) {
             key={car.id} 
             className="snap-center shrink-0 w-[85vw] md:w-[60vw] lg:w-[40vw] xl:w-[30vw] relative group"
           >
-             <Link href={`/fleet?category=${car.categories?.[0]?.name}`} className="block h-full">
+             {/* Use category name for filtering, fallback to make if no category */}
+             <Link 
+                href={`/fleet?category=${encodeURIComponent(car.categories?.[0]?.name || "")}`} 
+                className="block h-full"
+             >
                 <div className="bg-[#f3f4f6] rounded-[2.5rem] p-8 h-full border border-zinc-100 shadow-lg transition-all duration-500 group-hover:shadow-2xl group-hover:-translate-y-2 relative overflow-hidden flex flex-col">
                     
                     {/* Badge */}

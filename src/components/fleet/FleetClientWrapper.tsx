@@ -106,8 +106,12 @@ export function FleetClientWrapper({ cars, dictionary, options }: FleetClientWra
     return cars.filter(car => {
       // Category
       if (filters.categories.length > 0) {
-        const carCats = car.categories.map((c: any) => c.name)
-        if (!filters.categories.some(c => carCats.includes(c))) return false
+        // Filter out empty strings from filters (caused by missing category in link)
+        const activeCategories = filters.categories.filter(c => c && c !== "undefined" && c !== "null")
+        if (activeCategories.length > 0) {
+           const carCats = car.categories.map((c: any) => c.name)
+           if (!activeCategories.some(c => carCats.includes(c))) return false
+        }
       }
 
       // Transmission
