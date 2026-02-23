@@ -1,6 +1,7 @@
 "use server"
 
 import { Resend } from 'resend'
+import { ContactEmail } from '@/components/emails/ContactEmail'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -38,18 +39,14 @@ export async function submitContactForm(formData: FormData) {
       to: [adminEmail],
       subject: `New Contact Message: ${subject}`,
       replyTo: email,
-      html: `
-        <h2>New Contact Message</h2>
-        <p><strong>Subject:</strong> ${subject}</p>
-        <br/>
-        <h3>Customer Details</h3>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Phone:</strong> ${phone || "Not provided"}</p>
-        <br/>
-        <h3>Message</h3>
-        <p style="white-space: pre-wrap;">${message}</p>
-      `
+      react: <ContactEmail 
+        name={name}
+        email={email}
+        phone={phone}
+        subject={subject}
+        message={message}
+        type="ADMIN"
+      />
     })
 
     // Send confirmation to user
@@ -57,13 +54,14 @@ export async function submitContactForm(formData: FormData) {
       from: fromEmail,
       to: [email],
       subject: `We received your message: ${subject}`,
-      html: `
-        <h2>Thank you for contacting us, ${name}!</h2>
-        <p>We have received your message regarding "<strong>${subject}</strong>".</p>
-        <p>Our team will review your inquiry and get back to you as soon as possible (usually within 24 hours).</p>
-        <br/>
-        <p>Best regards,<br/>JustRent Team</p>
-      `
+      react: <ContactEmail 
+        name={name}
+        email={email}
+        phone={phone}
+        subject={subject}
+        message={message}
+        type="CUSTOMER"
+      />
     })
 
     return { success: true }
