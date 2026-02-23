@@ -50,11 +50,22 @@ async function uploadImage(file: File): Promise<string | null> {
 }
 
 export async function createLongTermCar(formData: FormData) {
-  const make = formData.get("make") as string
-  const model = formData.get("model") as string
+  let make = formData.get("make") as string
+  if (make === "Other") {
+    make = formData.get("customMake") as string
+  }
+
+  let model = formData.get("model") as string
+  if (model === "Other") {
+    model = formData.get("customModel") as string
+  }
+
   const year = parseInt(formData.get("year") as string)
   let imageUrl = formData.get("imageUrl") as string
   const monthlyPrice = parseFloat(formData.get("monthlyPrice") as string)
+  const price1to3 = parseFloat(formData.get("price1to3") as string) || 0
+  const price4to6 = parseFloat(formData.get("price4to6") as string) || 0
+  const price7plus = parseFloat(formData.get("price7plus") as string) || 0
   const deposit = parseFloat(formData.get("deposit") as string)
   const description = formData.get("description") as string
   const transmission = formData.get("transmission") as Transmission
@@ -83,6 +94,9 @@ export async function createLongTermCar(formData: FormData) {
         year,
         imageUrl,
         monthlyPrice,
+        price1to3,
+        price4to6,
+        price7plus,
         deposit: deposit || 0,
         description,
         transmission: transmission || "MANUAL",
@@ -102,11 +116,22 @@ export async function createLongTermCar(formData: FormData) {
 }
 
 export async function updateLongTermCar(id: string, formData: FormData) {
-  const make = formData.get("make") as string
-  const model = formData.get("model") as string
+  let make = formData.get("make") as string
+  if (make === "Other") {
+    make = formData.get("customMake") as string
+  }
+
+  let model = formData.get("model") as string
+  if (model === "Other") {
+    model = formData.get("customModel") as string
+  }
+
   const year = parseInt(formData.get("year") as string)
   let imageUrl = formData.get("imageUrl") as string
   const monthlyPrice = parseFloat(formData.get("monthlyPrice") as string)
+  const price1to3 = parseFloat(formData.get("price1to3") as string) || 0
+  const price4to6 = parseFloat(formData.get("price4to6") as string) || 0
+  const price7plus = parseFloat(formData.get("price7plus") as string) || 0
   const deposit = parseFloat(formData.get("deposit") as string)
   const description = formData.get("description") as string
   const transmission = formData.get("transmission") as Transmission
@@ -132,6 +157,9 @@ export async function updateLongTermCar(id: string, formData: FormData) {
         year,
         imageUrl,
         monthlyPrice,
+        price1to3,
+        price4to6,
+        price7plus,
         deposit,
         description,
         transmission,

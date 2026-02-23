@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -27,9 +27,24 @@ export function LongTermCarForm({ car, isEditing = false }: LongTermCarFormProps
   
   // State
   const [selectedMake, setSelectedMake] = useState(car?.make || "")
+  const [selectedModel, setSelectedModel] = useState<string>(() => {
+    if (!car?.model) return ""
+    // If make is not selected or not in known makes, default to car.model (which might be custom)
+    // But here we want to determine if the dropdown value should be "Other"
+    const makeModels = CAR_MODELS[car?.make]
+    if (makeModels && !makeModels.includes(car.model)) return "Other"
+    return car.model || ""
+  })
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>(car?.features || [])
   const [imagePreview, setImagePreview] = useState<string | null>(car?.imageUrl || null)
   const formRef = useRef<HTMLFormElement>(null)
+
+  // Reset model when make changes
+  useEffect(() => {
+     if (selectedMake !== car?.make) {
+        setSelectedModel("")
+     }
+  }, [selectedMake, car?.make])
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -114,7 +129,12 @@ export function LongTermCarForm({ car, isEditing = false }: LongTermCarFormProps
                 <div className="space-y-2">
                   <Label>Model</Label>
                   {selectedMake && CAR_MODELS[selectedMake] ? (
-                     <Select name="model" defaultValue={car?.model}>
+                     <>
+                     <Select 
+                        name="model" 
+                        value={selectedModel} 
+                        onValueChange={setSelectedModel}
+                     >
                         <SelectTrigger>
                            <SelectValue placeholder="Select Model" />
                         </SelectTrigger>
@@ -125,6 +145,16 @@ export function LongTermCarForm({ car, isEditing = false }: LongTermCarFormProps
                            <SelectItem value="Other">Other</SelectItem>
                         </SelectContent>
                      </Select>
+                     {selectedModel === "Other" && (
+                        <Input 
+                            name="customModel" 
+                            placeholder="Enter custom model" 
+                            className="mt-2" 
+                            defaultValue={car?.model && !CAR_MODELS[selectedMake]?.includes(car.model) ? car.model : ""}
+                            required
+                        />
+                     )}
+                     </>
                   ) : (
                      <Input name="model" placeholder="Model Name" defaultValue={car?.model} required />
                   )}
@@ -218,7 +248,7 @@ export function LongTermCarForm({ car, isEditing = false }: LongTermCarFormProps
                 
                 <div className="space-y-4">
                    <div className="space-y-2">
-                      <Label>Monthly Price (€)</Label>
+                      <Label>Monthly Price (€) (Base)</Label>
                       <div className="relative">
                          <span className="absolute left-3 top-2.5 text-zinc-500">€</span>
                          <Input 
@@ -231,11 +261,58 @@ export function LongTermCarForm({ car, isEditing = false }: LongTermCarFormProps
                             required 
                          />
                       </div>
-                      <p className="text-xs text-zinc-500">Price per month excluding VAT if applicable.</p>
+                      <p className="text-xs text-zinc-500">Base price for reference</p>
+                   </div>
+
+                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-zinc-50 rounded-lg border">
+                      <div className="space-y-2">
+                         <Label className="text-sm">Price 1-3 Months (€)</Label>
+                         <div className="relative">
+                            <span className="absolute left-3 top-2.5 text-zinc-500">€</span>
+                            <Input 
+                               name="price1to3" 
+                               type="number" 
+                               step="0.01" 
+                               className="pl-8" 
+                               placeholder="0.00" 
+                               defaultValue={car?.price1to3?.toString() || "0"}
+                            />
+                         </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                         <Label className="text-sm">Price 4-6 Months (€)</Label>
+                         <div className="relative">
+                            <span className="absolute left-3 top-2.5 text-zinc-500">€</span>
+                            <Input 
+                               name="price4to6" 
+                               type="number" 
+                               step="0.01" 
+                               className="pl-8" 
+                               placeholder="0.00" 
+                               defaultValue={car?.price4to6?.toString() || "0"}
+                            />
+                         </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                         <Label className="text-sm">Price 7-12 Months (€)</Label>
+                         <div className="relative">
+                            <span className="absolute left-3 top-2.5 text-zinc-500">€</span>
+                            <Input 
+                               name="price7plus" 
+                               type="number" 
+                               step="0.01" 
+                               className="pl-8" 
+                               placeholder="0.00" 
+                               defaultValue={car?.price7plus?.toString() || "0"}
+                            />
+                         </div>
+                      </div>
                    </div>
 
                    <div className="space-y-2">
-                      <Label>Deposit (€)</Label>
+                      <Label>Security Deposit (€)</Label>
                       <div className="relative">
                          <span className="absolute left-3 top-2.5 text-zinc-500">€</span>
                          <Input 

@@ -43,8 +43,18 @@ export default async function LongTermRentalsPage() {
         {/* Grid */}
         {cars.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-               {cars.map(car => (
-                  <LongTermCarCard key={car.id} car={car} />
+               {cars.map((car: any) => (
+                  <LongTermCarCard 
+                    key={car.id} 
+                    car={{
+                      ...car,
+                      monthlyPrice: Number(car.monthlyPrice),
+                      price1to3: Number(car.price1to3),
+                      price4to6: Number(car.price4to6),
+                      price7plus: Number(car.price7plus),
+                      deposit: Number(car.deposit),
+                    }} 
+                  />
                ))}
             </div>
         ) : (

@@ -81,7 +81,10 @@ model LongTermCar {
   model           String
   year            Int
   imageUrl        String?
-  monthlyPrice    Decimal
+  monthlyPrice    Decimal      // Keeping for backward compatibility or as base/1-3 month price
+  price1to3       Decimal      @default(0)
+  price4to6       Decimal      @default(0)
+  price7plus      Decimal      @default(0)
   deposit         Decimal      @default(0)
   description     String?
   features        String[]

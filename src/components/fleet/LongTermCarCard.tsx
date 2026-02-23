@@ -1,6 +1,7 @@
 
 "use client"
 
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Users, Gauge, Fuel, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -14,6 +15,9 @@ interface LongTermCar {
   year: number
   imageUrl: string | null
   monthlyPrice: any
+  price1to3: any
+  price4to6: any
+  price7plus: any
   deposit: any
   transmission: string
   fuelType: string
@@ -23,11 +27,31 @@ interface LongTermCar {
 }
 
 export function LongTermCarCard({ car }: { car: LongTermCar }) {
+  const [duration, setDuration] = useState(12)
+  const [currentPrice, setCurrentPrice] = useState(Number(car.monthlyPrice))
+
+  useEffect(() => {
+    let price = Number(car.monthlyPrice)
+    
+    if (duration >= 1 && duration <= 3) {
+      const p = Number(car.price1to3)
+      if (p > 0) price = p
+    } else if (duration >= 4 && duration <= 6) {
+      const p = Number(car.price4to6)
+      if (p > 0) price = p
+    } else if (duration >= 7) {
+      const p = Number(car.price7plus)
+      if (p > 0) price = p
+    }
+    
+    setCurrentPrice(price)
+  }, [duration, car])
+
   return (
-    <div className="group relative bg-white border border-zinc-200 rounded-3xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+    <div className="group relative bg-white border border-zinc-200 rounded-3xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full">
       
       {/* Image */}
-      <div className="relative h-56 bg-zinc-100 flex items-center justify-center p-4">
+      <div className="relative h-56 bg-zinc-100 flex items-center justify-center p-4 shrink-0">
         {car.imageUrl ? (
           <Image 
             src={car.imageUrl} 
@@ -47,7 +71,7 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
         </div>
       </div>
 
-      <div className="p-6 flex flex-col h-[calc(100%-14rem)]">
+      <div className="p-6 flex flex-col flex-grow">
         {/* Header */}
         <div className="mb-4">
           <h3 className="text-2xl font-black text-zinc-900 tracking-tight leading-none mb-1">
@@ -89,22 +113,45 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
             </div>
         )}
 
-        <div className="mt-auto pt-6 border-t border-zinc-100 flex items-end justify-between">
-           <div>
-              <div className="flex items-baseline gap-1">
-                 <span className="text-3xl font-black text-red-600 tracking-tighter">€{Number(car.monthlyPrice)}</span>
-                 <span className="text-sm text-zinc-500 font-bold">/ month</span>
+        <div className="mt-auto space-y-6">
+           {/* Duration Slider */}
+           <div className="space-y-3 bg-zinc-50 p-4 rounded-xl border border-zinc-100">
+              <div className="flex justify-between items-center">
+                 <span className="text-xs font-bold uppercase text-zinc-500 tracking-wider">Rental Duration</span>
+                 <span className="text-sm font-black text-zinc-900">{duration} Months</span>
               </div>
-              <div className="text-xs text-zinc-400 font-medium mt-1">
-                 Deposit: €{Number(car.deposit)}
+              <input 
+                 type="range" 
+                 min="1" 
+                 max="12" 
+                 value={duration} 
+                 onChange={(e) => setDuration(parseInt(e.target.value))}
+                 className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-red-600"
+              />
+              <div className="flex justify-between text-[10px] text-zinc-400 font-medium uppercase tracking-wider">
+                 <span>1 Mo</span>
+                 <span>6 Mo</span>
+                 <span>12+ Mo</span>
               </div>
            </div>
-           
-           <Link href="/contact">
-             <Button className="bg-black hover:bg-zinc-800 text-white font-bold rounded-xl px-6">
-                Inquire
-             </Button>
-           </Link>
+
+           <div className="pt-4 border-t border-zinc-100 flex items-end justify-between">
+              <div>
+                 <div className="flex items-baseline gap-1">
+                    <span className="text-3xl font-black text-red-600 tracking-tighter">€{currentPrice}</span>
+                    <span className="text-sm text-zinc-500 font-bold">/ month</span>
+                 </div>
+                 <div className="text-xs text-zinc-400 font-medium mt-1">
+                    Deposit: €{Number(car.deposit)}
+                 </div>
+              </div>
+              
+              <Link href="/contact">
+                <Button className="bg-black hover:bg-zinc-800 text-white font-bold rounded-xl px-6">
+                   Inquire
+                </Button>
+              </Link>
+           </div>
         </div>
       </div>
     </div>
