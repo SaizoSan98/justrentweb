@@ -74,9 +74,9 @@ git reset --hard 3f78149
 **Commit Hash:** `189a4de`
 **Leírás:**
 - **Mobile UI Fixes:**
-  - `BookingEngine`: "Budapest Airport" felirat középre igazítva mobilon.
-  - `FleetDatePicker`: Mobil nézetben 1 hónap látható, lapozó gombokkal, dupla "X" eltávolítva.
-  - `FleetCard`: A "Security Deposit" szöveg nem csúszik össze a "Book Now" gombbal (flex layout javítás).
+-  `BookingEngine`: "Budapest Airport" felirat középre igazítva mobilon.
+-  `FleetDatePicker`: Mobil nézetben 1 hónap látható, lapozó gombokkal, dupla "X" eltávolítva.
+-  `FleetCard`: A "Security Deposit" szöveg nem csúszik össze a "Book Now" gombbal (flex layout javítás).
 - **Funkcionális Javítás:** Dátumváltáskor az időpont nem ugrik vissza 00:00-ra, hanem megmarad.
 - **Állapot:** Ez a végleges, átadásra kész verzió (FINAL).
 
@@ -109,6 +109,29 @@ git reset --hard 5e4e6fd
 **Visszaállítási Parancs:**
 ```bash
 git reset --hard 03eebe6
+```
+
+### 7. BRANDING & MOBILE UX OVERHAUL - 2026.02.23
+**Commit Hash:** `f01bc3f`
+**Tag:** `backup-mobile-ui-stable`
+**Leírás:**
+- **Email Design:**
+  - Új `LongTermInquiryEmail` és `ContactEmail` sablonok modern dizájnnal.
+  - Minden emailben frissítve a logó (piros háttér, kisbetűs "just").
+  - `onboarding@resend.dev` fallback eltávolítva, csak hitelesített címről küld.
+- **Mobile UX:**
+  - Teljesen újratervezett, sötét témájú mobil menü.
+  - "Long Term" menüpont hozzáadva.
+  - Reszponzív "Long Term" felugró ablak (teljes képernyős mobilon, lekerekített sarkok, javított bezárás gomb).
+  - Mobil menü alján a "Sign Up" gomb láthatósága javítva.
+- **Bugfix:**
+  - Főoldali "Featured Cars" linkek javítva (üres kategória szűrő kezelése), így a flotta oldal nem dob 0 találatot.
+
+**Visszaállítási Parancs:**
+```bash
+git reset --hard f01bc3f
+# VAGY
+git checkout backup-mobile-ui-stable
 ```
 
 *   [Hely a következő mentésnek...]
