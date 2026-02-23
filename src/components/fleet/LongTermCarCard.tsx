@@ -253,7 +253,7 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
            </div>
 
            {/* Right: Calculator & Form */}
-           <div className="p-6 md:p-8 flex flex-col h-full overflow-y-auto">
+           <div className="p-6 md:p-8 flex flex-col h-full overflow-y-auto min-h-0">
               <DialogHeader className="mb-6 pt-4 md:pt-0 shrink-0">
                  <DialogTitle className="text-2xl md:text-3xl font-black text-zinc-900 tracking-tight uppercase leading-none">
                     {car.make} <span className="text-red-600">{car.model}</span>
@@ -300,9 +300,9 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
                  </div>
               </div>
 
-              <div className="mt-auto pb-4 md:pb-0">
+              <div className="mt-auto pb-8 md:pb-4">
                  {showInquiryForm ? (
-                    <form onSubmit={handleInquirySubmit} className="space-y-4 bg-zinc-50 p-6 rounded-2xl border border-zinc-100 animate-in fade-in slide-in-from-bottom-4">
+                    <form onSubmit={handleInquirySubmit} className="space-y-4 bg-zinc-50 p-6 rounded-2xl border border-zinc-100">
                         <div className="flex justify-between items-center mb-2">
                             <h4 className="font-bold text-zinc-900">Send Inquiry</h4>
                             <Button type="button" variant="ghost" size="sm" onClick={() => setShowInquiryForm(false)} className="h-6 w-6 p-0">
