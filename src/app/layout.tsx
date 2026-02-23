@@ -17,9 +17,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "JUST RENT - Rent a Car",
   description: "Experience the thrill of driving the world's finest automobiles with JustRent.",
-  icons: {
-    icon: "/favicon.ico", // Ensure you have a favicon at this path
-  },
 };
 
 export default async function RootLayout({
