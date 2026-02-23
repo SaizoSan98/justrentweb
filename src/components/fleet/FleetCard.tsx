@@ -197,7 +197,7 @@ export function FleetCard({
         </div>
 
         {/* Image */}
-        <div className="relative w-full h-[220px] flex items-center justify-center my-4 overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-500" onClick={handleToggle}>
+        <div className="relative w-full h-[220px] flex items-center justify-center my-4 overflow-hidden cursor-pointer hover:scale-105 transition-transform duration-500 p-4" onClick={handleToggle}>
             
             {/* Brand Logo Overlay - Top of Image */}
             {getBrandLogo(car.make) && (

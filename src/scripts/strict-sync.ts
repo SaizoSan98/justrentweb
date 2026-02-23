@@ -315,6 +315,9 @@ export async function strictSync() {
             : Transmission.MANUAL;
 
         // Create/Update Car
+        // We handle imageUrl carefully:
+        // - On Create: Use Renteon image (car.ImageURL) if available
+        // - On Update: Do NOT touch imageUrl to preserve manual edits
         const dbCar = await prisma.car.upsert({
             where: { renteonId: car.Id.toString() },
             update: {
@@ -325,18 +328,8 @@ export async function strictSync() {
                 seats: category.PassengerCapacity || 5,
                 doors: category.NumberOfDoors || 5,
                 pricePerDay: pricePerDay,
-                unlimitedMileagePrice: unlimitedMileage ? 0 : 0, // Schema only has unlimitedMileagePrice (Decimal), no boolean flag. 
-                // If unlimited mileage is included (free), maybe set a flag? 
-                // Schema has 'unlimitedMileagePrice'. If unlimited is standard, price is 0?
-                // Or if it is an extra service with price?
-                // In Renteon raw dump for Maxi: "Unlimited mileage - PVAD" was an extra service with 15 EUR price.
-                // So unlimitedMileage boolean here means "is it available as an option?".
-                // We should store this info.
-                // Let's check schema again. Car has `unlimitedMileagePrice Decimal @default(0)`.
-                // It does NOT have a boolean `unlimitedMileage` flag.
-                // So we can set unlimitedMileagePrice to the price found in extras if any, or 0 if included.
-                // But wait, the extra was 5 EUR/day. 
-                // Let's just set it to 0 for now as we don't have a field for "isUnlimitedAvailable".
+                unlimitedMileagePrice: unlimitedMileage ? 0 : 0,
+                // We do NOT update imageUrl here to preserve manual edits
             },
             create: {
                 renteonId: car.Id.toString(),
@@ -349,9 +342,21 @@ export async function strictSync() {
                 doors: category.NumberOfDoors || 5,
                 pricePerDay: pricePerDay,
                 mileage: 0,
-                unlimitedMileagePrice: 0, 
+                unlimitedMileagePrice: 0,
+                imageUrl: car.ImageURL || null // Use Renteon image on creation
             }
         });
+        
+        // Special case for recently restored cars (where imageUrl might be null because previous sync missed it)
+        // If DB has null image, but Renteon has one, we update it.
+        if (!dbCar.imageUrl && car.ImageURL) {
+            await prisma.car.update({
+                where: { id: dbCar.id },
+                data: { imageUrl: car.ImageURL }
+            });
+            console.log(`  📸 Restored image for ${dbCar.make} ${dbCar.model}`);
+        }
+
         
         // Track stats
         if (dbCar.createdAt.getTime() === dbCar.updatedAt.getTime()) {

@@ -91,6 +91,7 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
               {[
                 { href: "/", label: t('home') },
                 { href: "/fleet", label: t('fleet') },
+                { href: "/long-term", label: "Long Term" },
                 { href: "/contact", label: t('contact') }
               ].map((link) => (
                 <Link 
