@@ -62,10 +62,15 @@ export async function createLongTermCar(formData: FormData) {
 
   const year = parseInt(formData.get("year") as string)
   let imageUrl = formData.get("imageUrl") as string
-  const monthlyPrice = parseFloat(formData.get("monthlyPrice") as string)
+  
+  // Calculate lowest price for monthlyPrice base
   const price1to3 = parseFloat(formData.get("price1to3") as string) || 0
   const price4to6 = parseFloat(formData.get("price4to6") as string) || 0
   const price7plus = parseFloat(formData.get("price7plus") as string) || 0
+  
+  const prices = [price1to3, price4to6, price7plus].filter(p => p > 0)
+  const monthlyPrice = prices.length > 0 ? Math.min(...prices) : (parseFloat(formData.get("monthlyPrice") as string) || 0)
+
   const deposit = parseFloat(formData.get("deposit") as string)
   const description = formData.get("description") as string
   const transmission = formData.get("transmission") as Transmission
@@ -82,8 +87,8 @@ export async function createLongTermCar(formData: FormData) {
   const featuresRaw = formData.get("features") as string
   const features = featuresRaw ? featuresRaw.split(",").map(f => f.trim()).filter(f => f !== "") : []
 
-  if (!make || !model || !year || !monthlyPrice) {
-    return { error: "Missing required fields" }
+  if (!make || !model || isNaN(year) || monthlyPrice === 0) {
+    return { error: "Missing required fields or valid price" }
   }
 
   try {
@@ -97,11 +102,11 @@ export async function createLongTermCar(formData: FormData) {
         price1to3,
         price4to6,
         price7plus,
-        deposit: deposit || 0,
+        deposit: isNaN(deposit) ? 0 : deposit,
         description,
         transmission: transmission || "MANUAL",
         fuelType: fuelType || "PETROL",
-        seats: seats || 5,
+        seats: isNaN(seats) ? 5 : seats,
         features,
         isAvailable: true
       }
@@ -128,10 +133,15 @@ export async function updateLongTermCar(id: string, formData: FormData) {
 
   const year = parseInt(formData.get("year") as string)
   let imageUrl = formData.get("imageUrl") as string
-  const monthlyPrice = parseFloat(formData.get("monthlyPrice") as string)
+  
+  // Calculate lowest price for monthlyPrice base
   const price1to3 = parseFloat(formData.get("price1to3") as string) || 0
   const price4to6 = parseFloat(formData.get("price4to6") as string) || 0
   const price7plus = parseFloat(formData.get("price7plus") as string) || 0
+  
+  const prices = [price1to3, price4to6, price7plus].filter(p => p > 0)
+  const monthlyPrice = prices.length > 0 ? Math.min(...prices) : (parseFloat(formData.get("monthlyPrice") as string) || 0)
+
   const deposit = parseFloat(formData.get("deposit") as string)
   const description = formData.get("description") as string
   const transmission = formData.get("transmission") as Transmission
@@ -148,6 +158,10 @@ export async function updateLongTermCar(id: string, formData: FormData) {
   const featuresRaw = formData.get("features") as string
   const features = featuresRaw ? featuresRaw.split(",").map(f => f.trim()).filter(f => f !== "") : []
 
+  if (!make || !model || isNaN(year) || monthlyPrice === 0) {
+    return { error: "Missing required fields or valid price" }
+  }
+
   try {
     await prisma.longTermCar.update({
       where: { id },
@@ -160,11 +174,11 @@ export async function updateLongTermCar(id: string, formData: FormData) {
         price1to3,
         price4to6,
         price7plus,
-        deposit,
+        deposit: isNaN(deposit) ? 0 : deposit,
         description,
-        transmission,
-        fuelType,
-        seats,
+        transmission: transmission || "MANUAL",
+        fuelType: fuelType || "PETROL",
+        seats: isNaN(seats) ? 5 : seats,
         features,
         isAvailable
       }

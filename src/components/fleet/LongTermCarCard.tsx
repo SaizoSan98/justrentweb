@@ -51,6 +51,15 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showInquiryForm, setShowInquiryForm] = useState(false)
 
+  // Calculate lowest price for "from" display
+  const prices = [
+      Number(car.price1to3), 
+      Number(car.price4to6), 
+      Number(car.price7plus)
+  ].filter(p => p > 0)
+  
+  const minPrice = prices.length > 0 ? Math.min(...prices) : Number(car.monthlyPrice)
+
   useEffect(() => {
     let price = Number(car.monthlyPrice)
     
@@ -179,7 +188,7 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
                <div>
                   <div className="flex items-baseline gap-1">
                      <span className="text-sm text-zinc-500 font-bold">from</span>
-                     <span className="text-3xl font-black text-red-600 tracking-tighter">€{Number(car.monthlyPrice)}</span>
+                     <span className="text-3xl font-black text-red-600 tracking-tighter">€{minPrice}</span>
                      <span className="text-sm text-zinc-500 font-bold">/ month</span>
                   </div>
                </div>

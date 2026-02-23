@@ -250,13 +250,13 @@ export function LongTermCarForm({ car, isEditing = false }: LongTermCarFormProps
                             name="monthlyPrice" 
                             type="number" 
                             step="0.01" 
-                            className="pl-8 text-lg font-bold" 
-                            placeholder="0.00" 
+                            className="pl-8 text-lg font-bold bg-zinc-50" 
+                            placeholder="Auto-calculated from tiers" 
                             defaultValue={car?.monthlyPrice?.toString()}
-                            required 
+                            readOnly
                          />
                       </div>
-                      <p className="text-xs text-zinc-500">Base price for reference</p>
+                      <p className="text-xs text-zinc-500">Automatically set to the lowest tier price.</p>
                    </div>
 
                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-zinc-50 rounded-lg border">

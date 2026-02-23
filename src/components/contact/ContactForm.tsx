@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label"
 import { Loader2, Send } from "lucide-react"
 import { toast } from "sonner"
 
+import { submitContactForm } from "@/app/actions/contact"
+
 export function ContactForm() {
   const searchParams = useSearchParams()
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -37,15 +39,19 @@ export function ContactForm() {
     e.preventDefault()
     setIsSubmitting(true)
     
-    // Simulate form submission for now
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    const formData = new FormData(e.currentTarget)
+    const result = await submitContactForm(formData)
     
-    toast.success("Message sent successfully! We will contact you shortly.")
+    if (result.success) {
+      toast.success("Message sent successfully! We will contact you shortly.")
+      // Optional: Reset form
+      // setSubject("")
+      // setMessage("")
+    } else {
+      toast.error(result.error || "Failed to send message. Please try again.")
+    }
+    
     setIsSubmitting(false)
-    
-    // Reset form (optional, maybe keep it filled?)
-    // setSubject("")
-    // setMessage("")
   }
 
   return (
@@ -58,23 +64,24 @@ export function ContactForm() {
       <div className="grid md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="name">Name</Label>
-          <Input id="name" placeholder="John Doe" required className="bg-zinc-50 border-zinc-200" />
+          <Input id="name" name="name" placeholder="John Doe" required className="bg-zinc-50 border-zinc-200" />
         </div>
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" placeholder="john@example.com" required className="bg-zinc-50 border-zinc-200" />
+          <Input id="email" name="email" type="email" placeholder="john@example.com" required className="bg-zinc-50 border-zinc-200" />
         </div>
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="phone">Phone</Label>
-        <Input id="phone" type="tel" placeholder="+36..." className="bg-zinc-50 border-zinc-200" required />
+        <Input id="phone" name="phone" type="tel" placeholder="+36..." className="bg-zinc-50 border-zinc-200" required />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="subject">Subject</Label>
         <Input 
           id="subject" 
+          name="subject"
           value={subject} 
           onChange={(e) => setSubject(e.target.value)} 
           placeholder="How can we help?" 
@@ -87,6 +94,7 @@ export function ContactForm() {
         <Label htmlFor="message">Message</Label>
         <Textarea 
           id="message" 
+          name="message"
           value={message} 
           onChange={(e) => setMessage(e.target.value)} 
           placeholder="Your message..." 
