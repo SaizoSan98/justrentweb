@@ -267,11 +267,10 @@ async function linkInsurancesToCars(
         // Fetch all plans fresh from DB (in case we just added new ones)
         const allPlans = await prisma.insurancePlan.findMany();
         const planMap = new Map<string, any>(); // Map RenteonID -> Plan
-        const planNameMap = new Map<string, any>(); // Map Name -> Plan
         
         for(const p of allPlans) {
             if (p.renteonId) planMap.set(p.renteonId, p);
-            planNameMap.set(p.name.toLowerCase(), p);
+            // We NO LONGER map by name to avoid fuzzy matching duplicates
         }
 
         for (const car of cars) {
@@ -289,36 +288,28 @@ async function linkInsurancesToCars(
             await prisma.carInsurance.deleteMany({
                 where: { carId: car.id }
             });
+            
+            // Track added plan IDs to prevent duplicates for this car
+            const addedPlanIds = new Set<string>();
 
             for (const service of services) {
-                // Find matching plan in DB
+                // Find matching plan in DB - STRICTLY BY ID
                 let plan = null;
                 if (service.id) {
                     plan = planMap.get(service.id.toString());
                 }
-                if (!plan && service.name) {
-                    plan = planNameMap.get(service.name.toLowerCase());
-                }
-
-                if (plan) {
-                     await prisma.carInsurance.upsert({
-                        where: {
-                            carId_planId: {
-                                carId: car.id,
-                                planId: plan.id
-                            }
-                        },
-                        update: {
-                            deposit: service.deposit,
-                            pricePerDay: service.price
-                        },
-                        create: {
+                
+                // Only link if we found a plan AND haven't added it yet
+                if (plan && !addedPlanIds.has(plan.id)) {
+                     await prisma.carInsurance.create({
+                        data: {
                             carId: car.id,
                             planId: plan.id,
                             deposit: service.deposit,
                             pricePerDay: service.price
                         }
                     });
+                    addedPlanIds.add(plan.id);
                     linkedCount++;
                 }
             }

@@ -100,7 +100,16 @@ interface FleetDatePickerProps {
     }
 
     const adjustTime = (target: Date, source: Date | undefined) => {
-        if (!source) return setHours(setMinutes(target, 0), 10) // Default 10:00
+        if (!source) {
+             const now = new Date();
+             const isToday = target.toDateString() === now.toDateString();
+             if (isToday) {
+                 // If today, set to now + 3 hours
+                 return setHours(setMinutes(target, now.getMinutes()), now.getHours() + 3);
+             }
+             // Otherwise default to 10:00
+             return setHours(setMinutes(target, 0), 10);
+        }
         return setHours(setMinutes(target, source.getMinutes()), source.getHours())
     }
 
@@ -109,6 +118,51 @@ interface FleetDatePickerProps {
 
     setDate({ from: finalFrom, to: finalTo })
   }
+
+  const handleSelect = (range: any) => {
+      // Custom handler to preserve time
+      if (!range) {
+          setDate({ from: undefined, to: undefined })
+          return
+      }
+      
+      let newFrom = range.from;
+      let newTo = range.to;
+
+      // If we are selecting "from" date (and it wasn't set before or changed)
+      if (newFrom && (!date.from || newFrom.getTime() !== date.from.getTime())) {
+           const now = new Date();
+           const isToday = newFrom.toDateString() === now.toDateString();
+           
+           if (isToday) {
+               // Default to Now + 3h
+               newFrom = setHours(setMinutes(newFrom, now.getMinutes()), now.getHours() + 3);
+           } else if (date.from) {
+               // Keep existing time
+               newFrom = setHours(setMinutes(newFrom, date.from.getMinutes()), date.from.getHours());
+           } else {
+               // Default 10:00
+               newFrom = setHours(setMinutes(newFrom, 0), 10);
+           }
+      }
+
+      // If we are selecting "to" date
+      if (newTo && (!date.to || newTo.getTime() !== date.to.getTime())) {
+           if (date.to) {
+               // Keep existing time
+               newTo = setHours(setMinutes(newTo, date.to.getMinutes()), date.to.getHours());
+           } else if (newFrom) {
+               // Default to same time as From
+               newTo = setHours(setMinutes(newTo, newFrom.getMinutes()), newFrom.getHours());
+           } else {
+               // Default 10:00
+               newTo = setHours(setMinutes(newTo, 0), 10);
+           }
+      }
+
+      setDate({ from: newFrom, to: newTo })
+  }
+
 
   const Content = () => (
     <div className="flex flex-col">
@@ -154,7 +208,7 @@ interface FleetDatePickerProps {
             mode="range"
             defaultMonth={date.from || new Date()}
             selected={date}
-            onSelect={handleCalendarSelect}
+            onSelect={handleSelect}
             numberOfMonths={isMobile ? 1 : 2}
             orientation={isMobile ? "vertical" : "horizontal"}
             className="w-full border-0"
