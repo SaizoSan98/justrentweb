@@ -233,10 +233,6 @@ export function FleetCard({
                 <div className="text-sm font-bold text-zinc-400 mt-1">
                     €{Number(finalTotal.toFixed(1))} <span className="text-xs font-normal text-zinc-600">{dictionary.fleet.total?.toLowerCase()}</span>
                 </div>
-                <div className="text-[10px] font-bold text-zinc-500 mt-0.5 flex items-center gap-1">
-                    <Shield className="w-3 h-3 text-zinc-600" />
-                    {dictionary.fleet.deposit}: <span className="text-zinc-300">€{Number(currentDeposit.toFixed(1))}</span>
-                </div>
              </div>
              
              <Button 
@@ -361,7 +357,7 @@ export function FleetCard({
                                  </div>
                                  <div>
                                     <div className={cn("font-bold text-sm transition-colors", selectedInsuranceId === ins.planId ? "text-white" : "text-zinc-300")}>
-                                        {ins.plan.name?.replace(/ - (Mini|Midi|Maxi)/g, "")}
+                                        {ins.plan.name}
                                     </div>
                                     <div className="text-[11px] text-zinc-500 leading-tight mt-0.5">
                                         {ins.plan.description || dictionary.fleet.standard_protection}
@@ -475,7 +471,7 @@ export function FleetCard({
                         </div>
                         {selectedOption && (
                              <div className="flex justify-between">
-                                <span className="text-zinc-400">{dictionary.fleet.insurance} ({selectedOption.plan.name?.replace(/ - (Mini|Midi|Maxi)/g, "")})</span>
+                                <span className="text-zinc-400">{dictionary.fleet.insurance} ({selectedOption.plan.name})</span>
                                 <span className="font-bold text-zinc-200">+{Number(insuranceCost.toFixed(1))} €</span>
                             </div>
                         )}

@@ -331,7 +331,7 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                                         {selectedInsuranceId === ins.planId && <div className="w-2.5 h-2.5 rounded-full bg-black" />}
                                      </div>
                                      <div>
-                                        <div className="font-bold text-zinc-900">{ins.plan?.name?.replace(/ - (Mini|Midi|Maxi)/g, "")}</div>
+                                        <div className="font-bold text-zinc-900">{ins.plan?.name}</div>
                                         <div className="text-xs text-zinc-500">Deposit: {ins.deposit?.toLocaleString() ?? 0} €</div>
                                      </div>
                                   </div>
