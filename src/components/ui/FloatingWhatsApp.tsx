@@ -22,8 +22,8 @@ export function FloatingWhatsApp() {
             <MessageCircle size={24} />
             <span className="font-bold tracking-wide">WhatsApp</span>
 
-            {/* Optional ping animation to attract attention */}
-            <span className="absolute -z-10 h-full w-full animate-ping rounded-full bg-[#25D366] opacity-75"></span>
+            {/* Softer pulse animation */}
+            <span className="absolute -z-10 h-full w-full animate-pulse rounded-full bg-[#25D366] opacity-30"></span>
         </a>
     );
 }
