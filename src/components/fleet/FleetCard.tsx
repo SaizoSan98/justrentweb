@@ -412,23 +412,32 @@ export function FleetCard({
                             <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider bg-emerald-400/10 px-2 py-1 rounded">{dictionary.booking.included}</span>
                          </div>
 
-                         <div 
-                           // DISABLED: Unlimited Mileage Temporarily
-                           className={cn(
-                             "flex items-center justify-between p-4 rounded-xl border border-zinc-800/50 bg-zinc-900/20 opacity-40 cursor-not-allowed grayscale",
-                           )}
-                         >
-                            <div className="flex items-center gap-4">
-                               <div className="w-5 h-5 rounded-full border-2 border-zinc-700 flex items-center justify-center"></div>
-                               <div>
-                                  <div className="font-bold text-sm text-zinc-500 flex items-center gap-2">
-                                      {dictionary.fleet.unlimited} {dictionary.common.km}
-                                      <span className="bg-zinc-800 text-zinc-500 text-[8px] px-1.5 py-0.5 rounded uppercase tracking-wider font-bold">{dictionary.booking.coming_soon}</span>
-                                  </div>
-                               </div>
+                         {car.unlimitedMileagePrice && car.unlimitedMileagePrice > 0 && (
+                            <div
+                                onClick={() => setMileageOption('UNLIMITED')}
+                                className={cn(
+                                    "flex items-center justify-between p-4 rounded-xl border transition-all cursor-pointer group",
+                                    mileageOption === 'UNLIMITED'
+                                        ? "border-white bg-zinc-800 shadow-xl"
+                                        : "border-zinc-800 bg-zinc-900/50 hover:border-zinc-700 hover:bg-zinc-800/50"
+                                )}
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className={cn(
+                                        "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors",
+                                        mileageOption === 'UNLIMITED' ? "border-white" : "border-zinc-600 group-hover:border-zinc-500"
+                                    )}>
+                                        {mileageOption === 'UNLIMITED' && <div className="w-2.5 h-2.5 rounded-full bg-white" />}
+                                    </div>
+                                    <div>
+                                        <div className={cn("font-bold text-sm transition-colors", mileageOption === 'UNLIMITED' ? "text-white" : "text-zinc-300")}>
+                                            {dictionary.fleet.unlimited} {dictionary.common.km}
+                                        </div>
+                                    </div>
+                                </div>
+                                <span className="font-bold text-sm text-zinc-300">+{car.unlimitedMileagePrice} €</span>
                             </div>
-                            <span className="font-bold text-sm text-zinc-600">-- €</span>
-                         </div>
+                        )}
                     </div>
                  </div>
               </div>

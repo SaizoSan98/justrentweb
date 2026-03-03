@@ -133,6 +133,7 @@ export async function syncPrices() {
 
             if (res.ok) {
                 const data = await res.json();
+                console.log(JSON.stringify(data, null, 2));
                 if (data.Total) {
                     price = data.Total / 3; // Total for 3 days -> 1 day
                     success = true;
@@ -186,8 +187,8 @@ export async function syncPrices() {
 }
 
 // Allow running directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-    syncPrices()
-        .catch(console.error)
-        .finally(() => prisma.$disconnect());
-}
+// if (import.meta.url === `file://${process.argv[1]}`) {
+//     syncPrices()
+//         .catch(console.error)
+//         .finally(() => prisma.$disconnect());
+// }
