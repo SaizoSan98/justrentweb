@@ -14,7 +14,7 @@ export default async function ContactPage() {
   return (
     <div className="flex flex-col min-h-screen bg-white font-sans">
       <Header user={session?.user} dictionary={dictionary} lang={lang} />
-      
+
       <main className="flex-1 pt-32 pb-20">
         <div className="container mx-auto px-6">
           <div className="max-w-6xl mx-auto">
@@ -57,8 +57,8 @@ export default async function ContactPage() {
                     <div>
                       <h3 className="text-xl font-bold text-zinc-900 mb-2">{dictionary.contact.main_office}</h3>
                       <p className="text-zinc-500 leading-relaxed">
-                        2220 Vecsés,<br/>
-                        Dózsa György út 86.
+                        2220 Vecsés,<br />
+                        Lőrinci utca 130/a.
                       </p>
                     </div>
                   </div>
@@ -80,7 +80,7 @@ export default async function ContactPage() {
                       <span className="text-zinc-500">09:00 - 16:00</span>
                     </div>
                   </div>
-                  
+
                   <div className="mt-8 flex items-center gap-3 text-sm text-zinc-500 bg-white p-4 rounded-xl border border-zinc-100">
                     <Clock className="w-4 h-4 text-red-600" />
                     <span>{dictionary.contact.after_hours}</span>

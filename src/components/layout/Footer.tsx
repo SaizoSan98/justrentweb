@@ -63,7 +63,7 @@ export function Footer() {
             <ul className="space-y-6 text-zinc-400">
               <li className="flex items-start gap-4">
                 <MapPin className="w-6 h-6 text-red-600 shrink-0 mt-1" />
-                <span>2220 Vecsés, Dózsa György út 86.</span>
+                <span>2220 Vecsés, Lőrinci utca 130/a.</span>
               </li>
               <li className="flex items-center gap-4">
                 <Phone className="w-6 h-6 text-red-600 shrink-0" />
