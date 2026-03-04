@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import Image from "next/image"
 import { cn } from "@/lib/utils"
 
 interface PartnersStripProps {
@@ -11,10 +11,9 @@ export function PartnersStrip({ dictionary = {} }: PartnersStripProps) {
     const t = (key: string) => dictionary?.hero?.[key] || key;
 
     const partners = [
-        { name: "DiscoverCars", font: "font-serif tracking-tight" },
-        { name: "CarJet", font: "font-black tracking-tighter italic" },
-        { name: "EconomyCarRentals", font: "font-light tracking-widest uppercase text-sm" },
-        { name: "RentalCars.com", font: "font-bold tracking-tight lowercase" }
+        { name: "DiscoverCars", src: "/discovercars.png", width: 220, height: 65 },
+        { name: "CarJet", src: "/carjet.svg", width: 140, height: 50 },
+        { name: "EconomyCarRentals", src: "/economycar.png", width: 240, height: 75 }
     ];
 
     return (
@@ -29,18 +28,20 @@ export function PartnersStrip({ dictionary = {} }: PartnersStripProps) {
                     <div className="w-12 h-0.5 bg-red-600 mx-auto rounded-full" />
                 </div>
 
-                <div className="flex flex-wrap justify-center items-center gap-10 md:gap-20">
+                <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24 opacity-80">
                     {partners.map((partner, i) => (
                         <div
                             key={`${partner.name}-${i}`}
-                            className={cn(
-                                "opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500 cursor-default select-none group",
-                                partner.font
-                            )}
+                            className="relative grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-500 hover:scale-105 cursor-pointer filter mix-blend-multiply flex items-center justify-center shrink-0"
+                            style={{ width: partner.width, height: partner.height }}
                         >
-                            <span className="text-2xl md:text-3xl text-zinc-900 drop-shadow-sm group-hover:drop-shadow-md transition-all duration-500">
-                                {partner.name}
-                            </span>
+                            <Image
+                                src={partner.src}
+                                alt={`${partner.name} logo`}
+                                fill
+                                className="object-contain drop-shadow-sm"
+                                sizes="(max-width: 768px) 150px, 250px"
+                            />
                         </div>
                     ))}
                 </div>
