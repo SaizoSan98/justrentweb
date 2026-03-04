@@ -10,11 +10,23 @@ export const dictionaries = {
       signout: "Sign Out",
       profile: "My Profile"
     },
+    header: {
+      search_car: "Search Car",
+      dashboard: "Dashboard",
+      settings: "Settings",
+      log_out: "Log out",
+      log_in: "Log In",
+      sign_up: "Sign Up",
+      long_term: "Long Term",
+      new: "New"
+    },
     hero: {
       title: "Premium Car Rental",
       subtitle: "Experience the thrill of driving the world's finest automobiles.",
       cta: "View Fleet",
       pickup_return: "Pick-up & Return",
+      rental_dates: "Rental Dates",
+      airport_name: "Budapest Airport",
       pickup_date: "Pick-up Date",
       return_date: "Return Date",
       pick_date: "Pick a date",
@@ -37,7 +49,11 @@ export const dictionaries = {
       send_email: "Send an Email",
       privacy: "Privacy Policy",
       terms: "Terms of Service",
-      cookies: "Cookie Policy"
+      cookies: "Cookie Policy",
+      stats_cars: "Cars",
+      available_now: "Available Now",
+      total_distance: "Total Distance",
+      unlock_city: "Unlock the city with our elite fleet. Seamless digital booking, delivered to your door."
     },
     fleet: {
       title: "Our Fleet",
@@ -61,19 +77,26 @@ export const dictionaries = {
       excess: "Insurance Excess",
       bags: "Bags",
       guaranteed_model: "Guaranteed Model",
+      daily_rate: "/day",
       unlimited_mileage: "Unlimited Mileage",
-      unavailable: "UNAVAILABLE",
+      available: "Available",
+      unavailable: "Not Available",
+      available_vehicles: "Available Vehicles",
+      hide_filters: "Hide Filters",
+      no_vehicles: "No vehicles found",
+      try_adjusting: "Try adjusting your filters to see more results.",
+      select: "Select",
       featured: "Featured",
       or_similar_class: "or similar class",
       vehicle: "Vehicle",
-      select: "Select",
       booking_configuration: "Booking Configuration",
       standard_allowance: "Standard daily allowance",
       base_rental: "Base Rental",
       insurance: "Insurance",
       standard_protection: "Standard coverage protection",
       hide_breakdown: "Hide Breakdown",
-      total_for: "Total for"
+      total_for: "Total for",
+      seats_and_options: "Seats & Options"
     },
     booking: {
       customize_title: "Customize Your Booking",
@@ -158,7 +181,43 @@ export const dictionaries = {
       monday_friday: "Monday - Friday",
       saturday: "Saturday",
       sunday: "Sunday",
-      after_hours: "After-hours pickup available upon request."
+      after_hours: "24/7 support available for active rentals",
+      form: {
+        title: "Send us a message",
+        subtitle: "We usually respond within 24 hours.",
+        name: "Name",
+        email: "Email",
+        phone: "Phone",
+        subject: "Subject",
+        subject_placeholder: "How can we help?",
+        message: "Message",
+        message_placeholder: "Your message...",
+        send: "Send Message",
+        sending: "Sending...",
+        success: "Message sent successfully! We will contact you shortly.",
+        error: "Failed to send message. Please try again."
+      }
+    },
+    long_term: {
+      save: "Save",
+      cancel: "Cancel",
+      edit: "Edit",
+      delete: "Delete",
+      back: "Back",
+      clear_all: "Clear all",
+      next_step: "Next Step",
+      loading: "Loading...",
+      success: "Success",
+      error: "Error",
+      manual: "Manual",
+      automatic: "Automatic",
+      petrol: "Petrol",
+      diesel: "Diesel",
+      electric: "Electric",
+      hybrid: "Hybrid",
+      km: "km",
+      day: "day",
+      days: "days"
     },
     common: {
       save: "Save",
@@ -180,6 +239,44 @@ export const dictionaries = {
       km: "km",
       day: "day",
       days: "days"
+    },
+    featured: {
+      title_1: "FEATURED ",
+      title_2: "FLEET",
+      subtitle: "Hand-picked selection of our most exclusive vehicles.",
+      popular_choice: "Popular Choice",
+      or_similar: "OR SIMILAR",
+      vehicle: "Vehicle"
+    },
+    reviews: {
+      trusted_1: "TRUSTED BY ",
+      trusted_2: "MANY",
+      subtitle: "Don't just take our word for it. See what our customers say about their experience.",
+      rating: "5.0 / 5.0 Rating",
+      based_on: "Based on Google Reviews",
+      verified: "Verified Review"
+    },
+    featureGrid: {
+      explore_title: "Explore more to get your comfort zone",
+      explore_subtitle: "Book your perfect stay with us.",
+      booking_now: "Booking Now",
+      memory_title: "Beyond accommodation, creating memories of a lifetime",
+      vehicles_available: "Vehicles Available"
+    },
+    footer: {
+      description: "Experience the freedom of Budapest with our premium car rental service. Transparent pricing, instant booking, and a fleet that defines excellence.",
+      explore: "Explore",
+      support: "Support",
+      visit_us: "Visit Us",
+      our_fleet: "Our Fleet",
+      locations: "Locations",
+      about_us: "About Us",
+      help_center: "Help Center",
+      terms_of_service: "Terms of Service",
+      privacy_policy: "Privacy Policy",
+      contact_us: "Contact Us",
+      all_rights: "© 2026 JustRent Budapest. All rights reserved.",
+      created_by: "Created by:"
     }
   },
   he: {
@@ -193,11 +290,23 @@ export const dictionaries = {
       signout: "התנתק",
       profile: "הפרופיל שלי"
     },
+    header: {
+      search_car: "חפש רכב",
+      dashboard: "לוח בקרה",
+      settings: "הגדרות",
+      log_out: "התנתק",
+      log_in: "התחברות",
+      sign_up: "הרשמה",
+      long_term: "טווח ארוך",
+      new: "חדש"
+    },
     hero: {
       title: "השכרת רכב פרימיום",
       subtitle: "חוו את הריגוש בנהיגה ברכבים המשובחים בעולם.",
       cta: "צפה בצי הרכבים",
       pickup_return: "איסוף והחזרה",
+      rental_dates: "תאריכי השכרה",
+      airport_name: "נמל התעופה בודפשט",
       pickup_date: "תאריך איסוף",
       return_date: "תאריך החזרה",
       pick_date: "בחר תאריך",
@@ -220,7 +329,11 @@ export const dictionaries = {
       send_email: "שלח אימייל",
       privacy: "מדיניות פרטיות",
       terms: "תנאי שימוש",
-      cookies: "מדיניות עוגיות"
+      cookies: "מדיניות עוגיות",
+      stats_cars: "רכבים",
+      available_now: "זמין עכשיו",
+      total_distance: "מרחק כולל",
+      unlock_city: "פתחו את העיר עם צי הרכבים היוקרתי שלנו. הזמנה דיגיטלית חלקה, עד לדלת הבית."
     },
     fleet: {
       title: "הצי שלנו",
@@ -228,6 +341,8 @@ export const dictionaries = {
       filters: "סינון",
       price_per_day: "ליום",
       total: "סה״כ",
+      total_for: "סה״כ עבור",
+      hide_breakdown: "הסתר פירוט",
       book_now: "הזמן עכשיו",
       details: "פרטים",
       features: "מאפיינים",
@@ -244,19 +359,24 @@ export const dictionaries = {
       excess: "השתתפות עצמית",
       bags: "תיקים",
       guaranteed_model: "דגם מובטח",
+      daily_rate: "/יום",
       unlimited_mileage: "קילומטראז׳ ללא הגבלה",
+      available: "זמין",
       unavailable: "לא זמין",
+      available_vehicles: "רכבים זמינים",
+      hide_filters: "הסתר סינונים",
+      no_vehicles: "לא נמצאו רכבים",
+      try_adjusting: "נסה לשנות את הסינונים כדי לראות תוצאות נוספות.",
+      select: "בחר",
       featured: "מומלץ",
       or_similar_class: "או רכב דומה",
       vehicle: "רכב",
-      select: "בחר",
       booking_configuration: "הגדרות הזמנה",
       standard_allowance: "מכסה יומית סטנדרטית",
       base_rental: "השכרה בסיסית",
       insurance: "ביטוח",
       standard_protection: "כיסוי סטנדרטי",
-      hide_breakdown: "הסתר פירוט",
-      total_for: "סה״כ ל-"
+      seats_and_options: "מושבים ואפשרויות"
     },
     booking: {
       customize_title: "התאם את ההזמנה שלך",
@@ -341,7 +461,43 @@ export const dictionaries = {
       monday_friday: "שני - שישי",
       saturday: "שבת",
       sunday: "ראשון",
-      after_hours: "איסוף מחוץ לשעות הפעילות זמין לפי בקשה."
+      after_hours: "תמיכה 24/7 זמינה להשכרות פעילות",
+      form: {
+        title: "שלח לנו הודעה",
+        subtitle: "אנחנו בדרך כלל עונים תוך 24 שעות.",
+        name: "שם",
+        email: "אימייל",
+        phone: "טלפון",
+        subject: "נושא",
+        subject_placeholder: "איך נוכל לעזור?",
+        message: "הודעה",
+        message_placeholder: "ההודעה שלך...",
+        send: "שלח הודעה",
+        sending: "שולח...",
+        success: "ההודעה נשלחה בהצלחה! ניצור איתך קשר בהקדם.",
+        error: "שליחת ההודעה נכשלה. אנא נסה שנית."
+      }
+    },
+    long_term: {
+      save: "שמור",
+      cancel: "ביטול",
+      edit: "ערוך",
+      delete: "מחק",
+      back: "חזור",
+      clear_all: "נקה הכל",
+      next_step: "השלב הבא",
+      loading: "טוען...",
+      success: "הצלחה",
+      error: "שגיאה",
+      manual: "ידני",
+      automatic: "אוטומטי",
+      petrol: "בנזין",
+      diesel: "דיזל",
+      electric: "חשמלי",
+      hybrid: "היברידי",
+      km: "ק״מ",
+      day: "יום",
+      days: "ימים"
     },
     common: {
       save: "שמור",
@@ -363,6 +519,44 @@ export const dictionaries = {
       km: "ק״מ",
       day: "יום",
       days: "ימים"
+    },
+    featured: {
+      title_1: "צי רכבים ",
+      title_2: "נבחר",
+      subtitle: "מבחר קפדני של הרכבים היוקרתיים ביותר שלנו.",
+      popular_choice: "בחירה פופולרית",
+      or_similar: "או דומה",
+      vehicle: "רכב"
+    },
+    reviews: {
+      trusted_1: "מומלץ על ידי ",
+      trusted_2: "רבים",
+      subtitle: "אל תיקחו רק את המילה שלנו. ראו מה הלקוחות שלנו אומרים על החוויה שלהם.",
+      rating: "דירוג 5.0 / 5.0",
+      based_on: "מבוסס על ביקורות גוגל",
+      verified: "ביקורת מאומתת"
+    },
+    featureGrid: {
+      explore_title: "חקור עוד כדי להגיע לאזור הנוחות שלך",
+      explore_subtitle: "הזמן את החופשה המושלמת איתנו.",
+      booking_now: "הזמן עכשיו",
+      memory_title: "מעבר ללינה, יצירת זיכרונות לכל החיים",
+      vehicles_available: "רכבים זמינים"
+    },
+    footer: {
+      description: "חווה את החופש של בודפשט עם שירות השכרת הרכב הפרימיום שלנו. תמחור שקוף, הזמנה מיידית, וצי שמגדיר מצוינות.",
+      explore: "חקור",
+      support: "תמיכה",
+      visit_us: "בקר אותנו",
+      our_fleet: "הצי שלנו",
+      locations: "מיקומים",
+      about_us: "עלינו",
+      help_center: "מרכז תמיכה",
+      terms_of_service: "תנאי שירות",
+      privacy_policy: "מדיניות פרטיות",
+      contact_us: "צור קשר",
+      all_rights: "© 2026 JustRent Budapest. כל הזכויות שמורות.",
+      created_by: "נוצר על ידי:"
     }
   }
 }

@@ -90,7 +90,7 @@ export default async function ContactPage() {
 
               {/* Right Column: Form */}
               <div>
-                <ContactForm />
+                <ContactForm dictionary={dictionary} />
               </div>
             </div>
           </div>

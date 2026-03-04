@@ -11,10 +11,11 @@ import { toast } from "sonner"
 
 import { submitContactForm } from "@/app/actions/contact"
 
-export function ContactForm() {
+export function ContactForm({ dictionary }: { dictionary?: any }) {
   const searchParams = useSearchParams()
+  const t = (key: string) => dictionary?.contact?.form?.[key] || key;
   const [isSubmitting, setIsSubmitting] = useState(false)
-  
+
   // Form state
   const [subject, setSubject] = useState("")
   const [message, setMessage] = useState("")
@@ -23,10 +24,10 @@ export function ContactForm() {
     const carName = searchParams.get("carName")
     const duration = searchParams.get("duration")
     const price = searchParams.get("price")
-    
+
     if (carName) {
       setSubject(`Inquiry: ${carName}`)
-      
+
       if (duration && price) {
         setMessage(`I am interested in renting the ${carName} for ${duration} months at €${price}/month.\n\nPlease provide more information about availability and the next steps.`)
       } else {
@@ -38,67 +39,73 @@ export function ContactForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsSubmitting(true)
-    
+
     const formData = new FormData(e.currentTarget)
     const result = await submitContactForm(formData)
-    
+
     if (result.success) {
-      toast.success("Message sent successfully! We will contact you shortly.")
+      toast.success(t('success'))
       // Optional: Reset form
       // setSubject("")
       // setMessage("")
     } else {
-      toast.error(result.error || "Failed to send message. Please try again.")
+      toast.error(result.error || t('error'))
     }
-    
+
     setIsSubmitting(false)
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 bg-white p-8 rounded-[2.5rem] border border-zinc-100 shadow-xl shadow-zinc-900/5">
       <div className="space-y-2">
-        <h3 className="text-2xl font-bold text-zinc-900">Send us a message</h3>
-        <p className="text-zinc-500">We usually respond within 24 hours.</p>
+        <h3 className="text-2xl font-bold text-zinc-900">{t('title')}</h3>
+        <p className="text-zinc-500">{t('subtitle')}</p>
+      </div>
+
+      {/* Honeypot field - visually hidden to humans, attractive to bots */}
+      <div className="hidden" aria-hidden="true">
+        <Label htmlFor="lastName">Last Name</Label>
+        <Input id="lastName" name="lastName" tabIndex={-1} autoComplete="off" />
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="name">Name</Label>
+          <Label htmlFor="name">{t('name')}</Label>
           <Input id="name" name="name" placeholder="John Doe" required className="bg-zinc-50 border-zinc-200" />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">{t('email')}</Label>
           <Input id="email" name="email" type="email" placeholder="john@example.com" required className="bg-zinc-50 border-zinc-200" />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="phone">Phone</Label>
+        <Label htmlFor="phone">{t('phone')}</Label>
         <Input id="phone" name="phone" type="tel" placeholder="+36..." className="bg-zinc-50 border-zinc-200" required />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="subject">Subject</Label>
-        <Input 
-          id="subject" 
+        <Label htmlFor="subject">{t('subject')}</Label>
+        <Input
+          id="subject"
           name="subject"
-          value={subject} 
-          onChange={(e) => setSubject(e.target.value)} 
-          placeholder="How can we help?" 
-          required 
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+          placeholder={t('subject_placeholder')}
+          required
           className="bg-zinc-50 border-zinc-200"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="message">Message</Label>
-        <Textarea 
-          id="message" 
+        <Label htmlFor="message">{t('message')}</Label>
+        <Textarea
+          id="message"
           name="message"
-          value={message} 
-          onChange={(e) => setMessage(e.target.value)} 
-          placeholder="Your message..." 
-          required 
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder={t('message_placeholder')}
+          required
           className="min-h-[150px] bg-zinc-50 border-zinc-200"
         />
       </div>
@@ -107,12 +114,12 @@ export function ContactForm() {
         {isSubmitting ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Sending...
+            {t('sending')}
           </>
         ) : (
           <>
             <Send className="mr-2 h-4 w-4" />
-            Send Message
+            {t('send')}
           </>
         )}
       </Button>

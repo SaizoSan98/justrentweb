@@ -11,6 +11,14 @@ export async function submitContactForm(formData: FormData) {
   const phone = formData.get("phone") as string
   const subject = formData.get("subject") as string
   const message = formData.get("message") as string
+  const honeypot = formData.get("lastName") as string
+
+  // Spam protection: if the honeypot field is filled, it's a bot.
+  if (honeypot) {
+    console.log(`Honeypot triggered by potentially malicious bot submission. Subject: ${subject}`)
+    // Return early but simulate success to trick the bot
+    return { success: true }
+  }
 
   if (!name || !email || !message) {
     return { error: "Please fill in all required fields" }
@@ -22,8 +30,8 @@ export async function submitContactForm(formData: FormData) {
       console.warn("RESEND_API_KEY is missing")
       // In dev mode, simulate success if key is missing
       if (process.env.NODE_ENV === 'development') {
-          console.log("Dev mode (no key): Simulated email sending success")
-          return { success: true }
+        console.log("Dev mode (no key): Simulated email sending success")
+        return { success: true }
       }
       return { error: "Server configuration error (missing email key)" }
     }
@@ -39,7 +47,7 @@ export async function submitContactForm(formData: FormData) {
       to: [adminEmail],
       subject: `New Contact Message: ${subject}`,
       replyTo: email,
-      react: <ContactEmail 
+      react: <ContactEmail
         name={name}
         email={email}
         phone={phone}
@@ -54,7 +62,7 @@ export async function submitContactForm(formData: FormData) {
       from: fromEmail,
       to: [email],
       subject: `We received your message: ${subject}`,
-      react: <ContactEmail 
+      react: <ContactEmail
         name={name}
         email={email}
         phone={phone}
@@ -69,7 +77,7 @@ export async function submitContactForm(formData: FormData) {
     console.error("Failed to send contact email:", error)
     // Return the actual error in dev mode for debugging
     if (process.env.NODE_ENV === 'development') {
-        return { error: `Dev Error: ${(error as Error).message}` }
+      return { error: `Dev Error: ${(error as Error).message}` }
     }
     return { error: "Failed to send message. Please try again later." }
   }

@@ -44,11 +44,11 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
-  
+
   const handleSearch = (e?: React.FormEvent) => {
     e?.preventDefault()
     if (searchQuery.trim()) {
-        router.push(`/fleet?make=${encodeURIComponent(searchQuery.trim())}`)
+      router.push(`/fleet?make=${encodeURIComponent(searchQuery.trim())}`)
     }
   }
 
@@ -68,22 +68,22 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
 
   // Always white text on transparent, black on white background
   // Floating pill style logic
-  const isFloating = true; 
-  
+  const isFloating = true;
+
   return (
     <div className="fixed top-0 left-0 right-0 z-50 flex justify-center w-full pointer-events-none">
       <header className={cn(
         "pointer-events-auto transition-all duration-300 ease-in-out w-full",
         (isScrolled || !transparent)
-          ? "bg-white/95 backdrop-blur-md border-b border-zinc-200/50 py-3 shadow-sm text-zinc-900" 
+          ? "bg-white/95 backdrop-blur-md border-b border-zinc-200/50 py-3 shadow-sm text-zinc-900"
           : "bg-transparent py-6 text-white"
       )}>
         <div className="container mx-auto px-6 flex items-center justify-between">
-          
+
           <div className="flex items-center gap-12">
             {/* Logo */}
             <Link href="/" className="flex items-center group">
-               {(isScrolled || !transparent) ? <Logo variant="dark" /> : <Logo variant="light" />}
+              {(isScrolled || !transparent) ? <Logo variant="dark" /> : <Logo variant="light" />}
             </Link>
 
             {/* Desktop Nav */}
@@ -91,12 +91,12 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
               {[
                 { href: "/", label: t('home') },
                 { href: "/fleet", label: t('fleet') },
-                { href: "/long-term", label: "Long Term" },
+                { href: "/long-term", label: t('long_term', 'header') },
                 { href: "/contact", label: t('contact') }
               ].map((link) => (
-                <Link 
+                <Link
                   key={link.href}
-                  href={link.href} 
+                  href={link.href}
                   className={cn(
                     "text-sm font-bold uppercase tracking-wide transition-colors hover:opacity-80",
                     (isScrolled || !transparent) ? "text-zinc-800 hover:text-black" : "text-white/90 hover:text-white"
@@ -112,26 +112,26 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
           <div className={cn(
             "hidden lg:flex flex-1 max-w-md mx-12 items-center px-4 py-2.5 rounded-full transition-all duration-300",
             (isScrolled || !transparent)
-              ? "bg-zinc-100 border border-zinc-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-zinc-900 focus-within:border-transparent" 
+              ? "bg-zinc-100 border border-zinc-200 focus-within:bg-white focus-within:ring-2 focus-within:ring-zinc-900 focus-within:border-transparent"
               : "bg-white/10 backdrop-blur-md border border-white/20 focus-within:bg-white/20"
           )}>
             <form onSubmit={handleSearch} className="flex-1 flex items-center w-full">
-                <input 
-                  type="text" 
-                  placeholder="Search Car" 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className={cn(
-                    "flex-1 bg-transparent border-none outline-none text-sm placeholder:text-zinc-400 w-full",
-                    (isScrolled || !transparent) ? "text-zinc-900 placeholder:text-zinc-500" : "text-white placeholder:text-white/60"
-                  )}
-                />
-                <button type="submit" className={cn(
-                   "ml-2",
-                   (isScrolled || !transparent) ? "text-zinc-500 hover:text-zinc-900" : "text-white/60 hover:text-white"
-                )}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                </button>
+              <input
+                type="text"
+                placeholder={t('search_car', 'header')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={cn(
+                  "flex-1 bg-transparent border-none outline-none text-sm placeholder:text-zinc-400 w-full",
+                  (isScrolled || !transparent) ? "text-zinc-900 placeholder:text-zinc-500" : "text-white placeholder:text-white/60"
+                )}
+              />
+              <button type="submit" className={cn(
+                "ml-2",
+                (isScrolled || !transparent) ? "text-zinc-500 hover:text-zinc-900" : "text-white/60 hover:text-white"
+              )}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+              </button>
             </form>
           </div>
 
@@ -139,8 +139,8 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
           <div className="flex items-center gap-4">
             {/* Language Selector */}
             <div className="hidden sm:block">
-              <LanguageSwitcher 
-                currentLang={lang} 
+              <LanguageSwitcher
+                currentLang={lang}
                 variant={(isScrolled || !transparent) ? 'dark' : 'light'}
               />
             </div>
@@ -151,10 +151,10 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className={cn(
-                        "rounded-full w-10 h-10 p-0 hover:scale-105 transition-all cursor-pointer",
-                        (isScrolled || !transparent) ? "bg-zinc-900 text-white hover:bg-zinc-800" : "bg-white text-zinc-900 hover:bg-white/90"
+                      "rounded-full w-10 h-10 p-0 hover:scale-105 transition-all cursor-pointer",
+                      (isScrolled || !transparent) ? "bg-zinc-900 text-white hover:bg-zinc-800" : "bg-white text-zinc-900 hover:bg-white/90"
                     )}>
-                       <span className="text-xs font-bold">{getInitials(user.name)}</span>
+                      <span className="text-xs font-bold">{getInitials(user.name)}</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56 mt-2 rounded-2xl p-2 bg-white/90 backdrop-blur-xl border border-white/20 shadow-2xl">
@@ -168,13 +168,13 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
                     <Link href={user.role === 'ADMIN' ? "/admin" : "/dashboard"}>
                       <DropdownMenuItem className="cursor-pointer rounded-xl focus:bg-zinc-100 p-3">
                         <LayoutDashboard className="w-4 h-4 mr-2" />
-                        <span>Dashboard</span>
+                        <span>{t('dashboard', 'header')}</span>
                       </DropdownMenuItem>
                     </Link>
                     <Link href="/dashboard/profile">
                       <DropdownMenuItem className="cursor-pointer rounded-xl focus:bg-zinc-100 p-3">
                         <Settings className="w-4 h-4 mr-2" />
-                        <span>Settings</span>
+                        <span>{t('settings', 'header')}</span>
                       </DropdownMenuItem>
                     </Link>
                     <DropdownMenuSeparator className="bg-zinc-100" />
@@ -182,7 +182,7 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
                       <button type="submit" className="w-full">
                         <DropdownMenuItem className="cursor-pointer rounded-xl focus:bg-red-50 text-red-600 focus:text-red-700 p-3">
                           <LogOut className="w-4 h-4 mr-2" />
-                          <span>Log out</span>
+                          <span>{t('log_out', 'header')}</span>
                         </DropdownMenuItem>
                       </button>
                     </form>
@@ -191,23 +191,23 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
               </div>
             ) : (
               <div className="flex items-center gap-2 sm:gap-4">
-                <AuthModal 
+                <AuthModal
                   trigger={
                     <button className={cn(
-                        "text-sm font-bold transition-colors hover:opacity-80",
-                        (isScrolled || !transparent) ? "text-zinc-900" : "text-white"
+                      "text-sm font-bold transition-colors hover:opacity-80",
+                      (isScrolled || !transparent) ? "text-zinc-900" : "text-white"
                     )}>
-                      Log In
+                      {t('log_in', 'header')}
                     </button>
                   }
                 />
-                <AuthModal 
+                <AuthModal
                   trigger={
                     <Button className={cn(
-                        "rounded-lg px-4 sm:px-6 font-bold shadow-sm hover:shadow-md hover:scale-105 transition-all text-xs sm:text-sm h-9 sm:h-10",
-                        (isScrolled || !transparent) ? "bg-zinc-900 text-white hover:bg-zinc-800" : "bg-white text-zinc-900 hover:bg-white/90"
+                      "rounded-lg px-4 sm:px-6 font-bold shadow-sm hover:shadow-md hover:scale-105 transition-all text-xs sm:text-sm h-9 sm:h-10",
+                      (isScrolled || !transparent) ? "bg-zinc-900 text-white hover:bg-zinc-800" : "bg-white text-zinc-900 hover:bg-white/90"
                     )}>
-                      Sign Up
+                      {t('sign_up', 'header')}
                     </Button>
                   }
                 />
@@ -218,8 +218,8 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className={cn(
-                    "md:hidden rounded-full w-10 h-10 transition-colors",
-                    (isScrolled || !transparent) ? "text-zinc-900 hover:bg-zinc-100" : "text-white hover:bg-white/20"
+                  "md:hidden rounded-full w-10 h-10 transition-colors",
+                  (isScrolled || !transparent) ? "text-zinc-900 hover:bg-zinc-100" : "text-white hover:bg-white/20"
                 )}>
                   <Menu className="w-6 h-6" />
                 </Button>
@@ -233,18 +233,18 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
                     <X className="w-6 h-6" />
                   </Button>
                 </div>
-                
+
                 <div className="flex-1 overflow-y-auto px-6 py-8 flex flex-col justify-between pb-24">
                   <nav className="flex flex-col gap-6">
                     {[
                       { href: "/", label: t('home') },
                       { href: "/fleet", label: t('fleet') },
-                      { href: "/long-term", label: "Long Term", badge: "New" },
+                      { href: "/long-term", label: t('long_term', 'header'), badge: t('new', 'header') },
                       { href: "/contact", label: t('contact') }
                     ].map((link, idx) => (
-                      <Link 
+                      <Link
                         key={link.href}
-                        href={link.href} 
+                        href={link.href}
                         className="group flex items-center justify-between text-3xl font-black text-white tracking-tight hover:text-red-500 transition-colors"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
@@ -277,40 +277,40 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
                           <Link href={user.role === 'ADMIN' ? "/admin" : "/dashboard"} onClick={() => setIsMobileMenuOpen(false)}>
                             <Button variant="outline" className="w-full justify-start border-zinc-600 text-zinc-300 hover:text-white hover:bg-zinc-700 hover:border-zinc-500">
                               <LayoutDashboard className="w-4 h-4 mr-2" />
-                              Dashboard
+                              {t('dashboard', 'header')}
                             </Button>
                           </Link>
                           <form action={logoutAction} className="w-full">
-                             <Button type="submit" variant="outline" className="w-full justify-start border-red-900/30 text-red-400 hover:text-red-300 hover:bg-red-900/20 hover:border-red-900/50">
-                                <LogOut className="w-4 h-4 mr-2" />
-                                Log out
-                             </Button>
+                            <Button type="submit" variant="outline" className="w-full justify-start border-red-900/30 text-red-400 hover:text-red-300 hover:bg-red-900/20 hover:border-red-900/50">
+                              <LogOut className="w-4 h-4 mr-2" />
+                              {t('log_out', 'header')}
+                            </Button>
                           </form>
                         </div>
                       </div>
                     ) : (
-                       <div className="grid gap-3">
-                          <AuthModal 
-                            trigger={
-                              <Button className="w-full bg-white text-black hover:bg-zinc-200 font-bold h-12 text-lg rounded-xl">
-                                Log In
-                              </Button>
-                            }
-                          />
-                          <AuthModal 
-                            trigger={
-                              <Button variant="outline" className="w-full border-zinc-700 bg-transparent text-white hover:bg-zinc-800 font-bold h-12 text-lg rounded-xl">
-                                Sign Up
-                              </Button>
-                            }
-                          />
-                       </div>
+                      <div className="grid gap-3">
+                        <AuthModal
+                          trigger={
+                            <Button className="w-full bg-white text-black hover:bg-zinc-200 font-bold h-12 text-lg rounded-xl">
+                              {t('log_in', 'header')}
+                            </Button>
+                          }
+                        />
+                        <AuthModal
+                          trigger={
+                            <Button variant="outline" className="w-full border-zinc-700 bg-transparent text-white hover:bg-zinc-800 font-bold h-12 text-lg rounded-xl">
+                              {t('sign_up', 'header')}
+                            </Button>
+                          }
+                        />
+                      </div>
                     )}
-                    
+
                     <div className="flex items-center justify-between text-zinc-500 text-xs font-medium uppercase tracking-widest pt-6 border-t border-zinc-800">
                       <span>© {new Date().getFullYear()} JustRent</span>
                       <div className="flex gap-4">
-                         <LanguageSwitcher currentLang={lang} variant="dark" />
+                        <LanguageSwitcher currentLang={lang} variant="dark" />
                       </div>
                     </div>
                   </div>

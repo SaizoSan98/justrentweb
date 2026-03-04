@@ -24,10 +24,12 @@ interface Car {
 
 interface FeaturedCarsProps {
   cars: Car[]
+  dictionary?: any
 }
 
-export function FeaturedCars({ cars }: FeaturedCarsProps) {
+export function FeaturedCars({ cars, dictionary }: FeaturedCarsProps) {
   const scrollContainerRef = React.useRef<HTMLDivElement>(null)
+  const t = (key: string) => dictionary?.featured?.[key] || key;
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
@@ -46,132 +48,136 @@ export function FeaturedCars({ cars }: FeaturedCarsProps) {
     <section className="py-24 bg-white overflow-hidden">
       <div className="container mx-auto px-6 mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="max-w-2xl">
-           <h2 className="text-4xl md:text-6xl font-black text-zinc-900 tracking-tight mb-4">
-              FEATURED <span className="text-red-600">FLEET</span>
-           </h2>
-           <p className="text-zinc-500 text-lg md:text-xl max-w-lg">
-              Hand-picked selection of our most exclusive vehicles.
-           </p>
+          <h2 className="text-4xl md:text-6xl font-black text-zinc-900 tracking-tight mb-4">
+            {t('title_1')}<span className="text-red-600">{t('title_2')}</span>
+          </h2>
+          <p className="text-zinc-500 text-lg md:text-xl max-w-lg">
+            {t('subtitle')}
+          </p>
         </div>
-        
+
         <div className="flex gap-4">
-            <Button 
-                onClick={() => scroll('left')}
-                variant="outline" 
-                size="icon"
-                className="w-14 h-14 rounded-full border-zinc-200 hover:bg-black hover:text-white hover:border-black transition-all"
-            >
-                <ChevronLeft className="w-6 h-6" />
-            </Button>
-            <Button 
-                onClick={() => scroll('right')}
-                variant="outline" 
-                size="icon"
-                className="w-14 h-14 rounded-full border-zinc-200 hover:bg-black hover:text-white hover:border-black transition-all"
-            >
-                <ChevronRight className="w-6 h-6" />
-            </Button>
+          <Button
+            onClick={() => scroll('left')}
+            variant="outline"
+            size="icon"
+            className="w-14 h-14 rounded-full border-zinc-200 hover:bg-black hover:text-white hover:border-black transition-all"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </Button>
+          <Button
+            onClick={() => scroll('right')}
+            variant="outline"
+            size="icon"
+            className="w-14 h-14 rounded-full border-zinc-200 hover:bg-black hover:text-white hover:border-black transition-all"
+          >
+            <ChevronRight className="w-6 h-6" />
+          </Button>
         </div>
       </div>
 
       {/* Full Width Carousel */}
-      <div 
+      <div
         ref={scrollContainerRef}
         className="flex overflow-x-auto snap-x snap-mandatory gap-6 px-6 md:px-[10vw] pb-12 -mx-4 scrollbar-hide"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {cars.map((car) => (
-          <div 
-            key={car.id} 
+          <div
+            key={car.id}
             className="snap-center shrink-0 w-[85vw] md:w-[60vw] lg:w-[40vw] xl:w-[30vw] relative group"
           >
-             {/* Use category name for filtering, fallback to make if no category */}
-             <Link 
-                href={`/fleet?category=${encodeURIComponent(car.categories?.[0]?.name || "")}`} 
-                className="block h-full"
-             >
-                <div className="bg-[#f3f4f6] rounded-[2.5rem] p-8 h-full border border-zinc-100 shadow-lg transition-all duration-500 group-hover:shadow-2xl group-hover:-translate-y-2 relative overflow-hidden flex flex-col">
-                    
-                    {/* Badge */}
-                    <div className="relative z-10 mb-4">
-                         <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-black/20">
-                            <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-                            Popular Choice
-                         </span>
-                    </div>
+            {/* Use category name for filtering, fallback to make if no category */}
+            <Link
+              href={`/fleet?category=${encodeURIComponent(car.categories?.[0]?.name || "")}`}
+              className="block h-full"
+            >
+              <div className="bg-[#f3f4f6] rounded-[2.5rem] p-8 h-full border border-zinc-100 shadow-lg transition-all duration-500 group-hover:shadow-2xl group-hover:-translate-y-2 relative overflow-hidden flex flex-col">
 
-                    {/* Header */}
-                    <div className="relative z-10 mb-4">
-                        <h3 className="text-3xl font-black text-zinc-900 tracking-tight leading-none mb-1">
-                            {car.make} {car.model}
-                        </h3>
-                        <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-2">
-                            {car.categories?.[0]?.name && (
-                                <>
-                                    <span>{car.categories[0].name}</span>
-                                    <span className="text-zinc-300">|</span>
-                                </>
-                            )}
-                            <span>OR SIMILAR</span>
-                        </p>
-                    </div>
-
-                    {/* Specs - Chips */}
-                    <div className="flex flex-wrap gap-2 mb-6 relative z-10">
-                        <div className="bg-zinc-200/80 px-3 py-1.5 rounded-full flex items-center gap-1.5">
-                            <span className="text-xs font-bold text-zinc-600">{car.fuelType} Vehicle</span>
-                        </div>
-                        <div className="bg-zinc-200/80 px-3 py-1.5 rounded-full flex items-center gap-1.5">
-                            <Users className="w-3.5 h-3.5 text-zinc-600" />
-                            <span className="text-xs font-bold text-zinc-600">{car.seats}</span>
-                        </div>
-                        <div className="bg-zinc-200/80 px-3 py-1.5 rounded-full flex items-center gap-1.5">
-                            <Gauge className="w-3.5 h-3.5 text-zinc-600" />
-                            <span className="text-xs font-bold text-zinc-600">{car.transmission === 'AUTOMATIC' ? 'Auto' : 'Manual'}</span>
-                        </div>
-                    </div>
-
-                    {/* Car Image */}
-                    <div className="relative z-10 w-full h-[240px] mb-6 flex-shrink-0">
-                        
-                        {/* Brand Logo Overlay - Top of Image */}
-                        {getBrandLogo(car.make) && (
-                            <div className="absolute top-0 w-full h-full flex items-start justify-center pt-4 opacity-[0.1] pointer-events-none select-none z-0">
-                                <div className="relative w-32 h-32">
-                                    <Image 
-                                        src={getBrandLogo(car.make)}
-                                        alt={car.make}
-                                        fill
-                                        className="object-contain"
-                                        unoptimized
-                                    />
-                                </div>
-                            </div>
-                        )}
-
-                        <Image 
-                            src={car.imageUrl || "/placeholder-car.png"}
-                            alt={`${car.make} ${car.model}`}
-                            fill
-                            className="object-contain object-center drop-shadow-2xl transition-transform duration-700 group-hover:scale-110 z-10"
-                        />
-                    </div>
-
-                    {/* Footer */}
-                    <div className="relative z-10 pt-6 mt-4 border-t border-zinc-200 flex items-end justify-between">
-                         <div>
-                            <div className="flex items-baseline gap-1">
-                                <span className="text-4xl font-black text-zinc-900 tracking-tighter">€{Number(Number(car.pricePerDay).toFixed(1))}</span>
-                                <span className="text-sm text-zinc-500 font-medium">/ day</span>
-                            </div>
-                         </div>
-                         
-                         <div className="bg-[#c92a2a] text-white px-8 py-3 rounded-lg font-bold text-sm shadow-lg shadow-red-900/10 group-hover:bg-[#b02525] transition-colors">
-                            Select
-                         </div>
-                    </div>
+                {/* Badge */}
+                <div className="relative z-10 mb-4">
+                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-black text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-black/20">
+                    <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                    {t('popular_choice')}
+                  </span>
                 </div>
-             </Link>
+
+                {/* Header */}
+                <div className="relative z-10 mb-4">
+                  <h3 className="text-3xl font-black text-zinc-900 tracking-tight leading-none mb-1">
+                    {car.make} {car.model}
+                  </h3>
+                  <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-2">
+                    {car.categories?.[0]?.name && (
+                      <>
+                        <span>{car.categories[0].name}</span>
+                        <span className="text-zinc-300">|</span>
+                      </>
+                    )}
+                    <span>{t('or_similar')}</span>
+                  </p>
+                </div>
+
+                {/* Specs - Chips */}
+                <div className="flex flex-wrap gap-2 mb-6 relative z-10">
+                  <div className="bg-zinc-200/80 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-zinc-600">
+                      {dictionary?.common?.[car.fuelType.toLowerCase()] || car.fuelType} {t('vehicle')}
+                    </span>
+                  </div>
+                  <div className="bg-zinc-200/80 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                    <Users className="w-3.5 h-3.5 text-zinc-600" />
+                    <span className="text-xs font-bold text-zinc-600">{car.seats}</span>
+                  </div>
+                  <div className="bg-zinc-200/80 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                    <Gauge className="w-3.5 h-3.5 text-zinc-600" />
+                    <span className="text-xs font-bold text-zinc-600">
+                      {car.transmission === 'AUTOMATIC' ? (dictionary?.common?.automatic || 'Auto') : (dictionary?.common?.manual || 'Manual')}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Car Image */}
+                <div className="relative z-10 w-full h-[240px] mb-6 flex-shrink-0">
+
+                  {/* Brand Logo Overlay - Top of Image */}
+                  {getBrandLogo(car.make) && (
+                    <div className="absolute top-0 w-full h-full flex items-start justify-center pt-4 opacity-[0.1] pointer-events-none select-none z-0">
+                      <div className="relative w-32 h-32">
+                        <Image
+                          src={getBrandLogo(car.make)}
+                          alt={car.make}
+                          fill
+                          className="object-contain"
+                          unoptimized
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <Image
+                    src={car.imageUrl || "/placeholder-car.png"}
+                    alt={`${car.make} ${car.model}`}
+                    fill
+                    className="object-contain object-center drop-shadow-2xl transition-transform duration-700 group-hover:scale-110 z-10"
+                  />
+                </div>
+
+                {/* Footer */}
+                <div className="relative z-10 pt-6 mt-4 border-t border-zinc-200 flex items-end justify-between">
+                  <div>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-4xl font-black text-zinc-900 tracking-tighter">€{Number(Number(car.pricePerDay).toFixed(1))}</span>
+                      <span className="text-sm text-zinc-500 font-medium">/ {dictionary?.common?.day || 'day'}</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#c92a2a] text-white px-8 py-3 rounded-lg font-bold text-sm shadow-lg shadow-red-900/10 group-hover:bg-[#b02525] transition-colors">
+                    {dictionary?.fleet?.select || 'Select'}
+                  </div>
+                </div>
+              </div>
+            </Link>
           </div>
         ))}
         {/* Spacer for right padding */}

@@ -37,9 +37,9 @@ export default async function LandingPage() {
 
   // Fetch Featured Cars
   const featuredCars = await prisma.car.findMany({
-    where: { 
-        isFeatured: true,
-        status: 'AVAILABLE'
+    where: {
+      isFeatured: true,
+      status: 'AVAILABLE'
     },
     take: 6,
     include: { categories: true }
@@ -78,14 +78,14 @@ export default async function LandingPage() {
 
       {/* Popular Cars Section */}
       {serializedFeaturedCars.length > 0 && (
-          <FeaturedCars cars={serializedFeaturedCars} />
+        <FeaturedCars cars={serializedFeaturedCars} dictionary={dictionary} />
       )}
 
       {/* Reviews Section */}
-      <Reviews />
+      <Reviews dictionary={dictionary} />
 
       {/* Feature Grid */}
-      <FeatureGrid />
+      <FeatureGrid dictionary={dictionary} />
 
       {/* Footer is already in Layout */}
     </div>

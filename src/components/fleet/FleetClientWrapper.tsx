@@ -23,6 +23,7 @@ interface FleetClientWrapperProps {
 export function FleetClientWrapper({ cars, dictionary, options }: FleetClientWrapperProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = (key: string) => dictionary?.fleet?.[key] || key;
 
   // Initialize state from URL
   const [filters, setFilters] = useState({
@@ -54,7 +55,7 @@ export function FleetClientWrapper({ cars, dictionary, options }: FleetClientWra
   // and update URL for shareability.
   const updateUrl = (newFilters: typeof filters) => {
     const params = new URLSearchParams(searchParams.toString())
-    
+
     // Clear existing
     params.delete("category")
     params.delete("transmission")
@@ -90,12 +91,12 @@ export function FleetClientWrapper({ cars, dictionary, options }: FleetClientWra
 
   const handleClearAll = () => {
     const newFilters = {
-        categories: [],
-        transmissions: [],
-        fuelTypes: [],
-        seats: [],
-        guaranteedModel: false,
-        make: ""
+      categories: [],
+      transmissions: [],
+      fuelTypes: [],
+      seats: [],
+      guaranteedModel: false,
+      make: ""
     }
     setFilters(newFilters)
     updateUrl(newFilters)
@@ -109,8 +110,8 @@ export function FleetClientWrapper({ cars, dictionary, options }: FleetClientWra
         // Filter out empty strings from filters (caused by missing category in link)
         const activeCategories = filters.categories.filter(c => c && c !== "undefined" && c !== "null")
         if (activeCategories.length > 0) {
-           const carCats = car.categories.map((c: any) => c.name)
-           if (!activeCategories.some(c => carCats.includes(c))) return false
+          const carCats = car.categories.map((c: any) => c.name)
+          if (!activeCategories.some(c => carCats.includes(c))) return false
         }
       }
 
@@ -132,11 +133,11 @@ export function FleetClientWrapper({ cars, dictionary, options }: FleetClientWra
         const carName = `${car.make} ${car.model}`.toLowerCase()
         const renteonId = car.renteonId?.toString().toLowerCase() || ""
         const internalId = car.id.toLowerCase()
-        
-        if (!carName.includes(searchTerm) && 
-            !renteonId.includes(searchTerm) && 
-            !internalId.includes(searchTerm)) {
-            return false
+
+        if (!carName.includes(searchTerm) &&
+          !renteonId.includes(searchTerm) &&
+          !internalId.includes(searchTerm)) {
+          return false
         }
       }
 
@@ -146,77 +147,77 @@ export function FleetClientWrapper({ cars, dictionary, options }: FleetClientWra
 
   return (
     <div className="flex flex-col gap-8">
-      
+
       {/* Top Controls: Result Count & Filter Toggle */}
       <div className="flex items-center justify-between gap-4">
-           <h2 className="text-xl font-bold text-zinc-900">
-              Available Vehicles <span className="text-zinc-400 text-sm ml-2">({filteredCars.filter(c => c.isAvailable !== false).length})</span>
-           </h2>
-           
-           <Button 
-                onClick={() => setShowFilters(!showFilters)}
-                variant="outline"
-                size="sm"
-                className="gap-2 border-zinc-200 hover:border-black hover:bg-black hover:text-white transition-all rounded-full h-9 px-4 text-xs font-bold uppercase tracking-wider"
-           >
-               <SlidersHorizontal className="w-3.5 h-3.5" />
-               {showFilters ? 'Hide Filters' : 'Filters'}
-           </Button>
+        <h2 className="text-xl font-bold text-zinc-900">
+          {t('available_vehicles')} <span className="text-zinc-400 text-sm ml-2">({filteredCars.filter(c => c.isAvailable !== false).length})</span>
+        </h2>
+
+        <Button
+          onClick={() => setShowFilters(!showFilters)}
+          variant="outline"
+          size="sm"
+          className="gap-2 border-zinc-200 hover:border-black hover:bg-black hover:text-white transition-all rounded-full h-9 px-4 text-xs font-bold uppercase tracking-wider"
+        >
+          <SlidersHorizontal className="w-3.5 h-3.5" />
+          {showFilters ? t('hide_filters') : t('filters')}
+        </Button>
       </div>
 
       {/* Collapsible Filters */}
       <AnimatePresence>
         {showFilters && (
-            <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="overflow-hidden"
-            >
-                <div className="py-4">
-                    <FleetFilters 
-                        filters={filters} 
-                        onChange={handleFilterChange} 
-                        options={options}
-                        dictionary={dictionary}
-                    />
-                </div>
-            </motion.div>
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <div className="py-4">
+              <FleetFilters
+                filters={filters}
+                onChange={handleFilterChange}
+                options={options}
+                dictionary={dictionary}
+              />
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
-      
+
       {/* Active Filters Summary */}
-      <ActiveFilters 
-          filters={filters} 
-          onChange={handleFilterChange} 
-          onClearAll={handleClearAll}
+      <ActiveFilters
+        filters={filters}
+        onChange={handleFilterChange}
+        onClearAll={handleClearAll}
       />
 
       {/* Main Grid */}
       <div className="flex-1">
         {filteredCars.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredCars.map((car) => (
-                  <FleetCard 
-                    key={car.id}
-                    car={car} 
-                    dictionary={dictionary}
-                    searchParams={Object.fromEntries(searchParams.entries())}
-                  />
-              ))}
+            {filteredCars.map((car) => (
+              <FleetCard
+                key={car.id}
+                car={car}
+                dictionary={dictionary}
+                searchParams={Object.fromEntries(searchParams.entries())}
+              />
+            ))}
           </div>
         ) : (
           <div className="text-center py-24 bg-zinc-50 rounded-3xl border border-zinc-100">
-             <div className="mb-4 text-4xl">🔍</div>
-             <h3 className="text-xl font-bold text-zinc-900 mb-2">No vehicles found</h3>
-             <p className="text-zinc-500">Try adjusting your filters to see more results.</p>
-             <button 
-                onClick={handleClearAll}
-                className="mt-6 text-red-600 font-bold hover:underline"
-             >
-                Clear all filters
-             </button>
+            <div className="mb-4 text-4xl">🔍</div>
+            <h3 className="text-xl font-bold text-zinc-900 mb-2">{t('no_vehicles')}</h3>
+            <p className="text-zinc-500">{t('try_adjusting')}</p>
+            <button
+              onClick={handleClearAll}
+              className="mt-6 text-red-600 font-bold hover:underline"
+            >
+              {t('clear_all')}
+            </button>
           </div>
         )}
       </div>
