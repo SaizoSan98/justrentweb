@@ -104,8 +104,8 @@ export function AuthModal({ trigger, dictionary }: AuthModalProps) {
 
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <label className="text-xs font-bold text-zinc-500 uppercase">{dictionary.auth.password}</label>
-                  <Link href="/forgot-password" className="text-xs font-medium text-red-600 hover:underline">{dictionary.auth.forgot}</Link>
+                  <label className="text-xs font-bold text-zinc-500 uppercase">{dictionary?.auth?.password || "Password"}</label>
+                  <Link href="/forgot-password" className="text-xs font-medium text-red-600 hover:underline">{dictionary?.auth?.forgot || "Forgot?"}</Link>
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
@@ -119,7 +119,7 @@ export function AuthModal({ trigger, dictionary }: AuthModalProps) {
                 </div>
               </div>
 
-              <LoginButton pendingText={dictionary.auth.signing_in} text={dictionary.auth.sign_in} />
+              <LoginButton pendingText={dictionary?.auth?.signing_in || "Signing In..."} text={dictionary?.auth?.sign_in || "Sign In"} />
             </form>
           ) : (
             <form action={registerAction} className="space-y-4">

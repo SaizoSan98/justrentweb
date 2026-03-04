@@ -4,8 +4,8 @@ import { Header } from "@/components/layout/Header"
 export default function Loading() {
   return (
     <div className="min-h-screen bg-white text-zinc-900 font-sans">
-      <Header />
-      
+      <Header transparent={false} dictionary={{}} />
+
       {/* Booking Engine Skeleton */}
       <div className="pt-32 pb-8 bg-zinc-50/50">
         <div className="w-full max-w-6xl mx-auto px-4">
