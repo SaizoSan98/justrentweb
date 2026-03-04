@@ -48,7 +48,7 @@ export function AuthModal({ trigger, dictionary }: AuthModalProps) {
             <Logo variant="light" className="scale-110 md:scale-125" />
           </div>
           <p className="text-zinc-400 text-xs md:text-sm mt-2 relative z-10">
-            {dictionary.auth.access_premium}
+            {dictionary?.auth?.access_premium || "Access your premium fleet journey"}
           </p>
         </div>
 
@@ -63,7 +63,7 @@ export function AuthModal({ trigger, dictionary }: AuthModalProps) {
                 : "text-zinc-400 bg-zinc-50 hover:bg-zinc-100"
             )}
           >
-            {dictionary.auth.log_in}
+            {dictionary?.auth?.log_in || "Log In"}
             {activeTab === "login" && (
               <div className="absolute bottom-0 left-0 w-full h-0.5 bg-red-600" />
             )}
@@ -77,7 +77,7 @@ export function AuthModal({ trigger, dictionary }: AuthModalProps) {
                 : "text-zinc-400 bg-zinc-50 hover:bg-zinc-100"
             )}
           >
-            {dictionary.auth.register}
+            {dictionary?.auth?.register || "Register"}
             {activeTab === "register" && (
               <div className="absolute bottom-0 left-0 w-full h-0.5 bg-red-600" />
             )}
@@ -89,7 +89,7 @@ export function AuthModal({ trigger, dictionary }: AuthModalProps) {
           {activeTab === "login" ? (
             <form action={loginAction} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-500 uppercase">{dictionary.auth.email_address}</label>
+                <label className="text-xs font-bold text-zinc-500 uppercase">{dictionary?.auth?.email_address || "Email Address"}</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                   <Input
@@ -124,12 +124,12 @@ export function AuthModal({ trigger, dictionary }: AuthModalProps) {
           ) : (
             <form action={registerAction} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-500 uppercase">{dictionary.auth.name_company}</label>
+                <label className="text-xs font-bold text-zinc-500 uppercase">{dictionary?.auth?.name_company || "Name / Company Name"}</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                   <Input
                     name="name"
-                    placeholder={dictionary.auth.name_placeholder}
+                    placeholder={dictionary?.auth?.name_placeholder || "John Doe / Acme Corp"}
                     className="pl-10 h-11 border-zinc-200 focus:ring-red-600 focus:border-red-600 bg-zinc-50/50"
                     required
                   />
@@ -137,25 +137,25 @@ export function AuthModal({ trigger, dictionary }: AuthModalProps) {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-500 uppercase">{dictionary.auth.tax_id_optional}</label>
+                <label className="text-xs font-bold text-zinc-500 uppercase">{dictionary?.auth?.tax_id_optional || "Tax ID (Optional)"}</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                   <Input
                     name="taxId"
-                    placeholder={dictionary.auth.tax_placeholder}
+                    placeholder={dictionary?.auth?.tax_placeholder || "12345678-1-42"}
                     className="pl-10 h-11 border-zinc-200 focus:ring-red-600 focus:border-red-600 bg-zinc-50/50"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-500 uppercase">{dictionary.auth.phone_number}</label>
+                <label className="text-xs font-bold text-zinc-500 uppercase">{dictionary?.auth?.phone_number || "Phone Number"}</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                   <Input
                     name="phone"
                     type="tel"
-                    placeholder={dictionary.auth.phone_placeholder}
+                    placeholder={dictionary?.auth?.phone_placeholder || "+36 30 123 4567"}
                     className="pl-10 h-11 border-zinc-200 focus:ring-red-600 focus:border-red-600 bg-zinc-50/50"
                     required
                   />
@@ -163,7 +163,7 @@ export function AuthModal({ trigger, dictionary }: AuthModalProps) {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-500 uppercase">{dictionary.auth.email_address}</label>
+                <label className="text-xs font-bold text-zinc-500 uppercase">{dictionary?.auth?.email_address || "Email Address"}</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                   <Input
@@ -177,7 +177,7 @@ export function AuthModal({ trigger, dictionary }: AuthModalProps) {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-500 uppercase">{dictionary.auth.password}</label>
+                <label className="text-xs font-bold text-zinc-500 uppercase">{dictionary?.auth?.password || "Password"}</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                   <Input
@@ -190,7 +190,7 @@ export function AuthModal({ trigger, dictionary }: AuthModalProps) {
                 </div>
               </div>
 
-              <RegisterButton pendingText={dictionary.auth.creating_account} text={dictionary.auth.create_account} />
+              <RegisterButton pendingText={dictionary?.auth?.creating_account || "Creating Account..."} text={dictionary?.auth?.create_account || "Create Account"} />
             </form>
           )}
         </div>
