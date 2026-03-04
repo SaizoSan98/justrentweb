@@ -14,8 +14,8 @@ import { dictionaries } from "@/lib/dictionary"
 import { ArrowRight, Shield, Globe, Zap, Heart } from "lucide-react"
 import Image from "next/image"
 import { Footer } from "@/components/layout/Footer"
-
 import { BrandStrip } from "@/components/home/BrandStrip"
+import { PartnersStrip } from "@/components/home/PartnersStrip"
 import { FeatureGrid } from "@/components/home/FeatureGrid"
 
 import { Logo } from "@/components/ui/logo"
@@ -70,8 +70,8 @@ export default async function LandingPage() {
       {/* Hero Section */}
       <Hero dictionary={dictionary} carCount={carCount} />
 
-      {/* Spacer for Search Widget - Removed since it's now inside Hero */}
-      {/* <div className="h-32 md:h-24 bg-white" /> */}
+      {/* Partners Strip */}
+      <PartnersStrip dictionary={dictionary} />
 
       {/* Brand Strip */}
       <BrandStrip />

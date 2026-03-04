@@ -53,7 +53,8 @@ export const dictionaries = {
       stats_cars: "Cars",
       available_now: "Available Now",
       total_distance: "Total Distance",
-      unlock_city: "Unlock the city with our elite fleet. Seamless digital booking, delivered to your door."
+      unlock_city: "Unlock the city with our elite fleet. Seamless digital booking, delivered to your door.",
+      our_partners: "Our Partners"
     },
     fleet: {
       title: "Our Fleet",
@@ -486,7 +487,8 @@ export const dictionaries = {
       stats_cars: "רכבים",
       available_now: "זמין עכשיו",
       total_distance: "מרחק כולל",
-      unlock_city: "פתחו את העיר עם צי הרכבים היוקרתי שלנו. הזמנה דיגיטלית חלקה, עד לדלת הבית."
+      unlock_city: "פתחו את העיר עם צי הרכבים היוקרתי שלנו. הזמנה דיגיטלית חלקה, עד לדלת הבית.",
+      our_partners: "השותפים שלנו"
     },
     fleet: {
       title: "הצי שלנו",
