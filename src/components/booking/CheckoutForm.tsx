@@ -64,7 +64,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const stripePaymentRef = useRef<any>(null)
-  
+
   // Booking Details State
   const [startDate, setStartDate] = useState<Date>(initialStartDate)
   const [endDate, setEndDate] = useState<Date | undefined>(initialEndDate)
@@ -76,26 +76,26 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
 
   // Extras & Payment State
   const [selectedExtras, setSelectedExtras] = useState<string[]>([])
-  
+
   // Renter Details State
   const [firstName, setFirstName] = useState(user?.name?.split(' ')[0] || '')
   const [lastName, setLastName] = useState(user?.name?.split(' ').slice(1).join(' ') || '')
   const [email, setEmail] = useState(user?.email || '')
   const [phone, setPhone] = useState(user?.phone || '')
-  
+
   // Insurance State Logic
   const sortedInsurances = (car.insuranceOptions || []).sort((a: any, b: any) => (a.plan?.order || 0) - (b.plan?.order || 0))
   const defaultInsurance = sortedInsurances.length > 0 ? sortedInsurances[0].planId : ""
-  
+
   const [selectedInsuranceId, setSelectedInsuranceId] = useState<string>(initialInsurance || defaultInsurance)
   const [mileageOption, setMileageOption] = useState<'LIMITED' | 'UNLIMITED'>(initialMileage as 'LIMITED' | 'UNLIMITED' || 'LIMITED')
-  
+
   const [fullInsurance, setFullInsurance] = useState(false) // Legacy, keeping for compatibility or removing if fully replaced by tiered insurance
   const [isCompany, setIsCompany] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState("CASH_ON_SITE")
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [clientSecret, setClientSecret] = useState<string | null>(null)
-  
+
   // Calculation Logic
   const TIME_OPTIONS = Array.from({ length: 48 }).map((_, i) => {
     const h = Math.floor(i / 2)
@@ -106,21 +106,21 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
   const calculateDays = () => {
     // If endDate is missing, default to 1 day
     if (!endDate) return 1
-    
+
     // Combine date and time safely
     try {
-        const startStr = `${format(startDate, 'yyyy-MM-dd')}T${startTime}`
-        const endStr = `${format(endDate, 'yyyy-MM-dd')}T${endTime}`
-        const start = new Date(startStr)
-        const end = new Date(endStr)
-        
-        // If invalid dates
-        if (isNaN(start.getTime()) || isNaN(end.getTime())) return 1
+      const startStr = `${format(startDate, 'yyyy-MM-dd')}T${startTime}`
+      const endStr = `${format(endDate, 'yyyy-MM-dd')}T${endTime}`
+      const start = new Date(startStr)
+      const end = new Date(endStr)
 
-        const diff = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
-        return Math.max(1, diff)
+      // If invalid dates
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) return 1
+
+      const diff = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
+      return Math.max(1, diff)
     } catch (e) {
-        return 1
+      return 1
     }
   }
 
@@ -128,28 +128,28 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
 
   const getPricePerDay = () => {
     if (!car.pricingTiers || car.pricingTiers.length === 0) return car.pricePerDay
-    
+
     // Find matching tier
-    const tier = car.pricingTiers.find((t: any) => 
+    const tier = car.pricingTiers.find((t: any) =>
       days >= t.minDays && (t.maxDays === null || days <= t.maxDays)
     )
-    
+
     return tier ? tier.pricePerDay : car.pricePerDay
   }
 
   const pricePerDay = getPricePerDay()
   const basePrice = pricePerDay * days
-  
+
   // Calculate Insurance Price
   const selectedInsurance = car.insuranceOptions?.find((opt: any) => opt.planId === selectedInsuranceId)
   const insurancePrice = selectedInsurance ? (selectedInsurance.pricePerDay * days) : 0
-  
+
   // Deposit Calculation
   const currentDeposit = selectedInsurance ? selectedInsurance.deposit : (car.deposit || 0)
-  
+
   // Calculate Mileage Price
   const mileagePrice = mileageOption === 'UNLIMITED' ? ((car.unlimitedMileagePrice || 0) * days) : 0
-  
+
   const extrasPrice = selectedExtras.reduce((total, id) => {
     const extra = extras.find(e => e.id === id)
     if (!extra) return total
@@ -165,7 +165,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
 
   const isAfterHours = (date: Date | undefined, time: string) => {
     if (!settings || !date) return false
-    
+
     // Parse weekly settings
     let weeklyHours = settings.weeklyHours
     if (typeof weeklyHours === 'string') {
@@ -175,24 +175,24 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
         weeklyHours = {}
       }
     }
-    
+
     if (!weeklyHours) {
-        // Fallback to global legacy settings
-        const t = parseTime(time)
-        const open = parseTime(settings.openingTime || "08:00")
-        const close = parseTime(settings.closingTime || "18:00")
-        return t < open || t > close
+      // Fallback to global legacy settings
+      const t = parseTime(time)
+      const open = parseTime(settings.openingTime || "08:00")
+      const close = parseTime(settings.closingTime || "18:00")
+      return t < open || t > close
     }
 
     const dayName = format(date, 'EEEE') // "Monday", "Tuesday"...
     const daySettings = weeklyHours[dayName]
 
     if (!daySettings) {
-        // If no settings for this day, assume default open
-        const t = parseTime(time)
-        const open = parseTime(settings.openingTime || "08:00")
-        const close = parseTime(settings.closingTime || "18:00")
-        return t < open || t > close
+      // If no settings for this day, assume default open
+      const t = parseTime(time)
+      const open = parseTime(settings.openingTime || "08:00")
+      const close = parseTime(settings.closingTime || "18:00")
+      return t < open || t > close
     }
 
     if (daySettings.isClosed) return true
@@ -216,40 +216,40 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
   // But it connects extras based on ID.
   // We need to find the ID of the "Out of hours" extra if it exists in the 'extras' prop
   // and add it to the submission if conditions are met.
-  
+
   const outOfHoursExtra = extras.find(e => {
-      const n = e.name.toLowerCase()
-      return n.includes('out of hours') || n.includes('after hours')
+    const n = e.name.toLowerCase()
+    return n.includes('out of hours') || n.includes('after hours')
   })
 
   // Calculate if we need to auto-select this extra
   const needsOutOfHours = (settings && (isAfterHours(startDate, startTime) || isAfterHours(endDate, endTime)))
-  
+
   // Update: We don't want to double charge. car.pickupAfterHoursPrice is likely what we use for calculation.
   // If there is an EXTRA for it, we should use that instead? 
   // User instruction: "automatically be checked".
   // If we have car.pickupAfterHoursPrice, we use that for calculation above.
   // If we ALSO have an extra, we shouldn't use both.
   // Let's assume the "Extra" in the list IS the fee the user sees and wants hidden/auto-added.
-  
+
   const effectiveExtras = [...selectedExtras]
   if (needsOutOfHours && outOfHoursExtra && !effectiveExtras.includes(outOfHoursExtra.id)) {
-      // We don't add it to state to avoid loop, but we need to account for it in price?
-      // Actually, let's just rely on pickupFee/returnFee logic which uses car properties.
-      // If the user wants the "Extra" entity to be linked to the booking, we need to add it.
-      // But usually "Out of hours" is a fee field on the booking, not necessarily an extra relation.
-      // However, if Renteon expects an Extra ID, we must include it.
-      
-      // Let's rely on the explicit fee calculation we already have:
-      // const pickupFee = ...
-      // const returnFee = ...
-      // These are added to totalPrice.
-      
-      // If there is an "Out of hours" item in the extras list, it's likely a duplicate of the built-in fee logic 
-      // or the source of truth. The user wants it hidden from list but applied.
-      // If we already calculate `pickupFee` using `car.pickupAfterHoursPrice`, that is correct.
-      // We just hid the extra from the list so user can't manually toggle it.
-      // NOW: We must ensure that if Renteon needs this as an "Extra" service, we include its ID in submission.
+    // We don't add it to state to avoid loop, but we need to account for it in price?
+    // Actually, let's just rely on pickupFee/returnFee logic which uses car properties.
+    // If the user wants the "Extra" entity to be linked to the booking, we need to add it.
+    // But usually "Out of hours" is a fee field on the booking, not necessarily an extra relation.
+    // However, if Renteon expects an Extra ID, we must include it.
+
+    // Let's rely on the explicit fee calculation we already have:
+    // const pickupFee = ...
+    // const returnFee = ...
+    // These are added to totalPrice.
+
+    // If there is an "Out of hours" item in the extras list, it's likely a duplicate of the built-in fee logic 
+    // or the source of truth. The user wants it hidden from list but applied.
+    // If we already calculate `pickupFee` using `car.pickupAfterHoursPrice`, that is correct.
+    // We just hid the extra from the list so user can't manually toggle it.
+    // NOW: We must ensure that if Renteon needs this as an "Extra" service, we include its ID in submission.
   }
 
   const totalPrice = basePrice + insurancePrice + mileagePrice + extrasPrice + pickupFee + returnFee
@@ -259,45 +259,45 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
   // Note: In a real app, you might want to create the intent only when the user clicks "Pay" or "Confirm"
   // But Stripe Elements needs a clientSecret to render.
   // So if "Pay Online" is selected, we fetch it.
-  
+
   // Better approach: Only show PaymentElement when "Pay Online" is selected AND we have a secret.
-  
+
   const handlePaymentMethodChange = async (method: string) => {
-      setPaymentMethod(method)
-      if (method === 'PAY_ONLINE') {
-          // Fetch secret
-          try {
-              const res = await fetch("/api/create-payment-intent", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ amount: totalPrice, currency: "eur" }),
-              });
-              const data = await res.json();
-              if (data.clientSecret) {
-                  setClientSecret(data.clientSecret);
-              }
-          } catch (err) {
-              console.error("Failed to init payment", err);
-          }
-      } else {
-        setClientSecret(null)
+    setPaymentMethod(method)
+    if (method === 'PAY_ONLINE') {
+      // Fetch secret
+      try {
+        const res = await fetch("/api/create-payment-intent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount: totalPrice, currency: "eur" }),
+        });
+        const data = await res.json();
+        if (data.clientSecret) {
+          setClientSecret(data.clientSecret);
+        }
+      } catch (err) {
+        console.error("Failed to init payment", err);
       }
+    } else {
+      setClientSecret(null)
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    
+
     if (!termsAccepted) return
     if (!endDate) {
-        alert("Please select a return date.")
-        return
+      alert("Please select a return date.")
+      return
     }
 
     const formData = new FormData(e.currentTarget)
-    
+
     // Prepare extras list including hidden auto-extras
     let finalExtras = [...selectedExtras]
-    
+
     // If we have an "Out of hours" extra and we are out of hours, add it
     // ONLY IF we aren't already charging via car.pickupAfterHoursPrice to avoid double charge?
     // Actually, usually the system either uses the car field OR the extra. 
@@ -307,7 +307,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
     // Let's play safe: The user said "automatically be checked". 
     // So we should add the Extra ID if it exists and condition is met.
     if (needsOutOfHours && outOfHoursExtra && !finalExtras.includes(outOfHoursExtra.id)) {
-        finalExtras.push(outOfHoursExtra.id)
+      finalExtras.push(outOfHoursExtra.id)
     }
 
     // Append derived/state values
@@ -327,20 +327,20 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
     startTransition(async () => {
       try {
         const result = await createBooking(null, formData)
-        
+
         if (result.success) {
           if (paymentMethod === 'PAY_ONLINE' && clientSecret) {
             if (stripePaymentRef.current) {
-               const { error } = await stripePaymentRef.current.confirmPayment(result.bookingId)
-               if (error) {
-                 // In case of error, the user stays on the page.
-                 // We should probably show a better error message.
-                 alert(error.message || "Payment failed. Please try again.")
-               }
-               // If successful, Stripe redirects automatically.
+              const { error } = await stripePaymentRef.current.confirmPayment(result.bookingId)
+              if (error) {
+                // In case of error, the user stays on the page.
+                // We should probably show a better error message.
+                alert(error.message || "Payment failed. Please try again.")
+              }
+              // If successful, Stripe redirects automatically.
             } else {
-               // Fallback if ref is missing
-               router.push(`/booking/success/${result.bookingId}`)
+              // Fallback if ref is missing
+              router.push(`/booking/success/${result.bookingId}`)
             }
           } else {
             router.push(`/booking/success/${result.bookingId}`)
@@ -359,7 +359,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
     <form onSubmit={handleSubmit} className="grid lg:grid-cols-3 gap-8">
       {/* Left Column: Forms */}
       <div className="lg:col-span-2 space-y-8">
-        
+
         {/* Booking Details (Editable) */}
         <Card className="border-0 shadow-sm ring-1 ring-zinc-200">
           <CardHeader className="border-b border-zinc-100 bg-white flex flex-row items-center justify-between py-4">
@@ -380,39 +380,39 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                   <div className="space-y-1">
                     <Label className="text-xs text-zinc-500">{dictionary.hero.time}</Label>
                     <div className="flex gap-2">
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button variant="outline" className="w-full justify-start text-left font-normal">
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {startDate ? format(startDate, "PPP") : <span>{dictionary.booking.pick_a_date}</span>}
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-4 flex gap-4" align="start">
-                                <Calendar
-                                    mode="single"
-                                    selected={startDate}
-                                    onSelect={(date) => date && setStartDate(date)}
-                                    disabled={(date) => date < new Date()}
-                                />
-                                <div className="h-[300px] w-px bg-zinc-100" />
-                                <div className="h-[300px] overflow-y-auto w-24 space-y-1 pr-2">
-                                    {TIME_OPTIONS.map(time => (
-                                        <button
-                                            key={time}
-                                            onClick={() => setStartTime(time)}
-                                            className={cn(
-                                                "w-full text-xs font-bold py-2 rounded-md hover:bg-zinc-100 transition-colors",
-                                                startTime === time ? "bg-black text-white hover:bg-black" : "text-zinc-600"
-                                            )}
-                                        >
-                                            {time}
-                                        </button>
-                                    ))}
-                                </div>
-                            </PopoverContent>
-                        </Popover>
-                      <Input 
-                        type="time" 
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className="w-full justify-start text-left font-normal">
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {startDate ? format(startDate, "PPP") : <span>{dictionary.booking.pick_a_date}</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-4 flex gap-4" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={startDate}
+                            onSelect={(date) => date && setStartDate(date)}
+                            disabled={(date) => date < new Date()}
+                          />
+                          <div className="h-[300px] w-px bg-zinc-100" />
+                          <div className="h-[300px] overflow-y-auto w-24 space-y-1 pr-2">
+                            {TIME_OPTIONS.map(time => (
+                              <button
+                                key={time}
+                                onClick={() => setStartTime(time)}
+                                className={cn(
+                                  "w-full text-xs font-bold py-2 rounded-md hover:bg-zinc-100 transition-colors",
+                                  startTime === time ? "bg-black text-white hover:bg-black" : "text-zinc-600"
+                                )}
+                              >
+                                {time}
+                              </button>
+                            ))}
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                      <Input
+                        type="time"
                         value={startTime}
                         onChange={(e) => setStartTime(e.target.value)}
                         className="w-24 font-medium"
@@ -421,7 +421,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                   </div>
                   <div className="space-y-1">
                     <Label className="text-xs text-zinc-500">{dictionary.booking.location}</Label>
-                    <Input 
+                    <Input
                       value={pickupLocation}
                       readOnly
                       className="font-medium bg-zinc-50 text-zinc-500 cursor-not-allowed border-zinc-200 focus-visible:ring-0"
@@ -440,39 +440,39 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                   <div className="space-y-1">
                     <Label className="text-xs text-zinc-500">{dictionary.hero.time}</Label>
                     <div className="flex gap-2">
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !endDate && "border-red-500")}>
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {endDate ? format(endDate, "PPP") : <span>{dictionary.booking.pick_a_date}</span>}
-                                </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-4 flex gap-4" align="start">
-                                <Calendar
-                                    mode="single"
-                                    selected={endDate}
-                                    onSelect={(date) => date && setEndDate(date)}
-                                    disabled={(date) => date < startDate}
-                                />
-                                <div className="h-[300px] w-px bg-zinc-100" />
-                                <div className="h-[300px] overflow-y-auto w-24 space-y-1 pr-2">
-                                    {TIME_OPTIONS.map(time => (
-                                        <button
-                                            key={time}
-                                            onClick={() => setEndTime(time)}
-                                            className={cn(
-                                                "w-full text-xs font-bold py-2 rounded-md hover:bg-zinc-100 transition-colors",
-                                                endTime === time ? "bg-black text-white hover:bg-black" : "text-zinc-600"
-                                            )}
-                                        >
-                                            {time}
-                                        </button>
-                                    ))}
-                                </div>
-                            </PopoverContent>
-                        </Popover>
-                      <Input 
-                        type="time" 
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !endDate && "border-red-500")}>
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {endDate ? format(endDate, "PPP") : <span>{dictionary.booking.pick_a_date}</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-4 flex gap-4" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={endDate}
+                            onSelect={(date) => date && setEndDate(date)}
+                            disabled={(date) => date < startDate}
+                          />
+                          <div className="h-[300px] w-px bg-zinc-100" />
+                          <div className="h-[300px] overflow-y-auto w-24 space-y-1 pr-2">
+                            {TIME_OPTIONS.map(time => (
+                              <button
+                                key={time}
+                                onClick={() => setEndTime(time)}
+                                className={cn(
+                                  "w-full text-xs font-bold py-2 rounded-md hover:bg-zinc-100 transition-colors",
+                                  endTime === time ? "bg-black text-white hover:bg-black" : "text-zinc-600"
+                                )}
+                              >
+                                {time}
+                              </button>
+                            ))}
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                      <Input
+                        type="time"
                         value={endTime}
                         onChange={(e) => setEndTime(e.target.value)}
                         className="w-24 font-medium"
@@ -481,7 +481,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                   </div>
                   <div className="space-y-1">
                     <Label className="text-xs text-zinc-500">{dictionary.booking.location}</Label>
-                    <Input 
+                    <Input
                       value={dropoffLocation}
                       readOnly
                       className="font-medium bg-zinc-50 text-zinc-500 cursor-not-allowed border-zinc-200 focus-visible:ring-0"
@@ -510,42 +510,42 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
           <CardContent className="p-6 grid md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>{dictionary.booking.first_name} *</Label>
-              <Input 
-                name="firstName" 
-                placeholder="John" 
-                required 
+              <Input
+                name="firstName"
+                placeholder="John"
+                required
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
               />
             </div>
             <div className="space-y-2">
               <Label>{dictionary.booking.last_name} *</Label>
-              <Input 
-                name="lastName" 
-                placeholder="Doe" 
-                required 
+              <Input
+                name="lastName"
+                placeholder="Doe"
+                required
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
               />
             </div>
             <div className="space-y-2">
               <Label>{dictionary.booking.email} *</Label>
-              <Input 
-                name="email" 
-                type="email" 
-                placeholder="john@example.com" 
-                required 
+              <Input
+                name="email"
+                type="email"
+                placeholder="john@example.com"
+                required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div className="space-y-2">
               <Label>{dictionary.booking.phone} *</Label>
-              <Input 
-                name="phone" 
-                type="tel" 
-                placeholder="+36 20 123 4567" 
-                required 
+              <Input
+                name="phone"
+                type="tel"
+                placeholder="+36 20 123 4567"
+                required
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
               />
@@ -580,19 +580,19 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                 <Input name="companyName" required={isCompany} />
               </div>
               <div className="space-y-2">
-                <Label>Tax Number (Adószám) *</Label>
+                <Label>{dictionary.booking.tax_number} *</Label>
                 <Input name="companyTaxId" required={isCompany} />
               </div>
               <div className="space-y-2">
-                <Label>Company Email *</Label>
+                <Label>{dictionary.booking.company_email} *</Label>
                 <Input name="companyEmail" type="email" required={isCompany} />
               </div>
               <div className="space-y-2">
-                <Label>Company Phone *</Label>
+                <Label>{dictionary.booking.company_phone} *</Label>
                 <Input name="companyPhone" type="tel" required={isCompany} />
               </div>
               <div className="md:col-span-2 space-y-2">
-                <Label>Company Address *</Label>
+                <Label>{dictionary.booking.company_address} *</Label>
                 <Input name="companyAddress" required={isCompany} />
               </div>
             </CardContent>
@@ -608,35 +608,35 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
             </CardTitle>
           </CardHeader>
           <div className="p-6 space-y-4">
-             {car.insuranceOptions?.sort((a: any, b: any) => (a.plan?.order || 0) - (b.plan?.order || 0)).map((ins: any) => (
-                <div 
-                  key={ins.planId}
-                  className={cn(
-                    "border-2 rounded-xl p-4 cursor-pointer transition-all flex items-start gap-4",
-                    selectedInsuranceId === ins.planId ? "border-black bg-zinc-50" : "border-zinc-200 hover:border-zinc-300"
-                  )}
-                  onClick={() => setSelectedInsuranceId(ins.planId)}
-                >
-                  <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center mt-1 shrink-0", selectedInsuranceId === ins.planId ? "border-black" : "border-zinc-300")}>
-                    {selectedInsuranceId === ins.planId && <div className="w-3 h-3 bg-black rounded-full" />}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between items-center mb-1">
-                      <h4 className="font-bold text-zinc-900">{ins.plan.name}</h4>
-                      <span className="font-bold text-zinc-900 text-right">
-                        {ins.pricePerDay === 0 ? dictionary.booking.included : (
-                            <>
-                                <div>+€{Number((ins.pricePerDay * days).toFixed(1))}</div>
-                                <div className="text-[10px] text-zinc-400 font-normal">€{Number(ins.pricePerDay.toFixed(1))} {dictionary.booking.per_day}</div>
-                            </>
-                        )}
-                      </span>
-                    </div>
-                    <p className="text-sm text-zinc-500">{ins.plan.description || "Basic coverage."}</p>
-                    <p className="text-xs font-semibold text-zinc-700 mt-1">{dictionary.booking.security_deposit}: €{ins.deposit}</p>
-                  </div>
+            {car.insuranceOptions?.sort((a: any, b: any) => (a.plan?.order || 0) - (b.plan?.order || 0)).map((ins: any) => (
+              <div
+                key={ins.planId}
+                className={cn(
+                  "border-2 rounded-xl p-4 cursor-pointer transition-all flex items-start gap-4",
+                  selectedInsuranceId === ins.planId ? "border-black bg-zinc-50" : "border-zinc-200 hover:border-zinc-300"
+                )}
+                onClick={() => setSelectedInsuranceId(ins.planId)}
+              >
+                <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center mt-1 shrink-0", selectedInsuranceId === ins.planId ? "border-black" : "border-zinc-300")}>
+                  {selectedInsuranceId === ins.planId && <div className="w-3 h-3 bg-black rounded-full" />}
                 </div>
-             ))}
+                <div className="flex-1">
+                  <div className="flex justify-between items-center mb-1">
+                    <h4 className="font-bold text-zinc-900">{ins.plan.name}</h4>
+                    <span className="font-bold text-zinc-900 text-right">
+                      {ins.pricePerDay === 0 ? dictionary.booking.included : (
+                        <>
+                          <div>+€{Number((ins.pricePerDay * days).toFixed(1))}</div>
+                          <div className="text-[10px] text-zinc-400 font-normal">€{Number(ins.pricePerDay.toFixed(1))} {dictionary.booking.per_day}</div>
+                        </>
+                      )}
+                    </span>
+                  </div>
+                  <p className="text-sm text-zinc-500">{ins.plan.description || "Basic coverage."}</p>
+                  <p className="text-xs font-semibold text-zinc-700 mt-1">{dictionary.booking.security_deposit}: €{ins.deposit}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </Card>
 
@@ -648,44 +648,44 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
             </CardTitle>
           </CardHeader>
           <div className="p-6 space-y-4">
-             <div 
-               className={cn(
-                 "border-2 rounded-xl p-4 cursor-pointer transition-all flex items-start gap-4",
-                 mileageOption === 'LIMITED' ? "border-black bg-zinc-50" : "border-zinc-200 hover:border-zinc-300"
-               )}
-               onClick={() => setMileageOption('LIMITED')}
-             >
-               <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center mt-1 shrink-0", mileageOption === 'LIMITED' ? "border-black" : "border-zinc-300")}>
-                 {mileageOption === 'LIMITED' && <div className="w-3 h-3 bg-black rounded-full" />}
-               </div>
-               <div className="flex-1">
-                 <div className="flex justify-between items-center mb-1">
-                   <h4 className="font-bold text-zinc-900">{car.dailyMileageLimit || 300} {dictionary.common.km} {dictionary.booking.per_day}</h4>
-                   <span className="font-bold text-zinc-900">{dictionary.booking.included}</span>
-                 </div>
-               </div>
-             </div>
+            <div
+              className={cn(
+                "border-2 rounded-xl p-4 cursor-pointer transition-all flex items-start gap-4",
+                mileageOption === 'LIMITED' ? "border-black bg-zinc-50" : "border-zinc-200 hover:border-zinc-300"
+              )}
+              onClick={() => setMileageOption('LIMITED')}
+            >
+              <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center mt-1 shrink-0", mileageOption === 'LIMITED' ? "border-black" : "border-zinc-300")}>
+                {mileageOption === 'LIMITED' && <div className="w-3 h-3 bg-black rounded-full" />}
+              </div>
+              <div className="flex-1">
+                <div className="flex justify-between items-center mb-1">
+                  <h4 className="font-bold text-zinc-900">{car.dailyMileageLimit || 300} {dictionary.common.km} {dictionary.booking.per_day}</h4>
+                  <span className="font-bold text-zinc-900">{dictionary.booking.included}</span>
+                </div>
+              </div>
+            </div>
 
-             <div 
-               className={cn(
-                 "border-2 rounded-xl p-4 transition-all flex items-start gap-4 opacity-50 cursor-not-allowed",
-                 mileageOption === 'UNLIMITED' ? "border-black bg-zinc-50" : "border-zinc-200"
-               )}
-               // onClick={() => setMileageOption('UNLIMITED')}
-             >
-               <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center mt-1 shrink-0", mileageOption === 'UNLIMITED' ? "border-black" : "border-zinc-300")}>
-                 {mileageOption === 'UNLIMITED' && <div className="w-3 h-3 bg-black rounded-full" />}
-               </div>
-               <div className="flex-1">
-                 <div className="flex justify-between items-center mb-1">
-                   <h4 className="font-bold text-zinc-900 flex items-center gap-2">
-                     {dictionary.fleet.unlimited} {dictionary.common.km}
-                     <span className="bg-zinc-200 text-zinc-600 text-[10px] px-1.5 py-0.5 rounded uppercase tracking-wider font-bold">DEV</span>
-                   </h4>
-                   <span className="font-bold text-zinc-400">+{Number(((car.unlimitedMileagePrice || 0) * days).toFixed(1))} €</span>
-                 </div>
-               </div>
-             </div>
+            <div
+              className={cn(
+                "border-2 rounded-xl p-4 transition-all flex items-start gap-4 opacity-50 cursor-not-allowed",
+                mileageOption === 'UNLIMITED' ? "border-black bg-zinc-50" : "border-zinc-200"
+              )}
+            // onClick={() => setMileageOption('UNLIMITED')}
+            >
+              <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center mt-1 shrink-0", mileageOption === 'UNLIMITED' ? "border-black" : "border-zinc-300")}>
+                {mileageOption === 'UNLIMITED' && <div className="w-3 h-3 bg-black rounded-full" />}
+              </div>
+              <div className="flex-1">
+                <div className="flex justify-between items-center mb-1">
+                  <h4 className="font-bold text-zinc-900 flex items-center gap-2">
+                    {dictionary.fleet.unlimited} {dictionary.common.km}
+                    <span className="bg-zinc-200 text-zinc-600 text-[10px] px-1.5 py-0.5 rounded uppercase tracking-wider font-bold">DEV</span>
+                  </h4>
+                  <span className="font-bold text-zinc-400">+{Number(((car.unlimitedMileagePrice || 0) * days).toFixed(1))} €</span>
+                </div>
+              </div>
+            </div>
           </div>
         </Card>
 
@@ -699,15 +699,15 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
           </CardHeader>
           <div className="p-6 grid md:grid-cols-2 gap-4">
             {extras.filter(extra => {
-                const name = extra.name.toLowerCase()
-                // Filter out automatic fees from manual selection
-                return !name.includes('out of hours') && !name.includes('after hours') && !name.includes('pickup fee') && !name.includes('return fee')
+              const name = extra.name.toLowerCase()
+              // Filter out automatic fees from manual selection
+              return !name.includes('out of hours') && !name.includes('after hours') && !name.includes('pickup fee') && !name.includes('return fee')
             }).map((extra) => {
               const Icon = ICON_MAP[extra.icon] || Star
               const isSelected = selectedExtras.includes(extra.id)
-              
+
               return (
-                <div 
+                <div
                   key={extra.id}
                   className={cn(
                     "border rounded-xl p-4 cursor-pointer transition-all flex items-start gap-3",
@@ -751,7 +751,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
             </CardTitle>
           </CardHeader>
           <div className="p-6 space-y-4">
-            <div 
+            <div
               className={cn("border-2 rounded-xl p-4 cursor-pointer flex items-center gap-4", paymentMethod === 'CASH_ON_SITE' ? "border-red-600 bg-red-50/10" : "border-zinc-200")}
               onClick={() => handlePaymentMethodChange('CASH_ON_SITE')}
             >
@@ -760,8 +760,8 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
               </div>
               <span className="font-bold text-zinc-900">{dictionary.booking.cash_on_site}</span>
             </div>
-            
-            <div 
+
+            <div
               className={cn("border-2 rounded-xl p-4 cursor-pointer flex items-center gap-4", paymentMethod === 'CARD_ON_SITE' ? "border-red-600 bg-red-50/10" : "border-zinc-200")}
               onClick={() => handlePaymentMethodChange('CARD_ON_SITE')}
             >
@@ -771,20 +771,20 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
               <span className="font-bold text-zinc-900">{dictionary.booking.card_on_site}</span>
             </div>
 
-            <div 
+            <div
               className={cn(
                 "border-2 rounded-xl p-4 transition-all flex items-center gap-4 opacity-50 cursor-not-allowed bg-zinc-50/50",
                 paymentMethod === 'PAY_ONLINE' ? "border-red-600 bg-red-50/10" : "border-zinc-200"
               )}
-              // onClick={() => handlePaymentMethodChange('PAY_ONLINE')}
+            // onClick={() => handlePaymentMethodChange('PAY_ONLINE')}
             >
               <div className={cn("w-5 h-5 rounded-full border-2 flex items-center justify-center", paymentMethod === 'PAY_ONLINE' ? "border-red-600 bg-red-600" : "border-zinc-300")}>
                 {paymentMethod === 'PAY_ONLINE' && <div className="w-2 h-2 bg-white rounded-full" />}
               </div>
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
-                    <span className="font-bold text-zinc-900">{dictionary.booking.pay_online}</span>
-                    <span className="bg-zinc-200 text-zinc-600 text-[10px] px-1.5 py-0.5 rounded uppercase tracking-wider font-bold">COMING SOON</span>
+                  <span className="font-bold text-zinc-900">{dictionary.booking.pay_online}</span>
+                  <span className="bg-zinc-200 text-zinc-600 text-[10px] px-1.5 py-0.5 rounded uppercase tracking-wider font-bold">COMING SOON</span>
                 </div>
                 <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider">DEV MODE - DISABLED</span>
               </div>
@@ -792,11 +792,11 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
 
             {/* Stripe Element Container */}
             {paymentMethod === 'PAY_ONLINE' && clientSecret && (
-                <div className="p-4 border border-zinc-200 rounded-xl bg-white mt-4">
-                    <Elements stripe={stripePromise} options={{ clientSecret }}>
-                        <StripePaymentForm ref={stripePaymentRef} />
-                    </Elements>
-                </div>
+              <div className="p-4 border border-zinc-200 rounded-xl bg-white mt-4">
+                <Elements stripe={stripePromise} options={{ clientSecret }}>
+                  <StripePaymentForm ref={stripePaymentRef} />
+                </Elements>
+              </div>
             )}
           </div>
         </Card>
@@ -811,9 +811,9 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
               <h3 className="text-lg font-bold mb-4">{dictionary.booking.booking_summary}</h3>
               <div className="flex items-start gap-4 mb-6">
                 <div className="relative w-24 h-16 bg-white rounded-lg overflow-hidden">
-                  <Image 
-                    src={car.imageUrl} 
-                    alt={car.model} 
+                  <Image
+                    src={car.imageUrl}
+                    alt={car.model}
                     fill
                     className="object-cover"
                   />
@@ -822,46 +822,46 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                   <div className="font-black uppercase text-lg leading-tight">{car.make} {car.model}</div>
                   <div className="text-zinc-400 text-sm">{car.category}</div>
                   <div className="flex items-center gap-2 mt-2">
-                     <CreditCard className="w-4 h-4 text-zinc-400" />
-                     <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{dictionary.booking.min_driver_age}</span>
+                    <CreditCard className="w-4 h-4 text-zinc-400" />
+                    <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{dictionary.booking.min_driver_age}</span>
                   </div>
                 </div>
               </div>
-              
+
               <div className="space-y-4 text-sm">
                 <div className="flex items-center gap-3">
                   <CalendarIcon className="w-4 h-4 text-red-500" />
                   <div>
                     <div className="text-zinc-400 text-xs">{dictionary.booking.pickup}</div>
                     <Popover>
-                        <PopoverTrigger asChild>
-                            <button className="font-bold hover:bg-zinc-100 px-1 -ml-1 rounded transition-colors text-left">
-                                {format(startDate, 'MMM d, yyyy')} {startTime}
+                      <PopoverTrigger asChild>
+                        <button className="font-bold hover:bg-zinc-100 px-1 -ml-1 rounded transition-colors text-left">
+                          {format(startDate, 'MMM d, yyyy')} {startTime}
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-4 flex gap-4" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={startDate}
+                          onSelect={(date) => date && setStartDate(date)}
+                          disabled={(date) => date < new Date()}
+                        />
+                        <div className="h-[300px] w-px bg-zinc-100" />
+                        <div className="h-[300px] overflow-y-auto w-24 space-y-1 pr-2">
+                          {TIME_OPTIONS.map(time => (
+                            <button
+                              key={time}
+                              onClick={() => setStartTime(time)}
+                              className={cn(
+                                "w-full text-xs font-bold py-2 rounded-md hover:bg-zinc-100 transition-colors",
+                                startTime === time ? "bg-black text-white hover:bg-black" : "text-zinc-600"
+                              )}
+                            >
+                              {time}
                             </button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-4 flex gap-4" align="start">
-                            <Calendar
-                                mode="single"
-                                selected={startDate}
-                                onSelect={(date) => date && setStartDate(date)}
-                                disabled={(date) => date < new Date()}
-                            />
-                            <div className="h-[300px] w-px bg-zinc-100" />
-                            <div className="h-[300px] overflow-y-auto w-24 space-y-1 pr-2">
-                                {TIME_OPTIONS.map(time => (
-                                    <button
-                                        key={time}
-                                        onClick={() => setStartTime(time)}
-                                        className={cn(
-                                            "w-full text-xs font-bold py-2 rounded-md hover:bg-zinc-100 transition-colors",
-                                            startTime === time ? "bg-black text-white hover:bg-black" : "text-zinc-600"
-                                        )}
-                                    >
-                                        {time}
-                                    </button>
-                                ))}
-                            </div>
-                        </PopoverContent>
+                          ))}
+                        </div>
+                      </PopoverContent>
                     </Popover>
                     <div className="text-zinc-500 text-xs">{pickupLocation}</div>
                   </div>
@@ -871,34 +871,34 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                   <div>
                     <div className="text-zinc-400 text-xs">{dictionary.booking.return}</div>
                     <Popover>
-                        <PopoverTrigger asChild>
-                            <button className="font-bold hover:bg-zinc-100 px-1 -ml-1 rounded transition-colors text-left">
-                                {endDate ? format(endDate, 'MMM d, yyyy') : dictionary.hero.pick_date} {endTime}
+                      <PopoverTrigger asChild>
+                        <button className="font-bold hover:bg-zinc-100 px-1 -ml-1 rounded transition-colors text-left">
+                          {endDate ? format(endDate, 'MMM d, yyyy') : dictionary.hero.pick_date} {endTime}
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-4 flex gap-4" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={endDate}
+                          onSelect={(date) => date && setEndDate(date)}
+                          disabled={(date) => date < startDate}
+                        />
+                        <div className="h-[300px] w-px bg-zinc-100" />
+                        <div className="h-[300px] overflow-y-auto w-24 space-y-1 pr-2">
+                          {TIME_OPTIONS.map(time => (
+                            <button
+                              key={time}
+                              onClick={() => setEndTime(time)}
+                              className={cn(
+                                "w-full text-xs font-bold py-2 rounded-md hover:bg-zinc-100 transition-colors",
+                                endTime === time ? "bg-black text-white hover:bg-black" : "text-zinc-600"
+                              )}
+                            >
+                              {time}
                             </button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-4 flex gap-4" align="start">
-                            <Calendar
-                                mode="single"
-                                selected={endDate}
-                                onSelect={(date) => date && setEndDate(date)}
-                                disabled={(date) => date < startDate}
-                            />
-                            <div className="h-[300px] w-px bg-zinc-100" />
-                            <div className="h-[300px] overflow-y-auto w-24 space-y-1 pr-2">
-                                {TIME_OPTIONS.map(time => (
-                                    <button
-                                        key={time}
-                                        onClick={() => setEndTime(time)}
-                                        className={cn(
-                                            "w-full text-xs font-bold py-2 rounded-md hover:bg-zinc-100 transition-colors",
-                                            endTime === time ? "bg-black text-white hover:bg-black" : "text-zinc-600"
-                                        )}
-                                    >
-                                        {time}
-                                    </button>
-                                ))}
-                            </div>
-                        </PopoverContent>
+                          ))}
+                        </div>
+                      </PopoverContent>
                     </Popover>
                     <div className="text-zinc-500 text-xs">{dropoffLocation}</div>
                   </div>
@@ -916,89 +916,89 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
             </div>
 
             <div className="p-6 bg-zinc-950/50 space-y-3 text-sm">
-              
+
               <Dialog>
                 <DialogTrigger asChild>
-                    <button type="button" className="w-full flex justify-between items-center group">
-                        <span className="text-zinc-400 font-medium group-hover:text-white transition-colors">{dictionary.booking.total_price}</span>
-                        <div className="flex items-center gap-2">
-                             <span className="text-3xl font-black text-red-500">€{Number(totalPrice.toFixed(1))}</span>
-                             <div className="bg-zinc-800 text-zinc-400 text-[10px] px-2 py-1 rounded uppercase font-bold group-hover:bg-zinc-700 transition-colors">{dictionary.fleet.details}</div>
-                        </div>
-                    </button>
+                  <button type="button" className="w-full flex justify-between items-center group">
+                    <span className="text-zinc-400 font-medium group-hover:text-white transition-colors">{dictionary.booking.total_price}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-3xl font-black text-red-500">€{Number(totalPrice.toFixed(1))}</span>
+                      <div className="bg-zinc-800 text-zinc-400 text-[10px] px-2 py-1 rounded uppercase font-bold group-hover:bg-zinc-700 transition-colors">{dictionary.fleet.details}</div>
+                    </div>
+                  </button>
                 </DialogTrigger>
                 <DialogContent className="w-[90%] sm:max-w-[425px] bg-white text-zinc-900 border-zinc-200 rounded-2xl">
-                    <DialogHeader>
-                        <DialogTitle className="text-xl font-bold">{dictionary.booking.price_breakdown}</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-3 pt-4">
-                        <div className="flex justify-between">
-                            <span className="text-zinc-500">{dictionary.booking.car_rental} ({days} {dictionary.common.days})</span>
-                            <span className="font-bold">€{Number(basePrice.toFixed(1))}</span>
-                        </div>
-                        
-                        {insurancePrice > 0 && (
-                            <div className="flex justify-between text-green-600">
-                                <span>{dictionary.hero.insurance}</span>
-                                <span>+€{Number(insurancePrice.toFixed(1))}</span>
-                            </div>
-                        )}
-
-                        {mileagePrice > 0 && (
-                            <div className="flex justify-between text-zinc-500">
-                                <span>{dictionary.fleet.unlimited} {dictionary.common.km}</span>
-                                <span>+€{Number(mileagePrice.toFixed(1))}</span>
-                            </div>
-                        )}
-
-                        {selectedExtras.map(id => {
-                            const extra = extras.find(e => e.id === id)
-                            if (!extra) return null
-                            const price = extra.priceType === 'PER_DAY' ? extra.price * days : extra.price
-                            return (
-                                <div key={id} className="flex justify-between text-zinc-500">
-                                    <span>{extra.name}</span>
-                                    <span>+€{Number(price.toFixed(1))}</span>
-                                </div>
-                            )
-                        })}
-
-                        {pickupFee > 0 && (
-                            <div className="flex justify-between text-zinc-500">
-                                <span>{dictionary.booking.after_hours_pickup}</span>
-                                <span>+€{Number(pickupFee.toFixed(1))}</span>
-                            </div>
-                        )}
-                        {returnFee > 0 && (
-                            <div className="flex justify-between text-zinc-500">
-                                <span>{dictionary.booking.after_hours_return}</span>
-                                <span>+€{Number(returnFee.toFixed(1))}</span>
-                            </div>
-                        )}
-
-                        <div className="pt-4 border-t border-zinc-100 flex justify-between items-end mt-4">
-                            <span className="text-zinc-900 font-bold">{dictionary.fleet.total}</span>
-                            <span className="text-2xl font-black text-red-600">€{Number(totalPrice.toFixed(1))}</span>
-                        </div>
-                        
-                        <div className="pt-3 border-t border-zinc-100 flex justify-between items-center">
-                             <div className="flex items-center gap-1.5 text-zinc-500 font-bold text-xs uppercase tracking-wider">
-                                <ShieldCheck className="w-3.5 h-3.5" />
-                                {dictionary.booking.security_deposit}
-                             </div>
-                             <span className="font-bold text-zinc-900">€{Number(currentDeposit.toFixed(1))}</span>
-                        </div>
+                  <DialogHeader>
+                    <DialogTitle className="text-xl font-bold">{dictionary.booking.price_breakdown}</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-3 pt-4">
+                    <div className="flex justify-between">
+                      <span className="text-zinc-500">{dictionary.booking.car_rental} ({days} {dictionary.common.days})</span>
+                      <span className="font-bold">€{Number(basePrice.toFixed(1))}</span>
                     </div>
+
+                    {insurancePrice > 0 && (
+                      <div className="flex justify-between text-green-600">
+                        <span>{dictionary.hero.insurance}</span>
+                        <span>+€{Number(insurancePrice.toFixed(1))}</span>
+                      </div>
+                    )}
+
+                    {mileagePrice > 0 && (
+                      <div className="flex justify-between text-zinc-500">
+                        <span>{dictionary.fleet.unlimited} {dictionary.common.km}</span>
+                        <span>+€{Number(mileagePrice.toFixed(1))}</span>
+                      </div>
+                    )}
+
+                    {selectedExtras.map(id => {
+                      const extra = extras.find(e => e.id === id)
+                      if (!extra) return null
+                      const price = extra.priceType === 'PER_DAY' ? extra.price * days : extra.price
+                      return (
+                        <div key={id} className="flex justify-between text-zinc-500">
+                          <span>{extra.name}</span>
+                          <span>+€{Number(price.toFixed(1))}</span>
+                        </div>
+                      )
+                    })}
+
+                    {pickupFee > 0 && (
+                      <div className="flex justify-between text-zinc-500">
+                        <span>{dictionary.booking.after_hours_pickup}</span>
+                        <span>+€{Number(pickupFee.toFixed(1))}</span>
+                      </div>
+                    )}
+                    {returnFee > 0 && (
+                      <div className="flex justify-between text-zinc-500">
+                        <span>{dictionary.booking.after_hours_return}</span>
+                        <span>+€{Number(returnFee.toFixed(1))}</span>
+                      </div>
+                    )}
+
+                    <div className="pt-4 border-t border-zinc-100 flex justify-between items-end mt-4">
+                      <span className="text-zinc-900 font-bold">{dictionary.fleet.total}</span>
+                      <span className="text-2xl font-black text-red-600">€{Number(totalPrice.toFixed(1))}</span>
+                    </div>
+
+                    <div className="pt-3 border-t border-zinc-100 flex justify-between items-center">
+                      <div className="flex items-center gap-1.5 text-zinc-500 font-bold text-xs uppercase tracking-wider">
+                        <ShieldCheck className="w-3.5 h-3.5" />
+                        {dictionary.booking.security_deposit}
+                      </div>
+                      <span className="font-bold text-zinc-900">€{Number(currentDeposit.toFixed(1))}</span>
+                    </div>
+                  </div>
                 </DialogContent>
               </Dialog>
-              
+
               {/* Visible Deposit Field below Total */}
               <div className="pt-4 border-t border-zinc-800 flex justify-between items-center">
-                   <div className="flex items-center gap-2 text-zinc-400 font-bold text-xs uppercase tracking-wider">
-                      <ShieldCheck className="w-4 h-4" />
-                      {dictionary.booking.security_deposit}
-                   </div>
-                   <span className="font-bold text-white text-lg">€{Number(currentDeposit.toFixed(1))}</span>
+                <div className="flex items-center gap-2 text-zinc-400 font-bold text-xs uppercase tracking-wider">
+                  <ShieldCheck className="w-4 h-4" />
+                  {dictionary.booking.security_deposit}
+                </div>
+                <span className="font-bold text-white text-lg">€{Number(currentDeposit.toFixed(1))}</span>
               </div>
             </div>
           </Card>
@@ -1006,8 +1006,8 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
           {/* Terms */}
           <div className="bg-white p-4 rounded-xl border border-zinc-200 shadow-sm">
             <div className="flex items-start gap-3">
-              <Checkbox 
-                id="terms" 
+              <Checkbox
+                id="terms"
                 checked={termsAccepted}
                 onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
                 className="mt-1"
@@ -1018,7 +1018,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
             </div>
           </div>
 
-          <Button 
+          <Button
             type="submit"
             className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-6 text-lg uppercase tracking-wide shadow-xl shadow-red-600/20"
             disabled={!termsAccepted || isPending}
@@ -1054,7 +1054,7 @@ const StripePaymentForm = forwardRef<any, any>((props, ref) => {
         setErrorMessage(error.message || "Payment failed");
         return { error };
       }
-      
+
       return { success: true };
     }
   }));

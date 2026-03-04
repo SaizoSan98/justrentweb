@@ -43,7 +43,9 @@ export interface LongTermCar {
    description: string | null
 }
 
-export function LongTermCarCard({ car }: { car: LongTermCar }) {
+import { Dictionary } from "@/lib/dictionary"
+
+export function LongTermCarCard({ car, dictionary }: { car: LongTermCar, dictionary: Dictionary }) {
    const [duration, setDuration] = useState(12)
    const [currentPrice, setCurrentPrice] = useState(Number(car.monthlyPrice))
 
@@ -92,10 +94,10 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
       setIsSubmitting(false)
 
       if (result.success) {
-         toast.success("Inquiry sent successfully! We will contact you shortly.")
+         toast.success(dictionary.long_term.success_msg)
          setShowInquiryForm(false)
       } else {
-         toast.error(result.error || "Failed to send inquiry. Please try again.")
+         toast.error(result.error || dictionary.long_term.error_msg)
       }
    }
 
@@ -115,12 +117,12 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
                      />
                   ) : (
                      <div className="w-full h-full flex items-center justify-center text-zinc-300">
-                        No Image
+                        {dictionary.long_term.no_image}
                      </div>
                   )}
                   <div className="absolute top-4 right-4 z-10">
                      <Badge className="bg-black text-white hover:bg-black uppercase tracking-wider font-bold">
-                        Long Term
+                        {dictionary.long_term.badge}
                      </Badge>
                   </div>
                </div>
@@ -140,7 +142,7 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
                   <div className="flex flex-wrap gap-2 mb-6">
                      <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-600 bg-zinc-100 px-3 py-1.5 rounded-full">
                         <Users className="w-3.5 h-3.5" />
-                        {car.seats} Seats
+                        {car.seats} {dictionary.long_term.seats}
                      </div>
                      <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-600 bg-zinc-100 px-3 py-1.5 rounded-full">
                         <Fuel className="w-3.5 h-3.5" />
@@ -165,12 +167,12 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
                            <Popover>
                               <PopoverTrigger asChild>
                                  <button className="text-xs text-zinc-400 pl-5 hover:text-zinc-600 hover:underline transition-colors text-left">
-                                    +{car.features.length - 3} more features
+                                    {dictionary.long_term.more_features.replace('{count}', String(car.features.length - 3))}
                                  </button>
                               </PopoverTrigger>
                               <PopoverContent className="w-64 p-4">
                                  <div className="space-y-2">
-                                    <h4 className="font-bold text-sm mb-2">All Features</h4>
+                                    <h4 className="font-bold text-sm mb-2">{dictionary.long_term.all_features}</h4>
                                     {car.features.map((feature, idx) => (
                                        <div key={idx} className="flex items-center gap-2 text-xs text-zinc-600">
                                           <Check className="w-3 h-3 text-green-500 shrink-0" />
@@ -187,14 +189,14 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
                   <div className="mt-auto pt-6 border-t border-zinc-100 flex items-end justify-between">
                      <div>
                         <div className="flex items-baseline gap-1">
-                           <span className="text-sm text-zinc-500 font-bold">from</span>
+                           <span className="text-sm text-zinc-500 font-bold">{dictionary.long_term.from}</span>
                            <span className="text-3xl font-black text-red-600 tracking-tighter">€{minPrice}</span>
-                           <span className="text-sm text-zinc-500 font-bold">/ month</span>
+                           <span className="text-sm text-zinc-500 font-bold">{dictionary.long_term.per_month}</span>
                         </div>
                      </div>
 
                      <Button className="bg-black hover:bg-zinc-800 text-white font-bold rounded-xl px-6">
-                        View Deal
+                        {dictionary.long_term.view_deal}
                      </Button>
                   </div>
                </div>
@@ -214,35 +216,35 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
                            className="object-contain"
                         />
                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-zinc-300">No Image</div>
+                        <div className="w-full h-full flex items-center justify-center text-zinc-300">{dictionary.long_term.no_image}</div>
                      )}
                   </div>
 
                   <div className="mt-auto space-y-4">
                      <div className="grid grid-cols-2 gap-3 md:gap-4">
                         <div className="bg-white p-3 rounded-xl">
-                           <div className="text-xs text-zinc-500 mb-1">Transmission</div>
+                           <div className="text-xs text-zinc-500 mb-1">{dictionary.long_term.transmission}</div>
                            <div className="font-bold text-sm flex items-center gap-2">
                               <Gauge className="w-4 h-4 text-zinc-400" />
                               {car.transmission}
                            </div>
                         </div>
                         <div className="bg-white p-3 rounded-xl">
-                           <div className="text-xs text-zinc-500 mb-1">Fuel Type</div>
+                           <div className="text-xs text-zinc-500 mb-1">{dictionary.long_term.fuel_type}</div>
                            <div className="font-bold text-sm flex items-center gap-2">
                               <Fuel className="w-4 h-4 text-zinc-400" />
                               {car.fuelType}
                            </div>
                         </div>
                         <div className="bg-white p-3 rounded-xl">
-                           <div className="text-xs text-zinc-500 mb-1">Seats</div>
+                           <div className="text-xs text-zinc-500 mb-1">{dictionary.long_term.seats}</div>
                            <div className="font-bold text-sm flex items-center gap-2">
                               <Users className="w-4 h-4 text-zinc-400" />
-                              {car.seats} Persons
+                              {car.seats} {dictionary.long_term.persons}
                            </div>
                         </div>
                         <div className="bg-white p-3 rounded-xl">
-                           <div className="text-xs text-zinc-500 mb-1">Year</div>
+                           <div className="text-xs text-zinc-500 mb-1">{dictionary.long_term.year}</div>
                            <div className="font-bold text-sm flex items-center gap-2">
                               <Info className="w-4 h-4 text-zinc-400" />
                               {car.year}
@@ -269,8 +271,8 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
                      {/* Duration Slider */}
                      <div className="space-y-4">
                         <div className="flex justify-between items-center">
-                           <span className="text-sm font-bold uppercase text-zinc-500 tracking-wider">Rental Duration</span>
-                           <span className="text-lg font-black text-zinc-900">{duration} Months</span>
+                           <span className="text-sm font-bold uppercase text-zinc-500 tracking-wider">{dictionary.long_term.rental_duration}</span>
+                           <span className="text-lg font-black text-zinc-900">{duration} {dictionary.long_term.months}</span>
                         </div>
                         <input
                            type="range"
@@ -281,20 +283,20 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
                            className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer accent-red-600"
                         />
                         <div className="flex justify-between text-xs text-zinc-400 font-medium uppercase tracking-wider">
-                           <span>1 Mo</span>
-                           <span>6 Mo</span>
-                           <span>12+ Mo</span>
+                           <span>{dictionary.long_term.mo_1}</span>
+                           <span>{dictionary.long_term.mo_6}</span>
+                           <span>{dictionary.long_term.mo_12}</span>
                         </div>
                      </div>
 
                      {/* Price Display */}
                      <div className="bg-zinc-50 p-6 rounded-2xl border border-zinc-100">
                         <div className="flex items-end justify-between mb-2">
-                           <span className="text-zinc-500 font-medium">Monthly Rate</span>
+                           <span className="text-zinc-500 font-medium">{dictionary.long_term.monthly_rate}</span>
                            <span className="text-4xl font-black text-zinc-900 tracking-tighter">€{currentPrice}</span>
                         </div>
                         <div className="flex items-center justify-between text-sm text-zinc-400 pt-4 border-t border-zinc-200/50">
-                           <span>Security Deposit</span>
+                           <span>{dictionary.long_term.security_deposit}</span>
                            <span className="font-bold text-zinc-600">€{Number(car.deposit)}</span>
                         </div>
                      </div>
@@ -304,9 +306,9 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
                      {showInquiryForm ? (
                         <form onSubmit={handleInquirySubmit} className="space-y-4 bg-zinc-50 p-6 rounded-2xl border border-zinc-100">
                            <div className="flex justify-between items-center mb-2">
-                              <h4 className="font-bold text-zinc-900">Send Inquiry</h4>
+                              <h4 className="font-bold text-zinc-900">{dictionary.long_term.send_inquiry}</h4>
                               <Button type="button" variant="ghost" size="sm" onClick={() => setShowInquiryForm(false)} className="h-6 w-6 p-0">
-                                 <span className="sr-only">Close</span>
+                                 <span className="sr-only">{dictionary.long_term.close}</span>
                                  <span aria-hidden="true">&times;</span>
                               </Button>
                            </div>
@@ -318,28 +320,28 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
                            </div>
 
                            <div className="space-y-2">
-                              <Label htmlFor="name">Name</Label>
-                              <Input id="name" name="name" placeholder="John Doe" required className="bg-white" />
+                              <Label htmlFor="name">{dictionary.long_term.name}</Label>
+                              <Input id="name" name="name" placeholder={dictionary.long_term.name_placeholder} required className="bg-white" />
                            </div>
 
                            <div className="space-y-2">
-                              <Label htmlFor="email">Email</Label>
-                              <Input id="email" name="email" type="email" placeholder="john@example.com" required className="bg-white" />
+                              <Label htmlFor="email">{dictionary.long_term.email}</Label>
+                              <Input id="email" name="email" type="email" placeholder={dictionary.long_term.email_placeholder} required className="bg-white" />
                            </div>
 
                            <div className="space-y-2">
-                              <Label htmlFor="phone">Phone</Label>
-                              <Input id="phone" name="phone" type="tel" placeholder="+36..." required className="bg-white" />
+                              <Label htmlFor="phone">{dictionary.long_term.phone}</Label>
+                              <Input id="phone" name="phone" type="tel" placeholder={dictionary.long_term.phone_placeholder} required className="bg-white" />
                            </div>
 
                            <div className="space-y-2">
-                              <Label htmlFor="message">Message (Optional)</Label>
+                              <Label htmlFor="message">{dictionary.long_term.message}</Label>
                               <Textarea
                                  id="message"
                                  name="message"
-                                 placeholder="Any specific questions?"
+                                 placeholder={dictionary.long_term.message_placeholder}
                                  className="bg-white min-h-[80px]"
-                                 defaultValue={`I am interested in renting the ${car.make} ${car.model} for ${duration} months.`}
+                                 defaultValue={dictionary.long_term.message_default.replace('{make}', car.make).replace('{model}', car.model).replace('{duration}', String(duration))}
                               />
                            </div>
 
@@ -347,10 +349,10 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
                               {isSubmitting ? (
                                  <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Sending...
+                                    {dictionary.long_term.sending}
                                  </>
                               ) : (
-                                 "Send Request"
+                                 dictionary.long_term.send_request
                               )}
                            </Button>
                         </form>
@@ -360,11 +362,11 @@ export function LongTermCarCard({ car }: { car: LongTermCar }) {
                               onClick={() => setShowInquiryForm(true)}
                               className="w-full bg-red-600 hover:bg-red-700 text-white font-bold h-14 text-lg rounded-xl shadow-lg shadow-red-600/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                            >
-                              Inquire Now
+                              {dictionary.long_term.inquire_now}
                               <ArrowRight className="ml-2 w-5 h-5" />
                            </Button>
                            <p className="text-center text-xs text-zinc-400 mt-4">
-                              No payment required now. Send an inquiry to check availability.
+                              {dictionary.long_term.no_payment_info}
                            </p>
                         </>
                      )}

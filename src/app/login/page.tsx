@@ -12,9 +12,11 @@ import { RegisterButton } from "@/components/auth/RegisterButton"
 import { Suspense } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowLeft } from "lucide-react"
+import { cookies } from "next/headers"
+import { dictionaries, Dictionary } from "@/lib/dictionary"
 
 // Separate component to handle search params in Suspense
-function AuthForm({ searchParams }: { searchParams?: { error?: string, tab?: string } }) {
+function AuthForm({ searchParams, dictionary }: { searchParams?: { error?: string, tab?: string }, dictionary: Dictionary }) {
   const error = searchParams?.error
   const defaultTab = searchParams?.tab || "login"
 
@@ -22,81 +24,81 @@ function AuthForm({ searchParams }: { searchParams?: { error?: string, tab?: str
     <div className="w-full max-w-md">
       <Link href="/" className="inline-flex items-center text-sm text-zinc-500 hover:text-zinc-900 mb-6 transition-colors">
         <ArrowLeft className="w-4 h-4 mr-2" />
-        Back to Home
+        {dictionary.login.back_home}
       </Link>
       <Card className="w-full shadow-2xl border-zinc-200 overflow-hidden">
-      <CardHeader className="space-y-2 pb-6 bg-zinc-50 border-b border-zinc-100">
-        <div className="text-center mb-4 flex justify-center">
+        <CardHeader className="space-y-2 pb-6 bg-zinc-50 border-b border-zinc-100">
+          <div className="text-center mb-4 flex justify-center">
             <Logo variant="dark" className="scale-125" />
-        </div>
-        <CardTitle className="text-xl font-bold text-center text-zinc-800">Welcome</CardTitle>
-        <CardDescription className="text-center text-zinc-500">
-          Sign in or create an account to continue
-        </CardDescription>
-      </CardHeader>
-      
-      <Tabs defaultValue={defaultTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 rounded-none bg-zinc-100 p-0 h-12">
-          <TabsTrigger 
-            value="login" 
-            className="rounded-none h-full data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-red-600 data-[state=active]:text-red-600 font-bold"
-          >
-            Log In
-          </TabsTrigger>
-          <TabsTrigger 
-            value="register" 
-            className="rounded-none h-full data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-red-600 data-[state=active]:text-red-600 font-bold"
-          >
-            Register
-          </TabsTrigger>
-        </TabsList>
+          </div>
+          <CardTitle className="text-xl font-bold text-center text-zinc-800">{dictionary.login.welcome}</CardTitle>
+          <CardDescription className="text-center text-zinc-500">
+            {dictionary.login.subtitle}
+          </CardDescription>
+        </CardHeader>
 
-        <CardContent className="p-6">
-          {error && (
-            <div className="bg-red-50 text-red-600 text-sm p-3 rounded-md mb-6 border border-red-100 text-center font-medium">
-              {error === 'invalid_credentials' && "Invalid email or password"}
-              {error === 'unauthorized' && "You don't have permission to access the admin panel"}
-              {error === 'email_taken' && "This email is already registered"}
-              {error === 'registration_failed' && "Registration failed. Please try again."}
-            </div>
-          )}
+        <Tabs defaultValue={defaultTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2 rounded-none bg-zinc-100 p-0 h-12">
+            <TabsTrigger
+              value="login"
+              className="rounded-none h-full data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-red-600 data-[state=active]:text-red-600 font-bold"
+            >
+              {dictionary.auth.log_in}
+            </TabsTrigger>
+            <TabsTrigger
+              value="register"
+              className="rounded-none h-full data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-red-600 data-[state=active]:text-red-600 font-bold"
+            >
+              {dictionary.auth.register}
+            </TabsTrigger>
+          </TabsList>
 
-          <TabsContent value="login" className="space-y-4 mt-0">
-            <form action={loginAction} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" name="email" type="email" placeholder="name@example.com" required className="bg-zinc-50" />
+          <CardContent className="p-6">
+            {error && (
+              <div className="bg-red-50 text-red-600 text-sm p-3 rounded-md mb-6 border border-red-100 text-center font-medium">
+                {error === 'invalid_credentials' && dictionary.login.error_invalid}
+                {error === 'unauthorized' && dictionary.login.error_unauthorized}
+                {error === 'email_taken' && dictionary.login.error_taken}
+                {error === 'registration_failed' && dictionary.login.error_failed}
               </div>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <Link href="/forgot-password" className="text-xs text-red-600 hover:underline">Forgot password?</Link>
+            )}
+
+            <TabsContent value="login" className="space-y-4 mt-0">
+              <form action={loginAction} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">{dictionary.auth.email_address}</Label>
+                  <Input id="email" name="email" type="email" placeholder="name@example.com" required className="bg-zinc-50" />
                 </div>
-                <Input id="password" name="password" type="password" required className="bg-zinc-50" />
-              </div>
-              <LoginButton />
-            </form>
-          </TabsContent>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <Label htmlFor="password">{dictionary.auth.password}</Label>
+                    <Link href="/forgot-password" className="text-xs text-red-600 hover:underline">{dictionary.login.forgot_password}</Link>
+                  </div>
+                  <Input id="password" name="password" type="password" required className="bg-zinc-50" />
+                </div>
+                <LoginButton pendingText={dictionary.auth.signing_in} text={dictionary.auth.sign_in} />
+              </form>
+            </TabsContent>
 
-          <TabsContent value="register" className="space-y-4 mt-0">
-            <form action={registerAction} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="reg-name">Full Name</Label>
-                <Input id="reg-name" name="name" type="text" placeholder="John Doe" required className="bg-zinc-50" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="reg-email">Email</Label>
-                <Input id="reg-email" name="email" type="email" placeholder="name@example.com" required className="bg-zinc-50" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="reg-password">Password</Label>
-                <Input id="reg-password" name="password" type="password" required className="bg-zinc-50" />
-              </div>
-              <RegisterButton />
-            </form>
-          </TabsContent>
-        </CardContent>
-      </Tabs>
+            <TabsContent value="register" className="space-y-4 mt-0">
+              <form action={registerAction} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="reg-name">{dictionary.login.full_name}</Label>
+                  <Input id="reg-name" name="name" type="text" placeholder="John Doe" required className="bg-zinc-50" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="reg-email">{dictionary.auth.email_address}</Label>
+                  <Input id="reg-email" name="email" type="email" placeholder="name@example.com" required className="bg-zinc-50" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="reg-password">{dictionary.auth.password}</Label>
+                  <Input id="reg-password" name="password" type="password" required className="bg-zinc-50" />
+                </div>
+                <RegisterButton pendingText={dictionary.auth.creating_account} text={dictionary.auth.create_account} />
+              </form>
+            </TabsContent>
+          </CardContent>
+        </Tabs>
       </Card>
     </div>
   )
@@ -110,11 +112,14 @@ export default async function LoginPage(props: {
   const searchParams = await props.searchParams
   const error = typeof searchParams?.error === 'string' ? searchParams.error : undefined
   const tab = typeof searchParams?.tab === 'string' ? searchParams.tab : undefined
+  const cookieStore = await cookies()
+  const lang = cookieStore.get("NEXT_LOCALE")?.value || "en"
+  const dictionary = dictionaries[lang as keyof typeof dictionaries] || dictionaries.en
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-zinc-100 p-4">
       <Suspense>
-        <AuthForm searchParams={{ error, tab }} />
+        <AuthForm searchParams={{ error, tab }} dictionary={dictionary} />
       </Suspense>
     </div>
   )

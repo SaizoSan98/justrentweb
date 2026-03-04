@@ -19,19 +19,22 @@ import {
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
+import { Dictionary } from "@/lib/dictionary"
+
 interface AuthModalProps {
   trigger?: React.ReactNode
   isOpen?: boolean
   onClose?: () => void
+  dictionary: Dictionary
 }
 
-export function AuthModal({ trigger }: AuthModalProps) {
+export function AuthModal({ trigger, dictionary }: AuthModalProps) {
   const [activeTab, setActiveTab] = useState<"login" | "register">("login")
   const [isLoading, setIsLoading] = useState(false)
 
   // We'll use the server action directly for login
   // For register, we keep it as simulation for now or implement later
-  
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -45,7 +48,7 @@ export function AuthModal({ trigger }: AuthModalProps) {
             <Logo variant="light" className="scale-110 md:scale-125" />
           </div>
           <p className="text-zinc-400 text-xs md:text-sm mt-2 relative z-10">
-            Access your premium fleet journey
+            {dictionary.auth.access_premium}
           </p>
         </div>
 
@@ -55,12 +58,12 @@ export function AuthModal({ trigger }: AuthModalProps) {
             onClick={() => setActiveTab("login")}
             className={cn(
               "flex-1 py-4 text-sm font-bold transition-all relative",
-              activeTab === "login" 
-                ? "text-red-600 bg-white" 
+              activeTab === "login"
+                ? "text-red-600 bg-white"
                 : "text-zinc-400 bg-zinc-50 hover:bg-zinc-100"
             )}
           >
-            Log In
+            {dictionary.auth.log_in}
             {activeTab === "login" && (
               <div className="absolute bottom-0 left-0 w-full h-0.5 bg-red-600" />
             )}
@@ -69,12 +72,12 @@ export function AuthModal({ trigger }: AuthModalProps) {
             onClick={() => setActiveTab("register")}
             className={cn(
               "flex-1 py-4 text-sm font-bold transition-all relative",
-              activeTab === "register" 
-                ? "text-red-600 bg-white" 
+              activeTab === "register"
+                ? "text-red-600 bg-white"
                 : "text-zinc-400 bg-zinc-50 hover:bg-zinc-100"
             )}
           >
-            Register
+            {dictionary.auth.register}
             {activeTab === "register" && (
               <div className="absolute bottom-0 left-0 w-full h-0.5 bg-red-600" />
             )}
@@ -86,14 +89,14 @@ export function AuthModal({ trigger }: AuthModalProps) {
           {activeTab === "login" ? (
             <form action={loginAction} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-500 uppercase">Email Address</label>
+                <label className="text-xs font-bold text-zinc-500 uppercase">{dictionary.auth.email_address}</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                  <Input 
+                  <Input
                     name="email"
-                    type="email" 
-                    placeholder="name@example.com" 
-                    className="pl-10 h-11 border-zinc-200 focus:ring-red-600 focus:border-red-600 bg-zinc-50/50" 
+                    type="email"
+                    placeholder="name@example.com"
+                    className="pl-10 h-11 border-zinc-200 focus:ring-red-600 focus:border-red-600 bg-zinc-50/50"
                     required
                   />
                 </div>
@@ -101,93 +104,93 @@ export function AuthModal({ trigger }: AuthModalProps) {
 
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <label className="text-xs font-bold text-zinc-500 uppercase">Password</label>
-                  <Link href="/forgot-password" className="text-xs font-medium text-red-600 hover:underline">Forgot?</Link>
+                  <label className="text-xs font-bold text-zinc-500 uppercase">{dictionary.auth.password}</label>
+                  <Link href="/forgot-password" className="text-xs font-medium text-red-600 hover:underline">{dictionary.auth.forgot}</Link>
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                  <Input 
+                  <Input
                     name="password"
-                    type="password" 
-                    placeholder="••••••••" 
-                    className="pl-10 h-11 border-zinc-200 focus:ring-red-600 focus:border-red-600 bg-zinc-50/50" 
+                    type="password"
+                    placeholder="••••••••"
+                    className="pl-10 h-11 border-zinc-200 focus:ring-red-600 focus:border-red-600 bg-zinc-50/50"
                     required
                   />
                 </div>
               </div>
 
-              <LoginButton />
+              <LoginButton pendingText={dictionary.auth.signing_in} text={dictionary.auth.sign_in} />
             </form>
           ) : (
             <form action={registerAction} className="space-y-4">
-               <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-500 uppercase">Name / Company Name</label>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-zinc-500 uppercase">{dictionary.auth.name_company}</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                  <Input 
+                  <Input
                     name="name"
-                    placeholder="John Doe / Acme Corp" 
-                    className="pl-10 h-11 border-zinc-200 focus:ring-red-600 focus:border-red-600 bg-zinc-50/50" 
+                    placeholder={dictionary.auth.name_placeholder}
+                    className="pl-10 h-11 border-zinc-200 focus:ring-red-600 focus:border-red-600 bg-zinc-50/50"
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-500 uppercase">Tax ID (Optional)</label>
+                <label className="text-xs font-bold text-zinc-500 uppercase">{dictionary.auth.tax_id_optional}</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                  <Input 
+                  <Input
                     name="taxId"
-                    placeholder="12345678-1-42" 
-                    className="pl-10 h-11 border-zinc-200 focus:ring-red-600 focus:border-red-600 bg-zinc-50/50" 
+                    placeholder={dictionary.auth.tax_placeholder}
+                    className="pl-10 h-11 border-zinc-200 focus:ring-red-600 focus:border-red-600 bg-zinc-50/50"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-500 uppercase">Phone Number</label>
+                <label className="text-xs font-bold text-zinc-500 uppercase">{dictionary.auth.phone_number}</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                  <Input 
+                  <Input
                     name="phone"
                     type="tel"
-                    placeholder="+36 30 123 4567" 
-                    className="pl-10 h-11 border-zinc-200 focus:ring-red-600 focus:border-red-600 bg-zinc-50/50" 
+                    placeholder={dictionary.auth.phone_placeholder}
+                    className="pl-10 h-11 border-zinc-200 focus:ring-red-600 focus:border-red-600 bg-zinc-50/50"
                     required
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-500 uppercase">Email Address</label>
+                <label className="text-xs font-bold text-zinc-500 uppercase">{dictionary.auth.email_address}</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                  <Input 
+                  <Input
                     name="email"
-                    type="email" 
-                    placeholder="name@example.com" 
-                    className="pl-10 h-11 border-zinc-200 focus:ring-red-600 focus:border-red-600 bg-zinc-50/50" 
+                    type="email"
+                    placeholder="name@example.com"
+                    className="pl-10 h-11 border-zinc-200 focus:ring-red-600 focus:border-red-600 bg-zinc-50/50"
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-zinc-500 uppercase">Password</label>
+                <label className="text-xs font-bold text-zinc-500 uppercase">{dictionary.auth.password}</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                  <Input 
+                  <Input
                     name="password"
-                    type="password" 
-                    placeholder="••••••••" 
-                    className="pl-10 h-11 border-zinc-200 focus:ring-red-600 focus:border-red-600 bg-zinc-50/50" 
+                    type="password"
+                    placeholder="••••••••"
+                    className="pl-10 h-11 border-zinc-200 focus:ring-red-600 focus:border-red-600 bg-zinc-50/50"
                     required
                   />
                 </div>
               </div>
 
-              <RegisterButton />
+              <RegisterButton pendingText={dictionary.auth.creating_account} text={dictionary.auth.create_account} />
             </form>
           )}
         </div>

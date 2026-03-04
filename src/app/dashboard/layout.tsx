@@ -2,10 +2,10 @@
 import Link from "next/link"
 import Image from "next/image"
 import { Logo } from "@/components/ui/logo"
-import { 
-  LayoutDashboard, 
-  Calendar, 
-  User, 
+import {
+  LayoutDashboard,
+  Calendar,
+  User,
   LogOut,
   Car,
   ArrowLeft
@@ -14,6 +14,8 @@ import { Button } from "@/components/ui/button"
 import { logoutAction } from "@/app/admin/actions" // Reuse logout
 import { getSession } from "@/lib/auth"
 import { redirect } from "next/navigation"
+import { cookies } from "next/headers"
+import { dictionaries } from "@/lib/dictionary"
 
 export default async function DashboardLayout({
   children,
@@ -22,6 +24,10 @@ export default async function DashboardLayout({
 }) {
   const session = await getSession()
   const user = session?.user
+
+  const cookieStore = await cookies()
+  const lang = cookieStore.get("NEXT_LOCALE")?.value || "en"
+  const dictionary = dictionaries[lang as keyof typeof dictionaries] || dictionaries.en
 
   // Ensure only logged in users (and specifically USER role, though ADMINs can also view technically)
   if (!user) {
@@ -36,50 +42,50 @@ export default async function DashboardLayout({
           <Link href="/" className="mb-4 block">
             <Button variant="outline" size="sm" className="w-full mb-4 border-zinc-200 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Home
+              {dictionary.dashboard.back_home}
             </Button>
           </Link>
           <Link href="/" className="block">
             <div className="mb-2">
               <Logo variant="dark" />
             </div>
-            <span className="text-xs font-normal text-zinc-400 block tracking-widest mt-1">CLIENT PORTAL</span>
+            <span className="text-xs font-normal text-zinc-400 block tracking-widest mt-1">{dictionary.dashboard.client_portal}</span>
           </Link>
           <div className="mt-4 pt-4 border-t border-zinc-100 text-xs">
-            <span className="text-zinc-500 block">Welcome back,</span>
+            <span className="text-zinc-500 block">{dictionary.dashboard.welcome_back}</span>
             <span className="text-zinc-900 font-bold block truncate">{user.name}</span>
           </div>
         </div>
-        
+
         <nav className="flex-1 p-4 space-y-2">
           <Link href="/dashboard">
             <Button variant="ghost" className="w-full justify-start text-zinc-600 hover:text-red-600 hover:bg-red-50">
               <LayoutDashboard className="mr-3 h-5 w-5" />
-              Overview
+              {dictionary.dashboard.overview}
             </Button>
           </Link>
-          
+
           <Link href="/dashboard/bookings">
             <Button variant="ghost" className="w-full justify-start text-zinc-600 hover:text-red-600 hover:bg-red-50">
               <Calendar className="mr-3 h-5 w-5" />
-              My Bookings
+              {dictionary.dashboard.my_bookings}
             </Button>
           </Link>
-          
+
           <Link href="/dashboard/profile">
             <Button variant="ghost" className="w-full justify-start text-zinc-600 hover:text-red-600 hover:bg-red-50">
               <User className="mr-3 h-5 w-5" />
-              My Profile
+              {dictionary.dashboard.my_profile}
             </Button>
           </Link>
 
           <div className="pt-4 pb-2 border-t border-zinc-100 mt-4">
-             <Link href="/fleet">
-                <Button variant="outline" className="w-full justify-start border-zinc-200 text-zinc-700 hover:border-red-600 hover:text-red-600">
-                  <Car className="mr-3 h-5 w-5" />
-                  Browse Cars
-                </Button>
-              </Link>
+            <Link href="/fleet">
+              <Button variant="outline" className="w-full justify-start border-zinc-200 text-zinc-700 hover:border-red-600 hover:text-red-600">
+                <Car className="mr-3 h-5 w-5" />
+                {dictionary.dashboard.browse_cars}
+              </Button>
+            </Link>
           </div>
         </nav>
 
@@ -87,7 +93,7 @@ export default async function DashboardLayout({
           <form action={logoutAction}>
             <Button variant="ghost" className="w-full justify-start text-zinc-500 hover:text-red-600 hover:bg-red-50">
               <LogOut className="mr-3 h-5 w-5" />
-              Sign Out
+              {dictionary.dashboard.sign_out}
             </Button>
           </form>
         </div>
@@ -98,11 +104,11 @@ export default async function DashboardLayout({
         <main className="flex-1 p-4 md:p-8 overflow-y-auto">
           {/* Mobile Header */}
           <div className="md:hidden flex justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-zinc-200">
-             <Link href="/" className="text-xl font-black tracking-tight flex items-center gap-2">
+            <Link href="/" className="text-xl font-black tracking-tight flex items-center gap-2">
               <ArrowLeft className="w-5 h-5 text-zinc-500" />
               <span>JUST <span className="text-red-600">RENT</span></span>
             </Link>
-             <form action={logoutAction}>
+            <form action={logoutAction}>
               <Button variant="ghost" size="sm">
                 <LogOut className="w-5 h-5" />
               </Button>

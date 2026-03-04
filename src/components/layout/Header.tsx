@@ -192,6 +192,7 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
             ) : (
               <div className="flex items-center gap-2 sm:gap-4">
                 <AuthModal
+                  dictionary={dictionary}
                   trigger={
                     <button className={cn(
                       "text-sm font-bold transition-colors hover:opacity-80",
@@ -202,6 +203,7 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
                   }
                 />
                 <AuthModal
+                  dictionary={dictionary}
                   trigger={
                     <Button className={cn(
                       "rounded-lg px-4 sm:px-6 font-bold shadow-sm hover:shadow-md hover:scale-105 transition-all text-xs sm:text-sm h-9 sm:h-10",
@@ -291,6 +293,7 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
                     ) : (
                       <div className="grid gap-3">
                         <AuthModal
+                          dictionary={dictionary}
                           trigger={
                             <Button className="w-full bg-white text-black hover:bg-zinc-200 font-bold h-12 text-lg rounded-xl">
                               {t('log_in', 'header')}
@@ -298,6 +301,7 @@ export function Header({ transparent = false, user, dictionary = {}, lang = "en"
                           }
                         />
                         <AuthModal
+                          dictionary={dictionary}
                           trigger={
                             <Button variant="outline" className="w-full border-zinc-700 bg-transparent text-white hover:bg-zinc-800 font-bold h-12 text-lg rounded-xl">
                               {t('sign_up', 'header')}
