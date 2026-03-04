@@ -12,7 +12,7 @@ export function Hero({ dictionary, carCount }: { dictionary?: Dictionary; carCou
   };
 
   return (
-    <div className="md:pb-6 bg-zinc-50 relative">
+    <div className="md:pb-0 bg-white relative">
       <section className="relative h-[80vh] md:h-[900px] flex flex-col justify-start pt-28 md:pt-48 items-center overflow-hidden rounded-b-[2.5rem] md:rounded-b-[3rem] shadow-2xl">
 
         {/* Background Image with Parallax-like feel */}
