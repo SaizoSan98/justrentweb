@@ -165,55 +165,24 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
     return total + price
   }, 0)
 
-  // After Hours Logic
+  // After Hours Logic - Matching Renteon rules exactly
+  // Normal hours: 08:00 - 20:00 (inclusive)
+  // Outside this range = out-of-hours fee of 50€ per occurrence
+  const RENTEON_OOH_FEE = 50 // EUR
   const parseTime = (t: string) => {
     const [h, m] = t.split(':').map(Number)
     return h * 60 + m
   }
 
-  const isAfterHours = (date: Date | undefined, time: string) => {
-    if (!settings || !date) return false
-
-    // Parse weekly settings
-    let weeklyHours = settings.weeklyHours
-    if (typeof weeklyHours === 'string') {
-      try {
-        weeklyHours = JSON.parse(weeklyHours)
-      } catch (e) {
-        weeklyHours = {}
-      }
-    }
-
-    if (!weeklyHours) {
-      // Fallback to global legacy settings
-      const t = parseTime(time)
-      const open = parseTime(settings.openingTime || "08:00")
-      const close = parseTime(settings.closingTime || "18:00")
-      return t < open || t > close
-    }
-
-    const dayName = format(date, 'EEEE') // "Monday", "Tuesday"...
-    const daySettings = weeklyHours[dayName]
-
-    if (!daySettings) {
-      // If no settings for this day, assume default open
-      const t = parseTime(time)
-      const open = parseTime(settings.openingTime || "08:00")
-      const close = parseTime(settings.closingTime || "18:00")
-      return t < open || t > close
-    }
-
-    if (daySettings.isClosed) return true
-
+  const isAfterHours = (time: string) => {
     const t = parseTime(time)
-    const open = parseTime(daySettings.open)
-    const close = parseTime(daySettings.close)
-
+    const open = 8 * 60   // 08:00
+    const close = 20 * 60 // 20:00
     return t < open || t > close
   }
 
-  const pickupFee = (settings && isAfterHours(startDate, startTime)) ? Number(car.pickupAfterHoursPrice || 0) : 0
-  const returnFee = (settings && isAfterHours(endDate, endTime)) ? Number(car.returnAfterHoursPrice || 0) : 0
+  const pickupFee = isAfterHours(startTime) ? RENTEON_OOH_FEE : 0
+  const returnFee = isAfterHours(endTime) ? RENTEON_OOH_FEE : 0
 
   // Automatically find and add out-of-hours extras if applicable
   // This ensures they are passed to the server action as "selectedExtras" even if hidden from UI
@@ -231,7 +200,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
   })
 
   // Calculate if we need to auto-select this extra
-  const needsOutOfHours = (settings && (isAfterHours(startDate, startTime) || isAfterHours(endDate, endTime)))
+  const needsOutOfHours = (isAfterHours(startTime) || isAfterHours(endTime))
 
   // Update: We don't want to double charge. car.pickupAfterHoursPrice is likely what we use for calculation.
   // If there is an EXTRA for it, we should use that instead? 
