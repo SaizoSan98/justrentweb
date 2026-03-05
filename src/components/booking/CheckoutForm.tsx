@@ -1099,6 +1099,17 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                 </DialogContent>
               </Dialog>
 
+              {/* Promo Code applied badge */}
+              {appliedPromoCode && promoDiscountAmount > 0 && (
+                <div className="flex justify-between items-center bg-green-900/30 border border-green-700/40 rounded-lg px-3 py-2 mt-2">
+                  <span className="flex items-center gap-1.5 text-green-400 text-xs font-bold uppercase tracking-wider">
+                    <Tag className="w-3.5 h-3.5" />
+                    {appliedPromoCode.toUpperCase()}
+                  </span>
+                  <span className="text-green-400 font-bold text-sm">-€{Number(promoDiscountAmount.toFixed(2))}</span>
+                </div>
+              )}
+
               {/* Visible Deposit Field below Total */}
               <div className="pt-4 border-t border-zinc-800 flex justify-between items-center">
                 <div className="flex items-center gap-2 text-zinc-400 font-bold text-xs uppercase tracking-wider">
