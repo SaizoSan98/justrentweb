@@ -34,11 +34,11 @@ export function mapCarToCategoryId(car: any): number {
     if (model.includes('golf')) return 301; // Fallback
     if (model.includes('arteon')) return 292; // Similar to Passat group
   }
-  
+
   if (make.includes('skoda') || make.includes('škoda')) {
     if (model.includes('fabia')) {
-        if (transmission === 'manual') return 411;
-        return 402;
+      if (transmission === 'manual') return 411;
+      return 402;
     }
     if (model.includes('octavia')) return 301;
     if (model.includes('superb')) return 292;
@@ -47,8 +47,8 @@ export function mapCarToCategoryId(car: any): number {
 
   if (make.includes('kia')) {
     if (model.includes('ceed')) {
-        if (model.includes('sw') || model.includes('kombi')) return 293;
-        return 409;
+      if (model.includes('sw') || model.includes('kombi')) return 293;
+      return 409;
     }
     if (model.includes('sportage')) return 329;
     if (model.includes('niro')) return 290; // Crossover group
@@ -64,12 +64,12 @@ export function mapCarToCategoryId(car: any): number {
   if (make.includes('toyota')) {
     if (model.includes('yaris') && model.includes('cross')) return 290;
     if (model.includes('corolla')) {
-        if (model.includes('ts') || model.includes('touring')) return 298;
-        return 290; // Sedan (in 290 group with T-Cross/T-Roc)
+      if (model.includes('ts') || model.includes('touring')) return 298;
+      return 290; // Sedan (in 290 group with T-Cross/T-Roc)
     }
     if (model.includes('proace')) return 294;
   }
-  
+
   if (make.includes('bmw')) {
     if (model.includes('3')) return 297;
     if (model.includes('5')) return 297;
@@ -93,13 +93,13 @@ export function mapCarToCategoryId(car: any): number {
   if (make.includes('peugeot')) {
     if (model.includes('208')) return 401;
     if (model.includes('308')) {
-        if (model.includes('sw')) return 293;
-        return 412;
+      if (model.includes('sw')) return 293;
+      return 412;
     }
     if (model.includes('3008')) return 330;
     if (model.includes('5008')) return 348;
   }
-  
+
   if (make.includes('volvo')) {
     if (model.includes('xc60')) return 322;
     if (model.includes('xc90')) return 371; // Still mapped to Category 371? 
@@ -111,17 +111,17 @@ export function mapCarToCategoryId(car: any): number {
   }
 
   if (make.includes('seat')) {
-      if (model.includes('leon')) return 301;
-      if (model.includes('ateca')) return 329;
-      if (model.includes('tarraco')) return 330;
+    if (model.includes('leon')) return 301;
+    if (model.includes('ateca')) return 329;
+    if (model.includes('tarraco')) return 330;
   }
 
   if (make.includes('omoda') || model.includes('omoda')) {
-      return 330;
+    return 330;
   }
 
   // Default fallback if no match found (use a generic category like Golf/Compact)
-  return 301; 
+  return 301;
 }
 
 // Authentication
@@ -136,10 +136,10 @@ export async function getRenteonToken(): Promise<string> {
     const clientSecret = process.env.RENTEON_CLIENT_SECRET || '2016-Web';
     const username = process.env.RENTEON_USERNAME || 'Web01';
     const password = process.env.RENTEON_PASSWORD || '0pp.4fgt!RtZZ1';
-    
+
     // Generate Salt (8-50 chars)
     const salt = crypto.randomBytes(16).toString('hex');
-    
+
     // Generate Signature
     // Pattern: {username}{salt}{secret}{password}{salt}{secret}{client_id}
     const compositeKey = `${username}${salt}${clientSecret}${password}${salt}${clientSecret}${clientId}`;
@@ -152,12 +152,12 @@ export async function getRenteonToken(): Promise<string> {
     params.append('client_id', clientId);
     params.append('signature', signature);
     params.append('salt', salt);
-    
+
     // Authorization Header is NOT needed according to documentation when using signature
     // But some implementations might still expect Basic Auth or Bearer if specified otherwise.
     // The doc says: "Params format: BODY: application/x-www-form-urlencoded"
     // And does NOT mention Authorization header for token request, only parameters in body.
-    
+
     const response = await fetch(RENTEON_TOKEN_URL, {
       method: 'POST',
       headers: {
@@ -176,7 +176,7 @@ export async function getRenteonToken(): Promise<string> {
     cachedToken = data.access_token;
     // Set expiry (safety margin 60s)
     tokenExpiry = Date.now() + (data.expires_in * 1000) - 60000;
-    
+
     return cachedToken as string;
   } catch (error) {
     console.error('Renteon Auth Exception:', error);
@@ -222,102 +222,102 @@ export async function fetchRenteonServices(): Promise<any[]> {
 
   try {
     for (const ep of endpoints) {
-        try {
-            const response = await fetch(`${RENTEON_API_URL}${ep}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
+      try {
+        const response = await fetch(`${RENTEON_API_URL}${ep}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
 
-            if (response.ok) {
-                const data = await response.json();
-                if (Array.isArray(data)) {
-                    // console.log(`Fetched ${data.length} items from ${ep}`);
-                    data.forEach((item: any) => {
-                        const id = item.Id || item.id || item.Code; // Unique ID check
-                        if (id && !seenIds.has(id)) {
-                            seenIds.add(id);
-                            allServices.push(item);
-                        } else if (!id) {
-                             // If no ID, push anyway (rare)
-                            allServices.push(item);
-                        }
-                    });
-                }
-            }
-        } catch (innerError) {
-            console.warn(`Failed to fetch from ${ep}:`, innerError);
+        if (response.ok) {
+          const data = await response.json();
+          if (Array.isArray(data)) {
+            // console.log(`Fetched ${data.length} items from ${ep}`);
+            data.forEach((item: any) => {
+              const id = item.Id || item.id || item.Code; // Unique ID check
+              if (id && !seenIds.has(id)) {
+                seenIds.add(id);
+                allServices.push(item);
+              } else if (!id) {
+                // If no ID, push anyway (rare)
+                allServices.push(item);
+              }
+            });
+          }
         }
+      } catch (innerError) {
+        console.warn(`Failed to fetch from ${ep}:`, innerError);
+      }
     }
 
     // FALLBACK: Calculation Strategy if standard endpoints return nothing
     if (allServices.length === 0) {
-        console.log("Standard endpoints returned 0 services. Attempting Calculation Strategy (1 Day)...");
-        try {
-            const dOut = new Date(); dOut.setDate(dOut.getDate() + 35);
-            const dIn = new Date(dOut); dIn.setDate(dIn.getDate() + 1); // 1 day to detect per-day vs fixed
-            
-            const availPayload = {
-                DateOut: dOut.toISOString(),
-                DateIn: dIn.toISOString(),
-                OfficeOutId: 54, 
-                OfficeInId: 54,
-                BookAsCommissioner: true,
-                PricelistId: 306,
-                Currency: "EUR"
+      console.log("Standard endpoints returned 0 services. Attempting Calculation Strategy (1 Day)...");
+      try {
+        const dOut = new Date(); dOut.setDate(dOut.getDate() + 35);
+        const dIn = new Date(dOut); dIn.setDate(dIn.getDate() + 1); // 1 day to detect per-day vs fixed
+
+        const availPayload = {
+          DateOut: dOut.toISOString(),
+          DateIn: dIn.toISOString(),
+          OfficeOutId: 54,
+          OfficeInId: 54,
+          BookAsCommissioner: true,
+          PricelistId: 306,
+          Currency: "EUR"
+        };
+
+        const resAvail = await fetch(`${RENTEON_API_URL}/bookings/availability`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(availPayload)
+        });
+
+        if (resAvail.ok) {
+          const cars = await resAvail.json();
+          if (Array.isArray(cars) && cars.length > 0) {
+            const car = cars[0];
+            const calcPayload = {
+              ...availPayload,
+              CarCategoryId: car.CarCategoryId || car.CategoryId || car.Id
             };
-            
-            const resAvail = await fetch(`${RENTEON_API_URL}/bookings/availability`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify(availPayload)
+
+            const resCalc = await fetch(`${RENTEON_API_URL}/bookings/calculate`, {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify(calcPayload)
             });
-            
-            if (resAvail.ok) {
-                const cars = await resAvail.json();
-                if (Array.isArray(cars) && cars.length > 0) {
-                    const car = cars[0];
-                    const calcPayload = {
-                        ...availPayload,
-                        CarCategoryId: car.CarCategoryId || car.CategoryId || car.Id
-                    };
-                    
-                    const resCalc = await fetch(`${RENTEON_API_URL}/bookings/calculate`, {
-                        method: 'POST',
-                        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify(calcPayload)
-                    });
-                    
-                    if (resCalc.ok) {
-                        const calcData = await resCalc.json();
-                        if (calcData.Services && Array.isArray(calcData.Services)) {
-                            console.log(`Calculation Strategy found ${calcData.Services.length} services!`);
-                            calcData.Services.forEach((s: any) => {
-                                // Extract Price from nested ServicePrice if available
-                                const price = s.ServicePrice?.AmountTotal || s.Price || 0;
-                                const item = {
-                                    ...s,
-                                    Price: price,
-                                    Title: s.Name,
-                                    Id: s.ServiceId || s.Id
-                                };
-                                const id = item.Id;
-                                if (id && !seenIds.has(id)) {
-                                    seenIds.add(id);
-                                    allServices.push(item);
-                                }
-                            });
-                        }
-                    }
-                }
+
+            if (resCalc.ok) {
+              const calcData = await resCalc.json();
+              if (calcData.Services && Array.isArray(calcData.Services)) {
+                console.log(`Calculation Strategy found ${calcData.Services.length} services!`);
+                calcData.Services.forEach((s: any) => {
+                  // Extract Price from nested ServicePrice if available
+                  const price = s.ServicePrice?.AmountTotal || s.Price || 0;
+                  const item = {
+                    ...s,
+                    Price: price,
+                    Title: s.Name,
+                    Id: s.ServiceId || s.Id
+                  };
+                  const id = item.Id;
+                  if (id && !seenIds.has(id)) {
+                    seenIds.add(id);
+                    allServices.push(item);
+                  }
+                });
+              }
             }
-        } catch (calcErr) {
-            console.error("Calculation Strategy Failed:", calcErr);
+          }
         }
+      } catch (calcErr) {
+        console.error("Calculation Strategy Failed:", calcErr);
+      }
     }
-    
+
     return allServices;
 
   } catch (error) {
@@ -336,7 +336,7 @@ async function findBookingInRenteon(booking: any): Promise<string | null> {
     // Assuming the search endpoint filters by DateOut range.
     // We'll broaden the search a bit to ensure we catch it (e.g. +/- 1 day or exact)
     // Actually, let's try exact date match as Renteon likely expects that or a range.
-    
+
     // Search Endpoint: POST /api/bookings/search
     // Payload guess based on common Renteon patterns (DateFrom/DateTo)
     const payload = {
@@ -359,15 +359,15 @@ async function findBookingInRenteon(booking: any): Promise<string | null> {
     }
 
     const results = await response.json();
-    
+
     if (Array.isArray(results)) {
       // Client-side filtering to find the exact booking
       // Match by Client Name AND Email
       const match = results.find((b: any) => {
-        const clientMatch = 
-             (b.Client?.Email?.toLowerCase() === booking.email.toLowerCase()) ||
-             (b.Client?.FirstName?.toLowerCase() === booking.firstName.toLowerCase() && b.Client?.LastName?.toLowerCase() === booking.lastName.toLowerCase());
-        
+        const clientMatch =
+          (b.Client?.Email?.toLowerCase() === booking.email.toLowerCase()) ||
+          (b.Client?.FirstName?.toLowerCase() === booking.firstName.toLowerCase() && b.Client?.LastName?.toLowerCase() === booking.lastName.toLowerCase());
+
         // Also check if dates match roughly (string comparison of ISO date part)
         // b.DateOut might be "2026-03-05T12:00:00"
         const dateMatch = b.DateOut.startsWith(booking.startDate.toISOString().split('T')[0]);
@@ -377,7 +377,7 @@ async function findBookingInRenteon(booking: any): Promise<string | null> {
 
       return match ? match.ReservationNumber : null;
     }
-    
+
     return null;
   } catch (error) {
     console.error('Renteon Search Exception:', error);
@@ -388,7 +388,7 @@ async function findBookingInRenteon(booking: any): Promise<string | null> {
 // Booking Sync
 export async function syncBookingToRenteon(booking: any) {
   console.log(`Starting Renteon Sync for booking ${booking.id}`);
-  
+
   const token = await getRenteonToken();
   if (!token) {
     console.error('Failed to obtain Renteon token, aborting sync');
@@ -403,13 +403,13 @@ export async function syncBookingToRenteon(booking: any) {
     const dateIn = booking.endDate.toISOString();
 
     // Step 2: Create Booking Model
-    const createPayload = {
+    const createPayload: any = {
       CarCategoryId: categoryId,
       OfficeOutId: officeOutId,
       OfficeInId: officeInId,
       DateOut: dateOut,
       DateIn: dateIn,
-      Currency: "EUR", 
+      Currency: "EUR",
       PricelistId: 306, // WEB Pricelist (ID 306)
       BookAsCommissioner: true, // Required for Agency/Partner API users
       IgnoreAvailability: true, // Force booking creation even if availability check fails
@@ -419,6 +419,10 @@ export async function syncBookingToRenteon(booking: any) {
       // Or try 'OnRequest': true
       OnRequest: true
     };
+
+    if (booking.promoCode) {
+      createPayload.PromoCode = booking.promoCode;
+    }
 
     // 1. Availability Check (Optional but recommended to get PricelistId if needed)
     // We'll skip explicitly using the result for now unless errors occur.
@@ -433,15 +437,15 @@ export async function syncBookingToRenteon(booking: any) {
     });
 
     if (!calcResponse.ok) {
-        const err = await calcResponse.text();
-        console.warn('Renteon Price Calc Warning (continuing anyway):', err);
-        // Continue to create booking as create might handle it differently or give better error
+      const err = await calcResponse.text();
+      console.warn('Renteon Price Calc Warning (continuing anyway):', err);
+      // Continue to create booking as create might handle it differently or give better error
     } else {
-        const calcData = await calcResponse.json();
-        // If we got a price, we could update our local record, but for now just use it to validate
-        console.log('Renteon Price Validated:', calcData.Total);
+      const calcData = await calcResponse.json();
+      // If we got a price, we could update our local record, but for now just use it to validate
+      console.log('Renteon Price Validated:', calcData.Total);
     }
-    
+
     // 2. Create Booking (In-Memory)
     console.log("Creating Renteon booking with payload:", JSON.stringify(createPayload, null, 2));
     const createResponse = await fetch(`${RENTEON_API_URL}/bookings/create`, {
@@ -454,51 +458,51 @@ export async function syncBookingToRenteon(booking: any) {
     });
 
     if (!createResponse.ok) {
-        const err = await createResponse.text();
-        console.error('Renteon Create Booking Failed. Status:', createResponse.status, 'Error:', err);
-        
-        // RETRY STRATEGY: Try to create without specific category if availability fails
-        if (err.includes('no available cars') || err.includes('Price Calc Warning') || true) { // Always try retry if first attempt failed
-             console.warn('Retrying Renteon booking with explicit overbooking flags...');
-             const fallbackPayload = { ...createPayload };
-             
-             // IMPORTANT: CarCategoryId IS required by Renteon, so we must keep it.
-             // Instead, we rely heavily on the overbooking flags.
-             // We also try to set 'OnRequest' which might bypass immediate availability check.
-             
-             (fallbackPayload as any).IgnoreAvailability = true; 
-             (fallbackPayload as any).Force = true;
-             (fallbackPayload as any).Overbooking = true;
-             (fallbackPayload as any).OnRequest = true; // Try to request as "On Request" booking
-             (fallbackPayload as any).Status = 1; // Try to force status to "Quote" or "Pending" if possible (1 usually is Quote/Pending)
+      const err = await createResponse.text();
+      console.error('Renteon Create Booking Failed. Status:', createResponse.status, 'Error:', err);
 
-             try {
-                 const retryResponse = await fetch(`${RENTEON_API_URL}/bookings/create`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(fallbackPayload)
-                });
-                
-                if (retryResponse.ok) {
-                     const retryModel = await retryResponse.json();
-                     console.log('Retry Successful. Model ID:', retryModel.Id);
-                     return await finalizeBooking(retryModel, booking, token);
-                } else {
-                     const retryErr = await retryResponse.text();
-                     console.error('Retry Failed as well:', retryErr);
-                     // If still fails, we can't do much more via API.
-                     return { success: false, error: `Primary and Retry failed: ${retryErr}` };
-                }
-             } catch (retryEx) {
-                 console.error('Retry Exception:', retryEx);
-                 return { success: false, error: 'Retry Exception' };
-             }
+      // RETRY STRATEGY: Try to create without specific category if availability fails
+      if (err.includes('no available cars') || err.includes('Price Calc Warning') || true) { // Always try retry if first attempt failed
+        console.warn('Retrying Renteon booking with explicit overbooking flags...');
+        const fallbackPayload = { ...createPayload };
+
+        // IMPORTANT: CarCategoryId IS required by Renteon, so we must keep it.
+        // Instead, we rely heavily on the overbooking flags.
+        // We also try to set 'OnRequest' which might bypass immediate availability check.
+
+        (fallbackPayload as any).IgnoreAvailability = true;
+        (fallbackPayload as any).Force = true;
+        (fallbackPayload as any).Overbooking = true;
+        (fallbackPayload as any).OnRequest = true; // Try to request as "On Request" booking
+        (fallbackPayload as any).Status = 1; // Try to force status to "Quote" or "Pending" if possible (1 usually is Quote/Pending)
+
+        try {
+          const retryResponse = await fetch(`${RENTEON_API_URL}/bookings/create`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(fallbackPayload)
+          });
+
+          if (retryResponse.ok) {
+            const retryModel = await retryResponse.json();
+            console.log('Retry Successful. Model ID:', retryModel.Id);
+            return await finalizeBooking(retryModel, booking, token);
+          } else {
+            const retryErr = await retryResponse.text();
+            console.error('Retry Failed as well:', retryErr);
+            // If still fails, we can't do much more via API.
+            return { success: false, error: `Primary and Retry failed: ${retryErr}` };
+          }
+        } catch (retryEx) {
+          console.error('Retry Exception:', retryEx);
+          return { success: false, error: 'Retry Exception' };
         }
-        
-        return { success: false, error: err };
+      }
+
+      return { success: false, error: err };
     }
 
     const bookingModel = await createResponse.json();
@@ -512,153 +516,153 @@ export async function syncBookingToRenteon(booking: any) {
 
 // Helper to finalize and save booking (extracted to avoid code duplication)
 async function finalizeBooking(bookingModel: any, booking: any, token: string) {
-    console.log("Renteon Create Response (Model ID):", bookingModel.Id);
+  console.log("Renteon Create Response (Model ID):", bookingModel.Id);
 
-    // 3. Populate Customer Data
-    // NOTE: 'ClientName' might be required at the root level or within Client object depending on specific Renteon config.
-    // Based on error "ClientName is required", we'll ensure it's populated.
-    // Often Name = LastName + FirstName or CompanyName
-    
-    const clientName = booking.isCompany ? booking.companyName : `${booking.lastName} ${booking.firstName}`;
+  // 3. Populate Customer Data
+  // NOTE: 'ClientName' might be required at the root level or within Client object depending on specific Renteon config.
+  // Based on error "ClientName is required", we'll ensure it's populated.
+  // Often Name = LastName + FirstName or CompanyName
 
-    bookingModel.Client = {
-        FirstName: booking.firstName,
-        LastName: booking.lastName,
-        Email: booking.email,
-        Tel: booking.phone,
-        Name: clientName // Explicitly adding Name field to Client object
-    };
-    
-    // Also set ClientName at root if the model supports it (common in some API versions)
-    bookingModel.ClientName = clientName;
+  const clientName = booking.isCompany ? booking.companyName : `${booking.lastName} ${booking.firstName}`;
 
-    // Voucher Number is required for Commissioner/Partner bookings
-    // Use the JustRent booking ID as the voucher number
-    bookingModel.VoucherNumber = booking.id;
+  bookingModel.Client = {
+    FirstName: booking.firstName,
+    LastName: booking.lastName,
+    Email: booking.email,
+    Tel: booking.phone,
+    Name: clientName // Explicitly adding Name field to Client object
+  };
 
-    bookingModel.FlightNumber = booking.flightNumber;
-    bookingModel.Note = booking.comments;
+  // Also set ClientName at root if the model supports it (common in some API versions)
+  bookingModel.ClientName = clientName;
 
-    if (booking.isCompany) {
-        bookingModel.Client.CompanyName = booking.companyName;
-        bookingModel.Client.TaxId = booking.companyTaxId;
-        bookingModel.Client.Address1 = booking.companyAddress;
+  // Voucher Number is required for Commissioner/Partner bookings
+  // Use the JustRent booking ID as the voucher number
+  bookingModel.VoucherNumber = booking.id;
+
+  bookingModel.FlightNumber = booking.flightNumber;
+  bookingModel.Note = booking.comments;
+
+  if (booking.isCompany) {
+    bookingModel.Client.CompanyName = booking.companyName;
+    bookingModel.Client.TaxId = booking.companyTaxId;
+    bookingModel.Client.Address1 = booking.companyAddress;
+  }
+
+  // 4. Handle Extras & Insurance
+
+  // 4a. Insurance Plan (Exact Match)
+  let insuranceMatched = false;
+
+  if (booking.insurancePlan && booking.insurancePlan.renteonId) {
+    // Find by Renteon ID from InsurancePlan model
+    const plan = bookingModel.Services.find((s: any) =>
+      (s.Id && s.Id.toString() === booking.insurancePlan.renteonId.toString()) ||
+      (s.ServiceId && s.ServiceId.toString() === booking.insurancePlan.renteonId.toString())
+    );
+
+    if (plan) {
+      plan.IsSelected = true;
+      plan.Quantity = 1;
+      insuranceMatched = true;
+      console.log(`Selected Insurance Plan: ${plan.Name} (ID: ${plan.Id}) via DB Relation`);
+    } else {
+      console.warn(`Insurance Plan '${booking.insurancePlan.name}' (ID: ${booking.insurancePlan.renteonId}) not found in Renteon services.`);
     }
+  }
 
-    // 4. Handle Extras & Insurance
-    
-    // 4a. Insurance Plan (Exact Match)
-    let insuranceMatched = false;
-    
-    if (booking.insurancePlan && booking.insurancePlan.renteonId) {
-        // Find by Renteon ID from InsurancePlan model
-        const plan = bookingModel.Services.find((s: any) => 
-            (s.Id && s.Id.toString() === booking.insurancePlan.renteonId.toString()) ||
-            (s.ServiceId && s.ServiceId.toString() === booking.insurancePlan.renteonId.toString())
+  // Fallback: Full Insurance (Boolean flag)
+  if (!insuranceMatched && booking.fullInsurance) {
+    // Try to find by multiple criteria
+    const fullIns = bookingModel.Services.find((s: any) =>
+      s.Name.toLowerCase().includes('full insurance') ||
+      s.Name.toLowerCase().includes('full protection') ||
+      s.Id === 3215 || s.Id === 3213 || s.Id === 3214 ||
+      s.ServiceTypeId === 3 // Insurance type often has specific ID
+    );
+
+    if (fullIns) {
+      fullIns.IsSelected = true;
+      fullIns.Quantity = 1;
+      console.log(`Selected Full Insurance: ${fullIns.Name} (ID: ${fullIns.Id}) via Boolean Flag`);
+    } else {
+      console.warn('Full Insurance requested but no matching service found in Renteon model.');
+    }
+  }
+
+  // 4b. Selected Extras (Highway fee, Baby seats, etc.)
+  if (booking.extras && Array.isArray(booking.extras)) {
+    booking.extras.forEach((extra: any) => {
+      let serviceMatch = null;
+
+      // Try match by Renteon ID first
+      if (extra.renteonId) {
+        serviceMatch = bookingModel.Services.find((s: any) =>
+          (s.Id && s.Id.toString() === extra.renteonId.toString()) ||
+          (s.ServiceId && s.ServiceId.toString() === extra.renteonId.toString())
         );
-        
-        if (plan) {
-            plan.IsSelected = true;
-            plan.Quantity = 1;
-            insuranceMatched = true;
-            console.log(`Selected Insurance Plan: ${plan.Name} (ID: ${plan.Id}) via DB Relation`);
-        } else {
-            console.warn(`Insurance Plan '${booking.insurancePlan.name}' (ID: ${booking.insurancePlan.renteonId}) not found in Renteon services.`);
-        }
-    }
+      }
 
-    // Fallback: Full Insurance (Boolean flag)
-    if (!insuranceMatched && booking.fullInsurance) {
-        // Try to find by multiple criteria
-        const fullIns = bookingModel.Services.find((s: any) => 
-            s.Name.toLowerCase().includes('full insurance') || 
-            s.Name.toLowerCase().includes('full protection') ||
-            s.Id === 3215 || s.Id === 3213 || s.Id === 3214 || 
-            s.ServiceTypeId === 3 // Insurance type often has specific ID
-        );
-        
-        if (fullIns) {
-            fullIns.IsSelected = true;
-            fullIns.Quantity = 1;
-            console.log(`Selected Full Insurance: ${fullIns.Name} (ID: ${fullIns.Id}) via Boolean Flag`);
-        } else {
-            console.warn('Full Insurance requested but no matching service found in Renteon model.');
-        }
-    }
+      // Fallback to Name match
+      if (!serviceMatch) {
+        serviceMatch = bookingModel.Services.find((s: any) => s.Name.toLowerCase().trim() === extra.name.toLowerCase().trim());
+      }
 
-    // 4b. Selected Extras (Highway fee, Baby seats, etc.)
-    if (booking.extras && Array.isArray(booking.extras)) {
-        booking.extras.forEach((extra: any) => {
-            let serviceMatch = null;
+      // Fallback to Code match if available
+      if (!serviceMatch && extra.code) {
+        serviceMatch = bookingModel.Services.find((s: any) => s.ServiceCode === extra.code);
+      }
 
-            // Try match by Renteon ID first
-            if (extra.renteonId) {
-                serviceMatch = bookingModel.Services.find((s: any) => 
-                    (s.Id && s.Id.toString() === extra.renteonId.toString()) || 
-                    (s.ServiceId && s.ServiceId.toString() === extra.renteonId.toString())
-                );
-            }
-
-            // Fallback to Name match
-            if (!serviceMatch) {
-                serviceMatch = bookingModel.Services.find((s: any) => s.Name.toLowerCase().trim() === extra.name.toLowerCase().trim());
-            }
-            
-            // Fallback to Code match if available
-            if (!serviceMatch && extra.code) {
-                serviceMatch = bookingModel.Services.find((s: any) => s.ServiceCode === extra.code);
-            }
-
-            if (serviceMatch) {
-                serviceMatch.IsSelected = true;
-                serviceMatch.Quantity = 1; // Default to 1 for now, or add quantity field to booking_extras if needed
-                console.log(`Selected Extra: ${extra.name} -> Renteon Service: ${serviceMatch.Name} (ID: ${serviceMatch.Id})`);
-            } else {
-                console.warn(`Extra '${extra.name}' (ID: ${extra.renteonId}) requested but not found in Renteon services list.`);
-            }
-        });
-    }
-
-    // 5. Save Booking
-    // Check if services are valid before sending back
-    if (bookingModel.Services) {
-        bookingModel.Services = bookingModel.Services.map((s: any) => ({
-            ...s,
-            // Ensure numbers are numbers, etc. Renteon might be strict.
-        }));
-    }
-
-    // Force office ID 54 on save as well
-    bookingModel.OfficeOutId = 54;
-    bookingModel.OfficeInId = 54;
-
-    console.log("Saving Renteon booking model...");
-    const saveResponse = await fetch(`${RENTEON_API_URL}/bookings/save`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(bookingModel)
+      if (serviceMatch) {
+        serviceMatch.IsSelected = true;
+        serviceMatch.Quantity = 1; // Default to 1 for now, or add quantity field to booking_extras if needed
+        console.log(`Selected Extra: ${extra.name} -> Renteon Service: ${serviceMatch.Name} (ID: ${serviceMatch.Id})`);
+      } else {
+        console.warn(`Extra '${extra.name}' (ID: ${extra.renteonId}) requested but not found in Renteon services list.`);
+      }
     });
+  }
 
-    if (!saveResponse.ok) {
-        const err = await saveResponse.text();
-        console.error('Renteon Save Booking Failed. Status:', saveResponse.status, 'Error:', err);
-        console.error('Failed Booking Model Payload:', JSON.stringify(bookingModel, null, 2));
-        return { success: false, error: err };
-    }
+  // 5. Save Booking
+  // Check if services are valid before sending back
+  if (bookingModel.Services) {
+    bookingModel.Services = bookingModel.Services.map((s: any) => ({
+      ...s,
+      // Ensure numbers are numbers, etc. Renteon might be strict.
+    }));
+  }
 
-    const savedBooking = await saveResponse.json();
-    console.log('Renteon Booking Sync Successful:', savedBooking.ReservationNumber);
+  // Force office ID 54 on save as well
+  bookingModel.OfficeOutId = 54;
+  bookingModel.OfficeInId = 54;
 
-    return { success: true, renteonId: savedBooking.ReservationNumber };
+  console.log("Saving Renteon booking model...");
+  const saveResponse = await fetch(`${RENTEON_API_URL}/bookings/save`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(bookingModel)
+  });
+
+  if (!saveResponse.ok) {
+    const err = await saveResponse.text();
+    console.error('Renteon Save Booking Failed. Status:', saveResponse.status, 'Error:', err);
+    console.error('Failed Booking Model Payload:', JSON.stringify(bookingModel, null, 2));
+    return { success: false, error: err };
+  }
+
+  const savedBooking = await saveResponse.json();
+  console.log('Renteon Booking Sync Successful:', savedBooking.ReservationNumber);
+
+  return { success: true, renteonId: savedBooking.ReservationNumber };
 }
 
 // Cancel Booking
 export async function cancelBookingInRenteon(booking: any) {
   console.log(`Attempting to cancel Renteon booking for ${booking.id}`);
-  
+
   const token = await getRenteonToken();
   if (!token) return { success: false, error: 'Auth failed' };
 
@@ -666,25 +670,25 @@ export async function cancelBookingInRenteon(booking: any) {
     // 1. Find Reservation Number
     // If we had renteonId in DB, we'd use it. Since we might not, we search.
     const reservationNumber = booking.renteonId || await findBookingInRenteon(booking);
-    
+
     if (!reservationNumber) {
-        console.warn('Could not find corresponding Renteon booking to cancel');
-        return { success: false, error: 'Booking not found in Renteon' };
+      console.warn('Could not find corresponding Renteon booking to cancel');
+      return { success: false, error: 'Booking not found in Renteon' };
     }
 
     // 2. Cancel
     // DELETE {culture}/api/bookings/cancel/{number}
     const response = await fetch(`${RENTEON_API_URL}/bookings/cancel/${reservationNumber}`, {
-        method: 'DELETE',
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     });
 
     if (!response.ok) {
-        const err = await response.text();
-        console.error('Renteon Cancel Failed:', err);
-        return { success: false, error: err };
+      const err = await response.text();
+      console.error('Renteon Cancel Failed:', err);
+      return { success: false, error: err };
     }
 
     console.log(`Renteon booking ${reservationNumber} cancelled successfully`);
@@ -700,23 +704,23 @@ export async function cancelBookingInRenteon(booking: any) {
 // Note: Renteon updates typically involve "Open" -> Modify -> "Save"
 export async function updateBookingInRenteon(booking: any) {
   console.log(`Attempting to update Renteon booking for ${booking.id}`);
-  
+
   const token = await getRenteonToken();
   if (!token) return { success: false, error: 'Auth failed' };
 
   try {
     const reservationNumber = booking.renteonId || await findBookingInRenteon(booking);
-    
+
     if (!reservationNumber) {
-        // If not found, maybe create it? For now, we error.
-        console.warn('Could not find Renteon booking to update');
-        return { success: false, error: 'Booking not found' };
+      // If not found, maybe create it? For now, we error.
+      console.warn('Could not find Renteon booking to update');
+      return { success: false, error: 'Booking not found' };
     }
 
     // 1. Open Booking
     const openResponse = await fetch(`${RENTEON_API_URL}/bookings/open/${reservationNumber}`, {
-        method: 'GET',
-        headers: { 'Authorization': `Bearer ${token}` }
+      method: 'GET',
+      headers: { 'Authorization': `Bearer ${token}` }
     });
 
     if (!openResponse.ok) return { success: false, error: 'Failed to open booking' };
@@ -730,49 +734,49 @@ export async function updateBookingInRenteon(booking: any) {
     bookingModel.Client.Tel = booking.phone;
     bookingModel.Note = booking.comments;
     bookingModel.FlightNumber = booking.flightNumber;
-    
+
     // Update Dates/Car if needed? 
     // Usually modifying dates requires "Calculate" again.
     // Let's assume for now we just update contact info or status details. 
     // Deep modification (dates/car) is complex via API as it changes pricing.
     // If dates changed:
-    if (new Date(bookingModel.DateOut).toISOString() !== booking.startDate.toISOString() || 
-        new Date(bookingModel.DateIn).toISOString() !== booking.endDate.toISOString()) {
-            
-        bookingModel.DateOut = booking.startDate.toISOString();
-        bookingModel.DateIn = booking.endDate.toISOString();
-        
-        // We must calculate to update prices
-        const calcResponse = await fetch(`${RENTEON_API_URL}/bookings/calculate`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(bookingModel)
-        });
-        
-        if (calcResponse.ok) {
-            // Update model with calculated values
-            const calculatedModel = await calcResponse.json();
-            Object.assign(bookingModel, calculatedModel);
-        }
+    if (new Date(bookingModel.DateOut).toISOString() !== booking.startDate.toISOString() ||
+      new Date(bookingModel.DateIn).toISOString() !== booking.endDate.toISOString()) {
+
+      bookingModel.DateOut = booking.startDate.toISOString();
+      bookingModel.DateIn = booking.endDate.toISOString();
+
+      // We must calculate to update prices
+      const calcResponse = await fetch(`${RENTEON_API_URL}/bookings/calculate`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(bookingModel)
+      });
+
+      if (calcResponse.ok) {
+        // Update model with calculated values
+        const calculatedModel = await calcResponse.json();
+        Object.assign(bookingModel, calculatedModel);
+      }
     }
 
     // 3. Save
     const saveResponse = await fetch(`${RENTEON_API_URL}/bookings/save`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(bookingModel)
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(bookingModel)
     });
 
     if (!saveResponse.ok) {
-        const err = await saveResponse.text();
-        console.error('Renteon Update Failed:', err);
-        return { success: false, error: err };
+      const err = await saveResponse.text();
+      console.error('Renteon Update Failed:', err);
+      return { success: false, error: err };
     }
 
     console.log(`Renteon booking ${reservationNumber} updated successfully`);

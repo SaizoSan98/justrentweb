@@ -173,7 +173,9 @@ export const dictionaries = {
       company_phone: "Company Phone",
       company_address: "Company Address",
       checkout_title: "Checkout",
-      complete_booking_for: "Complete your booking for"
+      complete_booking_for: "Complete your booking for",
+      valid_promo_applied: "Promo code successfully applied!",
+      invalid_promo_code: "Invalid or expired promo code."
     },
     booking_success: {
       title: "Booking Request Received!",
@@ -607,7 +609,9 @@ export const dictionaries = {
       company_phone: "טלפון חברה",
       company_address: "כתובת חברה",
       checkout_title: "תשלום והזמנה",
-      complete_booking_for: "השלם את ההזמנה שלך עבור"
+      complete_booking_for: "השלם את ההזמנה שלך עבור",
+      valid_promo_applied: "קוד ההטבה הוחל בהצלחה!",
+      invalid_promo_code: "קוד חוקי או פג תוקף."
     },
     booking_success: {
       title: "בקשת ההזמנה התקבלה!",

@@ -180,6 +180,7 @@ model Booking {
   fullInsurance   Boolean        @default(false)
   pickupLocation  String         @default("Budapest Airport")
   insurancePlanId String?
+  promoCode       String?
   car             Car            @relation(fields: [carId], references: [id])
   insurancePlan   InsurancePlan? @relation(fields: [insurancePlanId], references: [id])
   user            User?          @relation(fields: [userId], references: [id])

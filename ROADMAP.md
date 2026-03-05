@@ -40,8 +40,19 @@
 - [x] Tesztelési jegyzőkönyv (TESTING_GUIDE.md)
 - [x] Email értesítések (Resend/SendGrid)
 - [x] Többnyelvűség (i18n) teljes implementációja (fordítások folyamatban)
+- [x] Globális lebegő WhatsApp gomb (szöveges címke, pulse animáció)
+- [x] Honeypot spam védelem a kapcsolatfelvételi űrlapokhoz
+- [x] Héber fordítás (home/fleet komponensek)
+- [x] Auth hibakezelés javítása (AuthModal crash fix)
 - [ ] Végső tesztelés és hibajavítás
 - [ ] Élesítés (Deployment)
+
+## 6. Phase: Landing Page & Branding (Folyamatban) 🔄
+- [x] Partners Strip – prémium logó sáv hozzáadása a Hero alá
+- [x] Partner logók frissítése (DiscoverCars, CarFlexi, Localrent, EconomyBookings)
+- [x] Hero–PartnersStrip vizuális átmenet javítása (seamless fehér háttér)
+- [ ] Landing page további vizuális finomhangolás
+- [ ] SEO meta tagek és Open Graph adatok
 
 ## Következő Lépések (Future)
 - [ ] Online fizetés (Stripe) integráció

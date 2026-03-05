@@ -11,27 +11,27 @@ import { login } from "@/lib/auth"
 export async function createBooking(prevState: any, formData: FormData) {
   try {
     const session = await getSession()
-    
+
     // ... Date parsing logic ...
     const startDateStr = formData.get('startDate') as string
     const endDateStr = formData.get('endDate') as string
-    
+
     if (!startDateStr || startDateStr === 'undefined') {
-        throw new Error("Invalid Start Date")
+      throw new Error("Invalid Start Date")
     }
-    
+
     const startDate = new Date(startDateStr)
     let endDate = endDateStr && endDateStr !== 'undefined' ? new Date(endDateStr) : undefined
-    
+
     if (!endDate) {
-        // Fallback: 1 day rental
-        endDate = new Date(startDate)
-        endDate.setDate(endDate.getDate() + 1)
+      // Fallback: 1 day rental
+      endDate = new Date(startDate)
+      endDate.setDate(endDate.getDate() + 1)
     }
 
     // Extract carId here as it was missed in previous patch
     const carId = formData.get('carId') as string
-    
+
     // --- USER HANDLING ---
     let userId = session?.user?.id
     let isNewUser = false
@@ -60,7 +60,7 @@ export async function createBooking(prevState: any, formData: FormData) {
         isNewUser = true
         // Generate random password (8 chars)
         autoPassword = Math.random().toString(36).slice(-8)
-        
+
         const newUser = await prisma.user.create({
           data: {
             email,
@@ -70,7 +70,7 @@ export async function createBooking(prevState: any, formData: FormData) {
             role: 'USER'
           }
         })
-        
+
         userId = newUser.id
 
         // Auto-login the new user so they land on dashboard authenticated
@@ -82,19 +82,21 @@ export async function createBooking(prevState: any, formData: FormData) {
         })
       }
     }
-    
+
     const pickupLocation = formData.get('pickupLocation') as string
     const dropoffLocation = formData.get('dropoffLocation') as string
     const totalPrice = Number(formData.get('totalPrice'))
-    
+
     const flightNumber = formData.get('flightNumber') as string
     const comments = formData.get('comments') as string
-    
+
     const isCompany = formData.get('isCompany') === 'true'
     const companyName = formData.get('companyName') as string
     const companyAddress = formData.get('companyAddress') as string
     const companyTaxId = formData.get('companyTaxId') as string
-    
+
+    const promoCode = formData.get('promoCode') as string
+
     const fullInsurance = formData.get('fullInsurance') === 'true'
     const insurancePlanId = formData.get('insurancePlanId') as string
     const paymentMethod = formData.get('paymentMethod') as string
@@ -121,6 +123,7 @@ export async function createBooking(prevState: any, formData: FormData) {
         companyName: isCompany ? companyName : null,
         companyAddress: isCompany ? companyAddress : null,
         companyTaxId: isCompany ? companyTaxId : null,
+        promoCode: promoCode || null,
         fullInsurance,
         insurancePlanId: (!insurancePlanId || insurancePlanId === 'stock') ? null : insurancePlanId,
         paymentMethod,
@@ -141,10 +144,13 @@ export async function createBooking(prevState: any, formData: FormData) {
     try {
       await sendBookingConfirmationEmail(booking)
       await sendAdminNewBookingEmail(booking)
-      
+
       // If new user, send welcome email with credentials
       if (isNewUser) {
-        await sendWelcomeUserEmail(booking.user, autoPassword)
+        const userWithDetails = await prisma.user.findUnique({ where: { id: userId } })
+        if (userWithDetails) {
+          await sendWelcomeUserEmail(userWithDetails, autoPassword)
+        }
       }
     } catch (emailError) {
       console.error("Failed to send email:", emailError)
@@ -167,7 +173,7 @@ export async function createBooking(prevState: any, formData: FormData) {
     }
 
     return { success: true, bookingId: booking.id }
-    
+
   } catch (error) {
     console.error('Booking creation failed:', error)
     // Return a clean error message to the client instead of crashing
