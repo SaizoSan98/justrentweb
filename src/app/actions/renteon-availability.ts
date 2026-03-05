@@ -62,10 +62,18 @@ export async function checkRealTimeAvailability(
             if (res.ok) {
                 const data = await res.json();
                 const unlimitedService = data.Services.find((s: any) => s.ServiceTypeName === 'Unlimited mileage');
+                const rentService = data.Services.find((s: any) => s.IsRent);
+
+                // Calculate the actual daily rate from DateOut/DateIn
+                const dOut = new Date(data.DateOut);
+                const dIn = new Date(data.DateIn);
+                const rentalDays = Math.max(1, Math.round((dIn.getTime() - dOut.getTime()) / (1000 * 60 * 60 * 24)));
+                const dailyRate = rentService ? (rentService.ServicePrice.AmountTotal / rentalDays) : (data.Total / rentalDays);
 
                 availabilityData.push({
                     CarCategoryId: catId,
                     Amount: data.Total,
+                    dailyRate: dailyRate,
                     DepositAmount: data.Deposit,
                     unlimitedMileagePrice: unlimitedService ? unlimitedService.ServicePrice.Amount : null
                 });

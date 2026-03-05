@@ -57,6 +57,7 @@ export default async function CheckoutPage({
 
   // FETCH FRESH RENTEON DATA for this specific car/dates
   let renteonPrice = 0;
+  let renteonDailyRate = 0;
   let renteonDeposit = 0;
 
   if (endDate) {
@@ -71,8 +72,9 @@ export default async function CheckoutPage({
 
         if (renteonItem) {
           renteonPrice = Number(renteonItem.Amount || 0);
+          renteonDailyRate = Number(renteonItem.dailyRate || 0);
           renteonDeposit = Number(renteonItem.DepositAmount || renteonItem.Deposit || 0);
-          console.log(`Checkout: Fetched fresh Renteon price: ${renteonPrice} EUR, Deposit: ${renteonDeposit}`);
+          console.log(`Checkout: Fetched fresh Renteon price: ${renteonPrice} EUR, dailyRate: ${renteonDailyRate}, Deposit: ${renteonDeposit}`);
         }
       }
     } catch (e) {
@@ -85,9 +87,9 @@ export default async function CheckoutPage({
   const durationMs = endDate ? endDate.getTime() - startDate.getTime() : 0;
   const days = Math.max(1, Math.ceil(durationMs / (1000 * 60 * 60 * 24)));
 
-  const effectivePricePerDay = renteonPrice > 0
-    ? Math.round(renteonPrice / days)
-    : Number(car.pricePerDay);
+  const effectivePricePerDay = renteonDailyRate > 0
+    ? Math.round(renteonDailyRate)
+    : (renteonPrice > 0 ? Math.round(renteonPrice / days) : Number(car.pricePerDay));
 
   const effectiveDeposit = renteonDeposit > 0
     ? renteonDeposit
@@ -99,7 +101,8 @@ export default async function CheckoutPage({
     deposit: effectiveDeposit,
     fullInsurancePrice: Number(car.fullInsurancePrice),
     unlimitedMileagePrice: Number(car.unlimitedMileagePrice || 0),
-    pricingTiers: car.pricingTiers.map(tier => ({
+    // CLEAR Pricing Tiers when Renteon price is used so CheckoutForm doesn't override with DB tiers
+    pricingTiers: renteonPrice > 0 ? [] : car.pricingTiers.map(tier => ({
       ...tier,
       pricePerDay: Number(tier.pricePerDay),
       deposit: Number(tier.deposit)

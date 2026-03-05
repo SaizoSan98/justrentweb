@@ -79,7 +79,7 @@ export default async function FleetPage({
   // 2. Renteon Availability Check (Real-time)
 
   let renteonAvailableCategoryIds: Set<number> | null = null;
-  let renteonPrices = new Map<number, { amount: number, deposit: number, unlimitedMileagePrice: number | null }>();
+  let renteonPrices = new Map<number, { amount: number, dailyRate: number, deposit: number, unlimitedMileagePrice: number | null }>();
 
   // Strict Renteon Dependency: We assume failure if check fails.
   let isRenteonCheckSuccessful = false;
@@ -99,6 +99,7 @@ export default async function FleetPage({
             if (item.Amount) {
               renteonPrices.set(catId, {
                 amount: Number(item.Amount),
+                dailyRate: Number(item.dailyRate || 0),
                 deposit: Number(item.DepositAmount || item.Deposit || 0),
                 unlimitedMileagePrice: item.unlimitedMileagePrice,
               });
@@ -147,8 +148,8 @@ export default async function FleetPage({
       const renteonData = renteonPrices.get(catId);
 
       if (renteonData) {
-        // Override pricePerDay with Renteon's effective daily rate
-        newCar.pricePerDay = Math.round(renteonData.amount / days) as any;
+        // Use the daily rate directly from Renteon's Rent service (not Total/days which can be wrong)
+        newCar.pricePerDay = (renteonData.dailyRate > 0 ? Math.round(renteonData.dailyRate) : Math.round(renteonData.amount / days)) as any;
         newCar.unlimitedMileagePrice = renteonData.unlimitedMileagePrice as any;
 
         // CLEAR Pricing Tiers so the UI uses this exact price
