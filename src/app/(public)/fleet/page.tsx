@@ -147,19 +147,13 @@ export default async function FleetPage({
       const catId = mapCarToCategoryId(car);
       const renteonData = renteonPrices.get(catId);
 
+      // ALWAYS clear DB pricing tiers - only Renteon prices are authoritative
+      newCar.pricingTiers = [];
+
       if (renteonData) {
-        // Use the daily rate directly from Renteon's Rent service (not Total/days which can be wrong)
+        // Use the daily rate directly from Renteon's Rent service
         newCar.pricePerDay = (renteonData.dailyRate > 0 ? Math.round(renteonData.dailyRate) : Math.round(renteonData.amount / days)) as any;
         newCar.unlimitedMileagePrice = renteonData.unlimitedMileagePrice as any;
-
-        // CLEAR Pricing Tiers so the UI uses this exact price
-        // This prevents FleetCard from recalculating based on static DB tiers
-        newCar.pricingTiers = [];
-
-        // DO NOT Override Deposit - User wants manual control
-        // if (renteonData.deposit > 0) {
-        //    newCar.deposit = renteonData.deposit as any;
-        // }
       }
       return newCar;
     });

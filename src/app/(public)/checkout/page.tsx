@@ -101,12 +101,8 @@ export default async function CheckoutPage({
     deposit: effectiveDeposit,
     fullInsurancePrice: Number(car.fullInsurancePrice),
     unlimitedMileagePrice: Number(car.unlimitedMileagePrice || 0),
-    // CLEAR Pricing Tiers when Renteon price is used so CheckoutForm doesn't override with DB tiers
-    pricingTiers: renteonPrice > 0 ? [] : car.pricingTiers.map(tier => ({
-      ...tier,
-      pricePerDay: Number(tier.pricePerDay),
-      deposit: Number(tier.deposit)
-    })),
+    // ALWAYS clear Pricing Tiers - only Renteon prices are used
+    pricingTiers: [] as any[],
     insuranceOptions: car.insuranceOptions.map(opt => ({
       ...opt,
       pricePerDay: Number(opt.pricePerDay),
