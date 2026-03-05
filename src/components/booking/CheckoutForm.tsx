@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { cn } from "@/lib/utils"
 import { createBooking } from "@/app/actions/booking"
-import { checkRealTimeAvailability } from "@/app/actions/renteon-availability"
+import { checkRealTimeAvailability, verifyPromoCodeForCar } from "@/app/actions/renteon-availability"
 import { useRouter } from "next/navigation"
 import {
   Popover,
@@ -278,50 +278,21 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
       const start = new Date(startStr)
       const end = new Date(endStr)
 
-      // Call Renteon API to check if code is valid
-      // We pass 54 (Vecsés) for now as default, or we could add a mapping if multiple offices exist
-      const res = await checkRealTimeAvailability(start, end, 54, 54, promoCodeInput.trim())
+      // Call the new dedicated server action to verify promo code and get exact discount
+      const res = await verifyPromoCodeForCar(car, start, end, 54, 54, promoCodeInput.trim())
 
-      if (res.success && res.data && res.data.length > 0) {
-        // Find our specific car category in the results
-        const matchingCategory = res.data.find((c: any) => c.CarCategoryId === car.categories?.[0]?.id || true) // Simplified match for now as we just need to know if the promo is valid
-        // Actually, checkRealTimeAvailability verifies if the PromoCode is valid overall. 
-        // If it returns success, the PromoCode is valid.
-        // We don't have the exact discount percentage from this endpoint easily without calling it twice (with and without promo) 
-        // Let's call it twice to calculate the exact difference.
-
-        const resWithoutPromo = await checkRealTimeAvailability(start, end, 54, 54)
-
-        let foundDiscount = 0;
-
-        if (resWithoutPromo.success && matchingCategory) {
-          // Compare prices of the first available car or average difference
-          const priceWithPromo = matchingCategory.Amount
-          const priceWithoutPromo = resWithoutPromo.data[0]?.Amount
-          if (priceWithoutPromo && priceWithPromo && priceWithoutPromo > priceWithPromo) {
-            foundDiscount = priceWithoutPromo - priceWithPromo
-          }
-        }
-
-        // Even if we couldn't calculate exact difference via API, we apply it. 
-        // Actually, Renteon API handles the final price on sync. 
-        // For the frontend, if we just want to show it's valid:
+      if (res.success) {
         setAppliedPromoCode(promoCodeInput.trim())
-        if (foundDiscount > 0) {
-          setPromoDiscountAmount(foundDiscount)
+        if (res.discountAmount > 0) {
+          setPromoDiscountAmount(res.discountAmount)
         } else {
-          // Fallback: If we can't determine the exact amount but it's valid, 
-          // we might just say "Valid!" but can't show exact discount yet, or we assume a generic 10%.
-          // Usually, returning the difference is best.
-          // We'll trust the API difference if we got it.
-          // For now, if no difference found but valid, let's at least mark it valid.
           setPromoError(dictionary.booking.valid_promo_applied || "Promo code applied!")
         }
       } else {
-        setPromoError(res.error || dictionary.booking.invalid_promo_code || "Érvénytelen promóciós kód.")
+        setPromoError(res.error || dictionary.booking.invalid_promo_code || "Invalid promo code.")
       }
     } catch (e) {
-      setPromoError("Hiba történt a kód ellenőrzésekor.")
+      setPromoError("An error occurred while verifying the code.")
     } finally {
       setIsCheckingPromo(false)
     }
@@ -586,11 +557,11 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
               <div className="flex flex-col gap-2">
                 <Label className="text-sm font-bold text-zinc-900 flex items-center gap-2">
                   <Tag className="w-4 h-4 text-red-600" />
-                  Promóciós kód (Opcionális)
+                  Promo Code (Optional)
                 </Label>
                 <div className="flex gap-2">
                   <Input
-                    placeholder="Írja be a kódot"
+                    placeholder="Enter code"
                     value={promoCodeInput}
                     onChange={(e) => setPromoCodeInput(e.target.value)}
                     disabled={isCheckingPromo || !!appliedPromoCode}
@@ -598,11 +569,11 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                   />
                   {appliedPromoCode ? (
                     <Button type="button" variant="outline" onClick={handleRemovePromo}>
-                      Eltávolítás
+                      Remove
                     </Button>
                   ) : (
                     <Button type="button" variant="secondary" onClick={handleApplyPromo} disabled={isCheckingPromo || !promoCodeInput.trim()}>
-                      {isCheckingPromo ? "Ellenőrzés..." : "Alkalmaz"}
+                      {isCheckingPromo ? "Checking..." : "Apply"}
                     </Button>
                   )}
                 </div>
@@ -610,7 +581,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                   <div className="text-xs text-red-500 font-medium">{promoError}</div>
                 )}
                 {appliedPromoCode && promoDiscountAmount === 0 && (
-                  <div className="text-xs text-green-600 font-medium">Promóciós kód elfogadva!</div>
+                  <div className="text-xs text-green-600 font-medium">{dictionary.booking.valid_promo_applied || "Promo code applied!"}</div>
                 )}
               </div>
             </div>
@@ -1096,7 +1067,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
 
                     {appliedPromoCode && promoDiscountAmount > 0 && (
                       <div className="flex justify-between text-green-600 font-bold border-t border-zinc-100 pt-2 mt-2">
-                        <span>Kedvezmény ({appliedPromoCode})</span>
+                        <span>Discount ({appliedPromoCode})</span>
                         <span>-€{Number(promoDiscountAmount.toFixed(1))}</span>
                       </div>
                     )}

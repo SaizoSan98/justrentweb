@@ -90,3 +90,83 @@ export async function checkRealTimeAvailability(
         data: availabilityData
     };
 }
+
+export async function verifyPromoCodeForCar(
+    car: any,
+    dateOut: Date,
+    dateIn: Date,
+    pickupId: number = 54,
+    dropoffId: number = 54,
+    promoCode: string
+): Promise<{ success: boolean; discountAmount: number; error?: string }> {
+    const token = await getRenteonToken();
+    if (!token) return { success: false, discountAmount: 0, error: "Auth Error" };
+
+    const { mapCarToCategoryId } = await import("@/lib/renteon");
+    const catId = mapCarToCategoryId(car);
+    const dOut = dateOut.toISOString();
+    const dIn = dateIn.toISOString();
+
+    const payloadWithoutPromo: any = {
+        CarCategoryId: catId,
+        OfficeOutId: pickupId,
+        OfficeInId: dropoffId,
+        DateOut: dOut,
+        DateIn: dIn,
+        BookAsCommissioner: true,
+        PricelistId: 306,
+        Currency: "EUR"
+    };
+
+    const payloadWithPromo: any = { ...payloadWithoutPromo, PromoCode: promoCode };
+
+    try {
+        // Fetch WITH promo
+        const resWith = await fetch(`${RENTEON_API_URL}/bookings/calculate`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(payloadWithPromo)
+        });
+
+        if (!resWith.ok) {
+            if (resWith.status === 422) {
+                return { success: false, discountAmount: 0, error: "Invalid promo code." };
+            }
+            return { success: false, discountAmount: 0, error: "Failed to verify promo." };
+        }
+
+        const dataWith = await resWith.json();
+        const priceWithPromo = dataWith.Total;
+
+        let explicitDiscount = 0;
+        if (dataWith.Services && Array.isArray(dataWith.Services)) {
+            dataWith.Services.forEach((s: any) => {
+                if (s.DiscountAmount) explicitDiscount += s.DiscountAmount;
+            });
+        }
+
+        if (explicitDiscount > 0) {
+            return { success: true, discountAmount: explicitDiscount };
+        }
+
+        // Fetch WITHOUT promo if explicit discount is 0 to see if Total changed
+        const resWithout = await fetch(`${RENTEON_API_URL}/bookings/calculate`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(payloadWithoutPromo)
+        });
+
+        if (resWithout.ok) {
+            const dataWithout = await resWithout.json();
+            const priceWithoutPromo = dataWithout.Total;
+            if (priceWithoutPromo > priceWithPromo) {
+                return { success: true, discountAmount: priceWithoutPromo - priceWithPromo };
+            }
+        }
+
+        // If promo is valid but discount is 0, we still accept it (maybe percentage is 0 or conditional)
+        return { success: true, discountAmount: 0 };
+    } catch (e) {
+        return { success: false, discountAmount: 0, error: "Verification error" };
+    }
+}
