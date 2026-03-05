@@ -580,6 +580,14 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                 {promoError && !appliedPromoCode && (
                   <div className="text-xs text-red-500 font-medium">{promoError}</div>
                 )}
+                {appliedPromoCode && promoDiscountAmount > 0 && (
+                  <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2 mt-1">
+                    <Check className="w-4 h-4 text-green-600" />
+                    <span className="text-sm text-green-700 font-semibold">
+                      Promo code applied! You save €{Number(promoDiscountAmount.toFixed(2))}
+                    </span>
+                  </div>
+                )}
                 {appliedPromoCode && promoDiscountAmount === 0 && (
                   <div className="text-xs text-green-600 font-medium">{dictionary.booking.valid_promo_applied || "Promo code applied!"}</div>
                 )}
@@ -1066,9 +1074,12 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                     )}
 
                     {appliedPromoCode && promoDiscountAmount > 0 && (
-                      <div className="flex justify-between text-green-600 font-bold border-t border-zinc-100 pt-2 mt-2">
-                        <span>Discount ({appliedPromoCode})</span>
-                        <span>-€{Number(promoDiscountAmount.toFixed(1))}</span>
+                      <div className="flex justify-between text-green-600 font-bold border-t border-green-100 pt-2 mt-2 bg-green-50 -mx-4 px-4 py-2 rounded-lg">
+                        <span className="flex items-center gap-1.5">
+                          <Tag className="w-3.5 h-3.5" />
+                          Promo: {appliedPromoCode.toUpperCase()}
+                        </span>
+                        <span>-€{Number(promoDiscountAmount.toFixed(2))}</span>
                       </div>
                     )}
 
