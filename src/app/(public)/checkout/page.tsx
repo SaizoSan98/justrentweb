@@ -91,7 +91,7 @@ export default async function CheckoutPage({
     ? Math.round(renteonDailyRate)
     : (renteonPrice > 0 ? Math.round(renteonPrice / days) : Number(car.pricePerDay));
 
-  const effectiveDeposit = renteonDeposit > 0
+  const effectiveDeposit = (renteonDeposit && renteonDeposit > 0)
     ? renteonDeposit
     : Number(car.deposit);
 
@@ -105,8 +105,8 @@ export default async function CheckoutPage({
     pricingTiers: [] as any[],
     insuranceOptions: car.insuranceOptions.map(opt => ({
       ...opt,
-      pricePerDay: Number(opt.pricePerDay),
-      deposit: Number(opt.deposit),
+      pricePerDay: Number(opt.pricePerDay || 0),
+      deposit: Number(opt.deposit || 0),
       plan: opt.plan
     }))
   }

@@ -236,7 +236,11 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
 
    // Sort insurance options for display
    const sortedInsurance = car.insuranceOptions
-      ? [...car.insuranceOptions].sort((a, b) => a.pricePerDay - b.pricePerDay)
+      ? [...car.insuranceOptions.map(opt => ({
+         ...opt,
+         pricePerDay: Number(opt.pricePerDay || 0),
+         deposit: Number(opt.deposit || 0)
+      }))].sort((a, b) => a.pricePerDay - b.pricePerDay)
       : []
 
    // Set default insurance
@@ -422,7 +426,7 @@ export function BookingModal({ isOpen, onClose, car, searchParams, extras }: Boo
                                        <div className="font-bold text-lg">{ins.plan?.name?.replace(/ - (Mini|Midi|Maxi)/g, "")}</div>
                                        <div className="text-sm text-zinc-500">{ins.plan?.description || "Standard coverage"}</div>
                                        <div className="mt-2 flex gap-4 text-xs font-medium text-zinc-700">
-                                          <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> Deposit: {ins.deposit?.toLocaleString() ?? 0} €</span>
+                                          <span className="flex items-center gap-1"><Shield className="w-3 h-3" /> Deposit: €{Number(ins.deposit || 0).toLocaleString()}</span>
                                        </div>
                                     </div>
                                  </div>

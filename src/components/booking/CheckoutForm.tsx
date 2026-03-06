@@ -688,7 +688,7 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                     </span>
                   </div>
                   <p className="text-sm text-zinc-500">{ins.plan.description || "Basic coverage."}</p>
-                  <p className="text-xs font-semibold text-zinc-700 mt-1">{dictionary.booking.security_deposit}: €{ins.deposit}</p>
+                  <p className="text-xs font-semibold text-zinc-700 mt-1">{dictionary.booking.security_deposit}: €{Number(ins.deposit || 0).toLocaleString()}</p>
                 </div>
               </div>
             ))}

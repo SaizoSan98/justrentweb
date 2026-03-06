@@ -355,7 +355,7 @@ export function FleetCard({
                                                     </div>
                                                     <div className="text-[11px] text-zinc-500 leading-tight mt-0.5">
                                                         {ins.plan.description || dictionary.fleet.standard_protection}
-                                                        <span className="block text-zinc-400 font-medium mt-0.5">{dictionary.fleet.deposit}: {Number((ins.deposit ?? 0).toFixed(1))} €</span>
+                                                        <span className="block text-zinc-400 font-medium mt-0.5">{dictionary.fleet.deposit}: €{Number(ins.deposit || 0).toLocaleString()}</span>
                                                     </div>
                                                 </div>
                                             </div>
