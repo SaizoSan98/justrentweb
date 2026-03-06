@@ -77,7 +77,7 @@ export async function checkRealTimeAvailability(
                         id: ins.ServiceId?.toString() || ins.ServiceGuid,
                         name: ins.ServiceName || ins.Name,
                         pricePerDay: ins.ServicePrice?.Amount / rentalDays,
-                        deposit: ins.InsuranceDepositAmount || 0,
+                        deposit: (ins.InsuranceDepositAmount !== null && ins.InsuranceDepositAmount !== undefined) ? ins.InsuranceDepositAmount : (data.Deposit || 0),
                     }));
 
                 availabilityData.push({
