@@ -72,12 +72,12 @@ export async function checkRealTimeAvailability(
 
                 // Extract insurances
                 const renteonInsurances = data.Services
-                    .filter((s: any) => s.IsInsurance)
+                    .filter((s: any) => s.ServiceTypeName === 'Insurance' || s.Name.toLowerCase().includes('insurance') || s.Name.toLowerCase().includes('protect'))
                     .map((ins: any) => ({
                         id: ins.ServiceId?.toString() || ins.ServiceGuid,
-                        name: ins.ServiceName,
+                        name: ins.ServiceName || ins.Name,
                         pricePerDay: ins.ServicePrice?.Amount / rentalDays,
-                        deposit: ins.DepositAmount || 0,
+                        deposit: ins.InsuranceDepositAmount || 0,
                     }));
 
                 availabilityData.push({
