@@ -71,10 +71,11 @@ type Extra = {
 export function FleetCard({
     car,
     searchParams,
-    redirectToFleet,
     extras = [],
     dictionary,
-    variant = 'light'
+    variant = 'light',
+    isExpanded = false,
+    onToggle
 }: {
     car: CarType,
     searchParams?: {
@@ -84,9 +85,10 @@ export function FleetCard({
     redirectToFleet?: boolean,
     extras?: Extra[],
     dictionary: Dictionary,
-    variant?: 'light' | 'dark'
+    variant?: 'light' | 'dark',
+    isExpanded?: boolean,
+    onToggle?: () => void
 }) {
-    const [isExpanded, setIsExpanded] = useState(false)
     const [selectedInsuranceId, setSelectedInsuranceId] = useState<string>("")
     const [mileageOption, setMileageOption] = useState<'LIMITED' | 'UNLIMITED'>('LIMITED')
     const [showBreakdown, setShowBreakdown] = useState(false)
@@ -126,7 +128,9 @@ export function FleetCard({
 
     const handleToggle = () => {
         if (!isAvailable) return
-        setIsExpanded(!isExpanded)
+        if (onToggle) {
+            onToggle()
+        }
     }
 
     return (

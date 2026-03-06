@@ -36,6 +36,7 @@ export function FleetClientWrapper({ cars, dictionary, options }: FleetClientWra
   })
 
   const [showFilters, setShowFilters] = useState(false)
+  const [expandedCardId, setExpandedCardId] = useState<string | null>(null)
 
   // Sync state with URL when URL changes (e.g. back button)
   useEffect(() => {
@@ -204,6 +205,8 @@ export function FleetClientWrapper({ cars, dictionary, options }: FleetClientWra
                 car={car}
                 dictionary={dictionary}
                 searchParams={Object.fromEntries(searchParams.entries())}
+                isExpanded={expandedCardId === car.id}
+                onToggle={() => setExpandedCardId(expandedCardId === car.id ? null : car.id)}
               />
             ))}
           </div>
