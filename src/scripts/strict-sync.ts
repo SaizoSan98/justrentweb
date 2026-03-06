@@ -1,5 +1,5 @@
 
-import { PrismaClient, Transmission } from "@prisma/client"
+import { PrismaClient, Transmission, FuelType } from "@prisma/client"
 import { config } from "dotenv"
 import crypto from 'crypto';
 
@@ -74,7 +74,7 @@ async function getRenteonToken(): Promise<string> {
     if (!clientId || !clientSecret || !username || !password) {
         throw new Error('Missing Renteon credentials');
     }
-    
+
     const salt = crypto.randomBytes(16).toString('hex');
     const compositeKey = `${username}${salt}${clientSecret}${password}${salt}${clientSecret}${clientId}`;
     const signature = crypto.createHash('sha512').update(compositeKey, 'utf8').digest('base64');
@@ -86,7 +86,7 @@ async function getRenteonToken(): Promise<string> {
     params.append('client_id', clientId);
     params.append('signature', signature);
     params.append('salt', salt);
-    
+
     const response = await fetch(RENTEON_TOKEN_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -105,10 +105,10 @@ async function getRenteonToken(): Promise<string> {
 
 export async function strictSync() {
     console.log("🔒 STARTING STRICT RENTEON SYNC (No Fallbacks, No Calculations)...");
-    
+
     let createdCount = 0;
     let updatedCount = 0;
-    
+
     // 0. Purge existing data to ensure clean slate (as requested earlier)
     // We assume purge-db was run, but let's be safe and do upserts/deletes carefully.
     // User asked to "csak azt töltse le", so we should probably clear what is not found.
@@ -129,7 +129,7 @@ export async function strictSync() {
     // 2. Iterate Categories and Validate Data Availability
     // We need to check if we can get PRICE and SERVICES for each category.
     // Since we can't get price list directly, we MUST perform a "probe" calculation for a future date.
-    
+
     const startDate = new Date();
     startDate.setDate(startDate.getDate() + 30); // 30 days ahead
     const endDate = new Date(startDate);
@@ -143,7 +143,7 @@ export async function strictSync() {
         // Probe for Data
         const payload = {
             CarCategoryId: cat.Id,
-            OfficeOutId: 54, 
+            OfficeOutId: 54,
             OfficeInId: 54,
             DateOut: startDate.toISOString(),
             DateIn: endDate.toISOString(),
@@ -165,24 +165,24 @@ export async function strictSync() {
             }
 
             const data = await res.json();
-            
+
             if (!data.Total || data.Total <= 0) {
-                 console.warn(`  ❌ Invalid price (0) for Cat ${cat.Id}. Skipping.`);
-                 continue;
+                console.warn(`  ❌ Invalid price (0) for Cat ${cat.Id}. Skipping.`);
+                continue;
             }
 
             // Extract Services
             const services: RenteonService[] = data.Services || [];
-            
-            const insurances = services.filter(s => 
+
+            const insurances = services.filter(s =>
                 (s.ServiceTypeName === 'Insurance' || s.Name.toLowerCase().includes('insurance') || s.Name.toLowerCase().includes('protect'))
             );
-            
-            const extras = services.filter(s => 
+
+            const extras = services.filter(s =>
                 s.ServiceTypeName === 'Additional equipment' || s.ServiceTypeName === 'Additional fee'
             );
-            
-            const unlimitedMileage = services.some(s => 
+
+            const unlimitedMileage = services.some(s =>
                 s.Name.toLowerCase().includes('unlimited mileage')
             );
 
@@ -214,7 +214,7 @@ export async function strictSync() {
     // 3. Sync to DB
     // First, let's clean up existing extras and plans to avoid duplicates if we are strict.
     // Or we just upsert.
-    
+
     // Sync Extras (Equipments) - Global List based on what we found
     // We collect all unique extras found across all valid categories
     const uniqueExtras = new Map<string, RenteonService>();
@@ -226,17 +226,17 @@ export async function strictSync() {
         // If OneTime, use AmountTotal (full price).
         // If PerDay, use AmountTotal / 3 (since we probed for 3 days).
         // NOTE: Renteon seems to return Total Amount in 'Amount' field too for calculated bookings.
-        const price = extra.ServicePrice.IsOneTimePayment 
-            ? extra.ServicePrice.AmountTotal 
+        const price = extra.ServicePrice.IsOneTimePayment
+            ? extra.ServicePrice.AmountTotal
             : (extra.ServicePrice.AmountTotal / 3);
-            
+
         const priceType = extra.ServicePrice.IsOneTimePayment ? 'ONE_TIME' : 'PER_DAY';
 
         await prisma.extra.upsert({
             where: { renteonId: extra.ServiceId.toString() },
             update: {
                 name: extra.Name,
-                price: price, 
+                price: price,
                 priceType: priceType,
                 // code: extra.ServiceId.toString()
             },
@@ -267,7 +267,7 @@ export async function strictSync() {
         // Usually "CDW" or "Basic" is default.
         // "SCDW" or "Medium" is mid.
         // "Full" or "Premium" is top.
-        
+
         if (nameLower.includes('basic') || nameLower.includes('cdw') && !nameLower.includes('super')) {
             order = 1;
             description = "Basic coverage with excess.";
@@ -310,9 +310,20 @@ export async function strictSync() {
 
         // Determine Transmission
         const transmissionName = category.CarTransmissionType?.Name?.toLowerCase() || '';
-        const transmission = transmissionName.includes('auto') || transmissionName.includes('dsg') 
-            ? Transmission.AUTOMATIC 
+        const transmission = transmissionName.includes('auto') || transmissionName.includes('dsg')
+            ? Transmission.AUTOMATIC
             : Transmission.MANUAL;
+
+        // Determine Fuel Type
+        const fullName = `${car.CarMakeName || ""} ${car.Name}`.toUpperCase();
+        let fuelType: FuelType = FuelType.PETROL;
+        if (fullName.includes("TDI") || fullName.includes("TDCI") || fullName.includes("CR DSG") || fullName.includes("TRAFIC") || fullName.includes("PROACE") || fullName.includes("TOURNEO") || fullName.includes("TRANSIT")) {
+            fuelType = FuelType.DIESEL;
+        } else if (fullName.includes("HEV") || fullName.includes("ETSI") || fullName.includes("PHEV") || fullName.includes("MHEV") || fullName.includes("HYBRID")) {
+            fuelType = FuelType.HYBRID;
+        } else if (fullName.includes(" EV") || fullName.includes("BEV") || fullName.includes("ELECTRIC")) {
+            fuelType = FuelType.ELECTRIC;
+        }
 
         // Create/Update Car
         // We handle imageUrl carefully:
@@ -325,6 +336,7 @@ export async function strictSync() {
                 model: car.Name.replace(car.CarMakeName || "", "").trim(),
                 year: car.Year || new Date().getFullYear(),
                 transmission: transmission,
+                fuelType: fuelType,
                 seats: category.PassengerCapacity || 5,
                 doors: category.NumberOfDoors || 5,
                 pricePerDay: pricePerDay,
@@ -338,6 +350,7 @@ export async function strictSync() {
                 model: car.Name.replace(car.CarMakeName || "", "").trim(),
                 year: car.Year || new Date().getFullYear(),
                 transmission: transmission,
+                fuelType: fuelType,
                 seats: category.PassengerCapacity || 5,
                 doors: category.NumberOfDoors || 5,
                 pricePerDay: pricePerDay,
@@ -346,7 +359,7 @@ export async function strictSync() {
                 imageUrl: car.ImageURL || null // Use Renteon image on creation
             }
         });
-        
+
         // Special case for recently restored cars (where imageUrl might be null because previous sync missed it)
         // If DB has null image, but Renteon has one, we update it.
         if (!dbCar.imageUrl && car.ImageURL) {
@@ -357,12 +370,12 @@ export async function strictSync() {
             console.log(`  📸 Restored image for ${dbCar.make} ${dbCar.model}`);
         }
 
-        
+
         // Track stats
         if (dbCar.createdAt.getTime() === dbCar.updatedAt.getTime()) {
-             createdCount++;
+            createdCount++;
         } else {
-             updatedCount++;
+            updatedCount++;
         }
 
         // Sync Insurances for this Car
@@ -382,8 +395,8 @@ export async function strictSync() {
             // Calculate daily price correctly
             // Renteon returns TOTAL amount for the duration (3 days) in Amount/AmountTotal fields for insurance.
             // We must divide by 3 to get the daily rate if it's not a one-time payment.
-            const dailyPrice = ins.ServicePrice.IsOneTimePayment 
-                ? ins.ServicePrice.AmountTotal 
+            const dailyPrice = ins.ServicePrice.IsOneTimePayment
+                ? ins.ServicePrice.AmountTotal
                 : (ins.ServicePrice.AmountTotal / 3);
 
             await prisma.carInsurance.upsert({
@@ -406,7 +419,7 @@ export async function strictSync() {
             });
         }
     }
-    
+
     // Optional: Cleanup cars that are NOT in validCars?
     // User said "csak azokat az autókat töltse be...". 
     // If we have cars in DB that are not in validCars, we should probably delete them.
@@ -421,7 +434,7 @@ export async function strictSync() {
     }
 
     console.log(`\n✅ Strict Sync Complete. Created: ${createdCount}, Updated: ${updatedCount}.`);
-    
+
     return {
         success: true,
         total: validCars.length,
