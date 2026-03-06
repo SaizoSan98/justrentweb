@@ -75,6 +75,22 @@ export default async function CheckoutPage({
           renteonDailyRate = Number(renteonItem.dailyRate || 0);
           renteonDeposit = Number(renteonItem.DepositAmount || renteonItem.Deposit || 0);
           console.log(`Checkout: Fetched fresh Renteon price: ${renteonPrice} EUR, dailyRate: ${renteonDailyRate}, Deposit: ${renteonDeposit}`);
+
+          if (renteonItem.renteonInsurances && renteonItem.renteonInsurances.length > 0) {
+            car.insuranceOptions = renteonItem.renteonInsurances.map((ins: any, index: number) => ({
+              id: ins.id,
+              carId: car.id,
+              planId: ins.id,
+              pricePerDay: Number(ins.pricePerDay),
+              deposit: Number(ins.deposit),
+              plan: {
+                id: ins.id,
+                name: ins.name,
+                description: "",
+                order: index
+              }
+            }));
+          }
         }
       }
     } catch (e) {

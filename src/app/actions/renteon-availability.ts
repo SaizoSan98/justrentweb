@@ -70,12 +70,23 @@ export async function checkRealTimeAvailability(
                 const rentalDays = Math.max(1, Math.round((dIn.getTime() - dOut.getTime()) / (1000 * 60 * 60 * 24)));
                 const dailyRate = rentService ? (rentService.ServicePrice.AmountTotal / rentalDays) : (data.Total / rentalDays);
 
+                // Extract insurances
+                const renteonInsurances = data.Services
+                    .filter((s: any) => s.IsInsurance)
+                    .map((ins: any) => ({
+                        id: ins.ServiceId?.toString() || ins.ServiceGuid,
+                        name: ins.ServiceName,
+                        pricePerDay: ins.ServicePrice?.Amount / rentalDays,
+                        deposit: ins.DepositAmount || 0,
+                    }));
+
                 availabilityData.push({
                     CarCategoryId: catId,
                     Amount: data.Total,
                     dailyRate: dailyRate,
                     DepositAmount: data.Deposit,
-                    unlimitedMileagePrice: unlimitedService ? unlimitedService.ServicePrice.Amount : null
+                    unlimitedMileagePrice: unlimitedService ? unlimitedService.ServicePrice.Amount : null,
+                    renteonInsurances: renteonInsurances
                 });
             } else if (res.status === 422 && promoCode) {
                 // Check if this error is specifically because of the promo code

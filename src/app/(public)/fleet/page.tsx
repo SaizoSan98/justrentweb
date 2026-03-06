@@ -79,7 +79,7 @@ export default async function FleetPage({
   // 2. Renteon Availability Check (Real-time)
 
   let renteonAvailableCategoryIds: Set<number> | null = null;
-  let renteonPrices = new Map<number, { amount: number, dailyRate: number, deposit: number, unlimitedMileagePrice: number | null }>();
+  let renteonPrices = new Map<number, { amount: number, dailyRate: number, deposit: number, unlimitedMileagePrice: number | null, renteonInsurances: any[] }>();
 
   // Strict Renteon Dependency: We assume failure if check fails.
   let isRenteonCheckSuccessful = false;
@@ -102,6 +102,7 @@ export default async function FleetPage({
                 dailyRate: Number(item.dailyRate || 0),
                 deposit: Number(item.DepositAmount || item.Deposit || 0),
                 unlimitedMileagePrice: item.unlimitedMileagePrice,
+                renteonInsurances: item.renteonInsurances || []
               });
             }
           }
@@ -154,6 +155,23 @@ export default async function FleetPage({
         // Use the daily rate directly from Renteon's Rent service
         newCar.pricePerDay = (renteonData.dailyRate > 0 ? Math.round(renteonData.dailyRate) : Math.round(renteonData.amount / days)) as any;
         newCar.unlimitedMileagePrice = renteonData.unlimitedMileagePrice as any;
+
+        // Override insurance options completely from Renteon
+        if (renteonData.renteonInsurances && renteonData.renteonInsurances.length > 0) {
+          newCar.insuranceOptions = renteonData.renteonInsurances.map((ins, index) => ({
+            id: ins.id,
+            carId: newCar.id,
+            planId: ins.id,
+            pricePerDay: Number(ins.pricePerDay),
+            deposit: Number(ins.deposit),
+            plan: {
+              id: ins.id,
+              name: ins.name,
+              description: "",
+              order: index
+            }
+          })) as any;
+        }
       }
       return newCar;
     });
