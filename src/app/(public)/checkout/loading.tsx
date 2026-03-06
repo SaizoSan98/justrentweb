@@ -80,7 +80,8 @@ export default function CheckoutLoading() {
             <div className="fixed inset-0 z-[-1] pointer-events-none flex items-center justify-center bg-black/50 backdrop-blur-sm">
                 <div className="flex flex-col items-center gap-4 text-zinc-400">
                     <Loader2 className="w-12 h-12 animate-spin text-white" />
-                    <span className="text-sm font-bold tracking-widest uppercase">Fetching Live Availability...</span>
+                    <span className="text-sm font-bold tracking-widest uppercase">Delivering available cars to the website...</span>
+                    <p className="text-sm text-zinc-400 font-medium">Please wait a moment</p>
                 </div>
             </div>
         </div>

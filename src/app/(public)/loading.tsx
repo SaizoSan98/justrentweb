@@ -17,8 +17,8 @@ export default function HomeLoading() {
             <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-md pt-24">
                 <div className="flex flex-col items-center gap-4 text-zinc-600 bg-white shadow-2xl p-8 rounded-[2rem] border border-zinc-100">
                     <Loader2 className="w-12 h-12 animate-spin text-red-600" />
-                    <span className="text-sm font-bold tracking-widest uppercase text-zinc-800">Fetching Live Fleet Data...</span>
-                    <p className="text-xs text-zinc-500 font-medium">Connecting to Renteon servers</p>
+                    <span className="text-sm font-bold tracking-widest uppercase text-zinc-800">Delivering available cars to the website...</span>
+                    <p className="text-xs text-zinc-500 font-medium">Please wait a moment</p>
                 </div>
             </div>
 
