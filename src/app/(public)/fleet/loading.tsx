@@ -1,5 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton"
 import { Header } from "@/components/layout/Header"
+import { Loader2 } from "lucide-react"
 
 export default function Loading() {
   return (
@@ -7,13 +8,22 @@ export default function Loading() {
       <Header transparent={false} dictionary={{}} />
 
       {/* Booking Engine Skeleton */}
-      <div className="pt-32 pb-8 bg-zinc-50/50">
+      <div className="pt-32 pb-8 bg-zinc-50/50 relative z-10">
         <div className="w-full max-w-6xl mx-auto px-4">
           <Skeleton className="h-24 w-full rounded-xl" />
         </div>
       </div>
 
-      <main className="container mx-auto px-6 py-12">
+      {/* Central Spinner Overlay */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-md pointer-events-none">
+        <div className="flex flex-col items-center gap-4 text-zinc-600 bg-white shadow-2xl p-8 rounded-[2rem] border border-zinc-100 mt-20">
+          <Loader2 className="w-12 h-12 animate-spin text-red-600" />
+          <span className="text-sm font-bold tracking-widest uppercase text-zinc-800">Fetching Live Availability...</span>
+          <p className="text-xs text-zinc-500 font-medium">Connecting to Renteon servers</p>
+        </div>
+      </div>
+
+      <main className="container mx-auto px-6 py-12 relative z-10">
         {/* Filters Skeleton */}
         <div className="flex justify-center gap-3 mb-12">
           {[1, 2, 3, 4, 5].map((i) => (
