@@ -103,14 +103,8 @@ export function FleetCard({
     const diffTime = Math.max(0, e.getTime() - s.getTime())
     const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)))
 
-    // Calculate price based on duration
+    // Price comes directly from Renteon (set by server) - no DB tier fallback
     let pricePerDay = Math.round(car.pricePerDay)
-    const matchingTier = car.pricingTiers?.find(
-        t => diffDays >= t.minDays && (t.maxDays === null || diffDays <= t.maxDays)
-    )
-    if (matchingTier) {
-        pricePerDay = Math.round(matchingTier.pricePerDay)
-    }
 
     const totalPrice = pricePerDay * diffDays
 

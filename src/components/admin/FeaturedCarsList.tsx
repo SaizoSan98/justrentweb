@@ -38,8 +38,8 @@ export function FeaturedCarsList({ cars }: { cars: any[] }) {
           <Card key={car.id} className={`overflow-hidden transition-all ${car.isFeatured ? 'ring-2 ring-yellow-500 border-yellow-500/50 bg-yellow-50/10' : 'hover:border-zinc-300'}`}>
             <div className="relative h-48 bg-zinc-100">
               {car.imageUrl ? (
-                <Image 
-                  src={car.imageUrl} 
+                <Image
+                  src={car.imageUrl}
                   alt={`${car.make} ${car.model}`}
                   fill
                   className="object-cover"
@@ -62,16 +62,19 @@ export function FeaturedCarsList({ cars }: { cars: any[] }) {
                   <p className="text-xs text-zinc-500">{car.licensePlate}</p>
                 </div>
                 <div className="text-right">
-                  <span className="block font-bold text-zinc-900">€{Number(Number(car.pricePerDay).toFixed(1))}</span>
+                  <span className="block font-bold text-zinc-900">
+                    €{Number(Number(car.pricePerDay).toFixed(1))}
+                    <span className="text-[10px] text-zinc-400 font-normal ml-1">DB Ref.</span>
+                  </span>
                   <span className="text-xs text-zinc-500">/day</span>
                 </div>
               </div>
-              
+
               <div className="flex items-center justify-between pt-4 border-t border-zinc-100">
                 <span className="text-sm font-medium text-zinc-600">Show on Homepage</span>
                 <div className="flex items-center gap-3">
                   {loadingId === car.id && <Loader2 className="w-4 h-4 animate-spin text-zinc-400" />}
-                  <Switch 
+                  <Switch
                     checked={car.isFeatured}
                     onCheckedChange={() => handleToggle(car.id, car.isFeatured)}
                     disabled={loadingId === car.id}

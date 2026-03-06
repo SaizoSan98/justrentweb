@@ -133,19 +133,8 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
   }
 
   const days = calculateDays()
-
-  const getPricePerDay = () => {
-    if (!car.pricingTiers || car.pricingTiers.length === 0) return car.pricePerDay
-
-    // Find matching tier
-    const tier = car.pricingTiers.find((t: any) =>
-      days >= t.minDays && (t.maxDays === null || days <= t.maxDays)
-    )
-
-    return tier ? tier.pricePerDay : car.pricePerDay
-  }
-
-  const pricePerDay = getPricePerDay()
+  // Calculate base price using car.pricePerDay (which is set to Renteon dailyRate by server)
+  const pricePerDay = car.pricePerDay
   const basePrice = pricePerDay * days
 
   // Calculate Insurance Price

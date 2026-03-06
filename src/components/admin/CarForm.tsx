@@ -37,7 +37,7 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [activeTab, setActiveTab] = useState("general")
-  
+
   // Dependent fields state
   const [selectedMake, setSelectedMake] = useState<string>(car?.make || "")
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
@@ -53,7 +53,7 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
   const [description, setDescription] = useState<string>(car?.description || "")
   const [descriptionHe, setDescriptionHe] = useState<string>(translations?.find((t: any) => t.field === 'description' && t.language === 'he')?.value || "")
   const [airConditioning, setAirConditioning] = useState<boolean>(car?.airConditioning !== false) // default true if undefined? Schema says default true.
-  
+
   // Controlled Inputs State
   const [year, setYear] = useState<string>(car?.year?.toString() || "")
   const [licensePlate, setLicensePlate] = useState<string>(car?.licensePlate || "")
@@ -67,7 +67,7 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
   const [extraKmPrice, setExtraKmPrice] = useState<string>(car?.extraKmPrice?.toString() || "")
   const [unlimitedMileagePrice, setUnlimitedMileagePrice] = useState<string>(car?.unlimitedMileagePrice?.toString() || "")
   const [dailyMileageLimit, setDailyMileageLimit] = useState<string>(car?.dailyMileageLimit?.toString() || "")
-  
+
   const [availableModels, setAvailableModels] = useState<string[]>([])
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>(car?.features || [])
 
@@ -78,64 +78,64 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
   const [imagePreview, setImagePreview] = useState<string | null>(car?.imageUrl || null)
   const [flipImage, setFlipImage] = useState<boolean>(false)
   const [additionalImages, setAdditionalImages] = useState<string[]>(car?.images || [])
-  
+
   // Insurance Plans State
   const [insuranceValues, setInsuranceValues] = useState<Record<string, { price: string, deposit: string, enabled: boolean }>>({})
 
   useEffect(() => {
     if (car?.insuranceOptions) {
       const initial: Record<string, { price: string, deposit: string, enabled: boolean }> = {}
-      
+
       // First, mark existing options as enabled
       car.insuranceOptions.forEach((opt: any) => {
-        initial[opt.planId] = { 
-            price: opt.pricePerDay?.toString() || "0", 
-            deposit: opt.deposit?.toString() || "0",
-            enabled: true
+        initial[opt.planId] = {
+          price: opt.pricePerDay?.toString() || "0",
+          deposit: opt.deposit?.toString() || "0",
+          enabled: true
         }
       })
-      
+
       // Initialize others as disabled
       insurancePlans.forEach((plan: any) => {
-          if (!initial[plan.id]) {
-              initial[plan.id] = { price: "0", deposit: "0", enabled: false }
-          }
+        if (!initial[plan.id]) {
+          initial[plan.id] = { price: "0", deposit: "0", enabled: false }
+        }
       })
-      
+
       setInsuranceValues(initial)
     } else if (insurancePlans.length > 0) {
-        // Initialize with defaults if new car or no existing options
-        const initial: Record<string, { price: string, deposit: string, enabled: boolean }> = {}
-        insurancePlans.forEach((plan: any) => {
-             // Default to disabled for new cars, user must select applicable plans
-             initial[plan.id] = { price: "0", deposit: "0", enabled: false }
-        })
-        setInsuranceValues(initial)
+      // Initialize with defaults if new car or no existing options
+      const initial: Record<string, { price: string, deposit: string, enabled: boolean }> = {}
+      insurancePlans.forEach((plan: any) => {
+        // Default to disabled for new cars, user must select applicable plans
+        initial[plan.id] = { price: "0", deposit: "0", enabled: false }
+      })
+      setInsuranceValues(initial)
     }
   }, [car, insurancePlans])
 
   const handleInsuranceChange = (planId: string, field: 'price' | 'deposit' | 'enabled', value: any) => {
     setInsuranceValues(prev => ({
-        ...prev,
-        [planId]: {
-            ...prev[planId],
-            [field]: value
-        }
+      ...prev,
+      [planId]: {
+        ...prev[planId],
+        [field]: value
+      }
     }))
   }
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null)
   const formRef = useRef<HTMLFormElement>(null)
 
   useEffect(() => {
     // Only update available models if the make changes AND we are not in initial load state for a custom model
     if (selectedMake && CAR_MODELS[selectedMake]) {
-        // Check if current model is valid for this make
-        const isModelValid = CAR_MODELS[selectedMake].includes(selectedModel)
-        
-        // If the current model is NOT in the new list, but it exists (e.g. custom Renteon model),
-        // we should NOT clear it immediately. We only set available models.
-        setAvailableModels(CAR_MODELS[selectedMake])
+      // Check if current model is valid for this make
+      const isModelValid = CAR_MODELS[selectedMake].includes(selectedModel)
+
+      // If the current model is NOT in the new list, but it exists (e.g. custom Renteon model),
+      // we should NOT clear it immediately. We only set available models.
+      setAvailableModels(CAR_MODELS[selectedMake])
     } else {
       setAvailableModels([])
     }
@@ -143,10 +143,10 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
 
   // Fix: When initial data loads, if model is not in available models, keep it as text
   useEffect(() => {
-      if (car?.model && !availableModels.includes(car.model) && !CAR_MODELS[selectedMake]?.includes(car.model)) {
-          // If model is custom/renteon, ensure we can edit it
-          // This effect is mainly to ensure state consistency if needed
-      }
+    if (car?.model && !availableModels.includes(car.model) && !CAR_MODELS[selectedMake]?.includes(car.model)) {
+      // If model is custom/renteon, ensure we can edit it
+      // This effect is mainly to ensure state consistency if needed
+    }
   }, [car, availableModels, selectedMake])
 
   const handleMakeChange = (value: string) => {
@@ -154,7 +154,7 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
     // Only clear model if the new make has models defined AND the current model is not one of them
     // Actually, when changing make, we usually want to clear model unless it's a "custom" make without models
     if (CAR_MODELS[value] && CAR_MODELS[value].length > 0) {
-        setSelectedModel("") // Reset model when make changes to a standard one
+      setSelectedModel("") // Reset model when make changes to a standard one
     }
   }
 
@@ -224,7 +224,7 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
       // Manually construct FormData from state to ensure all fields are present
       // regardless of active tab (which unmounts other tabs' inputs)
       const data = new FormData()
-      
+
       // General
       data.append('categories', JSON.stringify(selectedCategories))
       data.append('make', selectedMake)
@@ -241,7 +241,7 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
       data.append('fuelType', selectedFuelType)
       data.append('orSimilar', orSimilar ? 'true' : 'false')
       data.append('airConditioning', airConditioning ? 'true' : 'false')
-      
+
       // Prices
       data.append('pricePerDay', pricePerDay)
       data.append('deposit', deposit)
@@ -250,15 +250,15 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
       data.append('returnAfterHoursPrice', returnAfterHoursPrice)
       data.append('extraKmPrice', extraKmPrice)
       data.append('unlimitedMileagePrice', unlimitedMileagePrice)
-      
+
       // Attributes
       data.append('dailyMileageLimit', dailyMileageLimit)
       data.append('fuelPolicy', selectedFuelPolicy)
-      
+
       // Complex data
       data.append('pricingTiers', JSON.stringify(pricingTiers))
       data.append('features', JSON.stringify(selectedFeatures))
-      
+
       // Handle Image manually
       if (fileInputRef.current?.files?.[0]) {
         data.append('image', fileInputRef.current.files[0])
@@ -273,14 +273,14 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
 
       // Insurance Options (Fix: Properly map insuranceValues to form fields)
       Object.keys(insuranceValues).forEach(planId => {
-          data.append(`insurance_enabled_${planId}`, insuranceValues[planId].enabled ? 'true' : 'false')
-          data.append(`insurance_price_${planId}`, insuranceValues[planId].price)
-          data.append(`insurance_deposit_${planId}`, insuranceValues[planId].deposit)
+        data.append(`insurance_enabled_${planId}`, insuranceValues[planId].enabled ? 'true' : 'false')
+        data.append(`insurance_price_${planId}`, insuranceValues[planId].price)
+        data.append(`insurance_deposit_${planId}`, insuranceValues[planId].deposit)
       })
 
       // Switches (Fixing previous comment logic)
-       
-       let result
+
+      let result
       if (isEditing && car?.id) {
         data.append('id', car.id)
         result = await updateCar(data)
@@ -325,7 +325,7 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 border p-4 rounded-md bg-zinc-50">
                     {categories.map(cat => (
                       <div key={cat.id} className="flex items-center space-x-2">
-                        <Checkbox 
+                        <Checkbox
                           id={`cat-${cat.id}`}
                           checked={selectedCategories.includes(cat.name)}
                           onCheckedChange={(checked) => {
@@ -352,7 +352,7 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
                     <SelectContent>
                       {/* If selected make is not in the list, add it dynamically so it shows up */}
                       {!CAR_MAKES.includes(selectedMake) && selectedMake && (
-                          <SelectItem value={selectedMake}>{selectedMake}</SelectItem>
+                        <SelectItem value={selectedMake}>{selectedMake}</SelectItem>
                       )}
                       {CAR_MAKES.map(make => (
                         <SelectItem key={make} value={make}>{make}</SelectItem>
@@ -377,17 +377,17 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
                           ))}
                         </SelectContent>
                       </Select>
-                      <Button 
-                        type="button" 
-                        variant="ghost" 
-                        size="sm" 
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
                         className="text-xs text-zinc-500 h-6 mt-1"
                         onClick={() => {
-                            // Switch to manual mode by clearing available models temporarily for this session? 
-                            // Better: Add a "Switch to manual" toggle?
-                            // Quick fix: If user wants to type manually, we can just show input if they select "Other" or similar.
-                            // For now, let's keep it simple: If it's already a known model, show select.
-                            // But if we want to Edit it, we might need an input.
+                          // Switch to manual mode by clearing available models temporarily for this session? 
+                          // Better: Add a "Switch to manual" toggle?
+                          // Quick fix: If user wants to type manually, we can just show input if they select "Other" or similar.
+                          // For now, let's keep it simple: If it's already a known model, show select.
+                          // But if we want to Edit it, we might need an input.
                         }}
                       >
                         Model not listed? Type manually
@@ -395,62 +395,62 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
                     </>
                   ) : (
                     <div className="space-y-1">
-                        <Input 
-                            name="model" 
-                            value={selectedModel} 
-                            onChange={(e) => setSelectedModel(e.target.value)}
-                            placeholder="Type model manually" 
-                            required 
-                        />
-                        {availableModels.length > 0 && (
-                            <Button 
-                                type="button" 
-                                variant="ghost" 
-                                size="sm" 
-                                className="text-xs text-blue-600 h-6 px-0"
-                                onClick={() => {
-                                    if (availableModels.length > 0) setSelectedModel(availableModels[0])
-                                }}
-                            >
-                                Select from list instead
-                            </Button>
-                        )}
+                      <Input
+                        name="model"
+                        value={selectedModel}
+                        onChange={(e) => setSelectedModel(e.target.value)}
+                        placeholder="Type model manually"
+                        required
+                      />
+                      {availableModels.length > 0 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs text-blue-600 h-6 px-0"
+                          onClick={() => {
+                            if (availableModels.length > 0) setSelectedModel(availableModels[0])
+                          }}
+                        >
+                          Select from list instead
+                        </Button>
+                      )}
                     </div>
                   )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="year">Year</Label>
-                  <Input 
-                    name="year" 
-                    type="number" 
-                    value={year} 
-                    onChange={(e) => setYear(e.target.value)} 
-                    placeholder="2024" 
-                    required 
+                  <Input
+                    name="year"
+                    type="number"
+                    value={year}
+                    onChange={(e) => setYear(e.target.value)}
+                    placeholder="2024"
+                    required
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="licensePlate">License Plate</Label>
-                  <Input 
-                    name="licensePlate" 
-                    value={licensePlate} 
-                    onChange={(e) => setLicensePlate(e.target.value)} 
-                    placeholder="ABC-123" 
-                    required 
+                  <Input
+                    name="licensePlate"
+                    value={licensePlate}
+                    onChange={(e) => setLicensePlate(e.target.value)}
+                    placeholder="ABC-123"
+                    required
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="mileage">Current Mileage (km)</Label>
-                  <Input 
-                    name="mileage" 
-                    type="number" 
-                    value={mileage} 
-                    onChange={(e) => setMileage(e.target.value)} 
-                    placeholder="0" 
-                    required 
+                  <Input
+                    name="mileage"
+                    type="number"
+                    value={mileage}
+                    onChange={(e) => setMileage(e.target.value)}
+                    placeholder="0"
+                    required
                   />
                 </div>
 
@@ -486,13 +486,13 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
 
                 <div className="space-y-2">
                   <Label htmlFor="suitcases">Number of Suitcases</Label>
-                  <Input 
-                    name="suitcases" 
-                    type="number" 
-                    value={suitcases} 
-                    onChange={(e) => setSuitcases(e.target.value)} 
-                    placeholder="e.g. 2" 
-                    required 
+                  <Input
+                    name="suitcases"
+                    type="number"
+                    value={suitcases}
+                    onChange={(e) => setSuitcases(e.target.value)}
+                    placeholder="e.g. 2"
+                    required
                   />
                 </div>
 
@@ -528,7 +528,7 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
 
                 <div className="md:col-span-2 space-y-2">
                   <Label htmlFor="description">Description (English)</Label>
-                  <Textarea 
+                  <Textarea
                     id="description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
@@ -542,7 +542,7 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
                     <Label htmlFor="descriptionHe">Description (Hebrew)</Label>
                     <span className="text-xs text-zinc-500">Auto-translated if left empty</span>
                   </div>
-                  <Textarea 
+                  <Textarea
                     id="descriptionHe"
                     value={descriptionHe}
                     onChange={(e) => setDescriptionHe(e.target.value)}
@@ -554,11 +554,11 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
 
                 <div className="space-y-2 flex flex-col justify-end pb-2">
                   <div className="flex items-center space-x-2">
-                    <Switch 
-                      id="orSimilar" 
-                      name="orSimilar" 
-                      checked={orSimilar} 
-                      onCheckedChange={setOrSimilar} 
+                    <Switch
+                      id="orSimilar"
+                      name="orSimilar"
+                      checked={orSimilar}
+                      onCheckedChange={setOrSimilar}
                     />
                     <Label htmlFor="orSimilar">Show "Or Similar" label</Label>
                   </div>
@@ -578,22 +578,22 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
                 <Shield className="w-5 h-5 text-zinc-500" />
                 <h3 className="font-bold text-lg">Insurance Plans & Deposits</h3>
               </div>
-              
+
               <div className="grid gap-6">
                 {insurancePlans.length === 0 && (
-                    <div className="text-center p-8 bg-zinc-50 rounded-lg border border-dashed border-zinc-200">
-                        <p className="text-zinc-500">No insurance plans found.</p>
-                        <p className="text-xs text-zinc-400 mt-1">Run "Sync Renteon" to import plans.</p>
-                    </div>
+                  <div className="text-center p-8 bg-zinc-50 rounded-lg border border-dashed border-zinc-200">
+                    <p className="text-zinc-500">No insurance plans found.</p>
+                    <p className="text-xs text-zinc-400 mt-1">Run "Sync Renteon" to import plans.</p>
+                  </div>
                 )}
                 {insurancePlans.map((plan: any) => (
                   <div key={plan.id} className={`grid md:grid-cols-3 gap-4 p-4 border rounded-lg ${insuranceValues[plan.id]?.enabled ? 'bg-zinc-50/50 border-blue-200' : 'bg-zinc-100 opacity-60'}`}>
                     <div className="flex flex-col justify-center gap-2">
                       <div className="flex items-center space-x-2">
-                        <Checkbox 
-                            id={`ins-enable-${plan.id}`}
-                            checked={insuranceValues[plan.id]?.enabled || false}
-                            onCheckedChange={(checked) => handleInsuranceChange(plan.id, 'enabled', checked === true)}
+                        <Checkbox
+                          id={`ins-enable-${plan.id}`}
+                          checked={insuranceValues[plan.id]?.enabled || false}
+                          onCheckedChange={(checked) => handleInsuranceChange(plan.id, 'enabled', checked === true)}
                         />
                         <Label htmlFor={`ins-enable-${plan.id}`} className="font-bold cursor-pointer">{plan.name}</Label>
                       </div>
@@ -604,9 +604,9 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor={`ins-price-${plan.id}`}>Daily Price Add-on (€)</Label>
-                      <Input 
+                      <Input
                         id={`ins-price-${plan.id}`}
-                        type="number" 
+                        type="number"
                         min="0"
                         placeholder="0"
                         value={insuranceValues[plan.id]?.price || ""}
@@ -617,9 +617,9 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor={`ins-deposit-${plan.id}`}>Deposit Required (€)</Label>
-                      <Input 
+                      <Input
                         id={`ins-deposit-${plan.id}`}
-                        type="number" 
+                        type="number"
                         min="0"
                         placeholder="0"
                         value={insuranceValues[plan.id]?.deposit || ""}
@@ -639,47 +639,50 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
         <TabsContent value="prices">
           <Card>
             <CardContent className="p-6 space-y-8">
-              
+
               <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 text-sm text-blue-800 flex items-start gap-3">
-                 <div className="mt-0.5">ℹ️</div>
-                 <div>
-                    <p className="font-bold">Sync Information</p>
-                    <p>Only <strong>Base Rental Price</strong> is updated automatically from Renteon. All other fields (Deposit, Full Insurance, Extra KM, etc.) are managed manually here and will NOT be overwritten.</p>
-                 </div>
+                <div className="mt-0.5">ℹ️</div>
+                <div>
+                  <p className="font-bold">Sync Information</p>
+                  <p>Only <strong>Base Rental Price</strong> is updated automatically from Renteon. All other fields (Deposit, Full Insurance, Extra KM, etc.) are managed manually here and will NOT be overwritten.</p>
+                </div>
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="pricePerDay">Base Rental Price / Day (EUR)</Label>
-                  <Input 
-                    name="pricePerDay" 
-                    type="number" 
-                    value={pricePerDay} 
-                    onChange={(e) => setPricePerDay(e.target.value)} 
-                    placeholder="60" 
-                    required 
+                  <Input
+                    name="pricePerDay"
+                    type="number"
+                    value={pricePerDay}
+                    onChange={(e) => setPricePerDay(e.target.value)}
+                    placeholder="60"
+                    required
                   />
+                  <p className="text-[10px] text-zinc-500 mt-1">
+                    *DB Reference only. The live frontend displays Renteon API prices.
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="deposit">Security Deposit (EUR)</Label>
-                  <Input 
-                    name="deposit" 
-                    type="number" 
-                    value={deposit} 
-                    onChange={(e) => setDeposit(e.target.value)} 
-                    placeholder="500" 
-                    required 
+                  <Input
+                    name="deposit"
+                    type="number"
+                    value={deposit}
+                    onChange={(e) => setDeposit(e.target.value)}
+                    placeholder="500"
+                    required
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="fullInsurancePrice">Full Insurance Price / Day (EUR)</Label>
-                  <Input 
-                    name="fullInsurancePrice" 
-                    type="number" 
-                    value={fullInsurancePrice} 
-                    onChange={(e) => setFullInsurancePrice(e.target.value)} 
-                    placeholder="20" 
-                    required 
+                  <Input
+                    name="fullInsurancePrice"
+                    type="number"
+                    value={fullInsurancePrice}
+                    onChange={(e) => setFullInsurancePrice(e.target.value)}
+                    placeholder="20"
+                    required
                   />
                 </div>
               </div>
@@ -687,42 +690,42 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
               <div className="grid md:grid-cols-2 gap-6 p-4 bg-zinc-50 rounded-lg border border-zinc-200">
                 <div className="space-y-2">
                   <Label htmlFor="pickupAfterHoursPrice">Pickup After Business Hours Price (EUR)</Label>
-                  <Input 
-                    name="pickupAfterHoursPrice" 
-                    type="number" 
-                    value={pickupAfterHoursPrice} 
-                    onChange={(e) => setPickupAfterHoursPrice(e.target.value)} 
-                    placeholder="30" 
+                  <Input
+                    name="pickupAfterHoursPrice"
+                    type="number"
+                    value={pickupAfterHoursPrice}
+                    onChange={(e) => setPickupAfterHoursPrice(e.target.value)}
+                    placeholder="30"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="returnAfterHoursPrice">Return After Business Hours Price (EUR)</Label>
-                  <Input 
-                    name="returnAfterHoursPrice" 
-                    type="number" 
-                    value={returnAfterHoursPrice} 
-                    onChange={(e) => setReturnAfterHoursPrice(e.target.value)} 
-                    placeholder="30" 
+                  <Input
+                    name="returnAfterHoursPrice"
+                    type="number"
+                    value={returnAfterHoursPrice}
+                    onChange={(e) => setReturnAfterHoursPrice(e.target.value)}
+                    placeholder="30"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="extraKmPrice">Extra KM Price (EUR)</Label>
-                  <Input 
-                    name="extraKmPrice" 
-                    type="number" 
-                    value={extraKmPrice} 
-                    onChange={(e) => setExtraKmPrice(e.target.value)} 
-                    placeholder="0.5" 
+                  <Input
+                    name="extraKmPrice"
+                    type="number"
+                    value={extraKmPrice}
+                    onChange={(e) => setExtraKmPrice(e.target.value)}
+                    placeholder="0.5"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="unlimitedMileagePrice">Unlimited Mileage Price / Day (EUR)</Label>
-                  <Input 
-                    name="unlimitedMileagePrice" 
-                    type="number" 
-                    value={unlimitedMileagePrice} 
-                    onChange={(e) => setUnlimitedMileagePrice(e.target.value)} 
-                    placeholder="50" 
+                  <Input
+                    name="unlimitedMileagePrice"
+                    type="number"
+                    value={unlimitedMileagePrice}
+                    onChange={(e) => setUnlimitedMileagePrice(e.target.value)}
+                    placeholder="50"
                   />
                 </div>
               </div>
@@ -738,7 +741,7 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
                     Add Tier
                   </Button>
                 </div>
-                
+
                 {pricingTiers.length === 0 && (
                   <div className="text-center py-6 bg-zinc-50 rounded-lg border border-dashed border-zinc-200 text-zinc-500 text-sm">
                     No custom pricing tiers configured. Base price will be used.
@@ -751,18 +754,18 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
                       <div className="grid grid-cols-4 gap-4 flex-1">
                         <div className="space-y-1">
                           <Label className="text-xs">Min Days</Label>
-                          <Input 
-                            type="number" 
-                            value={tier.minDays} 
+                          <Input
+                            type="number"
+                            value={tier.minDays}
                             onChange={(e) => handleTierChange(index, 'minDays', parseInt(e.target.value))}
                             className="h-8"
                           />
                         </div>
                         <div className="space-y-1">
                           <Label className="text-xs">Max Days (Optional)</Label>
-                          <Input 
-                            type="number" 
-                            value={tier.maxDays || ''} 
+                          <Input
+                            type="number"
+                            value={tier.maxDays || ''}
                             onChange={(e) => handleTierChange(index, 'maxDays', e.target.value ? parseInt(e.target.value) : null)}
                             className="h-8"
                             placeholder="Unlimited"
@@ -770,27 +773,27 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
                         </div>
                         <div className="space-y-1">
                           <Label className="text-xs">Price / Day</Label>
-                          <Input 
-                            type="number" 
-                            value={tier.pricePerDay} 
+                          <Input
+                            type="number"
+                            value={tier.pricePerDay}
                             onChange={(e) => handleTierChange(index, 'pricePerDay', parseFloat(e.target.value))}
                             className="h-8"
                           />
                         </div>
                         <div className="space-y-1">
                           <Label className="text-xs">Deposit</Label>
-                          <Input 
-                            type="number" 
-                            value={tier.deposit} 
+                          <Input
+                            type="number"
+                            value={tier.deposit}
                             onChange={(e) => handleTierChange(index, 'deposit', parseFloat(e.target.value))}
                             className="h-8"
                           />
                         </div>
                       </div>
-                      <Button 
-                        type="button" 
-                        variant="ghost" 
-                        size="icon" 
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
                         className="mt-6 text-zinc-400 hover:text-red-600"
                         onClick={() => handleRemoveTier(index)}
                       >
@@ -811,12 +814,12 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="dailyMileageLimit">Daily Mileage Limit (km)</Label>
-                  <Input 
-                    name="dailyMileageLimit" 
-                    type="number" 
-                    value={dailyMileageLimit} 
-                    onChange={(e) => setDailyMileageLimit(e.target.value)} 
-                    placeholder="Leave empty for Unlimited" 
+                  <Input
+                    name="dailyMileageLimit"
+                    type="number"
+                    value={dailyMileageLimit}
+                    onChange={(e) => setDailyMileageLimit(e.target.value)}
+                    placeholder="Leave empty for Unlimited"
                   />
                 </div>
 
@@ -841,8 +844,8 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {CAR_FEATURES.map(feature => (
                     <div key={feature} className="flex items-center space-x-2">
-                      <Checkbox 
-                        id={`feat-${feature}`} 
+                      <Checkbox
+                        id={`feat-${feature}`}
                         checked={selectedFeatures.includes(feature)}
                         onCheckedChange={(checked: boolean) => handleFeatureToggle(feature)}
                       />
@@ -862,7 +865,7 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
               <div className="space-y-2">
                 <Label>Main Car Image</Label>
                 <div className="flex items-center gap-4">
-                  <div 
+                  <div
                     className="w-48 h-32 bg-zinc-100 rounded-lg border border-zinc-200 flex items-center justify-center overflow-hidden cursor-pointer hover:bg-zinc-50 transition-colors"
                     onClick={() => fileInputRef.current?.click()}
                   >
@@ -873,24 +876,24 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
                     )}
                   </div>
                   <div className="space-y-1">
-                    <Input 
+                    <Input
                       ref={fileInputRef}
-                      id="image" 
-                      name="image" 
-                      type="file" 
-                      accept="image/*" 
-                      className="hidden" 
+                      id="image"
+                      name="image"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
                       onChange={handleImageChange}
                     />
                     <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
                       Choose Main Image
                     </Button>
                     <p className="text-xs text-zinc-500">Supported formats: JPG, PNG, WebP</p>
-                    
+
                     <div className="flex items-center space-x-2 pt-2">
-                      <Checkbox 
-                        id="flipImage" 
-                        checked={flipImage} 
+                      <Checkbox
+                        id="flipImage"
+                        checked={flipImage}
                         onCheckedChange={(checked) => setFlipImage(checked === true)}
                       />
                       <Label htmlFor="flipImage" className="cursor-pointer font-normal">
@@ -918,16 +921,16 @@ export function CarForm({ car, categories = [], insurancePlans = [], isEditing =
       </Tabs>
 
       <div className="flex justify-end gap-4 sticky bottom-6 bg-white/80 backdrop-blur-md p-4 rounded-xl border border-zinc-200 shadow-2xl z-50">
-        <Button 
-          type="button" 
-          variant="outline" 
+        <Button
+          type="button"
+          variant="outline"
           onClick={() => router.back()}
           disabled={isSubmitting}
         >
           Cancel
         </Button>
-        <Button 
-          type="button" 
+        <Button
+          type="button"
           className="bg-zinc-900 text-white hover:bg-zinc-800 min-w-[150px]"
           disabled={isSubmitting}
           onClick={handleSave}

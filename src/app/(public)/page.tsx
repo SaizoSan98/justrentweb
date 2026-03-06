@@ -17,7 +17,8 @@ import { Footer } from "@/components/layout/Footer"
 import { BrandStrip } from "@/components/home/BrandStrip"
 import { PartnersStrip } from "@/components/home/PartnersStrip"
 import { FeatureGrid } from "@/components/home/FeatureGrid"
-
+import { checkRealTimeAvailability } from "@/app/actions/renteon-availability";
+import { mapCarToCategoryId } from "@/lib/renteon";
 import { Logo } from "@/components/ui/logo"
 
 export const dynamic = 'force-dynamic'
@@ -45,23 +46,54 @@ export default async function LandingPage() {
     include: { categories: true }
   })
 
-  // Serialize cars to avoid Decimal issues
-  const serializedFeaturedCars = featuredCars.map(car => ({
-    ...car,
-    categories: car.categories,
-    pricePerDay: Number(car.pricePerDay),
-    deposit: Number(car.deposit),
-    fullInsurancePrice: Number(car.fullInsurancePrice),
-    extraKmPrice: Number(car.extraKmPrice),
-    unlimitedMileagePrice: Number(car.unlimitedMileagePrice),
-    registrationFee: Number(car.registrationFee),
-    contractFee: Number(car.contractFee),
-    winterizationFee: Number(car.winterizationFee),
-    pickupAfterHoursPrice: Number(car.pickupAfterHoursPrice),
-    returnAfterHoursPrice: Number(car.returnAfterHoursPrice),
-    pricingTiers: [], // Not needed for featured card
-    insuranceOptions: [] // Not needed for featured card
-  }))
+  // Fetch Real-time Renteon prices for the featured cars
+  // We use a default 3-day window starting tomorrow to get accurate base rates
+  const rentDateOut = new Date();
+  rentDateOut.setDate(rentDateOut.getDate() + 1);
+  const rentDateIn = new Date(rentDateOut);
+  rentDateIn.setDate(rentDateIn.getDate() + 3);
+
+  let renteonPrices = new Map<number, number>();
+  try {
+    const renteonResult = await checkRealTimeAvailability(rentDateOut, rentDateIn);
+    if (renteonResult.success && Array.isArray(renteonResult.data)) {
+      renteonResult.data.forEach((item: any) => {
+        const catId = item.CarCategoryId || item.CategoryId || item.Id;
+        if (catId && item.dailyRate > 0) {
+          renteonPrices.set(catId, Number(item.dailyRate));
+        } else if (catId && item.Amount) {
+          // Fallback if dailyRate is missing but Amount is present
+          renteonPrices.set(catId, Number(item.Amount) / 3);
+        }
+      });
+    }
+  } catch (err) {
+    console.error("Failed to fetch featured car Renteon prices:", err);
+  }
+
+  // Serialize cars to avoid Decimal issues, and apply Renteon prices
+  const serializedFeaturedCars = featuredCars.map(car => {
+    const catId = mapCarToCategoryId(car);
+    const rRate = renteonPrices.get(catId);
+
+    return {
+      ...car,
+      categories: car.categories,
+      // Use Renteon daily rate or 0 if not available (to avoid showing DB price)
+      pricePerDay: rRate ? Math.round(rRate) : 0,
+      deposit: Number(car.deposit),
+      fullInsurancePrice: Number(car.fullInsurancePrice),
+      extraKmPrice: Number(car.extraKmPrice),
+      unlimitedMileagePrice: Number(car.unlimitedMileagePrice),
+      registrationFee: Number(car.registrationFee),
+      contractFee: Number(car.contractFee),
+      winterizationFee: Number(car.winterizationFee),
+      pickupAfterHoursPrice: Number(car.pickupAfterHoursPrice),
+      returnAfterHoursPrice: Number(car.returnAfterHoursPrice),
+      pricingTiers: [], // Not needed for featured card
+      insuranceOptions: [] // Not needed for featured card
+    };
+  }).filter(c => c.pricePerDay > 0); // Only show if we got a valid Renteon price
 
   return (
     <div className="flex flex-col min-h-screen bg-white font-sans selection:bg-blue-100 selection:text-blue-900">
