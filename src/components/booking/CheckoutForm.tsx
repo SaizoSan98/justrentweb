@@ -723,10 +723,10 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
 
             <div
               className={cn(
-                "border-2 rounded-xl p-4 transition-all flex items-start gap-4 opacity-50 cursor-not-allowed",
-                mileageOption === 'UNLIMITED' ? "border-black bg-zinc-50" : "border-zinc-200"
+                "border-2 rounded-xl p-4 cursor-pointer transition-all flex items-start gap-4",
+                mileageOption === 'UNLIMITED' ? "border-black bg-zinc-50" : "border-zinc-200 hover:border-zinc-300"
               )}
-            // onClick={() => setMileageOption('UNLIMITED')}
+              onClick={() => setMileageOption('UNLIMITED')}
             >
               <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center mt-1 shrink-0", mileageOption === 'UNLIMITED' ? "border-black" : "border-zinc-300")}>
                 {mileageOption === 'UNLIMITED' && <div className="w-3 h-3 bg-black rounded-full" />}
@@ -735,9 +735,8 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                 <div className="flex justify-between items-center mb-1">
                   <h4 className="font-bold text-zinc-900 flex items-center gap-2">
                     {dictionary.fleet.unlimited} {dictionary.common.km}
-                    <span className="bg-zinc-200 text-zinc-600 text-[10px] px-1.5 py-0.5 rounded uppercase tracking-wider font-bold">DEV</span>
                   </h4>
-                  <span className="font-bold text-zinc-400">+{Number(((car.unlimitedMileagePrice || 0) * days).toFixed(1))} €</span>
+                  <span className="font-bold text-zinc-900">+{Number(((car.unlimitedMileagePrice || 0) * days).toFixed(1))} €</span>
                 </div>
               </div>
             </div>
