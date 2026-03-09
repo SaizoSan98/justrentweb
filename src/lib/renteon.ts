@@ -56,7 +56,7 @@ export function mapCarToCategoryId(car: any): number {
 
   if (make.includes('ford')) {
     if (model.includes('focus')) return 293;
-    if (model.includes('tourneo')) return 294;
+    if (model.includes('tourneo')) return 384;
     if (model.includes('transit')) return 294;
     if (model.includes('puma')) return 331;
   }
@@ -114,6 +114,15 @@ export function mapCarToCategoryId(car: any): number {
     if (model.includes('leon')) return 301;
     if (model.includes('ateca')) return 329;
     if (model.includes('tarraco')) return 330;
+  }
+
+  if (make.includes('opel')) {
+    if (model.includes('astra')) return 409;
+    if (model.includes('corsa')) return 411;
+  }
+
+  if (make.includes('nissan')) {
+    if (model.includes('qashqai')) return 329;
   }
 
   if (make.includes('omoda') || model.includes('omoda')) {
