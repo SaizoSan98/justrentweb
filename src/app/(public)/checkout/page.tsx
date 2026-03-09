@@ -59,6 +59,7 @@ export default async function CheckoutPage({
   let renteonPrice = 0;
   let renteonDailyRate = 0;
   let renteonDeposit = 0;
+  let renteonUnlimitedMileagePrice = 0;
 
   if (endDate) {
     try {
@@ -74,7 +75,8 @@ export default async function CheckoutPage({
           renteonPrice = Number(renteonItem.Amount || 0);
           renteonDailyRate = Number(renteonItem.dailyRate || 0);
           renteonDeposit = Number(renteonItem.DepositAmount || renteonItem.Deposit || 0);
-          console.log(`Checkout: Fetched fresh Renteon price: ${renteonPrice} EUR, dailyRate: ${renteonDailyRate}, Deposit: ${renteonDeposit}`);
+          renteonUnlimitedMileagePrice = Number(renteonItem.unlimitedMileagePrice || 0);
+          console.log(`Checkout: Fetched fresh Renteon price: ${renteonPrice} EUR, dailyRate: ${renteonDailyRate}, Deposit: ${renteonDeposit}, Unlimited km: ${renteonUnlimitedMileagePrice}`);
 
           if (renteonItem.renteonInsurances && renteonItem.renteonInsurances.length > 0) {
             car.insuranceOptions = renteonItem.renteonInsurances.map((ins: any, index: number) => ({
@@ -116,7 +118,7 @@ export default async function CheckoutPage({
     pricePerDay: effectivePricePerDay,
     deposit: effectiveDeposit,
     fullInsurancePrice: Number(car.fullInsurancePrice),
-    unlimitedMileagePrice: Number(car.unlimitedMileagePrice || 0),
+    unlimitedMileagePrice: renteonUnlimitedMileagePrice > 0 ? renteonUnlimitedMileagePrice : Number(car.unlimitedMileagePrice || 0),
     // ALWAYS clear Pricing Tiers - only Renteon prices are used
     pricingTiers: [] as any[],
     insuranceOptions: car.insuranceOptions.map(opt => ({
