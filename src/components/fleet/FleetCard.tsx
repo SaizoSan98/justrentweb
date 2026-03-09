@@ -135,8 +135,8 @@ export function FleetCard({
 
     return (
         <div className={cn(
-            "group relative bg-gradient-to-br from-zinc-900 to-[#2d0a0a] border border-zinc-800/50 rounded-[2rem] overflow-hidden transition-all duration-500",
-            isExpanded ? "shadow-2xl ring-1 ring-white/10 col-span-1 md:col-span-2 xl:col-span-3" : "hover:border-red-900/50 hover:shadow-[0_20px_50px_rgba(45,10,10,0.3)] hover:-translate-y-2",
+            "group relative bg-gradient-to-br from-[#1c1c1c] via-zinc-950 to-[#4c0505] border border-zinc-800/50 rounded-[2rem] overflow-hidden transition-all duration-500",
+            isExpanded ? "shadow-2xl ring-1 ring-white/10 col-span-1 md:col-span-2 xl:col-span-3" : "hover:border-red-900/50 hover:shadow-[0_20px_50px_rgba(76,5,5,0.4)] hover:-translate-y-2",
             !isAvailable && "opacity-60 grayscale pointer-events-none"
         )}>
 
