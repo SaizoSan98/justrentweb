@@ -45,28 +45,28 @@ model Car {
   features              String[]
   createdAt             DateTime       @default(now())
   updatedAt             DateTime       @updatedAt
-  deposit               Decimal        @default(0)
-  fullInsurancePrice    Decimal        @default(0)
   airConditioning       Boolean        @default(true)
+  contractFee           Decimal        @default(0)
   dailyMileageLimit     Int?
+  deposit               Decimal        @default(0)
+  description           String?
   doors                 Int            @default(5)
+  extraKmPrice          Decimal        @default(0)
   fuelPolicy            String         @default("FULL_TO_FULL")
   fuelType              FuelType       @default(PETROL)
+  fullInsurancePrice    Decimal        @default(0)
+  isFeatured            Boolean        @default(false)
   orSimilar             Boolean        @default(false)
   pickupAfterHoursPrice Decimal        @default(0)
+  registrationFee       Decimal        @default(0)
+  renteonId             String?        @unique
   returnAfterHoursPrice Decimal        @default(0)
   seats                 Int            @default(5)
   suitcases             Int            @default(2)
   transmission          Transmission   @default(MANUAL)
-  contractFee           Decimal        @default(0)
-  extraKmPrice          Decimal        @default(0)
-  registrationFee       Decimal        @default(0)
   unlimitedMileagePrice Decimal        @default(0)
-  winterizationFee      Decimal        @default(0)
-  isFeatured            Boolean        @default(false)
-  description           String?
   vin                   String?        @unique
-  renteonId             String?        @unique
+  winterizationFee      Decimal        @default(0)
   availabilities        Availability[]
   bookings              Booking[]
   insuranceOptions      CarInsurance[]
@@ -76,24 +76,24 @@ model Car {
 }
 
 model LongTermCar {
-  id              String       @id @default(cuid())
-  make            String
-  model           String
-  year            Int
-  imageUrl        String?
-  monthlyPrice    Decimal      // Keeping for backward compatibility or as base/1-3 month price
-  price1to3       Decimal      @default(0)
-  price4to6       Decimal      @default(0)
-  price7plus      Decimal      @default(0)
-  deposit         Decimal      @default(0)
-  description     String?
-  features        String[]
-  isAvailable     Boolean      @default(true)
-  transmission    Transmission @default(MANUAL)
-  fuelType        FuelType     @default(PETROL)
-  seats           Int          @default(5)
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+  id           String       @id @default(cuid())
+  make         String
+  model        String
+  year         Int
+  imageUrl     String?
+  monthlyPrice Decimal
+  deposit      Decimal      @default(0)
+  description  String?
+  features     String[]
+  isAvailable  Boolean      @default(true)
+  transmission Transmission @default(MANUAL)
+  fuelType     FuelType     @default(PETROL)
+  seats        Int          @default(5)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  price1to3    Decimal      @default(0)
+  price4to6    Decimal      @default(0)
+  price7plus   Decimal      @default(0)
 }
 
 model Category {
@@ -122,8 +122,8 @@ model Extra {
   price       Decimal
   priceType   String    @default("PER_DAY")
   icon        String?
-  renteonId   String?   @unique
   code        String?
+  renteonId   String?   @unique
   bookings    Booking[] @relation("BookingToExtra")
 }
 
@@ -133,10 +133,10 @@ model InsurancePlan {
   description   String?
   isDefault     Boolean        @default(false)
   order         Int            @default(0)
-  renteonId     String?        @unique
-  code          String?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
+  code          String?
+  renteonId     String?        @unique
   bookings      Booking[]
   carInsurances CarInsurance[]
 }
@@ -169,17 +169,17 @@ model Booking {
   companyName     String?
   companyPhone    String?
   companyTaxId    String?
+  dropoffLocation String         @default("Budapest Airport")
   email           String
   firstName       String
   flightNumber    String?
+  fullInsurance   Boolean        @default(false)
+  insurancePlanId String?
   isCompany       Boolean        @default(false)
   lastName        String
   paymentMethod   String         @default("CASH_ON_SITE")
   phone           String
-  dropoffLocation String         @default("Budapest Airport")
-  fullInsurance   Boolean        @default(false)
   pickupLocation  String         @default("Budapest Airport")
-  insurancePlanId String?
   promoCode       String?
   car             Car            @relation(fields: [carId], references: [id])
   insurancePlan   InsurancePlan? @relation(fields: [insurancePlanId], references: [id])

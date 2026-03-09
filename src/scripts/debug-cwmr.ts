@@ -38,17 +38,12 @@ async function getRenteonToken(): Promise<string> {
 }
 
 async function checkTomorrow() {
-    console.log("🔍 Holnapi (2026-03-10) elérhetőség ellenőrzése (Standalone)...\n");
+    console.log("🔍 Holnapi (2026-03-10) elérhetőség ellenőrzése (Detailed)...\n");
 
     const token = await getRenteonToken();
-
-    // Tomorrow: 2026-03-10
     const startDate = new Date("2026-03-10T10:00:00Z");
     const endDate = new Date("2026-03-11T10:00:00Z");
 
-    console.log(`📅 Időszak: ${startDate.toISOString()} -> ${endDate.toISOString()}`);
-
-    // Fetch Categories
     const catRes = await fetch(`${RENTEON_API_URL}/carCategories`, {
         headers: { 'Authorization': `Bearer ${token}` }
     });
@@ -57,54 +52,37 @@ async function checkTomorrow() {
     const availPayload = {
         DateOut: startDate.toISOString(),
         DateIn: endDate.toISOString(),
-        OfficeOutId: 54, // Vecsés
+        OfficeOutId: 54,
         OfficeInId: 54,
         BookAsCommissioner: true,
         PricelistId: 453,
         Currency: "EUR"
     };
 
-    console.log("📡 Elérhetőség lekérése...");
-
     try {
         const resAvail = await fetch(`${RENTEON_API_URL}/bookings/availability`, {
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
             body: JSON.stringify(availPayload)
         });
 
-        if (!resAvail.ok) {
-            console.error(`❌ Hiba az elérhetőség lekérésekor: ${resAvail.status}`);
-            console.error(await resAvail.text());
-            return;
+        if (resAvail.ok) {
+            const availableCars = await resAvail.json();
+            for (const car of availableCars) {
+                if (car.SIPP === 'CWMR') {
+                    console.log("DEBUG: Full CWMR Data:", JSON.stringify(car, null, 2));
+                }
+                const catId = car.CarCategoryId || car.CategoryId;
+                const categoryInfo = Array.isArray(categories) ? categories.find((c: any) => c.Id === catId) : null;
+                const models = (categoryInfo && categoryInfo.CarModels) ? categoryInfo.CarModels.map((m: any) => m.Name).join(", ") : "Ismeretlen modellek";
+
+                console.log(`🚗 Kategória: ${car.CarCategoryName || categoryInfo?.Name || 'N/A'} (SIPP: ${car.SIPP})`);
+                console.log(`   Modellek: ${models}`);
+                console.log("------------------------------------------------");
+            }
         }
-
-        const availableCars = await resAvail.json();
-
-        if (!Array.isArray(availableCars) || availableCars.length === 0) {
-            console.log("📭 Nincs elérhető autó holnapra.");
-            return;
-        }
-
-        console.log(`✅ ${availableCars.length} kategória elérhető holnapra:\n`);
-
-        for (const car of availableCars) {
-            const catId = car.CarCategoryId || car.CategoryId;
-            const categoryInfo = Array.isArray(categories) ? categories.find((c: any) => c.Id === catId) : null;
-            const models = (categoryInfo && categoryInfo.CarModels) ? categoryInfo.CarModels.map((m: any) => m.Name).join(", ") : "Ismeretlen modellek";
-
-            console.log(`🚗 Kategória: ${car.CarCategoryName || categoryInfo?.Name || 'N/A'}`);
-            console.log(`   SIPP: ${car.SIPP || categoryInfo?.SIPP || 'N/A'}`);
-            console.log(`   Ár (1 nap): ${car.Price} ${car.Currency}`);
-            console.log(`   Modellek: ${models}`);
-            console.log("------------------------------------------------");
-        }
-
     } catch (e) {
-        console.error("Hiba:", e);
+        console.error(e);
     }
 }
 

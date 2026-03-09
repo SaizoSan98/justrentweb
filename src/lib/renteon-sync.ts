@@ -338,7 +338,7 @@ export async function executeSyncCars() {
             console.log("Fetching Real Prices with multi-strategy approach...");
 
             const startDate = new Date();
-            startDate.setDate(startDate.getDate() + 30);
+            startDate.setDate(startDate.getDate() + 2);
             const endDate = new Date(startDate);
             endDate.setDate(startDate.getDate() + 3);
 
@@ -376,7 +376,8 @@ export async function executeSyncCars() {
                                 const ins = data.Services
                                     .filter((s: any) => {
                                         const n = (s.Name || "").toLowerCase();
-                                        return n.includes('insurance') || n.includes('protect') || n.includes('cdw') || n.includes('sct');
+                                        const t = (s.ServiceTypeName || "").toLowerCase();
+                                        return n.includes('insurance') || n.includes('protect') || n.includes('cdw') || n.includes('sct') || t.includes('insurance') || s.InsuranceDepositAmount !== null;
                                     })
                                     .map((s: any) => {
                                         const serviceData = {
@@ -464,9 +465,13 @@ export async function executeSyncCars() {
                 return 'MANUAL'
             }
 
-            if (cat.CarModels && Array.isArray(cat.CarModels) && cat.CarModels.length > 0) {
-                for (const model of cat.CarModels) {
-                    const make = model.CarMakeName || cat.CarMakeName || 'Unknown';
+            if ((cat.CarModels && Array.isArray(cat.CarModels) && cat.CarModels.length > 0) || (cat.SIPP && cat.SIPP.length >= 4)) {
+                const modelsToSync = (cat.CarModels && cat.CarModels.length > 0)
+                    ? cat.CarModels
+                    : [{ Id: cat.Id, Name: cat.Name || decodeSIPP(cat.SIPP), CarMakeName: 'Opel' }]; // Fallback specifically for Astra/Corsa cases if they come without models
+
+                for (const model of modelsToSync) {
+                    const make = model.CarMakeName || cat.CarMakeName || 'Opel';
                     let modelName = model.Name;
 
                     if (modelName.toLowerCase().startsWith(make.toLowerCase())) {
@@ -475,23 +480,20 @@ export async function executeSyncCars() {
 
                     const finalPrice = priceMap.get(cat.Id);
                     if (!finalPrice) {
-                        console.log(`Skipping ${make} ${modelName} - No Renteon Price`);
+                        console.log(`Skipping ${make} ${modelName} (Cat ${cat.Id}) - No Renteon Price`);
                         continue;
                     }
 
-                    // STRICT MODE: Check for Insurances
                     const carInsurances = insurancesMap.get(cat.Id);
                     if (!carInsurances || carInsurances.length === 0) {
-                        console.log(`Skipping ${make} ${modelName} - No Insurance options found`);
+                        console.log(`Skipping ${make} ${modelName} (Cat ${cat.Id}) - No Insurance options found`);
                         continue;
                     }
 
-                    // STRICT MODE: Check for SIPP
                     if (!cat.SIPP || cat.SIPP.length < 4) {
-                        console.log(`Skipping ${make} ${modelName} - Invalid SIPP`);
+                        console.log(`Skipping ${make} ${modelName} (Cat ${cat.Id}) - Invalid SIPP: ${cat.SIPP}`);
                         continue;
                     }
-
                     const carData = {
                         make: make,
                         model: modelName,
