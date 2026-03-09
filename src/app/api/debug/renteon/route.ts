@@ -39,7 +39,7 @@ export async function GET() {
             OfficeOutId: 54, 
             OfficeInId: 54,
             BookAsCommissioner: true,
-            PricelistId: 306,
+            PricelistId: 453,
             Currency: "EUR"
         };
         

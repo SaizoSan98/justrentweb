@@ -168,7 +168,7 @@ async function cleanup() {
                 DateIn: endDate.toISOString(),
                 Currency: "EUR",
                 BookAsCommissioner: true,
-                PricelistId: 306
+                PricelistId: 453
             };
 
             try {

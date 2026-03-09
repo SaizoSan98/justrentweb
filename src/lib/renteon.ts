@@ -265,7 +265,7 @@ export async function fetchRenteonServices(): Promise<any[]> {
           OfficeOutId: 54,
           OfficeInId: 54,
           BookAsCommissioner: true,
-          PricelistId: 306,
+          PricelistId: 453,
           Currency: "EUR"
         };
 
@@ -410,7 +410,7 @@ export async function syncBookingToRenteon(booking: any) {
       DateOut: dateOut,
       DateIn: dateIn,
       Currency: "EUR",
-      PricelistId: 306, // WEB Pricelist (ID 306)
+      PricelistId: 453, // WEB Pricelist (ID 453)
       BookAsCommissioner: true, // Required for Agency/Partner API users
       IgnoreAvailability: true, // Force booking creation even if availability check fails
       Force: true, // Attempt to force booking

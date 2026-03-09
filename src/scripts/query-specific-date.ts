@@ -73,7 +73,7 @@ async function querySpecificDates() {
         DateIn: endDate.toISOString(),
         Currency: "EUR",
         BookAsCommissioner: true, 
-        PricelistId: 306
+        PricelistId: 453
     };
 
     console.log("\n📡 Kérés küldése a /bookings/calculate endpointra (Csak EXTRÁK)...");

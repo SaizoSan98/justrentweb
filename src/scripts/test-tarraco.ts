@@ -83,7 +83,7 @@ async function testTarraco() {
         DateIn: endDate.toISOString(),
         Currency: "EUR",
         BookAsCommissioner: true,
-        PricelistId: 306
+        PricelistId: 453
     };
 
     const res = await fetch(`${RENTEON_API_URL}/bookings/calculate`, {

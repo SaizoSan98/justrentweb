@@ -108,7 +108,7 @@ async function analyzeRenteonData() {
             DateIn: endDate.toISOString(),
             Currency: "EUR",
             BookAsCommissioner: true,
-            PricelistId: 306
+            PricelistId: 453
         };
 
         const calcRes = await fetch(`${RENTEON_API_URL}/bookings/calculate`, {

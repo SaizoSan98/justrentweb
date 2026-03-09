@@ -41,7 +41,7 @@ export async function checkRealTimeAvailability(
             DateOut: dOut,
             DateIn: dIn,
             BookAsCommissioner: true,
-            PricelistId: 306,
+            PricelistId: 453,
             Currency: "EUR"
         };
 
@@ -133,7 +133,7 @@ export async function verifyPromoCodeForCar(
         DateOut: dOut,
         DateIn: dIn,
         BookAsCommissioner: true,
-        PricelistId: 306,
+        PricelistId: 453,
         Currency: "EUR"
     };
 

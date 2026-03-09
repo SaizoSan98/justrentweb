@@ -22,7 +22,7 @@ async function check() {
       DateOut: startDate.toISOString(),
       DateIn: endDate.toISOString(),
       BookAsCommissioner: true,
-      PricelistId: 306,
+      PricelistId: 453,
       Currency: "EUR"
     }
 
