@@ -465,10 +465,8 @@ export async function executeSyncCars() {
                 return 'MANUAL'
             }
 
-            if ((cat.CarModels && Array.isArray(cat.CarModels) && cat.CarModels.length > 0) || (cat.SIPP && cat.SIPP.length >= 4)) {
-                const modelsToSync = (cat.CarModels && cat.CarModels.length > 0)
-                    ? cat.CarModels
-                    : [{ Id: cat.Id, Name: cat.Name || decodeSIPP(cat.SIPP), CarMakeName: 'Opel' }]; // Fallback specifically for Astra/Corsa cases if they come without models
+            if (cat.CarModels && Array.isArray(cat.CarModels) && cat.CarModels.length > 0) {
+                const modelsToSync = cat.CarModels
 
                 for (const model of modelsToSync) {
                     const make = model.CarMakeName || cat.CarMakeName || 'Opel';
@@ -596,9 +594,7 @@ export async function executeSyncCars() {
                     }
                 }
             } else {
-                // STRICT MODE: No standalone car creation without valid CarModels array
-                // This entire block was relying on fallback data for categories without specific models
-                console.log(`Skipping Category ${cat.Id} - No CarModels array (Strict Mode)`);
+                console.log(`Skipping Category ${cat.Id} - No CarModels array`);
             }
         }
 
