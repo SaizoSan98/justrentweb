@@ -135,8 +135,8 @@ export function FleetCard({
 
     return (
         <div className={cn(
-            "group relative bg-[#18181b] border border-zinc-800 rounded-[2rem] overflow-hidden transition-all duration-300",
-            isExpanded ? "shadow-2xl ring-1 ring-zinc-700 col-span-1 md:col-span-2 xl:col-span-3" : "hover:border-zinc-700 hover:shadow-xl hover:-translate-y-1",
+            "group relative bg-gradient-to-br from-zinc-900 to-[#2d0a0a] border border-zinc-800/50 rounded-[2rem] overflow-hidden transition-all duration-500",
+            isExpanded ? "shadow-2xl ring-1 ring-white/10 col-span-1 md:col-span-2 xl:col-span-3" : "hover:border-red-900/50 hover:shadow-[0_20px_50px_rgba(45,10,10,0.3)] hover:-translate-y-2",
             !isAvailable && "opacity-60 grayscale pointer-events-none"
         )}>
 
@@ -149,7 +149,7 @@ export function FleetCard({
             )}
 
             {/* --- COLLAPSED STATE (DEFAULT CARD) --- */}
-            <div className={cn("p-6 flex flex-col h-full bg-[#18181b] border border-zinc-800 rounded-[2rem] relative overflow-hidden", isExpanded && "hidden")}>
+            <div className={cn("p-6 flex flex-col h-full bg-transparent relative overflow-hidden", isExpanded && "hidden")}>
 
                 {/* Featured Badge */}
                 {car.isFeatured && (
@@ -244,9 +244,9 @@ export function FleetCard({
 
             {/* --- EXPANDED STATE (SPLIT VIEW) --- */}
             {isExpanded && (
-                <div className="flex flex-col md:flex-row h-auto min-h-[500px] border-t border-zinc-800">
+                <div className="flex flex-col md:flex-row h-auto min-h-[500px] border-t border-zinc-800/50">
                     {/* LEFT SIDE: DARK (Image + Specs) */}
-                    <div className="w-full md:w-[55%] bg-[#18181b] text-white p-8 relative flex flex-col justify-between overflow-hidden">
+                    <div className="w-full md:w-[55%] bg-transparent text-white p-8 relative flex flex-col justify-between overflow-hidden">
 
                         {/* Brand Logo Watermark */}
                         {getBrandLogo(car.make) && (
@@ -318,7 +318,7 @@ export function FleetCard({
                     </div>
 
                     {/* RIGHT SIDE: DARK (Options + Total) */}
-                    <div className="w-full md:w-[45%] bg-[#18181b] border-l border-zinc-800 p-6 flex flex-col relative">
+                    <div className="w-full md:w-[45%] bg-zinc-900/50 backdrop-blur-md border-l border-zinc-800/50 p-6 flex flex-col relative">
 
                         {/* Close Button */}
                         <button
