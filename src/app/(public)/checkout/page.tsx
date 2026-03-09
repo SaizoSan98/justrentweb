@@ -79,19 +79,31 @@ export default async function CheckoutPage({
           console.log(`Checkout: Fetched fresh Renteon price: ${renteonPrice} EUR, dailyRate: ${renteonDailyRate}, Deposit: ${renteonDeposit}, Unlimited km: ${renteonUnlimitedMileagePrice}`);
 
           if (renteonItem.renteonInsurances && renteonItem.renteonInsurances.length > 0) {
-            car.insuranceOptions = renteonItem.renteonInsurances.map((ins: any, index: number) => ({
-              id: ins.id,
-              carId: car.id,
-              planId: ins.id,
-              pricePerDay: Number(ins.pricePerDay),
-              deposit: Number(ins.deposit),
-              plan: {
-                id: ins.id,
-                name: ins.name,
-                description: "",
-                order: index
+            // MATCH Renteon IDs to internal DB IDs to prevent foreign key errors
+            const dbPlans = await prisma.insurancePlan.findMany({
+              where: {
+                renteonId: {
+                  in: renteonItem.renteonInsurances.map((ins: any) => ins.id?.toString())
+                }
               }
-            }));
+            });
+
+            car.insuranceOptions = renteonItem.renteonInsurances.map((ins: any, index: number) => {
+              const dbPlan = dbPlans.find(p => p.renteonId === ins.id?.toString());
+              return {
+                id: dbPlan?.id || ins.id, // Prefer DB ID for foreign key compatibility
+                carId: car.id,
+                planId: dbPlan?.id || ins.id,
+                pricePerDay: Number(ins.pricePerDay),
+                deposit: Number(ins.deposit),
+                plan: {
+                  id: dbPlan?.id || ins.id,
+                  name: ins.name,
+                  description: dbPlan?.description || "",
+                  order: dbPlan?.order ?? index
+                }
+              };
+            });
           }
         }
       }

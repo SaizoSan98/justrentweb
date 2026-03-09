@@ -68,15 +68,15 @@ export async function checkRealTimeAvailability(
                 const dOut = new Date(data.DateOut);
                 const dIn = new Date(data.DateIn);
                 const rentalDays = Math.max(1, Math.round((dIn.getTime() - dOut.getTime()) / (1000 * 60 * 60 * 24)));
-                const dailyRate = rentService ? (rentService.ServicePrice.AmountTotal / rentalDays) : (data.Total / rentalDays);
+                const dailyRate = rentService ? ((rentService.ServicePrice?.AmountTotal || rentService.ServicePrice?.Amount || 0) / rentalDays) : (data.Total / rentalDays);
 
                 // Extract insurances
                 const renteonInsurances = data.Services
                     .filter((s: any) => s.ServiceTypeName === 'Insurance' || s.Name.toLowerCase().includes('insurance') || s.Name.toLowerCase().includes('protect'))
                     .map((ins: any) => ({
-                        id: ins.ServiceId?.toString() || ins.ServiceGuid,
+                        id: ins.ServiceId?.toString() || ins.Id?.toString() || ins.ServiceGuid,
                         name: ins.ServiceName || ins.Name,
-                        pricePerDay: ins.ServicePrice?.Amount / rentalDays,
+                        pricePerDay: (ins.ServicePrice?.AmountTotal !== undefined ? ins.ServicePrice.AmountTotal : (ins.ServicePrice?.Amount || 0)) / rentalDays,
                         deposit: (ins.InsuranceDepositAmount !== null && ins.InsuranceDepositAmount !== undefined) ? ins.InsuranceDepositAmount : (data.Deposit || 0),
                     }));
 
@@ -85,7 +85,7 @@ export async function checkRealTimeAvailability(
                     Amount: data.Total,
                     dailyRate: dailyRate,
                     DepositAmount: data.Deposit,
-                    unlimitedMileagePrice: unlimitedService ? unlimitedService.ServicePrice.Amount : null,
+                    unlimitedMileagePrice: unlimitedService ? (unlimitedService.ServicePrice?.AmountTotal || unlimitedService.ServicePrice?.Amount || 0) : null,
                     renteonInsurances: renteonInsurances
                 });
             } else if (res.status === 422 && promoCode) {

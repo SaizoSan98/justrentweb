@@ -433,7 +433,12 @@ export function FleetCard({
                                                     </div>
                                                 </div>
                                             </div>
-                                            <span className="font-bold text-sm text-zinc-300">+{car.unlimitedMileagePrice} €</span>
+                                            <div className="text-right">
+                                                <div className={cn("font-bold text-sm", mileageOption === 'UNLIMITED' ? "text-white" : "text-zinc-300")}>
+                                                    +{Number((car.unlimitedMileagePrice * diffDays).toFixed(1))} €
+                                                </div>
+                                                <div className="text-[10px] text-zinc-500">({Number(car.unlimitedMileagePrice.toFixed(1))} €/day)</div>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
