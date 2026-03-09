@@ -113,8 +113,8 @@ export function FleetCard({
     // Insurance Logic
     const insuranceOptions = car.insuranceOptions?.sort((a, b) => (a.plan?.order || 0) - (b.plan?.order || 0)) || []
 
-    // Initialize default insurance
-    const defaultInsuranceId = insuranceOptions.length > 0 ? insuranceOptions[0].planId : ""
+    // Initialize default insurance (Prioritize 0-priced "Basic" insurance)
+    const defaultInsuranceId = insuranceOptions.find(o => o.pricePerDay === 0)?.planId || (insuranceOptions.length > 0 ? insuranceOptions[0].planId : "")
     const effectiveInsuranceId = selectedInsuranceId || defaultInsuranceId
 
     const selectedOption = insuranceOptions.find(o => o.planId === effectiveInsuranceId)
