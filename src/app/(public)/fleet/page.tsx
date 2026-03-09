@@ -177,6 +177,9 @@ export default async function FleetPage({
     });
   }
 
+  // FILTER: Remove unavailable cars
+  allAvailableCars = allAvailableCars.filter(car => car.isAvailable);
+
   // SORTING: Available first (Price ASC), then Unavailable (Price ASC)
   allAvailableCars.sort((a, b) => {
     // 1. Availability (Available first)
