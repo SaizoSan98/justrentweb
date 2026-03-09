@@ -736,7 +736,10 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
                   <h4 className="font-bold text-zinc-900 flex items-center gap-2">
                     {dictionary.fleet.unlimited} {dictionary.common.km}
                   </h4>
-                  <span className="font-bold text-zinc-900">+{Number(((car.unlimitedMileagePrice || 0) * days).toFixed(1))} €</span>
+                  <div className="text-right">
+                    <span className="font-bold text-zinc-900">+€{Number(((car.unlimitedMileagePrice || 0) * days).toFixed(1))}</span>
+                    <div className="text-[10px] text-zinc-400 font-normal">€{Number((car.unlimitedMileagePrice || 0).toFixed(1))} {dictionary.booking.per_day}</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1000,8 +1003,11 @@ export function CheckoutForm({ car, extras, startDate: initialStartDate, endDate
 
                     {mileagePrice > 0 && (
                       <div className="flex justify-between text-zinc-500">
-                        <span>{dictionary.fleet.unlimited} {dictionary.common.km}</span>
-                        <span>+€{Number(mileagePrice.toFixed(1))}</span>
+                        <div className="flex flex-col">
+                          <span>{dictionary.fleet.unlimited} {dictionary.common.km}</span>
+                          <span className="text-[10px] opacity-70">€{Number((car.unlimitedMileagePrice || 0).toFixed(1))} × {days} {dictionary.common.days}</span>
+                        </div>
+                        <span className="font-bold">+€{Number(mileagePrice.toFixed(1))}</span>
                       </div>
                     )}
 
