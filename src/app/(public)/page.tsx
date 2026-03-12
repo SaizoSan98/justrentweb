@@ -47,31 +47,50 @@ export default async function LandingPage() {
   })
 
   // Fetch Real-time Renteon prices for the featured cars
-  // We use a default 3-day window starting tomorrow to get accurate base rates
-  const rentDateOut = new Date();
-  rentDateOut.setDate(rentDateOut.getDate() + 1);
-  const rentDateIn = new Date(rentDateOut);
-  rentDateIn.setDate(rentDateIn.getDate() + 3);
+  // Stage 1: Try tomorrow (3-day window)
+  const rentDateOut1 = new Date();
+  rentDateOut1.setDate(rentDateOut1.getDate() + 1);
+  const rentDateIn1 = new Date(rentDateOut1);
+  rentDateIn1.setDate(rentDateIn1.getDate() + 3);
 
   let renteonPrices = new Map<number, number>();
-  try {
-    const renteonResult = await checkRealTimeAvailability(rentDateOut, rentDateIn);
-    if (renteonResult.success && Array.isArray(renteonResult.data)) {
-      renteonResult.data.forEach((item: any) => {
-        const catId = item.CarCategoryId || item.CategoryId || item.Id;
-        if (catId && item.dailyRate > 0) {
-          renteonPrices.set(catId, Number(item.dailyRate));
-        } else if (catId && item.Amount) {
-          // Fallback if dailyRate is missing but Amount is present
-          renteonPrices.set(catId, Number(item.Amount) / 3);
-        }
-      });
+
+  async function fetchPrices(dOut: Date, dIn: Date) {
+    try {
+      const renteonResult = await checkRealTimeAvailability(dOut, dIn);
+      if (renteonResult.success && Array.isArray(renteonResult.data)) {
+        renteonResult.data.forEach((item: any) => {
+          const catId = item.CarCategoryId || item.CategoryId || item.Id;
+          if (catId && item.dailyRate > 0) {
+            // Only set if not already present or if we want to ensure we get a price
+            if (!renteonPrices.has(catId)) {
+              renteonPrices.set(catId, Number(item.dailyRate));
+            }
+          }
+        });
+        return true;
+      }
+    } catch (err) {
+      console.error("Failed to fetch featured car Renteon prices:", err);
     }
-  } catch (err) {
-    console.error("Failed to fetch featured car Renteon prices:", err);
+    return false;
   }
 
-  // Serialize cars to avoid Decimal issues, and apply Renteon prices
+  // Initial fetch for tomorrow
+  await fetchPrices(rentDateOut1, rentDateIn1);
+
+  // Stage 2: Fallback to 30 days in the future if we don't have prices for all featured cars
+  // (We check if at least one price was found, or we could check specific cars)
+  const hasAtLeastOnePrice = renteonPrices.size > 0;
+  if (!hasAtLeastOnePrice) {
+    const rentDateOut2 = new Date();
+    rentDateOut2.setDate(rentDateOut2.getDate() + 30);
+    const rentDateIn2 = new Date(rentDateOut2);
+    rentDateIn2.setDate(rentDateOut2.getDate() + 3);
+    await fetchPrices(rentDateOut2, rentDateIn2);
+  }
+
+  // Serialize cars and apply Renteon prices
   const serializedFeaturedCars = featuredCars.map(car => {
     const catId = mapCarToCategoryId(car);
     const rRate = renteonPrices.get(catId);
@@ -79,7 +98,7 @@ export default async function LandingPage() {
     return {
       ...car,
       categories: car.categories,
-      // Use Renteon daily rate or 0 if not available (to avoid showing DB price)
+      // Use Renteon daily rate. If still missing, we set to 0 and filter out.
       pricePerDay: rRate ? Math.round(rRate) : 0,
       deposit: Number(car.deposit),
       fullInsurancePrice: Number(car.fullInsurancePrice),
@@ -93,7 +112,7 @@ export default async function LandingPage() {
       pricingTiers: [], // Not needed for featured card
       insuranceOptions: [] // Not needed for featured card
     };
-  }).filter(c => c.pricePerDay > 0); // Only show if we got a valid Renteon price
+  }).filter(c => c.pricePerDay > 0); // User specifically asked for ONLY Renteon prices
 
   return (
     <div className="flex flex-col min-h-screen bg-white font-sans selection:bg-blue-100 selection:text-blue-900">
