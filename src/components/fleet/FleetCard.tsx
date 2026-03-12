@@ -165,12 +165,6 @@ export function FleetCard({
                         {car.make} {car.model}
                     </h3>
                     <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
-                        {car.categories?.[0]?.name && (
-                            <>
-                                <span className="truncate">{car.categories[0].name}</span>
-                                <span className="text-zinc-600">|</span>
-                            </>
-                        )}
                         <span>{dictionary.fleet.or_similar_class?.toUpperCase() || "OR SIMILAR"}</span>
                     </p>
                 </div>
@@ -270,7 +264,6 @@ export function FleetCard({
                                 <span className="font-mono opacity-50">ID: {car.renteonId || car.id.slice(0, 8)}</span>
                             </p>
                             <div className="flex items-center gap-2 mt-2">
-                                <span className="bg-zinc-800 text-zinc-300 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">{car.categories?.[0]?.name}</span>
                                 <span className="bg-zinc-800 text-zinc-300 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">{car.transmission}</span>
                                 <span className="bg-zinc-800 text-zinc-300 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">{car.fuelType}</span>
                             </div>
